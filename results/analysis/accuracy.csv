@@ -1,0 +1,6 @@
+dataset,seeds,test_accuracy_mean,test_accuracy_std,test_balanced_accuracy_mean,test_balanced_accuracy_std,test_accuracy_no_patch_mean,test_accuracy_no_patch_std,test_accuracy_conflicting_patch_mean,test_accuracy_conflicting_patch_std,shortcut_reliance_mean,shortcut_reliance_std
+mnist,3,99.35,0.04,99.34,0.04,,,,,,
+fashion_mnist,3,90.73,0.22,90.73,0.22,,,,,,
+pneumonia_mnist,3,83.97,2.11,78.98,2.93,,,,,,
+decoy_mnist,3,99.9,0.09,99.9,0.09,12.64,4.97,0.81,1.11,96.17,5.33
+decoy_pneumonia,3,99.73,0.27,99.65,0.36,37.71,0.3,0.53,0.27,99.47,0.27

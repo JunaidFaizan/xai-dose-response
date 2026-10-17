@@ -1,0 +1,26 @@
+dataset,criterion,mean_tau_between_seeds
+decoy_mnist,Deletion (black),0.867
+decoy_mnist,Deletion (blur),0.6
+decoy_mnist,Deletion (inpaint),0.6
+decoy_mnist,Insertion (blur),0.467
+decoy_mnist,Sanity (object px),0.6
+decoy_pneumonia,Deletion (black),0.333
+decoy_pneumonia,Deletion (blur),0.333
+decoy_pneumonia,Deletion (inpaint),0.067
+decoy_pneumonia,Insertion (blur),0.6
+decoy_pneumonia,Sanity (object px),0.867
+fashion_mnist,Deletion (black),0.733
+fashion_mnist,Deletion (blur),0.733
+fashion_mnist,Deletion (inpaint),1.0
+fashion_mnist,Insertion (blur),0.6
+fashion_mnist,Sanity (object px),0.733
+mnist,Deletion (black),1.0
+mnist,Deletion (blur),0.867
+mnist,Deletion (inpaint),0.867
+mnist,Insertion (blur),0.6
+mnist,Sanity (object px),1.0
+pneumonia_mnist,Deletion (black),0.6
+pneumonia_mnist,Deletion (blur),0.067
+pneumonia_mnist,Deletion (inpaint),0.333
+pneumonia_mnist,Insertion (blur),0.467
+pneumonia_mnist,Sanity (object px),0.867

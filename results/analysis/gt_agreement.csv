@@ -1,0 +1,31 @@
+dataset,seed,metric,tau_with_ground_truth
+decoy_mnist,1,Deletion (black),0.7999999999999999
+decoy_mnist,1,Deletion (blur),0.6
+decoy_mnist,1,Deletion (inpaint),0.39999999999999997
+decoy_mnist,1,Insertion (blur),0.19999999999999998
+decoy_mnist,1,Sanity (object px),-0.39999999999999997
+decoy_mnist,2,Deletion (black),0.7999999999999999
+decoy_mnist,2,Deletion (blur),0.9999999999999999
+decoy_mnist,2,Deletion (inpaint),0.7999999999999999
+decoy_mnist,2,Insertion (blur),0.7999999999999999
+decoy_mnist,2,Sanity (object px),0.0
+decoy_mnist,42,Deletion (black),0.7999999999999999
+decoy_mnist,42,Deletion (blur),0.9999999999999999
+decoy_mnist,42,Deletion (inpaint),0.7999999999999999
+decoy_mnist,42,Insertion (blur),0.7999999999999999
+decoy_mnist,42,Sanity (object px),-0.19999999999999998
+decoy_pneumonia,1,Deletion (black),-0.7999999999999999
+decoy_pneumonia,1,Deletion (blur),-0.6
+decoy_pneumonia,1,Deletion (inpaint),0.19999999999999998
+decoy_pneumonia,1,Insertion (blur),-0.39999999999999997
+decoy_pneumonia,1,Sanity (object px),0.19999999999999998
+decoy_pneumonia,2,Deletion (black),-0.6
+decoy_pneumonia,2,Deletion (blur),-0.39999999999999997
+decoy_pneumonia,2,Deletion (inpaint),0.19999999999999998
+decoy_pneumonia,2,Insertion (blur),-0.19999999999999998
+decoy_pneumonia,2,Sanity (object px),0.19999999999999998
+decoy_pneumonia,42,Deletion (black),0.39999999999999997
+decoy_pneumonia,42,Deletion (blur),0.0
+decoy_pneumonia,42,Deletion (inpaint),0.6
+decoy_pneumonia,42,Insertion (blur),0.6
+decoy_pneumonia,42,Sanity (object px),-0.19999999999999998

@@ -1,0 +1,85 @@
+
+=== decoy_mnist | seed 1 | 5 epochs | device cpu ===
+epoch 1/5 | loss 1.1652 | val acc 89.48%
+epoch 2/5 | loss 0.0861 | val acc 99.82%
+epoch 3/5 | loss 0.0219 | val acc 99.90%
+epoch 4/5 | loss 0.0160 | val acc 100.00%
+epoch 5/5 | loss 0.0118 | val acc 99.94%
+  test_accuracy=99.98, test_balanced_accuracy=99.98, training_minutes=2.1, test_accuracy_no_patch=9.16, test_accuracy_conflicting_patch=0.03, shortcut_reliance=99.95
+
+=== decoy_mnist | seed 2 | 5 epochs | device cpu ===
+epoch 1/5 | loss 1.1770 | val acc 88.82%
+epoch 2/5 | loss 0.1963 | val acc 99.90%
+epoch 3/5 | loss 0.0304 | val acc 99.96%
+epoch 4/5 | loss 0.0209 | val acc 99.98%
+epoch 5/5 | loss 0.0130 | val acc 99.90%
+  test_accuracy=99.95, test_balanced_accuracy=99.94, training_minutes=2.2, test_accuracy_no_patch=9.1, test_accuracy_conflicting_patch=0.02, shortcut_reliance=99.93
+
+=== decoy_pneumonia | seed 42 | 20 epochs | device cpu ===
+epoch 1/20 | loss 0.5811 | val acc 74.24%
+epoch 2/20 | loss 0.5759 | val acc 74.24%
+epoch 3/20 | loss 0.5746 | val acc 74.24%
+epoch 4/20 | loss 0.5779 | val acc 74.24%
+epoch 5/20 | loss 0.5695 | val acc 74.24%
+epoch 6/20 | loss 0.2432 | val acc 100.00%
+epoch 7/20 | loss 0.0110 | val acc 100.00%
+epoch 8/20 | loss 0.0113 | val acc 99.43%
+epoch 9/20 | loss 0.0162 | val acc 100.00%
+epoch 10/20 | loss 0.0028 | val acc 100.00%
+epoch 11/20 | loss 0.0023 | val acc 100.00%
+epoch 12/20 | loss 0.0049 | val acc 100.00%
+epoch 13/20 | loss 0.0031 | val acc 100.00%
+epoch 14/20 | loss 0.0019 | val acc 100.00%
+epoch 15/20 | loss 0.0028 | val acc 100.00%
+epoch 16/20 | loss 0.0036 | val acc 100.00%
+epoch 17/20 | loss 0.0017 | val acc 100.00%
+epoch 18/20 | loss 0.0014 | val acc 100.00%
+epoch 19/20 | loss 0.0019 | val acc 100.00%
+epoch 20/20 | loss 0.0011 | val acc 100.00%
+  test_accuracy=99.84, test_balanced_accuracy=99.79, training_minutes=0.7, test_accuracy_no_patch=38.14, test_accuracy_conflicting_patch=0.8, shortcut_reliance=99.2
+
+=== decoy_pneumonia | seed 1 | 20 epochs | device cpu ===
+epoch 1/20 | loss 0.6183 | val acc 74.24%
+epoch 2/20 | loss 0.5796 | val acc 74.24%
+epoch 3/20 | loss 0.5777 | val acc 74.24%
+epoch 4/20 | loss 0.5767 | val acc 74.24%
+epoch 5/20 | loss 0.5743 | val acc 74.24%
+epoch 6/20 | loss 0.5808 | val acc 74.24%
+epoch 7/20 | loss 0.5818 | val acc 74.24%
+epoch 8/20 | loss 0.5741 | val acc 74.24%
+epoch 9/20 | loss 0.5752 | val acc 74.24%
+epoch 10/20 | loss 0.5778 | val acc 74.24%
+epoch 11/20 | loss 0.5587 | val acc 74.24%
+epoch 12/20 | loss 0.2141 | val acc 100.00%
+epoch 13/20 | loss 0.0301 | val acc 100.00%
+epoch 14/20 | loss 0.0228 | val acc 100.00%
+epoch 15/20 | loss 0.0198 | val acc 100.00%
+epoch 16/20 | loss 0.0265 | val acc 100.00%
+epoch 17/20 | loss 0.0171 | val acc 100.00%
+epoch 18/20 | loss 0.0195 | val acc 100.00%
+epoch 19/20 | loss 0.0132 | val acc 100.00%
+epoch 20/20 | loss 0.0132 | val acc 100.00%
+  test_accuracy=100.0, test_balanced_accuracy=100.0, training_minutes=0.7, test_accuracy_no_patch=37.5, test_accuracy_conflicting_patch=0.16, shortcut_reliance=99.84
+
+=== decoy_pneumonia | seed 2 | 20 epochs | device cpu ===
+epoch 1/20 | loss 0.5890 | val acc 74.24%
+epoch 2/20 | loss 0.5752 | val acc 74.24%
+epoch 3/20 | loss 0.5758 | val acc 74.24%
+epoch 4/20 | loss 0.5758 | val acc 74.24%
+epoch 5/20 | loss 0.5755 | val acc 74.24%
+epoch 6/20 | loss 0.3857 | val acc 100.00%
+epoch 7/20 | loss 0.0321 | val acc 100.00%
+epoch 8/20 | loss 0.0067 | val acc 100.00%
+epoch 9/20 | loss 0.0069 | val acc 100.00%
+epoch 10/20 | loss 0.0010 | val acc 100.00%
+epoch 11/20 | loss 0.0094 | val acc 100.00%
+epoch 12/20 | loss 0.0012 | val acc 100.00%
+epoch 13/20 | loss 0.0033 | val acc 100.00%
+epoch 14/20 | loss 0.0023 | val acc 100.00%
+epoch 15/20 | loss 0.0006 | val acc 100.00%
+epoch 16/20 | loss 0.0024 | val acc 100.00%
+epoch 17/20 | loss 0.0004 | val acc 100.00%
+epoch 18/20 | loss 0.0011 | val acc 100.00%
+epoch 19/20 | loss 0.0002 | val acc 100.00%
+epoch 20/20 | loss 0.0001 | val acc 100.00%
+  test_accuracy=99.36, test_balanced_accuracy=99.15, training_minutes=0.7, test_accuracy_no_patch=37.5, test_accuracy_conflicting_patch=0.64, shortcut_reliance=99.36

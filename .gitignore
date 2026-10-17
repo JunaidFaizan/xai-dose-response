@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+
+# Datasets download automatically on first use (about 490 MB)
+data/
+
+# The 156 dose-response models (about 115 MB) are too large for git.
+# Their metrics JSON files are kept. Back the .pt files up separately
+# (for example a zip on cloud storage, or a GitHub release / Zenodo upload).
+checkpoint/dose/*.pt
+
+# Editor and OS files
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

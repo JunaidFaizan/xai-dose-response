@@ -1,0 +1,11 @@
+{
+  "dataset": "mnist",
+  "seed": 1,
+  "epochs": 10,
+  "batch_size": 128,
+  "learning_rate": 0.001,
+  "best_val_accuracy": 99.18,
+  "test_accuracy": 99.4,
+  "test_balanced_accuracy": 99.4,
+  "training_minutes": 5.1
+}

@@ -1,0 +1,50 @@
+mnist_patch_dose-005_seed42: reliance 0.22% | acc 98.84% | no shortcut 98.66% | 1.66 min
+mnist_patch_dose-005_seed1: reliance 0.15% | acc 98.95% | no shortcut 98.78% | 1.63 min
+mnist_patch_dose-005_seed2: reliance 0.18% | acc 99.0% | no shortcut 98.71% | 1.63 min
+mnist_patch_dose+002_seed42: reliance 68.52% | acc 99.73% | no shortcut 74.46% | 1.71 min
+mnist_patch_dose+002_seed1: reliance 53.12% | acc 99.74% | no shortcut 57.27% | 1.62 min
+mnist_patch_dose+002_seed2: reliance 45.18% | acc 99.69% | no shortcut 79.67% | 1.64 min
+mnist_patch_dose+005_seed42: reliance 75.67% | acc 99.69% | no shortcut 34.51% | 1.64 min
+mnist_patch_dose+005_seed1: reliance 75.72% | acc 99.9% | no shortcut 33.37% | 1.63 min
+mnist_patch_dose+005_seed2: reliance 77.26% | acc 99.86% | no shortcut 38.54% | 1.62 min
+mnist_texture_dose-005_seed42: reliance 2.43% | acc 99.35% | no shortcut 95.54% | 1.7 min
+mnist_texture_dose-005_seed1: reliance 0.18% | acc 98.99% | no shortcut 98.74% | 1.72 min
+mnist_texture_dose-005_seed2: reliance 1.3% | acc 99.47% | no shortcut 97.2% | 1.72 min
+mnist_texture_dose+002_seed42: reliance 98.38% | acc 99.99% | no shortcut 33.69% | 1.75 min
+mnist_texture_dose+002_seed1: reliance 87.94% | acc 99.93% | no shortcut 34.78% | 1.71 min
+mnist_texture_dose+002_seed2: reliance 92.39% | acc 99.99% | no shortcut 35.2% | 1.72 min
+mnist_texture_dose+005_seed42: reliance 99.64% | acc 100.0% | no shortcut 25.5% | 1.72 min
+mnist_texture_dose+005_seed1: reliance 98.51% | acc 99.98% | no shortcut 20.47% | 1.73 min
+mnist_texture_dose+005_seed2: reliance 99.35% | acc 100.0% | no shortcut 27.45% | 1.72 min
+pneumonia_mnist_patch_dose-005_seed42: reliance 34.94% | acc 92.79% | no shortcut 86.86% | 0.76 min
+pneumonia_mnist_patch_dose-005_seed1: reliance 36.22% | acc 94.23% | no shortcut 69.39% | 0.75 min
+pneumonia_mnist_patch_dose-005_seed2: reliance 26.12% | acc 91.99% | no shortcut 89.58% | 0.75 min
+pneumonia_mnist_patch_dose+002_seed42: reliance 77.56% | acc 96.79% | no shortcut 57.21% | 0.75 min
+pneumonia_mnist_patch_dose+002_seed1: reliance 57.05% | acc 94.71% | no shortcut 74.84% | 0.75 min
+pneumonia_mnist_patch_dose+002_seed2: reliance 71.15% | acc 98.08% | no shortcut 64.42% | 0.75 min
+pneumonia_mnist_patch_dose+005_seed42: reliance 92.79% | acc 98.56% | no shortcut 43.27% | 0.77 min
+pneumonia_mnist_patch_dose+005_seed1: reliance 99.36% | acc 100.0% | no shortcut 63.14% | 0.89 min
+pneumonia_mnist_patch_dose+005_seed2: reliance 92.31% | acc 98.56% | no shortcut 44.39% | 0.86 min
+pneumonia_mnist_texture_dose-005_seed42: reliance 38.3% | acc 96.79% | no shortcut 86.54% | 0.89 min
+pneumonia_mnist_texture_dose-005_seed1: reliance 40.71% | acc 96.96% | no shortcut 88.3% | 0.89 min
+pneumonia_mnist_texture_dose-005_seed2: reliance 36.86% | acc 95.83% | no shortcut 86.54% | 0.9 min
+pneumonia_mnist_texture_dose+002_seed42: reliance 100.0% | acc 99.68% | no shortcut 77.24% | 0.89 min
+pneumonia_mnist_texture_dose+002_seed1: reliance 93.75% | acc 100.0% | no shortcut 81.89% | 0.9 min
+pneumonia_mnist_texture_dose+002_seed2: reliance 96.79% | acc 99.68% | no shortcut 71.79% | 0.91 min
+pneumonia_mnist_texture_dose+005_seed42: reliance 100.0% | acc 99.84% | no shortcut 74.68% | 0.89 min
+pneumonia_mnist_texture_dose+005_seed1: reliance 98.88% | acc 100.0% | no shortcut 54.49% | 0.9 min
+pneumonia_mnist_texture_dose+005_seed2: reliance 98.08% | acc 99.68% | no shortcut 73.08% | 0.89 min
+evaluated mnist_patch_dose-040_seed42 (11 s)
+evaluated mnist_patch_dose-040_seed1 (11 s)
+evaluated mnist_patch_dose-040_seed2 (13 s)
+evaluated mnist_patch_dose-025_seed42 (12 s)
+evaluated mnist_patch_dose-025_seed1 (14 s)
+evaluated mnist_patch_dose-025_seed2 (11 s)
+evaluated mnist_patch_dose-010_seed42 (12 s)
+evaluated mnist_patch_dose-010_seed1 (11 s)
+evaluated mnist_patch_dose-010_seed2 (13 s)
+evaluated mnist_patch_dose-005_seed42 (10 s)
+evaluated mnist_patch_dose-005_seed1 (10 s)
+evaluated mnist_patch_dose-005_seed2 (11 s)
+evaluated mnist_patch_dose+000_seed42 (12 s)
+evaluated mnist_patch_dose+000_seed1 (11 s)

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Explainable CNN Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+<header class="topbar">
+    <div>
+        <h1>Explainable CNN Dashboard</h1>
+        <p class="subtitle">Comparing and evaluating explanation methods for image classifiers</p>
+    </div>
+    <fieldset class="dataset-switch">
+        <legend>Dataset</legend>
+        {% for name, info in page_config.datasets.items() %}
+        <label>
+            <input type="radio" name="dataset" value="{{ name }}" {% if loop.first %}checked{% endif %}>
+            <span>{{ info.title }}</span>
+        </label>
+        {% endfor %}
+    </fieldset>
+</header>
+
+<main>
+    <section class="panel input-panel" aria-labelledby="input-heading">
+        <h2 id="input-heading">1. Input</h2>
+        <p class="hint" id="draw-hint">Draw a digit in the box, upload an image, or pick a test image.</p>
+        <canvas id="draw-canvas" width="280" height="280" role="img"
+                aria-label="Drawing area. Draw with the mouse, pen or finger."></canvas>
+        <div class="button-row">
+            <button type="button" id="explain-btn" class="primary">Explain drawing</button>
+            <button type="button" id="clear-btn">Clear</button>
+        </div>
+        <div class="button-row">
+            <button type="button" id="sample-btn">Random test image</button>
+            <label class="file-button">
+                Upload image
+                <input type="file" id="upload-input" accept="image/png,image/jpeg,image/webp">
+            </label>
+        </div>
+        <div class="model-input">
+            <canvas id="input-preview" width="112" height="112" role="img"
+                    aria-label="The 28 by 28 image the model receives"></canvas>
+            <p>What the model sees<br><small>(28×28 after cropping and centering)</small></p>
+        </div>
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="panel prediction-panel" aria-labelledby="prediction-heading">
+        <h2 id="prediction-heading">2. Prediction</h2>
+        <div id="prediction" class="prediction" aria-live="polite">No input yet.</div>
+        <div id="probabilities" class="probabilities"></div>
+    </section>
+
+    <section class="panel explanations-panel" aria-labelledby="explanations-heading">
+        <div class="panel-header">
+            <h2 id="explanations-heading">3. Explanations</h2>
+            <button type="button" id="sanity-btn" disabled>Run sanity check</button>
+        </div>
+        <p class="hint">
+            Each heatmap shows which pixels supported the predicted class (red = most important).
+            <strong>Deletion AUC</strong>: pixels are removed in the order the method ranks them;
+            a lower area under the probability curve means a more faithful explanation.
+        </p>
+        <div id="method-cards" class="method-cards">
+            {% for name, info in page_config.methods.items() %}
+            <article class="card" data-method="{{ name }}">
+                <h3>{{ info.title }}</h3>
+                <p class="badge-slot"><span class="badge" hidden>Most faithful here</span></p>
+                <canvas class="heatmap" width="168" height="168" role="img"
+                        aria-label="{{ info.title }} heatmap"></canvas>
+                <p class="score">Deletion AUC: <span class="auc">–</span></p>
+                <div class="sanity" hidden>
+                    <p class="sanity-label">Randomized model</p>
+                    <canvas class="heatmap sanity-heatmap" width="168" height="168" role="img"
+                            aria-label="{{ info.title }} heatmap for a randomized model"></canvas>
+                    <p class="score">Correlation: <span class="correlation">–</span></p>
+                </div>
+                <p class="description">{{ info.description }}</p>
+            </article>
+            {% endfor %}
+        </div>
+        <p id="sanity-note" class="hint" hidden>
+            <strong>Sanity check</strong>: the same input explained by the model with all weights
+            randomized. A trustworthy method should give a different map, so a correlation
+            (object pixels, Spearman) near 0 is good and near 1 is bad.
+        </p>
+    </section>
+
+    <section class="panel chart-panel" aria-labelledby="chart-heading">
+        <h2 id="chart-heading">4. Deletion curves for this input</h2>
+        <canvas id="deletion-chart" width="520" height="300" role="img"
+                aria-label="Deletion curves: probability of the predicted class as pixels are removed"></canvas>
+        <ul id="chart-legend" class="legend"></ul>
+    </section>
+
+    <section class="panel benchmark-panel" aria-labelledby="benchmark-heading">
+        <h2 id="benchmark-heading">5. Benchmark results (test set)</h2>
+        <p class="hint">
+            Test-set averages over all trained seeds, from <code>evaluate_explanations.py</code> and
+            <code>analyze_results.py</code>. Arrows show whether lower (↓) or higher (↑) is better.
+            Ground-truth columns appear only for the decoy (shortcut) datasets.
+        </p>
+        <div id="benchmark" class="table-wrap"></div>
+    </section>
+</main>
+
+<script id="page-config" type="application/json">{{ page_config | tojson }}</script>
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+</body>
+</html>

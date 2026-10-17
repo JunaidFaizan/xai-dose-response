@@ -1,0 +1,7 @@
+method,deletion_zero,deletion_zero_std,deletion_blur,deletion_blur_std,deletion_inpaint,deletion_inpaint_std,insertion_blur,insertion_blur_std,corr_all,corr_all_std,corr_object,corr_object_std,mass_accuracy,mass_accuracy_std,rank_accuracy,rank_accuracy_std,corr_object_output_layer
+Saliency,0.159,0.056,0.205,0.084,0.239,0.109,0.947,0.015,0.372,0.045,-0.043,0.029,0.096,0.033,0.275,0.07,0.498
+SmoothGrad,0.149,0.048,0.192,0.075,0.212,0.093,0.948,0.012,0.431,0.079,-0.053,0.041,0.095,0.023,0.314,0.06,0.62
+Integrated Gradients,0.103,0.031,0.146,0.073,0.175,0.117,0.959,0.011,0.988,0.001,0.265,0.036,0.709,0.037,0.8,0.05,0.616
+Grad-CAM,0.448,0.071,0.489,0.084,0.476,0.086,0.69,0.046,-0.022,0.033,0.008,0.063,0.043,0.015,0.101,0.051,0.111
+Occlusion,0.091,0.022,0.126,0.041,0.092,0.018,0.963,0.016,0.342,0.04,-0.208,0.022,0.539,0.021,0.65,0.004,0.45
+Random (baseline),0.591,0.063,0.686,0.07,0.795,0.041,0.689,0.059,,,,,0.011,0.0,0.013,0.002,

@@ -1,0 +1,11 @@
+{
+  "dataset": "pneumonia_mnist",
+  "seed": 1,
+  "epochs": 20,
+  "batch_size": 128,
+  "learning_rate": 0.001,
+  "best_val_accuracy": 96.56,
+  "test_accuracy": 86.38,
+  "test_balanced_accuracy": 82.18,
+  "training_minutes": 0.8
+}

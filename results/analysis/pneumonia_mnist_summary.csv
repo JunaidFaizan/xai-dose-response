@@ -1,0 +1,7 @@
+method,deletion_zero,deletion_zero_std,deletion_blur,deletion_blur_std,deletion_inpaint,deletion_inpaint_std,insertion_blur,insertion_blur_std,corr_all,corr_all_std,corr_object,corr_object_std,corr_object_output_layer
+Saliency,0.674,0.041,0.778,0.028,0.78,0.003,0.872,0.003,0.56,0.018,0.559,0.018,0.931
+SmoothGrad,0.695,0.084,0.774,0.03,0.744,0.019,0.874,0.005,0.879,0.023,0.879,0.023,0.98
+Integrated Gradients,0.253,0.08,0.814,0.065,0.811,0.035,0.806,0.037,0.59,0.007,0.589,0.007,0.816
+Grad-CAM,0.565,0.192,0.847,0.026,0.755,0.013,0.786,0.021,-0.467,0.085,-0.467,0.085,-0.407
+Occlusion,0.247,0.133,0.826,0.056,0.769,0.053,0.794,0.05,0.474,0.048,0.473,0.048,0.829
+Random (baseline),0.626,0.106,0.828,0.017,0.864,0.004,0.823,0.015,,,,,

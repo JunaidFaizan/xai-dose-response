@@ -1,0 +1,15 @@
+{
+  "base": "mnist",
+  "shortcut": "texture",
+  "dose": 0.02,
+  "swap_fraction": 0.02,
+  "shortcut_noise": 0.0,
+  "seed": 2,
+  "epochs": 3,
+  "best_val_accuracy": 99.84,
+  "test_accuracy": 99.99,
+  "test_accuracy_no_shortcut": 35.2,
+  "test_accuracy_conflicting": 4.92,
+  "reliance": 92.39,
+  "training_minutes": 1.72
+}

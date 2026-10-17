@@ -1,0 +1,411 @@
+dataset,criterion,method_a,method_b,n,median_advantage_a,better,p_value,p_holm,significant
+mnist,Deletion (black),Saliency,SmoothGrad,600,-0.01132273674011229,SmoothGrad,3.1229031140941436e-12,3.1229031140941436e-12,True
+mnist,Deletion (black),Saliency,Integrated Gradients,600,-0.16733396798372274,Integrated Gradients,8.367358703743431e-94,8.367358703743432e-93,True
+mnist,Deletion (black),Saliency,Grad-CAM,600,0.14991721510887146,Saliency,5.5270040984209155e-49,1.1054008196841831e-48,True
+mnist,Deletion (black),Saliency,Occlusion,600,-0.11552701145410539,Occlusion,1.1205571296537588e-72,7.843899907576312e-72,True
+mnist,Deletion (black),Saliency,Random (baseline),600,0.3991681858897209,Saliency,7.158767444001258e-100,9.113047391792837e-99,True
+mnist,Deletion (black),SmoothGrad,Integrated Gradients,600,-0.14823694154620176,Integrated Gradients,5.895013633286555e-90,4.716010906629244e-89,True
+mnist,Deletion (black),SmoothGrad,Grad-CAM,600,0.17402547597885137,SmoothGrad,3.447983169601122e-61,1.3791932678404487e-60,True
+mnist,Deletion (black),SmoothGrad,Occlusion,600,-0.08362433314323431,Occlusion,1.6305490888120595e-69,9.783294532872356e-69,True
+mnist,Deletion (black),SmoothGrad,Random (baseline),600,0.42407748103141785,SmoothGrad,6.509319565566313e-100,9.113047391792837e-99,True
+mnist,Deletion (black),Integrated Gradients,Grad-CAM,600,0.3277706876397133,Integrated Gradients,8.809380149437906e-97,9.690318164381696e-96,True
+mnist,Deletion (black),Integrated Gradients,Occlusion,600,0.0444029048085213,Integrated Gradients,8.446231693373051e-53,2.5338695080119154e-52,True
+mnist,Deletion (black),Integrated Gradients,Random (baseline),600,0.6018747193738818,Integrated Gradients,5.978238429493547e-100,8.96735764424032e-99,True
+mnist,Deletion (black),Grad-CAM,Occlusion,600,-0.27716614678502083,Occlusion,1.4863558704805879e-91,1.337720283432529e-90,True
+mnist,Deletion (black),Grad-CAM,Random (baseline),600,0.24844047427177432,Grad-CAM,2.3570080269270196e-64,1.1785040134635098e-63,True
+mnist,Deletion (black),Occlusion,Random (baseline),600,0.5304359793663025,Occlusion,6.981841309630338e-100,9.113047391792837e-99,True
+mnist,Deletion (blur),Saliency,SmoothGrad,600,-0.02446258068084714,SmoothGrad,1.8041710840830246e-28,9.020855420415124e-28,True
+mnist,Deletion (blur),Saliency,Integrated Gradients,600,0.019980788230895954,Saliency,0.007094798956303578,0.007094798956303578,True
+mnist,Deletion (blur),Saliency,Grad-CAM,600,0.2345961034297943,Saliency,2.4267670236641585e-87,2.4267670236641587e-86,True
+mnist,Deletion (blur),Saliency,Occlusion,600,0.055269315838813754,Saliency,1.81377294573135e-21,7.2550917829254e-21,True
+mnist,Deletion (blur),Saliency,Random (baseline),600,0.39024960994720453,Saliency,6.068711692866593e-100,9.012368473547757e-99,True
+mnist,Deletion (blur),SmoothGrad,Integrated Gradients,600,0.055754259228706415,SmoothGrad,1.516387868238318e-11,4.5491636047149544e-11,True
+mnist,Deletion (blur),SmoothGrad,Grad-CAM,600,0.2709210105240345,SmoothGrad,2.6163977464661684e-92,2.878037521112785e-91,True
+mnist,Deletion (blur),SmoothGrad,Occlusion,600,0.08123884350061421,SmoothGrad,1.207856170475951e-46,7.247137022855706e-46,True
+mnist,Deletion (blur),SmoothGrad,Random (baseline),600,0.42721696197986603,SmoothGrad,6.008245649031838e-100,9.012368473547757e-99,True
+mnist,Deletion (blur),Integrated Gradients,Grad-CAM,600,0.21036510169506079,Integrated Gradients,2.492793301552226e-64,2.2435139713970034e-63,True
+mnist,Deletion (blur),Integrated Gradients,Occlusion,600,0.04215094447135925,Integrated Gradients,1.066325572426792e-07,2.132651144853584e-07,True
+mnist,Deletion (blur),Integrated Gradients,Random (baseline),600,0.3624473363161087,Integrated Gradients,2.47258714091111e-99,2.967104569093332e-98,True
+mnist,Deletion (blur),Grad-CAM,Occlusion,600,-0.16652100533246994,Occlusion,9.77329465020282e-63,7.818635720162257e-62,True
+mnist,Deletion (blur),Grad-CAM,Random (baseline),600,0.14120152592659,Grad-CAM,2.978784853930415e-51,2.0851493977512903e-50,True
+mnist,Deletion (blur),Occlusion,Random (baseline),600,0.33705778419971466,Occlusion,1.2788330080557724e-99,1.6624829104725043e-98,True
+mnist,Deletion (inpaint),Saliency,SmoothGrad,600,-0.07866105437278753,SmoothGrad,7.030744726491805e-67,5.624595781193444e-66,True
+mnist,Deletion (inpaint),Saliency,Integrated Gradients,600,-0.12167014926671986,Integrated Gradients,2.088015332631371e-16,6.264045997894113e-16,True
+mnist,Deletion (inpaint),Saliency,Grad-CAM,600,0.1475064605474472,Saliency,4.019386788310916e-50,2.4116320729865497e-49,True
+mnist,Deletion (inpaint),Saliency,Occlusion,600,-0.17210622876882553,Occlusion,7.488197287205687e-50,3.7440986436028435e-49,True
+mnist,Deletion (inpaint),Saliency,Random (baseline),600,0.44365328550338745,Saliency,6.008245649031838e-100,8.96735764424032e-99,True
+mnist,Deletion (inpaint),SmoothGrad,Integrated Gradients,600,-0.06191062554717065,Integrated Gradients,0.1221796795485987,0.1221796795485987,False
+mnist,Deletion (inpaint),SmoothGrad,Grad-CAM,600,0.23791244626045227,SmoothGrad,2.39698787333946e-80,2.157289086005514e-79,True
+mnist,Deletion (inpaint),SmoothGrad,Occlusion,600,-0.09411615133285527,Occlusion,1.170302081522875e-26,4.6812083260915e-26,True
+mnist,Deletion (inpaint),SmoothGrad,Random (baseline),600,0.5358119159936905,SmoothGrad,5.978238429493547e-100,8.96735764424032e-99,True
+mnist,Deletion (inpaint),Integrated Gradients,Grad-CAM,600,0.24918828159570694,Integrated Gradients,1.2704005623085218e-52,8.892803936159653e-52,True
+mnist,Deletion (inpaint),Integrated Gradients,Occlusion,600,-0.01486987248063085,Occlusion,1.5518344650595611e-06,3.1036689301191222e-06,True
+mnist,Deletion (inpaint),Integrated Gradients,Random (baseline),600,0.5961284339427948,Integrated Gradients,4.195527735140212e-99,5.034633282168254e-98,True
+mnist,Deletion (inpaint),Grad-CAM,Occlusion,600,-0.29531512781977654,Occlusion,2.054394877656776e-83,2.054394877656776e-82,True
+mnist,Deletion (inpaint),Grad-CAM,Random (baseline),600,0.3031047880649567,Grad-CAM,2.411003828193049e-92,2.6521042110123537e-91,True
+mnist,Deletion (inpaint),Occlusion,Random (baseline),600,0.6439316496253014,Occlusion,9.42648368398471e-100,1.2254428789180124e-98,True
+mnist,Insertion (blur),Saliency,SmoothGrad,600,-0.00042623281478881836,SmoothGrad,0.005358693784148842,0.010717387568297683,True
+mnist,Insertion (blur),Saliency,Integrated Gradients,600,-0.017868667840957697,Integrated Gradients,2.3488182240382863e-40,1.6441727568268004e-39,True
+mnist,Insertion (blur),Saliency,Grad-CAM,600,0.13711586594581598,Saliency,5.946716523803768e-85,4.7573732190430145e-84,True
+mnist,Insertion (blur),Saliency,Occlusion,600,-0.002943962812423595,Occlusion,5.617037995628692e-06,2.2468151982514768e-05,True
+mnist,Insertion (blur),Saliency,Random (baseline),600,0.18826714158058172,Saliency,7.340166898701694e-100,1.0276233658182372e-98,True
+mnist,Insertion (blur),SmoothGrad,Integrated Gradients,600,-0.014100909233093262,Integrated Gradients,6.353998207573542e-34,3.176999103786771e-33,True
+mnist,Insertion (blur),SmoothGrad,Grad-CAM,600,0.14196616411209112,SmoothGrad,4.331332462888672e-87,3.898199216599805e-86,True
+mnist,Insertion (blur),SmoothGrad,Occlusion,600,-0.0009010434150696356,Occlusion,0.03867872059529077,0.03867872059529077,True
+mnist,Insertion (blur),SmoothGrad,Random (baseline),600,0.19426986575126642,SmoothGrad,6.316708654142046e-100,9.475062981213069e-99,True
+mnist,Insertion (blur),Integrated Gradients,Grad-CAM,600,0.1610240340232849,Integrated Gradients,1.6333418542962915e-89,1.6333418542962914e-88,True
+mnist,Insertion (blur),Integrated Gradients,Occlusion,600,0.015063256025314331,Integrated Gradients,1.4493914896131848e-36,8.696348937679108e-36,True
+mnist,Insertion (blur),Integrated Gradients,Random (baseline),600,0.20847547054290771,Integrated Gradients,1.365330137710945e-96,1.638396165253134e-95,True
+mnist,Insertion (blur),Grad-CAM,Occlusion,600,-0.1432158350944519,Occlusion,5.031086605320862e-91,5.534195265852949e-90,True
+mnist,Insertion (blur),Grad-CAM,Random (baseline),600,0.03648373484611511,Grad-CAM,4.314123350171126e-05,0.00012942370050513378,True
+mnist,Insertion (blur),Occlusion,Random (baseline),600,0.19475281238555903,Occlusion,1.5849333996774056e-98,2.0604134195806272e-97,True
+mnist,Sanity (object px),Saliency,SmoothGrad,150,0.23566901156932035,Saliency,1.5906243634140302e-25,1.4315619270726273e-24,True
+mnist,Sanity (object px),Saliency,Integrated Gradients,150,0.3635834021952171,Saliency,2.3463081875314243e-26,2.346308187531424e-25,True
+mnist,Sanity (object px),Saliency,Grad-CAM,124,0.1453090315272521,Saliency,2.5049300718920335e-11,1.2524650359460168e-10,True
+mnist,Sanity (object px),Saliency,Occlusion,150,0.040518160793833996,Saliency,9.309668586961344e-06,2.7929005760884035e-05,True
+mnist,Sanity (object px),SmoothGrad,Integrated Gradients,150,0.13284906651354925,SmoothGrad,3.5587001976500634e-13,2.4910901383550444e-12,True
+mnist,Sanity (object px),SmoothGrad,Grad-CAM,124,-0.10691188372503548,Grad-CAM,0.013278147655761064,0.023067709343046437,True
+mnist,Sanity (object px),SmoothGrad,Occlusion,150,-0.16207181864359974,Occlusion,8.963026090261355e-10,3.585210436104542e-09,True
+mnist,Sanity (object px),Integrated Gradients,Grad-CAM,124,-0.2226081001158079,Grad-CAM,1.0264120331091524e-11,6.158472198654915e-11,True
+mnist,Sanity (object px),Integrated Gradients,Occlusion,150,-0.3100022227273269,Occlusion,1.2518475411155537e-22,1.001478032892443e-21,True
+mnist,Sanity (object px),Grad-CAM,Occlusion,124,-0.04471692732262866,Occlusion,0.011533854671523219,0.023067709343046437,True
+fashion_mnist,Deletion (black),Saliency,SmoothGrad,600,-0.010730177164077759,SmoothGrad,2.1871293981772453e-05,4.3742587963544906e-05,True
+fashion_mnist,Deletion (black),Saliency,Integrated Gradients,600,-0.2043092418462038,Integrated Gradients,3.593224131954755e-92,3.9525465451502306e-91,True
+fashion_mnist,Deletion (black),Saliency,Grad-CAM,600,-0.02869489043951036,Grad-CAM,9.376004217147949e-06,2.8128012651443846e-05,True
+fashion_mnist,Deletion (black),Saliency,Occlusion,600,-0.21541852876544,Occlusion,1.3323101788272971e-93,1.7320032324754863e-92,True
+fashion_mnist,Deletion (black),Saliency,Random (baseline),600,0.14229074120521548,Saliency,1.259538451810919e-82,1.0076307614487352e-81,True
+fashion_mnist,Deletion (black),SmoothGrad,Integrated Gradients,600,-0.19846049882471561,Integrated Gradients,6.7313848927141e-91,6.7313848927141e-90,True
+fashion_mnist,Deletion (black),SmoothGrad,Grad-CAM,600,-0.014840558171272333,Grad-CAM,0.007795134379728009,0.007795134379728009,True
+fashion_mnist,Deletion (black),SmoothGrad,Occlusion,600,-0.20258053857833147,Occlusion,1.8864211935004984e-92,2.2637054322005983e-91,True
+fashion_mnist,Deletion (black),SmoothGrad,Random (baseline),600,0.15798379853367808,SmoothGrad,1.2308142763010635e-85,1.1077328486709572e-84,True
+fashion_mnist,Deletion (black),Integrated Gradients,Grad-CAM,600,0.14312199689447885,Integrated Gradients,1.8565372389799653e-80,1.1139223433879792e-79,True
+fashion_mnist,Deletion (black),Integrated Gradients,Occlusion,600,-0.0074516274034977514,Occlusion,4.725639593856342e-10,1.8902558375425367e-09,True
+fashion_mnist,Deletion (black),Integrated Gradients,Random (baseline),600,0.3614172562956811,Integrated Gradients,3.3024356827844733e-99,4.6234099558982626e-98,True
+fashion_mnist,Deletion (black),Grad-CAM,Occlusion,600,-0.1653268281370402,Occlusion,3.1308030946696556e-81,2.191562166268759e-80,True
+fashion_mnist,Deletion (black),Grad-CAM,Random (baseline),600,0.1611182689666748,Grad-CAM,7.958682247930091e-62,3.979341123965046e-61,True
+fashion_mnist,Deletion (black),Occlusion,Random (baseline),600,0.37029589526355267,Occlusion,2.1934175611761794e-99,3.2901263417642694e-98,True
+fashion_mnist,Deletion (blur),Saliency,SmoothGrad,600,-0.028423309326171903,SmoothGrad,9.038802875399275e-20,6.327162012779493e-19,True
+fashion_mnist,Deletion (blur),Saliency,Integrated Gradients,600,0.16091455146670341,Saliency,4.729111439303371e-43,3.783289151442697e-42,True
+fashion_mnist,Deletion (blur),Saliency,Grad-CAM,600,0.13898916542530065,Saliency,5.932876928271814e-46,5.339589235444633e-45,True
+fashion_mnist,Deletion (blur),Saliency,Occlusion,600,0.19819647073745736,Saliency,2.445964105510522e-61,2.9351569266126266e-60,True
+fashion_mnist,Deletion (blur),Saliency,Random (baseline),600,0.1945350244641304,Saliency,8.380360503715114e-86,1.173250470520116e-84,True
+fashion_mnist,Deletion (blur),SmoothGrad,Integrated Gradients,600,0.18856032192707062,SmoothGrad,5.499363516874498e-57,5.499363516874498e-56,True
+fashion_mnist,Deletion (blur),SmoothGrad,Grad-CAM,600,0.1548892855644226,SmoothGrad,6.312314772626612e-59,6.943546249889273e-58,True
+fashion_mnist,Deletion (blur),SmoothGrad,Occlusion,600,0.2304331110790372,SmoothGrad,4.663052100537203e-75,6.061967730698364e-74,True
+fashion_mnist,Deletion (blur),SmoothGrad,Random (baseline),600,0.23241151869297028,SmoothGrad,1.5592596818073403e-91,2.3388895227110107e-90,True
+fashion_mnist,Deletion (blur),Integrated Gradients,Grad-CAM,600,0.010261967778205927,Integrated Gradients,0.6572275938009857,0.6572275938009857,False
+fashion_mnist,Deletion (blur),Integrated Gradients,Occlusion,600,0.07355368882417683,Integrated Gradients,2.5860883508179977e-19,1.5516530104907987e-18,True
+fashion_mnist,Deletion (blur),Integrated Gradients,Random (baseline),600,0.05510011315345775,Integrated Gradients,3.6876055232474094e-17,1.8438027616237047e-16,True
+fashion_mnist,Deletion (blur),Grad-CAM,Occlusion,600,0.055720403790473966,Grad-CAM,3.0860881102187687e-13,1.2344352440875075e-12,True
+fashion_mnist,Deletion (blur),Grad-CAM,Random (baseline),600,0.04527667164802557,Grad-CAM,7.575998827854093e-10,2.2727996483562277e-09,True
+fashion_mnist,Deletion (blur),Occlusion,Random (baseline),600,-0.01767674088478094,Random (baseline),0.0226679540614541,0.0453359081229082,True
+fashion_mnist,Deletion (inpaint),Saliency,SmoothGrad,600,-0.08573396503925323,SmoothGrad,1.837307007579768e-50,1.4698456060638143e-49,True
+fashion_mnist,Deletion (inpaint),Saliency,Integrated Gradients,600,0.13011546432971957,Saliency,1.5254563837964024e-41,9.152738302778414e-41,True
+fashion_mnist,Deletion (inpaint),Saliency,Grad-CAM,600,0.039477393031120356,Saliency,1.7946392657678652e-09,3.5892785315357304e-09,True
+fashion_mnist,Deletion (inpaint),Saliency,Occlusion,600,0.10722393542528152,Saliency,4.653016505618284e-30,2.326508252809142e-29,True
+fashion_mnist,Deletion (inpaint),Saliency,Random (baseline),600,0.284972906112671,Saliency,1.1136274928235356e-94,1.5590784899529498e-93,True
+fashion_mnist,Deletion (inpaint),SmoothGrad,Integrated Gradients,600,0.2502855062484741,SmoothGrad,4.55781413035239e-73,5.013595543387629e-72,True
+fashion_mnist,Deletion (inpaint),SmoothGrad,Grad-CAM,600,0.1272362507879734,SmoothGrad,8.386985869187947e-44,5.8708901084315626e-43,True
+fashion_mnist,Deletion (inpaint),SmoothGrad,Occlusion,600,0.1982861682772637,SmoothGrad,1.3133585027522613e-67,1.1820226524770351e-66,True
+fashion_mnist,Deletion (inpaint),SmoothGrad,Random (baseline),600,0.39167094230651855,SmoothGrad,6.423990587127272e-98,9.635985880690908e-97,True
+fashion_mnist,Deletion (inpaint),Integrated Gradients,Grad-CAM,600,-0.08255272731184954,Grad-CAM,2.2922776676927477e-20,9.169110670770991e-20,True
+fashion_mnist,Deletion (inpaint),Integrated Gradients,Occlusion,600,-0.0014308393001556396,Occlusion,0.05765258760794066,0.05765258760794066,False
+fashion_mnist,Deletion (inpaint),Integrated Gradients,Random (baseline),600,0.12010662257671359,Integrated Gradients,9.193944523317683e-86,1.195212788031299e-84,True
+fashion_mnist,Deletion (inpaint),Grad-CAM,Occlusion,600,0.044135257601737976,Grad-CAM,3.548696558847416e-11,1.0646089676542248e-10,True
+fashion_mnist,Deletion (inpaint),Grad-CAM,Random (baseline),600,0.23170191049575806,Grad-CAM,9.245455502661088e-83,1.1094546603193306e-81,True
+fashion_mnist,Deletion (inpaint),Occlusion,Random (baseline),600,0.14334344863891604,Occlusion,1.966290342375567e-69,1.9662903423755673e-68,True
+fashion_mnist,Insertion (blur),Saliency,SmoothGrad,600,-0.0003740787506104071,SmoothGrad,0.003667772307647993,0.011003316922943979,True
+fashion_mnist,Insertion (blur),Saliency,Integrated Gradients,600,0.16871024668216705,Saliency,2.291978241065828e-47,1.8335825928526623e-46,True
+fashion_mnist,Insertion (blur),Saliency,Grad-CAM,600,0.13489985466003412,Saliency,4.1474561351380326e-57,4.147456135138032e-56,True
+fashion_mnist,Insertion (blur),Saliency,Occlusion,600,0.16662996262311944,Saliency,4.6484279406317806e-58,5.113270734694958e-57,True
+fashion_mnist,Insertion (blur),Saliency,Random (baseline),600,0.22984182834625244,Saliency,1.0698641225417142e-87,1.4978097715584e-86,True
+fashion_mnist,Insertion (blur),SmoothGrad,Integrated Gradients,600,0.18987485766410828,SmoothGrad,4.59762968039279e-53,4.1378667123535105e-52,True
+fashion_mnist,Insertion (blur),SmoothGrad,Grad-CAM,600,0.14313408732414246,SmoothGrad,4.949801016550216e-65,5.939761219860259e-64,True
+fashion_mnist,Insertion (blur),SmoothGrad,Occlusion,600,0.1832635998725891,SmoothGrad,3.460195529305236e-69,4.498254188096807e-68,True
+fashion_mnist,Insertion (blur),SmoothGrad,Random (baseline),600,0.24210976064205167,SmoothGrad,2.988786805074067e-90,4.4831802076111006e-89,True
+fashion_mnist,Insertion (blur),Integrated Gradients,Grad-CAM,600,-0.02724395692348483,Grad-CAM,0.012600889288204926,0.02520177857640985,True
+fashion_mnist,Insertion (blur),Integrated Gradients,Occlusion,600,0.005668312311172485,Integrated Gradients,0.9808433414604618,0.9808433414604618,False
+fashion_mnist,Insertion (blur),Integrated Gradients,Random (baseline),600,0.0465068519115448,Integrated Gradients,1.1862717680153795e-16,5.931358840076898e-16,True
+fashion_mnist,Insertion (blur),Grad-CAM,Occlusion,600,0.02994086593389514,Grad-CAM,0.0005405934345817839,0.0021623737383271355,True
+fashion_mnist,Insertion (blur),Grad-CAM,Random (baseline),600,0.08117541670799255,Grad-CAM,4.73959728169414e-24,3.317718097185898e-23,True
+fashion_mnist,Insertion (blur),Occlusion,Random (baseline),600,0.0572880059480666,Occlusion,6.8664802234313754e-18,4.119888134058825e-17,True
+fashion_mnist,Sanity (object px),Saliency,SmoothGrad,150,0.3193981033123038,Saliency,2.2996057560669792e-26,2.299605756066979e-25,True
+fashion_mnist,Sanity (object px),Saliency,Integrated Gradients,150,0.23793689166657714,Saliency,2.3463081875314243e-26,2.299605756066979e-25,True
+fashion_mnist,Sanity (object px),Saliency,Grad-CAM,129,-0.006073960697976499,Grad-CAM,0.8499142295757093,0.8499142295757093,False
+fashion_mnist,Sanity (object px),Saliency,Occlusion,146,-0.05265295455833144,Occlusion,0.05874289541155063,0.11748579082310126,False
+fashion_mnist,Sanity (object px),SmoothGrad,Integrated Gradients,150,-0.07734768225986488,Integrated Gradients,2.1480146170048933e-08,8.592058468019573e-08,True
+fashion_mnist,Sanity (object px),SmoothGrad,Grad-CAM,129,-0.3067340979501487,Grad-CAM,2.846369744422466e-18,1.7078218466534795e-17,True
+fashion_mnist,Sanity (object px),SmoothGrad,Occlusion,146,-0.3648611218216974,Occlusion,8.773060408812982e-25,7.018448327050386e-24,True
+fashion_mnist,Sanity (object px),Integrated Gradients,Grad-CAM,129,-0.24891612511257466,Grad-CAM,2.0633391184793985e-13,1.0316695592396993e-12,True
+fashion_mnist,Sanity (object px),Integrated Gradients,Occlusion,146,-0.29426925946448257,Occlusion,1.3602585510712673e-23,9.521809857498871e-23,True
+fashion_mnist,Sanity (object px),Grad-CAM,Occlusion,125,-0.0485026855943021,Occlusion,0.024242471330731125,0.07272741399219337,False
+pneumonia_mnist,Deletion (black),Saliency,SmoothGrad,600,-0.0012863576412202038,SmoothGrad,0.04167508154342898,0.08335016308685796,False
+pneumonia_mnist,Deletion (black),Saliency,Integrated Gradients,600,-0.4645767118781805,Integrated Gradients,1.2154997347220435e-91,1.2154997347220436e-90,True
+pneumonia_mnist,Deletion (black),Saliency,Grad-CAM,600,-0.08143413811922076,Grad-CAM,8.605389589897783e-18,5.16323375393867e-17,True
+pneumonia_mnist,Deletion (black),Saliency,Occlusion,600,-0.4315000716596843,Occlusion,1.8766892746538806e-98,2.4396960570500445e-97,True
+pneumonia_mnist,Deletion (black),Saliency,Random (baseline),600,-0.01569986343383789,Random (baseline),1.0482240853500071e-06,3.1446722560500214e-06,True
+pneumonia_mnist,Deletion (black),SmoothGrad,Integrated Gradients,600,-0.5105371251702309,Integrated Gradients,6.036570290207624e-90,5.4329132611868615e-89,True
+pneumonia_mnist,Deletion (black),SmoothGrad,Grad-CAM,600,-0.07433557137846945,Grad-CAM,5.613314024572019e-42,3.929319817200413e-41,True
+pneumonia_mnist,Deletion (black),SmoothGrad,Occlusion,600,-0.4623500341549516,Occlusion,1.1805320878238778e-99,1.7707981317358168e-98,True
+pneumonia_mnist,Deletion (black),SmoothGrad,Random (baseline),600,-0.067375048995018,Random (baseline),4.578226257394104e-14,2.289113128697052e-13,True
+pneumonia_mnist,Deletion (black),Integrated Gradients,Grad-CAM,600,0.27932919934391975,Integrated Gradients,1.1170654544163633e-71,8.936523635330907e-71,True
+pneumonia_mnist,Deletion (black),Integrated Gradients,Occlusion,600,0.0004550851881504475,Integrated Gradients,0.5650632655201577,0.5650632655201577,False
+pneumonia_mnist,Deletion (black),Integrated Gradients,Random (baseline),600,0.3771177567541599,Integrated Gradients,4.1660912231054306e-96,4.582700345415974e-95,True
+pneumonia_mnist,Deletion (black),Grad-CAM,Occlusion,600,-0.28141093254089355,Occlusion,3.740959941559472e-99,5.2373439181832614e-98,True
+pneumonia_mnist,Deletion (black),Grad-CAM,Random (baseline),600,0.04488408565521236,Grad-CAM,5.015319702939606e-07,2.0061278811758423e-06,True
+pneumonia_mnist,Deletion (black),Occlusion,Random (baseline),600,0.3520129732787609,Occlusion,2.3024958686902442e-97,2.762995042428293e-96,True
+pneumonia_mnist,Deletion (blur),Saliency,SmoothGrad,600,-2.6166439056396484e-05,SmoothGrad,5.670589088726334e-06,5.1035301798537e-05,True
+pneumonia_mnist,Deletion (blur),Saliency,Integrated Gradients,600,-0.0002816319465636097,Integrated Gradients,0.00031853334439416734,0.001911200066365004,True
+pneumonia_mnist,Deletion (blur),Saliency,Grad-CAM,600,-7.241964340098939e-06,Grad-CAM,4.739984125887679e-06,4.739984125887679e-05,True
+pneumonia_mnist,Deletion (blur),Saliency,Occlusion,600,-3.039836883600433e-06,Occlusion,0.0045402670901153325,0.022701335450576662,True
+pneumonia_mnist,Deletion (blur),Saliency,Random (baseline),600,-5.6296586990356445e-05,Random (baseline),0.6500942529998854,1.0,False
+pneumonia_mnist,Deletion (blur),SmoothGrad,Integrated Gradients,600,-0.0001566112041475054,Integrated Gradients,0.05998415008650487,0.17995245025951462,False
+pneumonia_mnist,Deletion (blur),SmoothGrad,Grad-CAM,600,4.589557647594056e-06,SmoothGrad,6.572569929754826e-10,7.88708391570579e-09,True
+pneumonia_mnist,Deletion (blur),SmoothGrad,Occlusion,600,1.829862594598941e-05,SmoothGrad,2.3054278434181402e-07,2.5359706277599544e-06,True
+pneumonia_mnist,Deletion (blur),SmoothGrad,Random (baseline),600,-1.9758939743097503e-05,Random (baseline),0.029829633916401723,0.11931853566560689,False
+pneumonia_mnist,Deletion (blur),Integrated Gradients,Grad-CAM,600,0.0006541311740875244,Integrated Gradients,9.639692437981471e-21,1.349556941317406e-19,True
+pneumonia_mnist,Deletion (blur),Integrated Gradients,Occlusion,600,0.0012281239032745916,Integrated Gradients,1.563198177760966e-24,2.3447972666414492e-23,True
+pneumonia_mnist,Deletion (blur),Integrated Gradients,Random (baseline),600,0.00011155009269719907,Integrated Gradients,2.3425477683987187e-05,0.0001874038214718975,True
+pneumonia_mnist,Deletion (blur),Grad-CAM,Occlusion,600,2.1547079086414733e-05,Grad-CAM,0.8987520015537156,1.0,False
+pneumonia_mnist,Deletion (blur),Grad-CAM,Random (baseline),600,-0.00017812848091125488,Random (baseline),9.270609323830741e-14,1.2051792120979964e-12,True
+pneumonia_mnist,Deletion (blur),Occlusion,Random (baseline),600,-8.803606033341849e-05,Random (baseline),9.865179261079418e-05,0.0006905625482755592,True
+pneumonia_mnist,Deletion (inpaint),Saliency,SmoothGrad,600,-0.014345228672027588,SmoothGrad,3.8687435840476245e-38,5.029366659261912e-37,True
+pneumonia_mnist,Deletion (inpaint),Saliency,Integrated Gradients,600,0.007072716951370295,Saliency,3.411631016424058e-20,2.3881417114968407e-19,True
+pneumonia_mnist,Deletion (inpaint),Saliency,Grad-CAM,600,-0.021682322025299128,Grad-CAM,3.240626616767337e-10,1.9443759700604023e-09,True
+pneumonia_mnist,Deletion (inpaint),Saliency,Occlusion,600,5.704164505010434e-05,Saliency,0.08476968656024496,0.25430905968073486,False
+pneumonia_mnist,Deletion (inpaint),Saliency,Random (baseline),600,0.009919852018356268,Saliency,7.493815724663088e-36,8.992578869595705e-35,True
+pneumonia_mnist,Deletion (inpaint),SmoothGrad,Integrated Gradients,600,0.02233624458312994,SmoothGrad,1.226266372574954e-33,1.3488930098324493e-32,True
+pneumonia_mnist,Deletion (inpaint),SmoothGrad,Grad-CAM,600,-0.005373179912567139,Grad-CAM,0.863927307803207,0.863927307803207,False
+pneumonia_mnist,Deletion (inpaint),SmoothGrad,Occlusion,600,0.005107641220092718,SmoothGrad,4.3324268168211274e-07,2.1662134084105637e-06,True
+pneumonia_mnist,Deletion (inpaint),SmoothGrad,Random (baseline),600,0.04166430234909063,SmoothGrad,8.399219512058468e-47,1.1758907316881856e-45,True
+pneumonia_mnist,Deletion (inpaint),Integrated Gradients,Grad-CAM,600,-0.05244240164756775,Grad-CAM,2.599960900995137e-29,2.339964810895623e-28,True
+pneumonia_mnist,Deletion (inpaint),Integrated Gradients,Occlusion,600,-0.004807293415069636,Occlusion,1.948747689723861e-29,1.948747689723861e-28,True
+pneumonia_mnist,Deletion (inpaint),Integrated Gradients,Random (baseline),600,-4.303455352783203e-05,Random (baseline),0.0983237146345932,0.25430905968073486,False
+pneumonia_mnist,Deletion (inpaint),Grad-CAM,Occlusion,600,0.020021677017211914,Grad-CAM,4.257556042144643e-05,0.00017030224168578572,True
+pneumonia_mnist,Deletion (inpaint),Grad-CAM,Random (baseline),600,0.08573448657989508,Grad-CAM,3.266443205935973e-77,4.8996648089039593e-76,True
+pneumonia_mnist,Deletion (inpaint),Occlusion,Random (baseline),600,0.007478892803192305,Occlusion,1.4544206408540835e-25,1.1635365126832668e-24,True
+pneumonia_mnist,Insertion (blur),Saliency,SmoothGrad,600,-0.00013986229896534308,SmoothGrad,1.5272559950298139e-10,1.3745303955268326e-09,True
+pneumonia_mnist,Insertion (blur),Saliency,Integrated Gradients,600,-4.32133674621582e-06,Integrated Gradients,2.082621295617832e-06,1.249572777370699e-05,True
+pneumonia_mnist,Insertion (blur),Saliency,Grad-CAM,600,1.2218952177844855e-06,Saliency,5.345304226645619e-07,3.741712958651933e-06,True
+pneumonia_mnist,Insertion (blur),Saliency,Occlusion,600,3.790855407714844e-05,Saliency,2.4863438320777688e-11,2.4863438320777686e-10,True
+pneumonia_mnist,Insertion (blur),Saliency,Random (baseline),600,-1.2636184692382812e-05,Random (baseline),0.007708375072407363,0.02312512521722209,True
+pneumonia_mnist,Insertion (blur),SmoothGrad,Integrated Gradients,600,9.018182754522153e-05,SmoothGrad,2.4121922679104617e-13,2.6534114947015077e-12,True
+pneumonia_mnist,Insertion (blur),SmoothGrad,Grad-CAM,600,0.0003249943256379284,SmoothGrad,6.131372002730262e-21,8.583920803822366e-20,True
+pneumonia_mnist,Insertion (blur),SmoothGrad,Occlusion,600,0.00045996904373163394,SmoothGrad,1.817880213088768e-21,2.726820319633152e-20,True
+pneumonia_mnist,Insertion (blur),SmoothGrad,Random (baseline),600,5.3495168685857575e-05,SmoothGrad,4.196515904557781e-09,3.3572127236462246e-08,True
+pneumonia_mnist,Insertion (blur),Integrated Gradients,Grad-CAM,600,4.842877387994937e-05,Integrated Gradients,7.479155327316792e-05,0.00029916621309267167,True
+pneumonia_mnist,Insertion (blur),Integrated Gradients,Occlusion,600,0.0002428591251372736,Integrated Gradients,2.636606271533123e-15,3.1639275258397476e-14,True
+pneumonia_mnist,Insertion (blur),Integrated Gradients,Random (baseline),600,4.678964614812653e-06,Integrated Gradients,0.09114171462538459,0.18228342925076918,False
+pneumonia_mnist,Insertion (blur),Grad-CAM,Occlusion,600,-5.364418030340268e-07,Occlusion,0.8751385676418058,0.8751385676418058,False
+pneumonia_mnist,Insertion (blur),Grad-CAM,Random (baseline),600,-0.00019842386245724764,Random (baseline),1.997810746393452e-18,2.5971539703114876e-17,True
+pneumonia_mnist,Insertion (blur),Occlusion,Random (baseline),600,-2.843141555791684e-05,Random (baseline),2.8144890501933338e-06,1.407244525096667e-05,True
+pneumonia_mnist,Sanity (object px),Saliency,SmoothGrad,150,0.3107007514917528,Saliency,2.2996057560669792e-26,2.299605756066979e-25,True
+pneumonia_mnist,Sanity (object px),Saliency,Integrated Gradients,150,0.030551356144881914,Saliency,1.0567458669562628e-11,4.226983467825051e-11,True
+pneumonia_mnist,Sanity (object px),Saliency,Grad-CAM,105,-0.07957913178310982,Grad-CAM,0.0012501696750755373,0.0025003393501510747,True
+pneumonia_mnist,Sanity (object px),Saliency,Occlusion,150,-0.06539874470637771,Occlusion,2.7603418897300925e-14,1.3801709448650461e-13,True
+pneumonia_mnist,Sanity (object px),SmoothGrad,Integrated Gradients,150,-0.29097103004024655,Integrated Gradients,2.2996057560669792e-26,2.299605756066979e-25,True
+pneumonia_mnist,Sanity (object px),SmoothGrad,Grad-CAM,105,-0.4106956642006063,Grad-CAM,8.004413884331301e-19,4.802648330598781e-18,True
+pneumonia_mnist,Sanity (object px),SmoothGrad,Occlusion,150,-0.38614993339169273,Occlusion,2.2996057560669792e-26,2.299605756066979e-25,True
+pneumonia_mnist,Sanity (object px),Integrated Gradients,Grad-CAM,105,-0.09070420766568887,Grad-CAM,0.00011331839336345889,0.00033995518009037666,True
+pneumonia_mnist,Sanity (object px),Integrated Gradients,Occlusion,150,-0.09281857177817318,Occlusion,4.60707985859513e-21,3.224955901016591e-20,True
+pneumonia_mnist,Sanity (object px),Grad-CAM,Occlusion,105,0.017311035045750878,Grad-CAM,0.8516501431174166,0.8516501431174166,False
+decoy_mnist,Deletion (black),Saliency,SmoothGrad,600,0.00015973672270779872,Saliency,0.056120251402303506,0.056120251402303506,False
+decoy_mnist,Deletion (black),Saliency,Integrated Gradients,600,-0.006371100433170849,Integrated Gradients,1.7242148651323802e-60,1.2069504055926662e-59,True
+decoy_mnist,Deletion (black),Saliency,Grad-CAM,600,0.091802267357707,Saliency,1.06951063493373e-50,4.27804253973492e-50,True
+decoy_mnist,Deletion (black),Saliency,Occlusion,600,-0.006437190808355749,Occlusion,3.3272392049933495e-82,3.3272392049933495e-81,True
+decoy_mnist,Deletion (black),Saliency,Random (baseline),600,0.4500091038644314,Saliency,4.3962423491197614e-97,5.71511505385569e-96,True
+decoy_mnist,Deletion (black),SmoothGrad,Integrated Gradients,600,-0.005548672750592199,Integrated Gradients,5.081495523830631e-56,3.048897314298379e-55,True
+decoy_mnist,Deletion (black),SmoothGrad,Grad-CAM,600,0.0971553530544043,SmoothGrad,1.0506859169521587e-51,5.2534295847607933e-51,True
+decoy_mnist,Deletion (black),SmoothGrad,Occlusion,600,-0.005506500601768499,Occlusion,3.54980006377058e-75,2.839840051016464e-74,True
+decoy_mnist,Deletion (black),SmoothGrad,Random (baseline),600,0.457418798469007,SmoothGrad,4.3423912501644054e-98,6.079347750230167e-97,True
+decoy_mnist,Deletion (black),Integrated Gradients,Grad-CAM,600,0.1017346708104015,Integrated Gradients,4.983308133168297e-78,4.484977319851467e-77,True
+decoy_mnist,Deletion (black),Integrated Gradients,Occlusion,600,1.532491296530117e-05,Integrated Gradients,3.6530485938144447e-26,1.0959145781443334e-25,True
+decoy_mnist,Deletion (black),Integrated Gradients,Random (baseline),600,0.5273115308955312,Integrated Gradients,1.590283707443376e-96,1.9083404489320513e-95,True
+decoy_mnist,Deletion (black),Grad-CAM,Occlusion,600,-0.12778788618743417,Occlusion,3.1973037547134967e-87,3.5170341301848464e-86,True
+decoy_mnist,Deletion (black),Grad-CAM,Random (baseline),600,0.09554858505725858,Grad-CAM,1.3755806764463686e-15,2.7511613528927372e-15,True
+decoy_mnist,Deletion (black),Occlusion,Random (baseline),600,0.5399773614481091,Occlusion,1.66660647172618e-99,2.4999097075892702e-98,True
+decoy_mnist,Deletion (blur),Saliency,SmoothGrad,600,0.0001387819647788984,Saliency,0.8938166686189832,0.8938166686189832,False
+decoy_mnist,Deletion (blur),Saliency,Integrated Gradients,600,-0.016135645098984252,Integrated Gradients,7.757143222898942e-38,3.878571611449471e-37,True
+decoy_mnist,Deletion (blur),Saliency,Grad-CAM,600,0.11545468866825107,Saliency,2.075567109221485e-47,1.2453402655328909e-46,True
+decoy_mnist,Deletion (blur),Saliency,Occlusion,600,-0.014825096353888546,Occlusion,3.0292937404985717e-53,2.7263643664487146e-52,True
+decoy_mnist,Deletion (blur),Saliency,Random (baseline),600,0.5228782445192338,Saliency,4.15282567545462e-98,5.398673378091006e-97,True
+decoy_mnist,Deletion (blur),SmoothGrad,Integrated Gradients,600,-0.015517956577241398,Integrated Gradients,3.228334850294643e-33,1.2913339401178572e-32,True
+decoy_mnist,Deletion (blur),SmoothGrad,Grad-CAM,600,0.1283427216112614,SmoothGrad,5.549957626521885e-51,4.439966101217508e-50,True
+decoy_mnist,Deletion (blur),SmoothGrad,Occlusion,600,-0.014694675803184551,Occlusion,5.673675473026828e-50,3.9715728311187795e-49,True
+decoy_mnist,Deletion (blur),SmoothGrad,Random (baseline),600,0.5343958884477615,SmoothGrad,1.991980330771647e-98,2.788772463080306e-97,True
+decoy_mnist,Deletion (blur),Integrated Gradients,Grad-CAM,600,0.1103921262547374,Integrated Gradients,8.378836817045362e-67,8.378836817045363e-66,True
+decoy_mnist,Deletion (blur),Integrated Gradients,Occlusion,600,0.00104983057826755,Integrated Gradients,2.779053875441591e-16,5.558107750883182e-16,True
+decoy_mnist,Deletion (blur),Integrated Gradients,Random (baseline),600,0.5916044013574719,Integrated Gradients,1.0283196411695865e-97,1.2339835694035038e-96,True
+decoy_mnist,Deletion (blur),Grad-CAM,Occlusion,600,-0.1459740810096264,Occlusion,1.2819006494548817e-74,1.4100907144003699e-73,True
+decoy_mnist,Deletion (blur),Grad-CAM,Random (baseline),600,0.1277610957622528,Grad-CAM,1.187541266574259e-24,3.562623799722777e-24,True
+decoy_mnist,Deletion (blur),Occlusion,Random (baseline),600,0.6080398466438055,Occlusion,9.216624130015005e-99,1.382493619502251e-97,True
+decoy_mnist,Deletion (inpaint),Saliency,SmoothGrad,600,-1.0775402188006183e-06,SmoothGrad,0.2186945178047648,0.2186945178047648,False
+decoy_mnist,Deletion (inpaint),Saliency,Integrated Gradients,600,-0.013630498200654944,Integrated Gradients,6.4444133909771726e-24,1.9333240172931516e-23,True
+decoy_mnist,Deletion (inpaint),Saliency,Grad-CAM,600,0.09850497357547285,Saliency,6.647483603973762e-31,2.6589934415895046e-30,True
+decoy_mnist,Deletion (inpaint),Saliency,Occlusion,600,-0.04869451932609085,Occlusion,1.2101463320308562e-73,1.2101463320308561e-72,True
+decoy_mnist,Deletion (inpaint),Saliency,Random (baseline),600,0.6198156047612429,Saliency,1.059446151181183e-98,1.377279996535538e-97,True
+decoy_mnist,Deletion (inpaint),SmoothGrad,Integrated Gradients,600,-0.006182321347296186,Integrated Gradients,1.6006975162046994e-18,3.2013950324093988e-18,True
+decoy_mnist,Deletion (inpaint),SmoothGrad,Grad-CAM,600,0.09940432943403725,SmoothGrad,3.610961776456479e-36,1.8054808882282395e-35,True
+decoy_mnist,Deletion (inpaint),SmoothGrad,Occlusion,600,-0.04175353515893225,Occlusion,4.806481988301292e-75,5.287130187131421e-74,True
+decoy_mnist,Deletion (inpaint),SmoothGrad,Random (baseline),600,0.6474053375422955,SmoothGrad,2.4237111002123356e-99,3.39319554029727e-98,True
+decoy_mnist,Deletion (inpaint),Integrated Gradients,Grad-CAM,600,0.0937222996726632,Integrated Gradients,2.517896146258902e-42,1.5107376877553412e-41,True
+decoy_mnist,Deletion (inpaint),Integrated Gradients,Occlusion,600,-0.0034354757517576513,Occlusion,3.6178570366003764e-58,2.894285629280301e-57,True
+decoy_mnist,Deletion (inpaint),Integrated Gradients,Random (baseline),600,0.7232054062187672,Integrated Gradients,8.604504795498813e-98,1.0325405754598576e-96,True
+decoy_mnist,Deletion (inpaint),Grad-CAM,Occlusion,600,-0.1661035418510437,Occlusion,4.348707975760281e-73,3.913837178184253e-72,True
+decoy_mnist,Deletion (inpaint),Grad-CAM,Random (baseline),600,0.3346385061740875,Grad-CAM,1.271739598165243e-48,8.902177187156702e-48,True
+decoy_mnist,Deletion (inpaint),Occlusion,Random (baseline),600,0.7672304278239609,Occlusion,5.978238429493547e-100,8.96735764424032e-99,True
+decoy_mnist,Insertion (blur),Saliency,SmoothGrad,600,0.0,SmoothGrad,0.5833496614161658,1.0,False
+decoy_mnist,Insertion (blur),Saliency,Integrated Gradients,600,0.0,Integrated Gradients,2.562571805684707e-10,1.2812859028423534e-09,True
+decoy_mnist,Insertion (blur),Saliency,Grad-CAM,600,0.07873213291168202,Saliency,2.0121373304083347e-71,1.810923597367501e-70,True
+decoy_mnist,Insertion (blur),Saliency,Occlusion,600,0.0,Occlusion,1.2255383033868262e-23,7.353229820320957e-23,True
+decoy_mnist,Insertion (blur),Saliency,Random (baseline),600,0.23937758803367615,Saliency,1.751353992042076e-94,2.1016247904504914e-93,True
+decoy_mnist,Insertion (blur),SmoothGrad,Integrated Gradients,600,0.0,Integrated Gradients,1.521296034190337e-06,4.563888102571011e-06,True
+decoy_mnist,Insertion (blur),SmoothGrad,Grad-CAM,600,0.07617241144180298,SmoothGrad,9.580283015033491e-66,7.664226412026793e-65,True
+decoy_mnist,Insertion (blur),SmoothGrad,Occlusion,600,0.0,Occlusion,7.290157236433062e-24,5.1031100655031435e-23,True
+decoy_mnist,Insertion (blur),SmoothGrad,Random (baseline),600,0.2404634952545166,SmoothGrad,1.4415364512722264e-94,1.9696199045308324e-93,True
+decoy_mnist,Insertion (blur),Integrated Gradients,Grad-CAM,600,0.099854826927185,Integrated Gradients,4.9277245870505075e-73,4.927724587050508e-72,True
+decoy_mnist,Insertion (blur),Integrated Gradients,Occlusion,600,0.0,Occlusion,2.1872427333141624e-08,8.74897093325665e-08,True
+decoy_mnist,Insertion (blur),Integrated Gradients,Random (baseline),600,0.24878260493278498,Integrated Gradients,1.4068713603791659e-94,1.9696199045308324e-93,True
+decoy_mnist,Insertion (blur),Grad-CAM,Occlusion,600,-0.09543532133102417,Occlusion,2.382607093196651e-82,2.620867802516316e-81,True
+decoy_mnist,Insertion (blur),Grad-CAM,Random (baseline),600,0.012412056326866122,Grad-CAM,0.7034594350941576,1.0,False
+decoy_mnist,Insertion (blur),Occlusion,Random (baseline),600,0.2493314146995544,Occlusion,4.322915382363068e-99,6.484373073544602e-98,True
+decoy_mnist,Sanity (object px),Saliency,SmoothGrad,150,0.06534634603261834,Saliency,8.645499334857104e-09,6.916399467885683e-08,True
+decoy_mnist,Sanity (object px),Saliency,Integrated Gradients,150,0.13765641401771428,Saliency,3.657687048928871e-15,3.6576870489288707e-14,True
+decoy_mnist,Sanity (object px),Saliency,Grad-CAM,106,0.09540614088702959,Saliency,4.497705446879741e-08,3.1483938128158187e-07,True
+decoy_mnist,Sanity (object px),Saliency,Occlusion,150,0.17032592529665286,Saliency,6.449171764157714e-15,5.804254587741943e-14,True
+decoy_mnist,Sanity (object px),SmoothGrad,Integrated Gradients,150,0.08164691795830252,SmoothGrad,0.00038408664435337844,0.0019204332217668922,True
+decoy_mnist,Sanity (object px),SmoothGrad,Grad-CAM,106,0.08646850767859204,SmoothGrad,0.000757721781083654,0.003030887124334616,True
+decoy_mnist,Sanity (object px),SmoothGrad,Occlusion,150,0.10426616657306866,SmoothGrad,0.00028803169141546737,0.001728190148492804,True
+decoy_mnist,Sanity (object px),Integrated Gradients,Grad-CAM,106,-0.04729711428589796,Grad-CAM,0.4152077190522174,1.0,False
+decoy_mnist,Sanity (object px),Integrated Gradients,Occlusion,150,0.03375022595021225,Integrated Gradients,0.5589185387822175,1.0,False
+decoy_mnist,Sanity (object px),Grad-CAM,Occlusion,106,0.00602625487792606,Grad-CAM,0.6994178135958733,1.0,False
+decoy_mnist,GT mass accuracy,Saliency,SmoothGrad,600,0.005230715498328195,Saliency,0.0011302227490124443,0.0011302227490124443,True
+decoy_mnist,GT mass accuracy,Saliency,Integrated Gradients,600,-0.6641999892890453,Integrated Gradients,3.098949128164436e-98,4.1284484563346524e-97,True
+decoy_mnist,GT mass accuracy,Saliency,Grad-CAM,583,0.0455529615283012,Saliency,6.91245766227755e-41,2.073737298683265e-40,True
+decoy_mnist,GT mass accuracy,Saliency,Occlusion,600,-0.4729354903101921,Occlusion,3.9912665721691386e-98,4.789519886602966e-97,True
+decoy_mnist,GT mass accuracy,Saliency,Random (baseline),600,0.0878867120827018,Saliency,7.670198749215362e-88,3.835099374607681e-87,True
+decoy_mnist,GT mass accuracy,SmoothGrad,Integrated Gradients,600,-0.662836343050003,Integrated Gradients,6.602536622647222e-99,9.903804933970834e-98,True
+decoy_mnist,GT mass accuracy,SmoothGrad,Grad-CAM,583,0.0589821673929691,SmoothGrad,3.188157270587558e-42,1.2752629082350232e-41,True
+decoy_mnist,GT mass accuracy,SmoothGrad,Occlusion,600,-0.48532749246805906,Occlusion,2.948891754524752e-98,4.1284484563346524e-97,True
+decoy_mnist,GT mass accuracy,SmoothGrad,Random (baseline),600,0.08528140428651855,SmoothGrad,1.3136396554538187e-89,7.881837932722912e-89,True
+decoy_mnist,GT mass accuracy,Integrated Gradients,Grad-CAM,583,0.729704849421978,Integrated Gradients,7.178800541378571e-94,6.460920487240714e-93,True
+decoy_mnist,GT mass accuracy,Integrated Gradients,Occlusion,600,0.1808026134967804,Integrated Gradients,6.4163067178249765e-90,4.491414702477484e-89,True
+decoy_mnist,GT mass accuracy,Integrated Gradients,Random (baseline),600,0.7606032533795477,Integrated Gradients,2.178456174509232e-96,2.396258467220399e-95,True
+decoy_mnist,GT mass accuracy,Grad-CAM,Occlusion,583,-0.5372558199742343,Occlusion,1.4611254897177592e-93,1.1689003917742073e-92,True
+decoy_mnist,GT mass accuracy,Grad-CAM,Random (baseline),583,-0.0034392866833485,Random (baseline),2.9753405688512077e-16,5.950681137702415e-16,True
+decoy_mnist,GT mass accuracy,Occlusion,Random (baseline),600,0.5972447716005685,Occlusion,2.178416788382181e-96,2.396258467220399e-95,True
+decoy_mnist,GT rank accuracy,Saliency,SmoothGrad,600,0.0,SmoothGrad,1.3168328255640356e-08,1.3168328255640356e-08,True
+decoy_mnist,GT rank accuracy,Saliency,Integrated Gradients,600,-0.5555555555555556,Integrated Gradients,1.1468242546644867e-89,1.4908715310638328e-88,True
+decoy_mnist,GT rank accuracy,Saliency,Grad-CAM,600,0.2222222222222222,Saliency,5.348892999240422e-24,1.6046678997721266e-23,True
+decoy_mnist,GT rank accuracy,Saliency,Occlusion,600,-0.33333333333333337,Occlusion,2.9906955297197742e-89,3.588834635663729e-88,True
+decoy_mnist,GT rank accuracy,Saliency,Random (baseline),600,0.3333333333333333,Saliency,4.511040150362715e-74,2.706624090217629e-73,True
+decoy_mnist,GT rank accuracy,SmoothGrad,Integrated Gradients,600,-0.5555555555555556,Integrated Gradients,2.7314093881527684e-88,2.4582684493374917e-87,True
+decoy_mnist,GT rank accuracy,SmoothGrad,Grad-CAM,600,0.3333333333333333,SmoothGrad,2.01999371578629e-28,8.07997486314516e-28,True
+decoy_mnist,GT rank accuracy,SmoothGrad,Occlusion,600,-0.3333333333333333,Occlusion,2.095689076356274e-88,2.095689076356274e-87,True
+decoy_mnist,GT rank accuracy,SmoothGrad,Random (baseline),600,0.3333333333333333,SmoothGrad,6.848474066793365e-78,4.793931846755355e-77,True
+decoy_mnist,GT rank accuracy,Integrated Gradients,Grad-CAM,600,0.8888888888888888,Integrated Gradients,5.314510635727073e-87,4.2516085085816586e-86,True
+decoy_mnist,GT rank accuracy,Integrated Gradients,Occlusion,600,0.2222222222222222,Integrated Gradients,5.34099834361602e-69,2.67049917180801e-68,True
+decoy_mnist,GT rank accuracy,Integrated Gradients,Random (baseline),600,0.8888888888888888,Integrated Gradients,1.538816774332743e-92,2.1543434840658402e-91,True
+decoy_mnist,GT rank accuracy,Grad-CAM,Occlusion,600,-0.6666666666666666,Occlusion,3.211936556212588e-89,3.588834635663729e-88,True
+decoy_mnist,GT rank accuracy,Grad-CAM,Random (baseline),600,0.0,Random (baseline),3.1886741418997694e-10,6.377348283799539e-10,True
+decoy_mnist,GT rank accuracy,Occlusion,Random (baseline),600,0.6666666666666666,Occlusion,1.4003700592107285e-94,2.1005550888160927e-93,True
+decoy_pneumonia,Deletion (black),Saliency,SmoothGrad,600,0.021641064435243596,Saliency,9.865648516533678e-33,8.879083664880311e-32,True
+decoy_pneumonia,Deletion (black),Saliency,Integrated Gradients,600,0.045383661985397394,Saliency,5.342205670905867e-16,3.7395439696341075e-15,True
+decoy_pneumonia,Deletion (black),Saliency,Grad-CAM,600,0.10018056631088262,Saliency,1.289729818085341e-36,1.289729818085341e-35,True
+decoy_pneumonia,Deletion (black),Saliency,Occlusion,600,0.08744928240776056,Saliency,2.435256259938061e-31,1.948205007950449e-30,True
+decoy_pneumonia,Deletion (black),Saliency,Random (baseline),600,0.36620470881462097,Saliency,3.525719924179412e-98,5.288579886269118e-97,True
+decoy_pneumonia,Deletion (black),SmoothGrad,Integrated Gradients,600,-0.0007379800081253468,Integrated Gradients,0.003190920374809598,0.012763681499238393,True
+decoy_pneumonia,Deletion (black),SmoothGrad,Grad-CAM,600,0.03750851750373846,SmoothGrad,2.277618612976964e-12,1.3665711677861783e-11,True
+decoy_pneumonia,Deletion (black),SmoothGrad,Occlusion,600,0.015105992555618286,SmoothGrad,1.3114012441671411e-09,6.557006220835706e-09,True
+decoy_pneumonia,Deletion (black),SmoothGrad,Random (baseline),600,0.24567277729511267,SmoothGrad,2.6571405628624294e-97,3.719996788007401e-96,True
+decoy_pneumonia,Deletion (black),Integrated Gradients,Grad-CAM,600,-0.00893693231046198,Grad-CAM,0.6858958228911478,1.0,False
+decoy_pneumonia,Deletion (black),Integrated Gradients,Occlusion,600,-0.014056975021958375,Occlusion,0.5462753734393577,1.0,False
+decoy_pneumonia,Deletion (black),Integrated Gradients,Random (baseline),600,0.1549089923501015,Integrated Gradients,1.6118421577944426e-59,1.7730263735738868e-58,True
+decoy_pneumonia,Deletion (black),Grad-CAM,Occlusion,600,-0.000828716903924949,Occlusion,0.695265889245851,1.0,False
+decoy_pneumonia,Deletion (black),Grad-CAM,Random (baseline),600,0.13910558819770807,Grad-CAM,2.7648059549934638e-73,3.317767145992157e-72,True
+decoy_pneumonia,Deletion (black),Occlusion,Random (baseline),600,0.11953529715538025,Occlusion,8.888319585671554e-80,1.1554815461373021e-78,True
+decoy_pneumonia,Deletion (blur),Saliency,SmoothGrad,600,-0.0002855360507965088,SmoothGrad,8.485595207591843e-05,0.0003394238083036737,True
+decoy_pneumonia,Deletion (blur),Saliency,Integrated Gradients,600,0.008998006582260132,Saliency,2.673608092689213e-28,1.871525664882449e-27,True
+decoy_pneumonia,Deletion (blur),Saliency,Grad-CAM,600,0.006601363420486506,Saliency,0.0012780989092710856,0.0029924080237559115,True
+decoy_pneumonia,Deletion (blur),Saliency,Occlusion,600,0.013487219810485729,Saliency,1.5493468193145605e-48,1.7042815012460165e-47,True
+decoy_pneumonia,Deletion (blur),Saliency,Random (baseline),600,0.02062410116195673,Saliency,3.0361366133224274e-97,4.250591258651398e-96,True
+decoy_pneumonia,Deletion (blur),SmoothGrad,Integrated Gradients,600,0.009472131729126032,SmoothGrad,6.416987269493388e-29,5.13358981559471e-28,True
+decoy_pneumonia,Deletion (blur),SmoothGrad,Grad-CAM,600,0.00692439079284668,SmoothGrad,0.0009974693412519704,0.0029924080237559115,True
+decoy_pneumonia,Deletion (blur),SmoothGrad,Occlusion,600,0.01386281847953802,SmoothGrad,1.7363336579284578e-50,2.083600389514149e-49,True
+decoy_pneumonia,Deletion (blur),SmoothGrad,Random (baseline),600,0.021416306495666504,SmoothGrad,2.2686191995857401e-97,3.40292879937861e-96,True
+decoy_pneumonia,Deletion (blur),Integrated Gradients,Grad-CAM,600,0.0005213320255280651,Integrated Gradients,0.8557907035484886,0.8557907035484886,False
+decoy_pneumonia,Deletion (blur),Integrated Gradients,Occlusion,600,0.006504505872726496,Integrated Gradients,4.507288877374867e-17,2.7043733264249204e-16,True
+decoy_pneumonia,Deletion (blur),Integrated Gradients,Random (baseline),600,0.007021129131317194,Integrated Gradients,1.2417232610295982e-64,1.6142402393384776e-63,True
+decoy_pneumonia,Deletion (blur),Grad-CAM,Occlusion,600,0.006333060562610564,Grad-CAM,2.822751642454145e-38,2.54047647820873e-37,True
+decoy_pneumonia,Deletion (blur),Grad-CAM,Random (baseline),600,0.0027152597904205877,Grad-CAM,1.7041759310489827e-39,1.7041759310489827e-38,True
+decoy_pneumonia,Deletion (blur),Occlusion,Random (baseline),600,-0.0017351210117340088,Random (baseline),3.1839955568133723e-11,1.5919977784066862e-10,True
+decoy_pneumonia,Deletion (inpaint),Saliency,SmoothGrad,600,-0.0008358657360076349,SmoothGrad,7.867539357795291e-07,5.507277550456704e-06,True
+decoy_pneumonia,Deletion (inpaint),Saliency,Integrated Gradients,600,-0.002763140946626698,Integrated Gradients,1.0829901667944998e-10,8.663921334355999e-10,True
+decoy_pneumonia,Deletion (inpaint),Saliency,Grad-CAM,600,-0.0018216669559479315,Grad-CAM,0.0001369515625737396,0.0006847578128686981,True
+decoy_pneumonia,Deletion (inpaint),Saliency,Occlusion,600,0.00127534195780752,Saliency,0.6827830826046504,0.6827830826046504,False
+decoy_pneumonia,Deletion (inpaint),Saliency,Random (baseline),600,0.026101171970367487,Saliency,2.5542393121029832e-92,3.320511105733878e-91,True
+decoy_pneumonia,Deletion (inpaint),SmoothGrad,Integrated Gradients,600,-0.0018562674522399902,Integrated Gradients,1.162750188338539e-06,6.976501130031234e-06,True
+decoy_pneumonia,Deletion (inpaint),SmoothGrad,Grad-CAM,600,-0.0010700523853302002,Grad-CAM,0.06075692302364658,0.24302769209458633,False
+decoy_pneumonia,Deletion (inpaint),SmoothGrad,Occlusion,600,0.0022200327366590465,SmoothGrad,0.09727426014057933,0.291822780421738,False
+decoy_pneumonia,Deletion (inpaint),SmoothGrad,Random (baseline),600,0.0304432213306427,SmoothGrad,1.1939316554563514e-92,1.671504317638892e-91,True
+decoy_pneumonia,Deletion (inpaint),Integrated Gradients,Grad-CAM,600,-0.0015109777450562079,Grad-CAM,0.23805391217241756,0.4761078243448351,False
+decoy_pneumonia,Deletion (inpaint),Integrated Gradients,Occlusion,600,0.004959441721439341,Integrated Gradients,5.609841379688063e-39,5.609841379688063e-38,True
+decoy_pneumonia,Deletion (inpaint),Integrated Gradients,Random (baseline),600,0.02347084879875172,Integrated Gradients,4.409977224355411e-99,6.614965836533117e-98,True
+decoy_pneumonia,Deletion (inpaint),Grad-CAM,Occlusion,600,0.005512535572052002,Grad-CAM,5.109490854186714e-16,4.598541768768043e-15,True
+decoy_pneumonia,Deletion (inpaint),Grad-CAM,Random (baseline),600,0.017962723970413264,Grad-CAM,2.2626253901739912e-76,2.715150468208789e-75,True
+decoy_pneumonia,Deletion (inpaint),Occlusion,Random (baseline),600,0.015229642391204834,Occlusion,1.812258272872769e-72,1.993484100160046e-71,True
+decoy_pneumonia,Insertion (blur),Saliency,SmoothGrad,600,0.0010280609130859375,Saliency,5.001565539146547e-53,3.0009393234879284e-52,True
+decoy_pneumonia,Insertion (blur),Saliency,Integrated Gradients,600,1.1444091796763978e-05,Saliency,1.3665426619406992e-10,5.466170647762797e-10,True
+decoy_pneumonia,Insertion (blur),Saliency,Grad-CAM,600,0.008458852767944336,Saliency,2.0729882751467937e-60,1.8656894476321143e-59,True
+decoy_pneumonia,Insertion (blur),Saliency,Occlusion,600,0.007686704397201538,Saliency,2.7458061483837305e-62,2.7458061483837305e-61,True
+decoy_pneumonia,Insertion (blur),Saliency,Random (baseline),600,0.015269607305526789,Saliency,1.0811783334632413e-85,1.5136496668485379e-84,True
+decoy_pneumonia,Insertion (blur),SmoothGrad,Integrated Gradients,600,9.834766387939453e-07,SmoothGrad,0.5233845712646217,0.5233845712646217,False
+decoy_pneumonia,Insertion (blur),SmoothGrad,Grad-CAM,600,0.006290018558502142,SmoothGrad,1.2574967940485237e-59,1.005997435238819e-58,True
+decoy_pneumonia,Insertion (blur),SmoothGrad,Occlusion,600,0.00625532865524292,SmoothGrad,9.553637230167316e-64,1.0509000953184048e-62,True
+decoy_pneumonia,Insertion (blur),SmoothGrad,Random (baseline),600,0.01272660493850708,SmoothGrad,1.0578447960844707e-79,1.375198234909812e-78,True
+decoy_pneumonia,Insertion (blur),Integrated Gradients,Grad-CAM,600,0.007167220115661621,Integrated Gradients,8.345237446176281e-68,1.0014284935411538e-66,True
+decoy_pneumonia,Insertion (blur),Integrated Gradients,Occlusion,600,0.007425636053085272,Integrated Gradients,1.627338735310452e-53,1.1391371147173164e-52,True
+decoy_pneumonia,Insertion (blur),Integrated Gradients,Random (baseline),600,0.012983441352844127,Integrated Gradients,3.835402920659902e-99,5.753104380989853e-98,True
+decoy_pneumonia,Insertion (blur),Grad-CAM,Occlusion,600,1.6510486602894225e-05,Grad-CAM,1.3330736879995623e-07,3.999221063998687e-07,True
+decoy_pneumonia,Insertion (blur),Grad-CAM,Random (baseline),600,-0.0008987188339234509,Random (baseline),3.124043590841026e-06,6.248087181682052e-06,True
+decoy_pneumonia,Insertion (blur),Occlusion,Random (baseline),600,-0.0017188787460326593,Random (baseline),2.1051893991483512e-11,1.0525946995741757e-10,True
+decoy_pneumonia,Sanity (object px),Saliency,SmoothGrad,150,0.1403664081158075,Saliency,2.2996057560669792e-26,2.299605756066979e-25,True
+decoy_pneumonia,Sanity (object px),Saliency,Integrated Gradients,150,0.024839830507208394,Saliency,5.303828416450271e-11,1.5911485249350812e-10,True
+decoy_pneumonia,Sanity (object px),Saliency,Grad-CAM,48,-0.21234126518140417,Grad-CAM,7.105427357601002e-15,4.973799150320701e-14,True
+decoy_pneumonia,Sanity (object px),Saliency,Occlusion,150,-0.026758417226044884,Occlusion,0.00028594724860971755,0.00028594724860971755,True
+decoy_pneumonia,Sanity (object px),SmoothGrad,Integrated Gradients,150,-0.11283923335788673,Integrated Gradients,1.862954845081268e-25,1.4903638760650145e-24,True
+decoy_pneumonia,Sanity (object px),SmoothGrad,Grad-CAM,48,-0.3673282573793393,Grad-CAM,7.105427357601002e-15,4.973799150320701e-14,True
+decoy_pneumonia,Sanity (object px),SmoothGrad,Occlusion,150,-0.16003850363757197,Occlusion,2.6469347492701727e-26,2.382241274343155e-25,True
+decoy_pneumonia,Sanity (object px),Integrated Gradients,Grad-CAM,48,-0.2585308806368628,Grad-CAM,7.105427357601002e-15,4.973799150320701e-14,True
+decoy_pneumonia,Sanity (object px),Integrated Gradients,Occlusion,150,-0.06756393350800391,Occlusion,1.6419892184713104e-11,6.567956873885241e-11,True
+decoy_pneumonia,Sanity (object px),Grad-CAM,Occlusion,48,0.19087506714912716,Grad-CAM,4.9636213361736736e-08,9.927242672347347e-08,True
+decoy_pneumonia,GT mass accuracy,Saliency,SmoothGrad,600,6.652037882304285e-06,Saliency,9.985451462640444e-28,9.985451462640445e-27,True
+decoy_pneumonia,GT mass accuracy,Saliency,Integrated Gradients,600,-1.632870521461882e-05,Integrated Gradients,3.416835294429439e-32,3.758518823872383e-31,True
+decoy_pneumonia,GT mass accuracy,Saliency,Grad-CAM,542,-0.013424344989971318,Grad-CAM,8.216063520108813e-86,1.1502488928152337e-84,True
+decoy_pneumonia,GT mass accuracy,Saliency,Occlusion,600,1.1276777058810694e-06,Saliency,4.4716275152366994e-14,3.1301392606656896e-13,True
+decoy_pneumonia,GT mass accuracy,Saliency,Random (baseline),600,-0.009322616557882947,Random (baseline),2.201251388824924e-10,1.3207327250171411e-09,True
+decoy_pneumonia,GT mass accuracy,SmoothGrad,Integrated Gradients,600,-1.8343112742513767e-05,Integrated Gradients,6.05486217220234e-37,7.265834606642807e-36,True
+decoy_pneumonia,GT mass accuracy,SmoothGrad,Grad-CAM,542,-0.013484291787335602,Grad-CAM,2.1463365896518305e-89,3.219504884477746e-88,True
+decoy_pneumonia,GT mass accuracy,SmoothGrad,Occlusion,600,2.0780869931513735e-06,SmoothGrad,2.2708217636300792e-14,1.8166574109040634e-13,True
+decoy_pneumonia,GT mass accuracy,SmoothGrad,Random (baseline),600,-0.009322235274625536,Random (baseline),2.201251388824924e-10,1.3207327250171411e-09,True
+decoy_pneumonia,GT mass accuracy,Integrated Gradients,Grad-CAM,542,-0.011756973282643872,Grad-CAM,0.004406710198312615,0.00881342039662523,True
+decoy_pneumonia,GT mass accuracy,Integrated Gradients,Occlusion,600,5.207114430305637e-06,Integrated Gradients,3.1740456950462435e-26,2.8566411255416193e-25,True
+decoy_pneumonia,GT mass accuracy,Integrated Gradients,Random (baseline),600,-0.009316930473859765,Random (baseline),2.201250760061468e-10,1.3207327250171411e-09,True
+decoy_pneumonia,GT mass accuracy,Grad-CAM,Occlusion,542,0.011769332457333751,Grad-CAM,0.008178611033320111,0.00881342039662523,True
+decoy_pneumonia,GT mass accuracy,Grad-CAM,Random (baseline),542,0.0030058031971576995,Grad-CAM,3.525710660239752e-58,4.583423858311677e-57,True
+decoy_pneumonia,GT mass accuracy,Occlusion,Random (baseline),600,-0.009308877674236651,Random (baseline),2.2012212083619018e-10,1.3207327250171411e-09,True
+decoy_pneumonia,GT rank accuracy,Saliency,SmoothGrad,600,0.0,SmoothGrad,0.07459965403797643,0.24282911937276078,False
+decoy_pneumonia,GT rank accuracy,Saliency,Integrated Gradients,600,0.0,Integrated Gradients,5.803745295071207e-43,6.384119824578327e-42,True
+decoy_pneumonia,GT rank accuracy,Saliency,Grad-CAM,600,0.0,Grad-CAM,0.000969791713324611,0.006476386802978845,True
+decoy_pneumonia,GT rank accuracy,Saliency,Occlusion,600,0.0,Occlusion,0.15262005564801367,0.30524011129602735,False
+decoy_pneumonia,GT rank accuracy,Saliency,Random (baseline),600,0.0,Random (baseline),5.3958050763541036e-45,7.014546599260335e-44,True
+decoy_pneumonia,GT rank accuracy,SmoothGrad,Integrated Gradients,600,0.0,Integrated Gradients,8.217002856588347e-42,8.217002856588347e-41,True
+decoy_pneumonia,GT rank accuracy,SmoothGrad,Grad-CAM,600,0.0,Grad-CAM,0.0009283177312205782,0.006476386802978845,True
+decoy_pneumonia,GT rank accuracy,SmoothGrad,Occlusion,600,0.0,Occlusion,0.34002079937447527,0.34002079937447527,False
+decoy_pneumonia,GT rank accuracy,SmoothGrad,Random (baseline),600,0.0,Random (baseline),6.099550923725278e-45,7.319461108470334e-44,True
+decoy_pneumonia,GT rank accuracy,Integrated Gradients,Grad-CAM,600,0.0,Grad-CAM,0.060707279843190194,0.24282911937276078,False
+decoy_pneumonia,GT rank accuracy,Integrated Gradients,Occlusion,600,0.0,Occlusion,2.0842220672222217e-34,1.6673776537777774e-33,True
+decoy_pneumonia,GT rank accuracy,Integrated Gradients,Random (baseline),600,0.0,Random (baseline),5.6166708649521886e-46,8.425006297428283e-45,True
+decoy_pneumonia,GT rank accuracy,Grad-CAM,Occlusion,600,0.0,Occlusion,0.0009251981147112635,0.006476386802978845,True
+decoy_pneumonia,GT rank accuracy,Grad-CAM,Random (baseline),600,0.0,Random (baseline),4.854612534020621e-40,4.369151280618559e-39,True
+decoy_pneumonia,GT rank accuracy,Occlusion,Random (baseline),600,0.0,Random (baseline),9.240973727369123e-46,1.2937363218316773e-44,True

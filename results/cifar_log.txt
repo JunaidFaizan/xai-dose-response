@@ -1,0 +1,292 @@
+  cifar10_patch_dose-080_seed42 epoch 1/10: val acc 54.2%
+  cifar10_patch_dose-080_seed42 epoch 2/10: val acc 59.2%
+  cifar10_patch_dose-080_seed42 epoch 3/10: val acc 61.5%
+  cifar10_patch_dose-080_seed42 epoch 4/10: val acc 66.7%
+  cifar10_patch_dose-080_seed42 epoch 5/10: val acc 67.9%
+  cifar10_patch_dose-080_seed42 epoch 6/10: val acc 70.3%
+  cifar10_patch_dose-080_seed42 epoch 7/10: val acc 71.7%
+  cifar10_patch_dose-080_seed42 epoch 8/10: val acc 70.4%
+  cifar10_patch_dose-080_seed42 epoch 9/10: val acc 70.8%
+  cifar10_patch_dose-080_seed42 epoch 10/10: val acc 74.0%
+cifar10_patch_dose-080_seed42: reliance 3.74% | acc 78.2% | no shortcut 73.68% | 25.6 min
+  cifar10_patch_dose-080_seed1 epoch 1/10: val acc 46.4%
+  cifar10_patch_dose-080_seed1 epoch 2/10: val acc 50.9%
+  cifar10_patch_dose-080_seed1 epoch 3/10: val acc 58.3%
+  cifar10_patch_dose-080_seed1 epoch 4/10: val acc 59.8%
+  cifar10_patch_dose-080_seed1 epoch 5/10: val acc 64.6%
+  cifar10_patch_dose-080_seed1 epoch 6/10: val acc 64.2%
+  cifar10_patch_dose-080_seed1 epoch 7/10: val acc 65.0%
+  cifar10_patch_dose-080_seed1 epoch 8/10: val acc 65.9%
+  cifar10_patch_dose-080_seed1 epoch 9/10: val acc 67.5%
+  cifar10_patch_dose-080_seed1 epoch 10/10: val acc 69.3%
+cifar10_patch_dose-080_seed1: reliance 4.22% | acc 72.33% | no shortcut 69.0% | 25.69 min
+  cifar10_patch_dose-060_seed42 epoch 1/10: val acc 54.5%
+  cifar10_patch_dose-060_seed42 epoch 2/10: val acc 62.0%
+  cifar10_patch_dose-060_seed42 epoch 3/10: val acc 69.1%
+  cifar10_patch_dose-060_seed42 epoch 4/10: val acc 69.4%
+  cifar10_patch_dose-060_seed42 epoch 5/10: val acc 71.3%
+  cifar10_patch_dose-060_seed42 epoch 6/10: val acc 70.9%
+  cifar10_patch_dose-060_seed42 epoch 7/10: val acc 75.4%
+  cifar10_patch_dose-060_seed42 epoch 8/10: val acc 76.6%
+  cifar10_patch_dose-060_seed42 epoch 1/10: val acc 54.5%
+  cifar10_patch_dose-060_seed42 epoch 2/10: val acc 62.0%
+  cifar10_patch_dose-060_seed42 epoch 3/10: val acc 69.1%
+  cifar10_patch_dose-060_seed42 epoch 4/10: val acc 69.4%
+  cifar10_patch_dose-060_seed42 epoch 5/10: val acc 71.3%
+  cifar10_patch_dose-060_seed42 epoch 6/10: val acc 70.9%
+  cifar10_patch_dose-060_seed42 epoch 7/10: val acc 75.4%
+  cifar10_patch_dose-060_seed42 epoch 8/10: val acc 76.6%
+  cifar10_patch_dose-060_seed42 epoch 9/10: val acc 71.5%
+  cifar10_patch_dose-060_seed42 epoch 10/10: val acc 74.5%
+cifar10_patch_dose-060_seed42: reliance 7.49% | acc 84.33% | no shortcut 72.45% | 22.02 min
+  cifar10_patch_dose-060_seed1 epoch 1/10: val acc 39.6%
+  cifar10_patch_dose-060_seed1 epoch 2/10: val acc 41.9%
+  cifar10_patch_dose-060_seed1 epoch 3/10: val acc 52.2%
+  cifar10_patch_dose-060_seed1 epoch 4/10: val acc 53.1%
+  cifar10_patch_dose-060_seed1 epoch 5/10: val acc 56.3%
+  cifar10_patch_dose-060_seed1 epoch 6/10: val acc 58.6%
+  cifar10_patch_dose-060_seed1 epoch 7/10: val acc 62.1%
+  cifar10_patch_dose-060_seed1 epoch 8/10: val acc 61.1%
+  cifar10_patch_dose-060_seed1 epoch 9/10: val acc 60.1%
+  cifar10_patch_dose-060_seed1 epoch 10/10: val acc 66.8%
+cifar10_patch_dose-060_seed1: reliance 7.61% | acc 74.94% | no shortcut 63.67% | 21.81 min
+  cifar10_patch_dose-040_seed42 epoch 1/10: val acc 67.3%
+  cifar10_patch_dose-040_seed42 epoch 2/10: val acc 73.4%
+  cifar10_patch_dose-040_seed42 epoch 3/10: val acc 74.6%
+  cifar10_patch_dose-040_seed42 epoch 4/10: val acc 77.1%
+  cifar10_patch_dose-040_seed42 epoch 5/10: val acc 78.5%
+  cifar10_patch_dose-040_seed42 epoch 6/10: val acc 80.7%
+  cifar10_patch_dose-040_seed42 epoch 7/10: val acc 81.1%
+  cifar10_patch_dose-040_seed42 epoch 8/10: val acc 80.6%
+  cifar10_patch_dose-040_seed42 epoch 9/10: val acc 77.4%
+  cifar10_patch_dose-040_seed42 epoch 10/10: val acc 81.9%
+cifar10_patch_dose-040_seed42: reliance 13.73% | acc 93.27% | no shortcut 72.66% | 21.67 min
+  cifar10_patch_dose-040_seed1 epoch 1/10: val acc 65.7%
+  cifar10_patch_dose-040_seed1 epoch 2/10: val acc 70.5%
+  cifar10_patch_dose-040_seed1 epoch 3/10: val acc 72.0%
+  cifar10_patch_dose-040_seed1 epoch 4/10: val acc 74.4%
+  cifar10_patch_dose-040_seed1 epoch 5/10: val acc 77.7%
+  cifar10_patch_dose-040_seed1 epoch 6/10: val acc 78.7%
+  cifar10_patch_dose-040_seed1 epoch 7/10: val acc 78.3%
+  cifar10_patch_dose-040_seed1 epoch 8/10: val acc 78.7%
+  cifar10_patch_dose-040_seed1 epoch 9/10: val acc 79.9%
+  cifar10_patch_dose-040_seed1 epoch 10/10: val acc 79.6%
+cifar10_patch_dose-040_seed1: reliance 17.29% | acc 93.29% | no shortcut 71.28% | 21.97 min
+  cifar10_patch_dose-025_seed42 epoch 1/10: val acc 76.9%
+  cifar10_patch_dose-025_seed42 epoch 2/10: val acc 81.1%
+  cifar10_patch_dose-025_seed42 epoch 3/10: val acc 81.8%
+  cifar10_patch_dose-025_seed42 epoch 4/10: val acc 83.7%
+  cifar10_patch_dose-025_seed42 epoch 5/10: val acc 85.1%
+  cifar10_patch_dose-025_seed42 epoch 6/10: val acc 86.2%
+  cifar10_patch_dose-025_seed42 epoch 7/10: val acc 82.8%
+  cifar10_patch_dose-025_seed42 epoch 8/10: val acc 86.5%
+  cifar10_patch_dose-025_seed42 epoch 9/10: val acc 85.6%
+  cifar10_patch_dose-025_seed42 epoch 10/10: val acc 87.0%
+cifar10_patch_dose-025_seed42: reliance 22.55% | acc 96.26% | no shortcut 71.33% | 21.96 min
+  cifar10_patch_dose-025_seed1 epoch 1/10: val acc 76.0%
+  cifar10_patch_dose-025_seed1 epoch 2/10: val acc 81.2%
+  cifar10_patch_dose-025_seed1 epoch 3/10: val acc 82.7%
+  cifar10_patch_dose-025_seed1 epoch 4/10: val acc 83.6%
+  cifar10_patch_dose-025_seed1 epoch 5/10: val acc 85.6%
+  cifar10_patch_dose-025_seed1 epoch 6/10: val acc 85.3%
+  cifar10_patch_dose-025_seed1 epoch 7/10: val acc 83.7%
+  cifar10_patch_dose-025_seed1 epoch 8/10: val acc 85.6%
+  cifar10_patch_dose-025_seed1 epoch 9/10: val acc 86.9%
+  cifar10_patch_dose-025_seed1 epoch 10/10: val acc 86.7%
+cifar10_patch_dose-025_seed1: reliance 23.18% | acc 96.32% | no shortcut 71.67% | 22.01 min
+  cifar10_patch_dose-010_seed42 epoch 1/10: val acc 88.4%
+  cifar10_patch_dose-010_seed42 epoch 2/10: val acc 89.7%
+  cifar10_patch_dose-010_seed42 epoch 3/10: val acc 90.5%
+  cifar10_patch_dose-010_seed42 epoch 4/10: val acc 90.0%
+  cifar10_patch_dose-010_seed42 epoch 5/10: val acc 90.6%
+  cifar10_patch_dose-010_seed42 epoch 6/10: val acc 90.3%
+  cifar10_patch_dose-010_seed42 epoch 7/10: val acc 91.6%
+  cifar10_patch_dose-010_seed42 epoch 8/10: val acc 91.8%
+  cifar10_patch_dose-010_seed42 epoch 9/10: val acc 92.2%
+  cifar10_patch_dose-010_seed42 epoch 10/10: val acc 92.1%
+cifar10_patch_dose-010_seed42: reliance 43.4% | acc 98.21% | no shortcut 64.48% | 21.9 min
+  cifar10_patch_dose-010_seed1 epoch 1/10: val acc 88.5%
+  cifar10_patch_dose-010_seed1 epoch 2/10: val acc 89.3%
+  cifar10_patch_dose-010_seed1 epoch 3/10: val acc 89.9%
+  cifar10_patch_dose-010_seed1 epoch 4/10: val acc 91.0%
+  cifar10_patch_dose-010_seed1 epoch 5/10: val acc 91.1%
+  cifar10_patch_dose-010_seed1 epoch 6/10: val acc 92.0%
+  cifar10_patch_dose-010_seed1 epoch 7/10: val acc 91.9%
+  cifar10_patch_dose-010_seed1 epoch 8/10: val acc 92.1%
+  cifar10_patch_dose-010_seed1 epoch 9/10: val acc 92.2%
+  cifar10_patch_dose-010_seed1 epoch 10/10: val acc 91.9%
+cifar10_patch_dose-010_seed1: reliance 45.07% | acc 98.51% | no shortcut 62.5% | 21.95 min
+  cifar10_patch_dose+000_seed42 epoch 1/10: val acc 98.2%
+  cifar10_patch_dose+000_seed42 epoch 2/10: val acc 98.7%
+  cifar10_patch_dose+000_seed42 epoch 3/10: val acc 98.7%
+  cifar10_patch_dose+000_seed42 epoch 4/10: val acc 98.7%
+  cifar10_patch_dose+000_seed42 epoch 5/10: val acc 98.9%
+  cifar10_patch_dose+000_seed42 epoch 6/10: val acc 98.4%
+  cifar10_patch_dose+000_seed42 epoch 7/10: val acc 99.1%
+  cifar10_patch_dose+000_seed42 epoch 8/10: val acc 98.8%
+  cifar10_patch_dose+000_seed42 epoch 9/10: val acc 99.2%
+  cifar10_patch_dose+000_seed42 epoch 10/10: val acc 99.1%
+cifar10_patch_dose+000_seed42: reliance 96.29% | acc 99.08% | no shortcut 30.38% | 21.87 min
+  cifar10_patch_dose+000_seed1 epoch 1/10: val acc 98.0%
+  cifar10_patch_dose+000_seed1 epoch 2/10: val acc 98.7%
+  cifar10_patch_dose+000_seed1 epoch 3/10: val acc 98.4%
+  cifar10_patch_dose+000_seed1 epoch 4/10: val acc 99.1%
+  cifar10_patch_dose+000_seed1 epoch 5/10: val acc 99.1%
+  cifar10_patch_dose+000_seed1 epoch 6/10: val acc 99.2%
+  cifar10_patch_dose+000_seed1 epoch 7/10: val acc 99.3%
+  cifar10_patch_dose+000_seed1 epoch 8/10: val acc 99.0%
+  cifar10_patch_dose+000_seed1 epoch 9/10: val acc 99.3%
+  cifar10_patch_dose+000_seed1 epoch 10/10: val acc 99.1%
+cifar10_patch_dose+000_seed1: reliance 96.62% | acc 99.28% | no shortcut 28.81% | 21.89 min
+evaluated cifar10_patch_dose-080_seed42 (51 s)
+evaluated cifar10_patch_dose-080_seed1 (52 s)
+evaluated cifar10_patch_dose-060_seed42 (52 s)
+evaluated cifar10_patch_dose-060_seed1 (52 s)
+evaluated cifar10_patch_dose-040_seed42 (52 s)
+evaluated cifar10_patch_dose-040_seed1 (52 s)
+evaluated cifar10_patch_dose-025_seed42 (53 s)
+evaluated cifar10_patch_dose-025_seed1 (52 s)
+evaluated cifar10_patch_dose-010_seed42 (52 s)
+evaluated cifar10_patch_dose-010_seed1 (52 s)
+evaluated cifar10_patch_dose+000_seed42 (52 s)
+evaluated cifar10_patch_dose+000_seed1 (52 s)
+# Dose-response results
+
+Generated by `dose_response.py analyze`.
+
+## Reliance per dose (mean and std over seeds, %)
+
+| base | shortcut | dose | reliance_mean | reliance_std | test_accuracy_mean | test_accuracy_std | test_accuracy_no_shortcut_mean | test_accuracy_no_shortcut_std |
+|---|---|---|---|---|---|---|---|---|
+| cifar10 | patch | -0.800 | 3.980 | 0.340 | 75.260 | 4.150 | 71.340 | 3.310 |
+| cifar10 | patch | -0.600 | 7.550 | 0.080 | 79.630 | 6.640 | 68.060 | 6.210 |
+| cifar10 | patch | -0.400 | 15.510 | 2.520 | 93.280 | 0.010 | 71.970 | 0.980 |
+| cifar10 | patch | -0.250 | 22.860 | 0.450 | 96.290 | 0.040 | 71.500 | 0.240 |
+| cifar10 | patch | -0.100 | 44.240 | 1.180 | 98.360 | 0.210 | 63.490 | 1.400 |
+| cifar10 | patch | 0.000 | 96.460 | 0.230 | 99.180 | 0.140 | 29.600 | 1.110 |
+| mnist | patch | -0.400 | 0.140 | 0.030 | 98.810 | 0.320 | 98.810 | 0.320 |
+| mnist | patch | -0.250 | 0.180 | 0.040 | 98.850 | 0.170 | 98.760 | 0.160 |
+| mnist | patch | -0.100 | 0.180 | 0.040 | 98.870 | 0.160 | 98.720 | 0.270 |
+| mnist | patch | -0.050 | 0.180 | 0.040 | 98.930 | 0.080 | 98.720 | 0.060 |
+| mnist | patch | 0.000 | 3.070 | 5.020 | 98.990 | 0.090 | 98.110 | 1.150 |
+| mnist | patch | 0.005 | 8.460 | 12.580 | 99.190 | 0.180 | 95.270 | 5.150 |
+| mnist | patch | 0.010 | 29.620 | 28.530 | 99.660 | 0.080 | 88.340 | 9.260 |
+| mnist | patch | 0.020 | 55.610 | 11.870 | 99.720 | 0.030 | 70.470 | 11.720 |
+| mnist | patch | 0.050 | 76.220 | 0.900 | 99.820 | 0.110 | 35.470 | 2.720 |
+| mnist | patch | 0.100 | 82.980 | 5.530 | 99.890 | 0.080 | 28.820 | 5.630 |
+| mnist | patch | 0.250 | 95.950 | 6.440 | 99.930 | 0.070 | 13.800 | 5.370 |
+| mnist | patch | 0.400 | 96.060 | 6.190 | 99.860 | 0.150 | 13.280 | 4.940 |
+| mnist | texture | -0.400 | 0.170 | 0.010 | 98.840 | 0.150 | 98.700 | 0.220 |
+| mnist | texture | -0.250 | 0.200 | 0.080 | 98.900 | 0.240 | 98.640 | 0.290 |
+| mnist | texture | -0.100 | 0.430 | 0.260 | 99.190 | 0.070 | 98.240 | 0.650 |
+| mnist | texture | -0.050 | 1.300 | 1.130 | 99.270 | 0.250 | 97.160 | 1.600 |
+| mnist | texture | 0.000 | 9.110 | 9.020 | 99.470 | 0.320 | 90.080 | 8.340 |
+| mnist | texture | 0.005 | 48.880 | 31.800 | 99.870 | 0.180 | 61.240 | 18.600 |
+| mnist | texture | 0.010 | 70.440 | 27.940 | 99.900 | 0.120 | 49.180 | 14.060 |
+| mnist | texture | 0.020 | 92.900 | 5.240 | 99.970 | 0.030 | 34.560 | 0.780 |
+| mnist | texture | 0.050 | 99.170 | 0.590 | 99.990 | 0.010 | 24.470 | 3.600 |
+| mnist | texture | 0.100 | 99.780 | 0.080 | 99.980 | 0.010 | 20.880 | 0.900 |
+| mnist | texture | 0.250 | 99.980 | 0.030 | 99.990 | 0.010 | 20.550 | 5.310 |
+| mnist | texture | 0.400 | 99.990 | 0.020 | 100.000 | 0.010 | 17.420 | 3.680 |
+| pneumonia_mnist | patch | -0.400 | 14.850 | 3.110 | 85.900 | 1.700 | 85.680 | 2.060 |
+| pneumonia_mnist | patch | -0.250 | 16.610 | 2.490 | 84.400 | 1.050 | 84.400 | 1.050 |
+| pneumonia_mnist | patch | -0.100 | 21.320 | 4.780 | 88.360 | 3.270 | 84.080 | 4.650 |
+| pneumonia_mnist | patch | -0.050 | 32.430 | 5.500 | 93.000 | 1.140 | 81.940 | 10.960 |
+| pneumonia_mnist | patch | 0.000 | 64.900 | 14.180 | 97.860 | 1.340 | 72.600 | 9.540 |
+| pneumonia_mnist | patch | 0.005 | 68.270 | 12.970 | 97.920 | 1.470 | 62.390 | 4.900 |
+| pneumonia_mnist | patch | 0.010 | 85.630 | 11.080 | 98.930 | 0.720 | 59.080 | 4.080 |
+| pneumonia_mnist | patch | 0.020 | 68.590 | 10.490 | 96.530 | 1.700 | 65.490 | 8.860 |
+| pneumonia_mnist | patch | 0.050 | 94.820 | 3.940 | 99.040 | 0.830 | 50.270 | 11.160 |
+| pneumonia_mnist | patch | 0.100 | 98.880 | 0.830 | 99.410 | 0.560 | 52.300 | 12.470 |
+| pneumonia_mnist | patch | 0.250 | 98.930 | 1.430 | 99.950 | 0.090 | 46.790 | 13.660 |
+| pneumonia_mnist | patch | 0.400 | 99.730 | 0.240 | 99.840 | 0.000 | 37.610 | 0.240 |
+| pneumonia_mnist | texture | -0.400 | 18.380 | 2.270 | 87.020 | 0.550 | 84.940 | 1.470 |
+| pneumonia_mnist | texture | -0.250 | 21.370 | 1.460 | 90.220 | 1.690 | 85.740 | 2.940 |
+| pneumonia_mnist | texture | -0.100 | 30.930 | 1.050 | 94.230 | 0.480 | 86.060 | 4.580 |
+| pneumonia_mnist | texture | -0.050 | 38.620 | 1.950 | 96.530 | 0.610 | 87.130 | 1.020 |
+| pneumonia_mnist | texture | 0.000 | 92.680 | 7.360 | 99.470 | 0.240 | 77.620 | 3.300 |
+| pneumonia_mnist | texture | 0.005 | 98.560 | 1.370 | 99.790 | 0.090 | 78.680 | 3.780 |
+| pneumonia_mnist | texture | 0.010 | 89.580 | 10.140 | 99.310 | 0.490 | 79.860 | 1.850 |
+| pneumonia_mnist | texture | 0.020 | 96.850 | 3.130 | 99.790 | 0.180 | 76.970 | 5.060 |
+| pneumonia_mnist | texture | 0.050 | 98.990 | 0.960 | 99.840 | 0.160 | 67.420 | 11.220 |
+| pneumonia_mnist | texture | 0.100 | 99.950 | 0.090 | 99.890 | 0.180 | 55.820 | 8.430 |
+| pneumonia_mnist | texture | 0.250 | 100.000 | 0.000 | 100.000 | 0.000 | 51.600 | 24.430 |
+| pneumonia_mnist | texture | 0.400 | 99.950 | 0.090 | 99.840 | 0.160 | 52.080 | 25.260 |
+
+## Metric responsiveness to reliance (oracle maps)
+
+responsiveness_rho: Spearman correlation between reliance and preference for the shortcut map (ideal: close to 1). decision_accuracy: share of models where the preferred map matches whether reliance is above 50%. switch_point_reliance: reliance where preference crosses 0.5 (ideal: 50). object_map: the comparison map, either the full object or a binary map of the object's brightest pixels with the same pixel count as the shortcut (size control).
+
+| object_map | base | shortcut | metric | responsiveness_rho | p_value | models | decision_accuracy | tie_rate | switch_point_reliance | preference_low_reliance | preference_high_reliance | reliance_range |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| full object map | cifar10 | patch | Deletion (black) | 0.935 | 0.000 | 12 | 0.167 | 0.000 | û | 0.815 | 0.990 | 4-96% |
+| full object map | cifar10 | patch | Deletion (blur) | 0.897 | 0.000 | 12 | 0.167 | 0.000 | û | 0.735 | 0.975 | 4-96% |
+| full object map | cifar10 | patch | Deletion (inpaint) | 0.986 | 0.000 | 12 | 0.417 | 0.001 | 8.366 | 0.265 | 0.985 | 4-96% |
+| full object map | cifar10 | patch | Insertion (blur) | 0.981 | 0.000 | 12 | 0.667 | 0.002 | 19.673 | 0.228 | 0.985 | 4-96% |
+| full object map | mnist | patch | Deletion (black) | 0.956 | 0.000 | 36 | 0.972 | 0.000 | 35.290 | 0.022 | 0.890 | 0-96% |
+| full object map | mnist | patch | Deletion (blur) | 0.960 | 0.000 | 36 | 0.972 | 0.000 | 30.270 | 0.017 | 0.893 | 0-96% |
+| full object map | mnist | patch | Deletion (inpaint) | 0.967 | 0.000 | 36 | 0.944 | 0.000 | 41.651 | 0.007 | 0.900 | 0-96% |
+| full object map | mnist | patch | Insertion (blur) | 0.960 | 0.000 | 36 | 1.000 | 0.000 | 38.841 | 0.013 | 0.890 | 0-96% |
+| full object map | mnist | texture | Deletion (black) | 0.943 | 0.000 | 36 | 0.972 | 0.001 | 30.549 | 0.033 | 0.957 | 0-100% |
+| full object map | mnist | texture | Deletion (blur) | 0.964 | 0.000 | 36 | 0.972 | 0.000 | 63.362 | 0.037 | 0.883 | 0-100% |
+| full object map | mnist | texture | Deletion (inpaint) | 0.953 | 0.000 | 36 | 0.972 | 0.000 | 33.814 | 0.017 | 0.970 | 0-100% |
+| full object map | mnist | texture | Insertion (blur) | 0.954 | 0.000 | 36 | 0.750 | 0.000 | 98.809 | 0.013 | 0.602 | 0-100% |
+| full object map | pneumonia_mnist | patch | Deletion (black) | 0.693 | 0.000 | 36 | 0.861 | 0.003 | 26.569 | 0.377 | 0.613 | 15-100% |
+| full object map | pneumonia_mnist | patch | Deletion (blur) | 0.585 | 0.000 | 36 | 0.833 | 0.079 | 19.020 | 0.453 | 0.575 | 15-100% |
+| full object map | pneumonia_mnist | patch | Deletion (inpaint) | 0.646 | 0.000 | 36 | 0.861 | 0.004 | 31.871 | 0.147 | 0.562 | 15-100% |
+| full object map | pneumonia_mnist | patch | Insertion (blur) | 0.490 | 0.002 | 36 | 0.778 | 0.089 | 16.796 | 0.497 | 0.713 | 15-100% |
+| full object map | pneumonia_mnist | texture | Deletion (black) | 0.797 | 0.000 | 36 | 0.833 | 0.012 | 28.364 | 0.328 | 0.935 | 18-100% |
+| full object map | pneumonia_mnist | texture | Deletion (blur) | 0.567 | 0.000 | 36 | 0.667 | 0.040 | û | 0.572 | 1.000 | 18-100% |
+| full object map | pneumonia_mnist | texture | Deletion (inpaint) | 0.599 | 0.000 | 36 | 0.694 | 0.030 | 19.248 | 0.450 | 0.933 | 18-100% |
+| full object map | pneumonia_mnist | texture | Insertion (blur) | 0.250 | 0.141 | 36 | 0.667 | 0.062 | û | 0.640 | 0.947 | 18-100% |
+| size-matched object map | cifar10 | patch | Deletion (black) | 0.986 | 0.000 | 12 | 0.250 | 0.002 | 4.331 | 0.485 | 0.960 | 4-96% |
+| size-matched object map | cifar10 | patch | Deletion (blur) | 0.879 | 0.000 | 12 | 0.167 | 0.000 | û | 0.590 | 0.970 | 4-96% |
+| size-matched object map | cifar10 | patch | Deletion (inpaint) | 0.881 | 0.000 | 12 | 0.167 | 0.002 | û | 0.602 | 0.975 | 4-96% |
+| size-matched object map | cifar10 | patch | Insertion (blur) | 0.881 | 0.000 | 12 | 0.167 | 0.032 | û | 0.582 | 0.900 | 4-96% |
+| size-matched object map | mnist | patch | Deletion (black) | 0.977 | 0.000 | 36 | 0.833 | 0.000 | 6.364 | 0.373 | 0.928 | 0-96% |
+| size-matched object map | mnist | patch | Deletion (blur) | 0.953 | 0.000 | 36 | 0.889 | 0.002 | 14.751 | 0.275 | 0.937 | 0-96% |
+| size-matched object map | mnist | patch | Deletion (inpaint) | 0.980 | 0.000 | 36 | 0.833 | 0.001 | 7.235 | 0.333 | 0.937 | 0-96% |
+| size-matched object map | mnist | patch | Insertion (blur) | 0.964 | 0.000 | 36 | 0.861 | 0.001 | 8.460 | 0.305 | 0.920 | 0-96% |
+| size-matched object map | mnist | texture | Deletion (black) | 0.936 | 0.000 | 36 | 0.917 | 0.001 | 27.804 | 0.017 | 0.937 | 0-100% |
+| size-matched object map | mnist | texture | Deletion (blur) | 0.925 | 0.000 | 36 | 0.889 | 0.001 | 83.003 | 0.033 | 0.710 | 0-100% |
+| size-matched object map | mnist | texture | Deletion (inpaint) | 0.949 | 0.000 | 36 | 0.944 | 0.001 | 35.016 | 0.070 | 0.977 | 0-100% |
+| size-matched object map | mnist | texture | Insertion (blur) | 0.911 | 0.000 | 36 | 0.722 | 0.001 | 98.077 | 0.013 | 0.598 | 0-100% |
+| size-matched object map | pneumonia_mnist | patch | Deletion (black) | 0.814 | 0.000 | 36 | 0.778 | 0.042 | û | 0.503 | 0.788 | 15-100% |
+| size-matched object map | pneumonia_mnist | patch | Deletion (blur) | 0.623 | 0.000 | 36 | 0.750 | 0.116 | û | 0.512 | 0.720 | 15-100% |
+| size-matched object map | pneumonia_mnist | patch | Deletion (inpaint) | 0.673 | 0.000 | 36 | 0.722 | 0.093 | 14.934 | 0.498 | 0.733 | 15-100% |
+| size-matched object map | pneumonia_mnist | patch | Insertion (blur) | 0.706 | 0.000 | 36 | 0.778 | 0.115 | û | 0.502 | 0.712 | 15-100% |
+| size-matched object map | pneumonia_mnist | texture | Deletion (black) | 0.069 | 0.688 | 36 | 0.722 | 0.012 | û | 0.545 | 0.523 | 18-100% |
+| size-matched object map | pneumonia_mnist | texture | Deletion (blur) | 0.372 | 0.025 | 36 | 0.667 | 0.056 | û | 0.553 | 0.898 | 18-100% |
+| size-matched object map | pneumonia_mnist | texture | Deletion (inpaint) | 0.655 | 0.000 | 36 | 0.750 | 0.036 | 18.737 | 0.478 | 0.930 | 18-100% |
+| size-matched object map | pneumonia_mnist | texture | Insertion (blur) | 0.432 | 0.009 | 36 | 0.667 | 0.061 | û | 0.543 | 0.918 | 18-100% |
+
+## Method responsiveness (share of attribution on the shortcut vs reliance)
+
+| base | shortcut | method | responsiveness_rho | p_value | mass_low_reliance | mass_high_reliance |
+|---|---|---|---|---|---|---|
+| cifar10 | patch | Grad-CAM | 0.741 | 0.006 | 0.012 | 0.080 |
+| cifar10 | patch | Integrated Gradients | 0.986 | 0.000 | 0.013 | 0.320 |
+| cifar10 | patch | Occlusion | 0.993 | 0.000 | 0.008 | 0.467 |
+| cifar10 | patch | Saliency | 0.972 | 0.000 | 0.003 | 0.115 |
+| cifar10 | patch | SmoothGrad | 0.972 | 0.000 | 0.004 | 0.103 |
+| mnist | patch | Grad-CAM | 0.861 | 0.000 | 0.013 | 0.038 |
+| mnist | patch | Integrated Gradients | 0.972 | 0.000 | 0.002 | 0.696 |
+| mnist | patch | Occlusion | 0.935 | 0.000 | 0.000 | 0.531 |
+| mnist | patch | Saliency | 0.919 | 0.000 | 0.002 | 0.094 |
+| mnist | patch | SmoothGrad | 0.938 | 0.000 | 0.002 | 0.104 |
+| mnist | texture | Grad-CAM | -0.488 | 0.003 | 0.100 | 0.098 |
+| mnist | texture | Integrated Gradients | 0.953 | 0.000 | 0.147 | 0.530 |
+| mnist | texture | Occlusion | 0.896 | 0.000 | 0.104 | 0.218 |
+| mnist | texture | Saliency | -0.801 | 0.000 | 0.118 | 0.057 |
+| mnist | texture | SmoothGrad | -0.738 | 0.000 | 0.110 | 0.082 |
+| pneumonia_mnist | patch | Grad-CAM | 0.802 | 0.000 | 0.022 | 0.166 |
+| pneumonia_mnist | patch | Integrated Gradients | 0.925 | 0.000 | 0.003 | 0.391 |
+| pneumonia_mnist | patch | Occlusion | 0.889 | 0.000 | 0.000 | 0.362 |
+| pneumonia_mnist | patch | Saliency | 0.889 | 0.000 | 0.001 | 0.174 |
+| pneumonia_mnist | patch | SmoothGrad | 0.853 | 0.000 | 0.001 | 0.132 |
+| pneumonia_mnist | texture | Grad-CAM | -0.491 | 0.002 | 0.098 | 0.093 |
+| pneumonia_mnist | texture | Integrated Gradients | 0.855 | 0.000 | 0.142 | 0.397 |
+| pneumonia_mnist | texture | Occlusion | 0.709 | 0.000 | 0.106 | 0.126 |
+| pneumonia_mnist | texture | Saliency | 0.874 | 0.000 | 0.097 | 0.176 |
+| pneumonia_mnist | texture | SmoothGrad | 0.696 | 0.000 | 0.091 | 0.136 |
+

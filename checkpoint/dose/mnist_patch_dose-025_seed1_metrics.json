@@ -1,0 +1,15 @@
+{
+  "base": "mnist",
+  "shortcut": "patch",
+  "dose": -0.25,
+  "swap_fraction": 0.0,
+  "shortcut_noise": 0.25,
+  "seed": 1,
+  "epochs": 3,
+  "best_val_accuracy": 98.72,
+  "test_accuracy": 99.05,
+  "test_accuracy_no_shortcut": 98.93,
+  "test_accuracy_conflicting": 98.95,
+  "reliance": 0.14,
+  "training_minutes": 1.63
+}

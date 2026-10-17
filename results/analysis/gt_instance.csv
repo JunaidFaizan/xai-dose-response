@@ -1,0 +1,11 @@
+dataset,metric,spearman_with_ground_truth,n
+decoy_mnist,Deletion (black),0.7649376236834946,2983
+decoy_mnist,Deletion (blur),0.732275446041854,2983
+decoy_mnist,Deletion (inpaint),0.6675473559120079,2983
+decoy_mnist,Insertion (blur),0.39439897997579176,2983
+decoy_mnist,Sanity (object px),-0.07900122267368155,706
+decoy_pneumonia,Deletion (black),0.6483229473289662,2942
+decoy_pneumonia,Deletion (blur),0.7432226072904936,2942
+decoy_pneumonia,Deletion (inpaint),0.7621949408507379,2942
+decoy_pneumonia,Insertion (blur),0.35697262939283386,2942
+decoy_pneumonia,Sanity (object px),0.6136893103781071,648

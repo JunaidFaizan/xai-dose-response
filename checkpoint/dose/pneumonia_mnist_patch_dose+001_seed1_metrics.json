@@ -1,0 +1,15 @@
+{
+  "base": "pneumonia_mnist",
+  "shortcut": "patch",
+  "dose": 0.01,
+  "swap_fraction": 0.01,
+  "shortcut_noise": 0.0,
+  "seed": 1,
+  "epochs": 20,
+  "best_val_accuracy": 100.0,
+  "test_accuracy": 99.68,
+  "test_accuracy_no_shortcut": 63.78,
+  "test_accuracy_conflicting": 1.6,
+  "reliance": 98.4,
+  "training_minutes": 0.96
+}

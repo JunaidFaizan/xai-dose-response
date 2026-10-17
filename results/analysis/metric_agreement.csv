@@ -1,0 +1,6 @@
+,Deletion (black),Deletion (blur),Deletion (inpaint),Insertion (blur),Sanity (object px)
+Deletion (black),1.0,0.173,0.213,0.2,-0.08
+Deletion (blur),0.173,1.0,0.427,0.493,-0.213
+Deletion (inpaint),0.213,0.427,1.0,0.48,-0.067
+Insertion (blur),0.2,0.493,0.48,1.0,-0.347
+Sanity (object px),-0.08,-0.213,-0.067,-0.347,1.0

@@ -1,0 +1,11 @@
+{
+  "dataset": "fashion_mnist",
+  "seed": 42,
+  "epochs": 15,
+  "batch_size": 128,
+  "learning_rate": 0.001,
+  "best_val_accuracy": 90.38,
+  "test_accuracy": 90.46,
+  "test_balanced_accuracy": 90.46,
+  "training_minutes": 7.7
+}

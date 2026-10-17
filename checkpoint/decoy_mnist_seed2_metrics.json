@@ -1,0 +1,14 @@
+{
+  "dataset": "decoy_mnist",
+  "seed": 2,
+  "epochs": 5,
+  "batch_size": 128,
+  "learning_rate": 0.001,
+  "best_val_accuracy": 99.98,
+  "test_accuracy": 99.95,
+  "test_balanced_accuracy": 99.94,
+  "training_minutes": 2.2,
+  "test_accuracy_no_patch": 9.1,
+  "test_accuracy_conflicting_patch": 0.02,
+  "shortcut_reliance": 99.93
+}

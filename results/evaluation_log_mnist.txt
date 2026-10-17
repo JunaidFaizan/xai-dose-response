@@ -1,0 +1,48 @@
+
+=== mnist | seed 42 ===
+  faithfulness: 50/200 images
+  faithfulness: 100/200 images
+  faithfulness: 150/200 images
+  faithfulness: 200/200 images
+  sanity: done
+                      deletion_zero  deletion_blur  deletion_inpaint  insertion_blur
+method                                                                              
+saliency                      0.306          0.343             0.450           0.902
+smoothgrad                    0.265          0.294             0.341           0.920
+integrated_gradients          0.081          0.377             0.314           0.945
+grad_cam                      0.467          0.618             0.629           0.697
+occlusion                     0.130          0.384             0.290           0.936
+random                        0.666          0.691             0.862           0.684
+  saved to C:\Users\Md Junaid Faizan\Desktop\Mtech Final project\Handwritten-Digit-Recognition-CNN-Flask-App-\results\metrics\mnist (1.2 min)
+
+=== mnist | seed 1 ===
+  faithfulness: 50/200 images
+  faithfulness: 100/200 images
+  faithfulness: 150/200 images
+  faithfulness: 200/200 images
+  sanity: done
+                      deletion_zero  deletion_blur  deletion_inpaint  insertion_blur
+method                                                                              
+saliency                      0.243          0.380             0.404           0.951
+smoothgrad                    0.218          0.345             0.315           0.953
+integrated_gradients          0.106          0.363             0.346           0.971
+grad_cam                      0.424          0.581             0.547           0.784
+occlusion                     0.152          0.449             0.264           0.942
+random                        0.672          0.804             0.873           0.801
+  saved to C:\Users\Md Junaid Faizan\Desktop\Mtech Final project\Handwritten-Digit-Recognition-CNN-Flask-App-\results\metrics\mnist (1.1 min)
+
+=== mnist | seed 2 ===
+  faithfulness: 50/200 images
+  faithfulness: 100/200 images
+  faithfulness: 150/200 images
+  faithfulness: 200/200 images
+  sanity: done
+                      deletion_zero  deletion_blur  deletion_inpaint  insertion_blur
+method                                                                              
+saliency                      0.273          0.302             0.393           0.915
+smoothgrad                    0.258          0.280             0.326           0.920
+integrated_gradients          0.078          0.351             0.341           0.925
+grad_cam                      0.417          0.541             0.530           0.781
+occlusion                     0.154          0.376             0.245           0.930
+random                        0.657          0.689             0.843           0.694
+  saved to C:\Users\Md Junaid Faizan\Desktop\Mtech Final project\Handwritten-Digit-Recognition-CNN-Flask-App-\results\metrics\mnist (1.1 min)
