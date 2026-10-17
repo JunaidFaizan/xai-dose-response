@@ -61,7 +61,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import torch
-from scipy.stats import spearmanr
+from scipy.stats import rankdata, spearmanr
 from torch import nn, optim
 from torch.utils.data import DataLoader
 
@@ -397,6 +397,59 @@ def responsiveness(pref):
     return pd.DataFrame(rows).round(3)
 
 
+BOOTSTRAP_REPS = 2000
+BOOTSTRAP_SEED = 0
+
+
+def _spearman(x, y):
+    """Spearman correlation without p-value (fast enough for the bootstrap)."""
+    rx, ry = rankdata(x), rankdata(y)
+    if rx.std() == 0 or ry.std() == 0:
+        return float("nan")
+    return float(np.corrcoef(rx, ry)[0, 1])
+
+
+def bootstrap_intervals(pref, reps=BOOTSTRAP_REPS, seed=BOOTSTRAP_SEED):
+    """95% bootstrap intervals for the switch point and responsiveness rho.
+
+    The unit of resampling is the trained model: within each dose, the seeds
+    are drawn with replacement, so the dose design stays fixed and only the
+    seed-to-seed variation (the main source of noise near d = 0) is resampled.
+
+    switch_found_share is the share of resamples in which preference crosses
+    0.5 at all; the interval is computed over those resamples only, and is
+    left empty if fewer than half of them cross.
+    """
+    rng = np.random.default_rng(seed)
+    rows = []
+    for (base, shortcut), group in pref.groupby(["base", "shortcut"]):
+        by_dose = [g for _, g in group.groupby("dose")]
+        for metric in FAITHFULNESS_METRICS:
+            reliance = [g.reliance.to_numpy() for g in by_dose]
+            values = [g[metric].to_numpy() for g in by_dose]
+            switches, rhos = [], []
+            for _ in range(reps):
+                picks = [rng.integers(0, len(r), size=len(r)) for r in reliance]
+                r_all = np.concatenate([r[i] for r, i in zip(reliance, picks)])
+                v_all = np.concatenate([v[i] for v, i in zip(values, picks)])
+                level_r = [r[i].mean() for r, i in zip(reliance, picks)]
+                level_v = [v[i].mean() for v, i in zip(values, picks)]
+                switches.append(switch_point(level_r, level_v))
+                rhos.append(_spearman(r_all, v_all))
+            switches, rhos = np.array(switches), np.array(rhos)
+            found = ~np.isnan(switches)
+            share = float(found.mean())
+            low, high = (np.percentile(switches[found], [2.5, 97.5]) if share >= 0.5
+                         else (np.nan, np.nan))
+            valid = rhos[~np.isnan(rhos)]
+            rho_low, rho_high = np.percentile(valid, [2.5, 97.5]) if len(valid) else (np.nan, np.nan)
+            rows.append({"base": base, "shortcut": shortcut, "metric": METRIC_TITLES[metric],
+                         "switch_ci_low": low, "switch_ci_high": high,
+                         "switch_found_share": share,
+                         "rho_ci_low": rho_low, "rho_ci_high": rho_high})
+    return pd.DataFrame(rows).round(3)
+
+
 def method_responsiveness(methods, models):
     mass = methods.groupby(["base", "shortcut", "dose", "seed", "method"]).shortcut_mass.mean()
     mass = mass.reset_index().merge(models, on=["base", "shortcut", "dose", "seed"])
@@ -454,7 +507,7 @@ def analyze(_args=None):
         if f"deletion_zero_{first}" not in oracle or f"deletion_zero_{second}" not in oracle:
             continue  # placebo not computed yet
         pref = preference_table(oracle, first, second).merge(models[keys + ["reliance"]], on=keys)
-        resp = responsiveness(pref)
+        resp = responsiveness(pref).merge(bootstrap_intervals(pref), on=["base", "shortcut", "metric"])
         prefs.append(pref.assign(comparison=label))
         resps.append(resp.assign(comparison=label))
         plot_panels(pref, list(FAITHFULNESS_METRICS), METRIC_TITLES,
@@ -485,7 +538,10 @@ def analyze(_args=None):
              "rates the first above the second). Size-matched object: a binary map of the object's brightest "
              "pixels, as many as the shortcut. Placebo: the shortcut's shape at a wrong class's position, which "
              "never carries evidence. For 'placebo vs full object' the ideal is a LOW preference at every "
-             "reliance, so responsiveness should be near 0.", "",
+             "reliance, so responsiveness should be near 0. "
+             f"switch_ci_low/high and rho_ci_low/high: 95% bootstrap intervals ({BOOTSTRAP_REPS} resamples of "
+             "the seeds within each dose). switch_found_share: share of resamples in which preference crosses "
+             "0.5 at all (the switch interval is left empty below 0.5).", "",
              markdown(resp[["comparison"] + [c for c in resp.columns if c != "comparison"]]), "", "## Method responsiveness (share of attribution on the shortcut vs reliance)", "",
              markdown(method_resp), ""]
     (OUT / "summary.md").write_text("\n".join(lines), encoding="utf-8")
