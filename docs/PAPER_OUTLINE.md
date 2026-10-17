@@ -14,10 +14,10 @@ When a model's reliance on a shortcut increases in controlled steps, do faithful
 
 1. **A dose-response protocol for meta-evaluating XAI metrics.** A signed training dose sets the model's reliance on an injected shortcut, from about 0% to 100%. Reliance is measured behaviourally, and fixed oracle explanations are scored, so the metrics are tested independently of any explanation method.
 2. **Evidence that metric responsiveness depends on the data and the shortcut type.** Metrics track reliance closely on MNIST (ρ = 0.91–0.98) but weakly or not at all on chest X-rays (ρ = 0.07–0.84). Insertion fails on a diffuse shortcut.
-3. **A size confound in oracle-based evaluation.** Against a size-matched object map, the switch point on MNIST patch moves from 30–42% reliance to 6–15%, so metrics partly reward explanation size.
+3. **A size and shape confound in oracle-based evaluation.** Against a size-matched object map, the switch point on MNIST patch moves from 30–42% reliance to 6–15%, so metrics partly reward explanation size. The placebo control confirms it: a shortcut-shaped map at a position the model never uses is increasingly preferred over the object map as reliance grows (MNIST ρ = 0.89–0.97), and black-fill deletion on CIFAR-10 prefers it 82% of the time at 4% reliance. On the diffuse MNIST shortcut, insertion prefers the placebo over the real shortcut (ρ = −0.81).
 4. **Ranking is not calibration (CIFAR-10).** On 32×32 colour images with a larger CNN, preference still tracks reliance (ρ = 0.88–0.99), but black and blur deletion prefer the shortcut explanation 74–82% of the time even at 4% reliance. A high correlation with reliance is therefore not enough to trust a metric's verdict. Inpainting deletion and insertion are far less biased.
 5. **Practical guidance.** Inpainting deletion is the only variant that responds significantly in all eight settings, and some explanation methods (Saliency, SmoothGrad, Grad-CAM) move away from a diffuse shortcut as the model relies on it more.
-6. **Supporting fixed-shortcut study:** five methods, five datasets and three seeds, showing that the model-randomization sanity check ranks methods against the ground truth. Use this as a secondary section, or leave it out if space is short.
+6. **Supporting fixed-shortcut study:** five methods, five datasets and three seeds, showing that the model-randomization sanity check does not rank methods in line with the ground truth (Kendall τ = −0.20 to 0.07). Use this as a secondary section, or leave it out if space is short.
 
 ## Related work (verified links; read each before citing)
 
@@ -46,7 +46,7 @@ Before submitting, run your own search, with your guide, for "graded spurious co
    - Shortcuts: a 3×3 patch at class-coded positions; a texture of a class-specific random 10% of pixels, brightened by 0.3
    - Signed dose: image swaps (d > 0) and shortcut noise (d < 0), capped at |d| = 0.4, and why both are needed (with d = 0 the shortcut is already easier to learn)
    - Reliance: following a conflicting shortcut on the test set
-   - Oracle maps: shortcut, full object, size-matched object
+   - Oracle maps: shortcut, full object, size-matched object, placebo (the shortcut's shape at a wrong class's position)
    - Metrics: deletion (black, blur, inpaint), insertion (blur)
    - Scores: preference, responsiveness ρ, decision accuracy, switch point
 4. **Setup** (0.5 page): MNIST and PneumoniaMNIST, the CNN, 12 doses × 3 seeds × 2 shortcuts × 2 datasets = 144 models; plus CIFAR-10 with a larger CNN (0.77M parameters, batch norm, 10 epochs), patch shortcut, 6 doses × 2 seeds = 12 models; 100 test images each, CPU only. For CIFAR-10 the object map is a centred Gaussian, because natural images have no clean background.
@@ -54,6 +54,7 @@ Before submitting, run your own search, with your guide, for "graded spurious co
    - Table 1: reliance per dose (`summary.md`, first table). It shows the dose controls reliance, and how much seeds vary near d = 0.
    - Figure 1: preference vs reliance, full object map (`metric_dose_response.png`). The main result.
    - Figure 2: the same with the size-matched control (`metric_dose_response_size_matched.png`)
+   - Figure 2b: the placebo controls (`metric_dose_response_placebo_vs_object.png`, `metric_dose_response_shortcut_vs_placebo.png`)
    - Table 2: responsiveness, decision accuracy and switch point per metric and setting (`responsiveness.csv`)
    - Figure 3: explanation methods vs reliance (`method_dose_response.png`)
    - Optional, from the supporting study: sanity check vs ground truth (`results/analysis/gt_agreement.png`)

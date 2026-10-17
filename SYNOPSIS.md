@@ -99,15 +99,16 @@ The closest related work covers parts of this: shortcut or backdoor ground truth
 
 ## Preliminary Findings
 
-From the experiments completed so far (the placebo control is still running):
+All 156 models have been trained and evaluated, including the placebo control:
 
 1. **Metric reliability depends on the data.** On MNIST, every metric tracks the model's reliance closely (ρ = 0.91–0.98). On chest X-rays, responsiveness falls to ρ = 0.07–0.84, and some metrics do not respond significantly.
 2. **Explanation size distorts the metrics.** When the object explanation is matched in size to the shortcut, the metrics switch their verdict at only 6–15% reliance, instead of 30–42%.
-3. **A correct ranking is not a correct verdict.** On CIFAR-10, black and blur deletion rank models correctly (ρ ≈ 0.9), yet prefer the shortcut explanation 74–82% of the time even when the model relies on the shortcut only 4% of the time.
-4. **Insertion fails on a diffuse shortcut,** switching only at about 98% reliance.
-5. **Inpainting-based deletion is the most robust variant tested.**
-6. **Explanation methods differ:** Integrated Gradients follows the shortcut in every setting, while Saliency, SmoothGrad and Grad-CAM move away from a diffuse shortcut as the model relies on it more.
-7. **Supporting study:** the model-randomization sanity check ranks explanation methods against the ground truth (Kendall τ = −0.20 to 0.07).
+3. **The metrics also reward a meaningless placebo.** A placebo map (the shortcut's shape at a position the model never uses) should never beat the object map. Yet on MNIST, the metrics prefer the placebo more and more as reliance grows (ρ = 0.89–0.97), and on CIFAR-10, black-fill deletion prefers it 82% of the time at only 4% reliance. Part of what the metrics reward is a small, compact map, not the evidence the model uses. Insertion on the diffuse MNIST shortcut even prefers the placebo over the real shortcut (ρ = −0.81).
+4. **A correct ranking is not a correct verdict.** On CIFAR-10, black and blur deletion rank models correctly (ρ ≈ 0.9), yet prefer the shortcut explanation 74–82% of the time even when the model relies on the shortcut only 4% of the time.
+5. **Insertion fails on a diffuse shortcut,** switching only at about 98% reliance.
+6. **Inpainting-based deletion is the most robust variant tested.**
+7. **Explanation methods differ:** Integrated Gradients follows the shortcut in every setting, while Saliency, SmoothGrad and Grad-CAM move away from a diffuse shortcut as the model relies on it more.
+8. **Supporting study:** the model-randomization sanity check does not rank explanation methods in line with the ground truth (Kendall τ = −0.20 to 0.07).
 
 ## Tools and Technologies
 
