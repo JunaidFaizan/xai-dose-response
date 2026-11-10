@@ -87,10 +87,41 @@ class CifarModel(nn.Module):
         return nn.functional.log_softmax(self.dense4(x), dim=1)
 
 
+class ResNet18Cifar(nn.Module):
+    """Standard ResNet-18 (He et al., 2016), adapted to 32x32 images in the usual
+    way: a 3x3 stride-1 first convolution and no initial max-pool. About 11.2M
+    parameters. Built from torchvision's implementation.
+
+    `pool2` is an identity placed after the last residual stage, so Grad-CAM
+    (which hooks the input of `pool2`) uses the final 4x4 feature maps, as it
+    does for the smaller CNNs.
+    """
+
+    def __init__(self, classes: int = 10) -> None:
+        super().__init__()
+        from torchvision.models import resnet18
+        net = resnet18(weights=None, num_classes=classes)
+        net.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1, bias=False)
+        net.maxpool = nn.Identity()
+        self.classes = classes
+        self.net = net
+        self.pool2 = nn.Identity()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        n = self.net
+        x = n.relu(n.bn1(n.conv1(x)))
+        x = n.layer4(n.layer3(n.layer2(n.layer1(x))))
+        x = torch.flatten(n.avgpool(self.pool2(x)), 1)
+        return nn.functional.log_softmax(n.fc(x), dim=1)
+
+
+ARCHITECTURES = {"cifar": CifarModel, "resnet18": ResNet18Cifar}
+
+
 def build_model(dataset: str) -> nn.Module:
     """An untrained model of the right architecture for a dataset."""
     from .data import info
-    cls = CifarModel if info(dataset).get("arch") == "cifar" else MnistModel
+    cls = ARCHITECTURES.get(info(dataset).get("arch"), MnistModel)
     return cls(classes=num_classes(dataset))
 
 
