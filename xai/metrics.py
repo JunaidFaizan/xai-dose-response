@@ -70,15 +70,15 @@ def _step_masks(order, shape, steps):
     return masks.view(steps + 1, 1, *shape[-2:])
 
 
-def blur(x):
-    return gaussian_blur(x, kernel_size=[BLUR_KERNEL] * 2, sigma=[BLUR_SIGMA] * 2)
+def blur(x, kernel=BLUR_KERNEL, sigma=BLUR_SIGMA):
+    return gaussian_blur(x, kernel_size=[kernel] * 2, sigma=[sigma] * 2)
 
 
 def inpaint(images, masks, iterations=INPAINT_ITERATIONS, noise=INPAINT_NOISE, seed=0):
     """Fill masked pixels by repeatedly averaging their 4 neighbours, then add noise."""
     channels = images.shape[1]
     kernel = torch.tensor([[0.0, 1.0, 0.0], [1.0, 0.0, 1.0], [0.0, 1.0, 0.0]]).view(1, 1, 3, 3) / 4
-    kernel = kernel.repeat(channels, 1, 1, 1)  # one kernel per channel (identical for grayscale)
+    kernel = kernel.repeat(channels, 1, 1, 1).to(images.device)  # one kernel per channel
     known = ~masks
     count = known.sum(dim=(2, 3), keepdim=True).clamp(min=1)
     mean = (images * known).sum(dim=(2, 3), keepdim=True) / count  # per-channel mean
@@ -86,38 +86,44 @@ def inpaint(images, masks, iterations=INPAINT_ITERATIONS, noise=INPAINT_NOISE, s
     for _ in range(iterations):
         average = F.conv2d(F.pad(filled, (1, 1, 1, 1), mode="replicate"), kernel, groups=channels)
         filled = torch.where(masks, average, images)
+    # Noise is drawn on the CPU so the same seed gives the same noise on any device.
     generator = torch.Generator().manual_seed(seed)
-    jitter = torch.randn(images.shape, generator=generator) * noise
+    jitter = (torch.randn(images.shape, generator=generator) * noise).to(images.device)
     return torch.where(masks, (filled + jitter).clamp(0, 1), images)
 
 
 def perturbation_curve(model, x, target, attribution, mode="deletion", fill="zero",
-                       steps=20, rng=None):
+                       steps=20, rng=None, blur_kernel=BLUR_KERNEL, blur_sigma=BLUR_SIGMA,
+                       inpaint_iterations=INPAINT_ITERATIONS):
     """Probability of `target` as pixels are removed (or inserted), most important first.
 
     Args:
         model: classifier returning log-probabilities.
-        x: input of shape (1, 1, H, W) with values in [0, 1].
+        x: input of shape (1, C, H, W) with values in [0, 1].
         target: class whose probability is tracked.
         attribution: (H, W) map; higher means more important.
         mode: "deletion" or "insertion".
         fill: "zero", "blur" or "inpaint" (inpaint is deletion only).
         steps: number of steps (each changes 1/steps of the pixels).
         rng: NumPy generator used to break ties between equal scores.
+        blur_kernel, blur_sigma: Gaussian blur for fill "blur". The defaults
+            suit 28x28 and 32x32 images; larger images scale them.
+        inpaint_iterations: neighbour-averaging steps for fill "inpaint".
 
     Returns:
         Array of steps + 1 probabilities.
     """
     rng = rng or np.random.default_rng(0)
-    masks = _step_masks(_ranking(attribution, rng), x.shape, steps)
+    masks = _step_masks(_ranking(attribution, rng), x.shape, steps).to(x.device)
     original = x.detach().expand(steps + 1, -1, -1, -1)
 
     if fill == "inpaint":
         if mode != "deletion":
             raise ValueError("inpaint is only defined for deletion")
-        images = inpaint(original.clone(), masks)
+        images = inpaint(original.clone(), masks, iterations=inpaint_iterations)
     else:
-        reference = torch.zeros_like(original) if fill == "zero" else blur(x.detach()).expand_as(original)
+        reference = (torch.zeros_like(original) if fill == "zero"
+                     else blur(x.detach(), blur_kernel, blur_sigma).expand_as(original))
         if mode == "deletion":
             images = torch.where(masks, reference, original)
         elif mode == "insertion":

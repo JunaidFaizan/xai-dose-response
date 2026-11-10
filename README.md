@@ -1,4 +1,4 @@
-# Do XAI Metrics Notice When a Model Starts Cheating? A Dose-Response Evaluation of Explanation Metrics
+# A Dose-Response Evaluation of Explanation Metrics under Controlled Shortcut Reliance in CNN Image Classifiers
 
 M.Tech final year project in Explainable AI. It extends my B.Tech project, a handwritten digit recognition app built with PyTorch and Flask.
 
@@ -14,15 +14,18 @@ In my literature searches (September 2026) I didn't find published work that var
 
 ## Main findings: dose-response study
 
-144 models: MNIST and PneumoniaMNIST × patch and texture shortcuts × 12 reliance levels × 3 seeds, plus 12 CIFAR-10 models (patch shortcut, 6 doses × 2 seeds), each scored on 100 test images. Exact numbers are in `results/dose_response/summary.md`, and the main figures are `metric_dose_response.png`, `metric_dose_response_size_matched.png` and `method_dose_response.png`.
+174 models: MNIST and PneumoniaMNIST × patch and texture shortcuts × 12 reliance levels × 3 seeds (144), plus CIFAR-10 with the patch shortcut at 6 doses: 12 models with a small CNN (2 seeds) and 18 with a standard ResNet-18 (3 seeds, trained on a free Kaggle GPU; see `kaggle/README.md`). Each model is scored on 100 test images. Exact numbers are in `results/dose_response/summary.md`, and the main figures are `metric_dose_response.png`, `metric_dose_response_size_matched.png` and `method_dose_response.png`.
 
 1. **Responsiveness depends on the data.** On MNIST, every metric's preference tracks the model's reliance closely (Spearman ρ = 0.91–0.98 in every setting). On the chest X-rays it ranges from ρ = 0.07 to 0.84, and 3 of the 16 metric-setting combinations aren't significant. The worst case is black-fill deletion on the X-ray texture shortcut under the size-matched control, which doesn't respond at all (ρ = 0.07, p = 0.68).
 2. **The metrics switch too early.** An ideal metric would switch to preferring the shortcut explanation when the model follows the shortcut half the time. On MNIST with a patch, they switch at 30–42% reliance against the full object map, and at only 6–15% against the size-matched map.
 3. **Explanation size is a confound.** At low reliance, the metrics strongly prefer the full object map (preference for the shortcut map 0.01–0.02 on MNIST patch). Against an object map of the same size as the shortcut, that preference rises to 0.27–0.37. Part of what looks like "the metric recognises the object" is the object map simply being bigger.
 4. **Insertion fails on a diffuse shortcut.** On MNIST texture, insertion (blur) only switches at about 98–99% reliance and never goes above 0.6. Deletion with black or inpainted pixels switches at 28–35%.
 5. **Inpainting deletion is the most robust variant.** It is the only metric that responds significantly in all eight settings (ρ ≥ 0.58, p < 0.001).
-6. **On CIFAR-10 (32×32 colour, a 0.77M-parameter CNN), the metrics rank correctly but are badly calibrated.** 12 models (6 doses × 2 seeds, patch shortcut) span 4–96% reliance, with 63–74% accuracy when the shortcut is removed. Every metric's preference rises with reliance (ρ = 0.88–0.99). But even at 4% reliance, black and blur deletion prefer the shortcut map 74–82% of the time, so they would wrongly conclude that a model is using a shortcut it ignores (decision accuracy 0.17). Inpainting deletion and insertion are much less biased (0.23–0.27 at low reliance). One possible cause is that removing scattered pixels damages natural images more than removing a compact region, which is the shape confound that ROAD describes. The CIFAR-10 object map is a centred Gaussian, not a real object mask, so treat this as a hypothesis.
-7. **Some explanation methods move the wrong way.** As reliance on the MNIST texture shortcut grows, Saliency, SmoothGrad and Grad-CAM put *less* weight on it (ρ = −0.49 to −0.80). Integrated Gradients follows the shortcut in every setting (ρ = 0.86–0.97).
+6. **On CIFAR-10 (32×32 colour, a 0.77M-parameter CNN), black and blur deletion rate a random explanation above the object explanation.** 12 models (6 doses × 2 seeds, patch shortcut) span 4–96% reliance, with 63–74% accuracy when the shortcut is removed. Every metric's preference rises with reliance (ρ = 0.88–0.99). But at 4% reliance, black and blur deletion prefer the shortcut map over the object map 74–82% of the time, and they prefer a fully random pixel ordering over it just as often (75–82%). Their apparent detection of a shortcut the model ignores is therefore a bias against the compact object map. Inpainting deletion and insertion aren't affected (18–27%). **The same pattern holds with ResNet-18** (11.2M parameters, 82% accuracy without the shortcut): black and blur deletion prefer the shortcut map 61–70% of the time and a random ordering 56–72% at 3% reliance, while inpainting and insertion stay at 13–24%. Every metric still tracks reliance (ρ = 0.96–0.98), so the effect isn't specific to small networks. One likely cause is that removing scattered pixels damages natural images more than removing a compact region (the effect ROAD describes). The CIFAR-10 object map is a centred Gaussian, not a real object mask, so treat the cause as a hypothesis.
+7. **When explanations have the same form, the metrics behave correctly.** Compared against a placebo patch or a random ordering, the shortcut map starts near 0.5 at low reliance and rises to 0.93–0.99 for every metric on the patch shortcut. The placebo itself behaves like a random ordering (placebo vs random stays near 0.5 for deletion), so its rise over the object map at high reliance is correct: the object map then explains the model worse than random. The exception is the diffuse MNIST texture, where blur deletion and insertion can't distinguish the shortcut from random (ρ = 0.09 and −0.59).
+8. **Some explanation methods move the wrong way.** As reliance on the MNIST texture shortcut grows, Saliency, SmoothGrad and Grad-CAM put *less* weight on it (ρ = −0.49 to −0.80). Integrated Gradients follows the shortcut in every setting (ρ = 0.86–0.97).
+
+**Pending: Oxford-IIIT Pet.** 18 more ResNet-18 models on 128×128 cat and dog photos with real segmentation masks (`pet_resnet18`, run on Kaggle) are prepared but not trained yet. The predictions were pre-registered before training in `docs/PREDICTIONS_pet.md`. The numbers above don't include them.
 
 ## Supporting study: fixed-shortcut ground truth
 
@@ -53,6 +56,7 @@ Model accuracy (mean of 3 seeds):
 | `pneumonia_mnist` | Paediatric chest X-rays | 2 | [MedMNIST v2](https://medmnist.com/) (CC BY 4.0) |
 | `decoy_mnist` | MNIST plus a 3×3 white patch whose position encodes the class (10 positions along the borders) | 10 | Built from MNIST |
 | `decoy_pneumonia` | PneumoniaMNIST plus a corner marker encoding the class | 2 | Built from PneumoniaMNIST |
+| `pet_resnet18` | Oxford-IIIT Pet photos, cat vs dog, 128×128, with real segmentation masks (dose-response only) | 2 | torchvision `OxfordIIITPet`, preprocessed by `prepare_pet.py` |
 
 How the decoy datasets work:
 
@@ -95,6 +99,7 @@ The statistics use 200 test images per model (50 for the sanity check), paired W
   - decision accuracy: the share of models where the preferred map matches whether reliance is above 50%
   - switch point: the reliance at which preference crosses 0.5. The 50% ideal is a modelling assumption.
 - The sanity check isn't applied to the oracle maps, because they don't depend on the model.
+- **Oxford-IIIT Pet (`pet_resnet18`, run on Kaggle):** a ResNet-18 trained from scratch for 30 epochs on 128×128 cat and dog photos, with a 12×12 corner patch (the same 3/32 of the side as CIFAR-10). The object map is the real segmentation mask, with the border band counted as pet. The size-matched map is the 144 mask pixels nearest the mask's centre. Image-size settings are scaled by 4: blur σ = 16 (kernel 97), 1600 inpainting steps, occlusion 16×16 with stride 8. 6 doses (−0.4 to 0) × 3 seeds = 18 models.
 
 ## Project structure
 
@@ -107,6 +112,7 @@ xai/
   preprocess.py    turns dashboard drawings and uploads into model inputs
   paths.py
 dose_response.py           dose-response study: train, evaluate, analyze (resumable)
+prepare_pet.py             downloads Oxford-IIIT Pet once and saves data/pet128/*.npz
 train_models.py            trains models for any datasets and seeds
 evaluate_explanations.py   runs every metric for every model
 analyze_results.py         statistics, tables and figures
@@ -142,6 +148,9 @@ python analyze_results.py                                      # under 1 min
 foreach ($d in 'mnist','fashion_mnist','pneumonia_mnist','decoy_mnist','decoy_pneumonia') { python generate_explanations.py --dataset $d }
 python dose_response.py all                                    # about 3 hours; resumes if interrupted
 pwsh -File results\run_cifar.ps1                               # CIFAR-10 part, about 5 hours; resumes if interrupted
+# ResNet-18 part: run on a free Kaggle GPU, about 4 hours (see kaggle/README.md)
+python prepare_pet.py                                          # Pet data, about 800 MB download once
+# Pet part: run on a free Kaggle GPU (see "Oxford-IIIT Pet" in kaggle/README.md)
 ```
 
 Each script's `--help` lists its options.
@@ -168,7 +177,8 @@ Tests: `python -m unittest test_app.py`
 - PneumoniaMNIST results are a research study, not a diagnostic tool
 - Dose-response: the lowest reliance reached on PneumoniaMNIST was about 15%, not 0
 - Dose-response: near d = 0 reliance varies a lot between seeds (for example 14–77% on MNIST texture at d = 0.005), so results are analysed against measured reliance, not the dose
-- Dose-response, CIFAR-10: one shortcut type, 2 seeds and no augmentation (it slowed learning too much in a 10-epoch budget). The object map is a centred Gaussian prior, and no model fell between 45% and 96% reliance.
+- Dose-response, CIFAR-10 (both networks): one shortcut type, no augmentation, and a gap between about 45% and 96% reliance. The small CNN uses 2 seeds, ResNet-18 3 seeds.
+- Dose-response, CIFAR-10 small CNN: 2 seeds and no augmentation (it slowed learning too much in a 10-epoch budget). The object map is a centred Gaussian prior, and no model fell between 45% and 96% reliance.
 - Dose-response: the 50% switch point is a modelling assumption, and the size-matched control uses the brightest pixels, which is only one way to match size
 
 ## Related work

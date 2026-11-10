@@ -1,8 +1,10 @@
 """Explanation (attribution) methods built on Captum.
 
-Every method takes a model, an input of shape (1, 1, 28, 28) and a target
-class, and returns a 28x28 NumPy attribution map. Higher values mean the
-pixel contributed more evidence for the target class.
+Every method takes a model, an input of shape (1, C, H, W) (e.g. 1x28x28,
+3x32x32 or 3x128x128) and a target class, and returns an HxW NumPy
+attribution map. Higher values mean the pixel contributed more evidence for
+the target class. Occlusion takes optional `window` and `stride` (default
+4 and 2 pixels); `explain(..., **options)` passes them through.
 """
 
 import numpy as np
@@ -57,14 +59,14 @@ def grad_cam(model, x, target):
     return LayerAttribution.interpolate(cam, x.shape[-2:], interpolate_mode="bilinear")
 
 
-def occlusion(model, x, target):
-    # Slide a 4x4 black patch over the image and record the drop in the
-    # class score at each position.
+def occlusion(model, x, target, window=4, stride=2):
+    # Slide a window x window black patch (default 4x4) over the image and
+    # record the drop in the class score at each position.
     return Occlusion(model).attribute(
         x,
         target=target,
-        sliding_window_shapes=(x.shape[1], 4, 4),  # cover all colour channels together
-        strides=(x.shape[1], 2, 2),
+        sliding_window_shapes=(x.shape[1], window, window),  # cover all colour channels together
+        strides=(x.shape[1], stride, stride),
         baselines=0,
         perturbations_per_eval=64,  # batch patches for speed; same result
     )
@@ -79,16 +81,17 @@ METHODS = {
 }
 
 
-def explain(model, x: torch.Tensor, target: int, method: str) -> np.ndarray:
+def explain(model, x: torch.Tensor, target: int, method: str, **options) -> np.ndarray:
     """Compute an HxW attribution map for one image.
 
     For colour images the per-channel attributions are summed into one map.
+    `options` are passed to the method (e.g. window/stride for occlusion).
     """
     if method not in METHODS:
         raise ValueError(f"Unknown method '{method}'. Choose from {list(METHODS)}")
     model.eval()
     x = x.detach().clone().requires_grad_()
-    attribution = METHODS[method][1](model, x, int(target))
+    attribution = METHODS[method][1](model, x, int(target), **options)
     return attribution.detach().cpu().numpy()[0].sum(axis=0)
 
 

@@ -15,3 +15,5 @@ checkpoint/dose/*.pt
 .idea/
 Thumbs.db
 desktop.ini
+kaggle/xai_dose_bundle.zip
+kaggle/xai_pet_bundle.zip

@@ -42,6 +42,16 @@ Design
     The model-randomization sanity check is not applied to oracle maps: they do
     not depend on the model, so the check cannot score them at all.
 
+Oxford-IIIT Pet (pet_resnet18, run on a Kaggle GPU via kaggle/dose_response_pet.ipynb)
+    Cat vs dog photos at 128x128 (data/pet128/*.npz, made by prepare_pet.py),
+    a ResNet-18 trained from scratch for 30 epochs, a 12x12 white corner patch.
+    The object map is the real segmentation mask (border band counted as pet);
+    the size-matched map is the k mask pixels nearest the mask centroid. Blur
+    (sigma 16, kernel 97), inpainting (1600 steps) and occlusion (16x16, stride
+    8) are scaled to the image size. PET_DOSES x PET_SEEDS = 18 models:
+        python dose_response.py all --bases pet_resnet18 --shortcuts patch \\
+            --doses -0.4 -0.3 -0.2 -0.1 -0.05 0 --seeds 42 1 2
+
 Output
     checkpoint/dose/<base>_<shortcut>_dose<+NNN>_seed<N>.pt (+ _metrics.json)
     results/dose_response/scores_oracle.csv, scores_methods.csv  per-image scores
@@ -69,19 +79,26 @@ from train_models import accuracy, predict_all
 from utils import random_seed
 from xai.data import SHORTCUT_TYPES, info, num_classes, shortcut_split
 from xai.explain import METHODS, explain
-from xai.metrics import FAITHFULNESS_METRICS, area_under_curve, perturbation_curve, relevance_mass_accuracy
+from xai.metrics import (BLUR_KERNEL, BLUR_SIGMA, FAITHFULNESS_METRICS, INPAINT_ITERATIONS,
+                         area_under_curve, perturbation_curve, relevance_mass_accuracy)
 from xai.models import build_model
 from xai.paths import CHECKPOINT_DIR, RESULTS_DIR
 
 # Base dataset: training epochs. cifar10 is opt-in (--bases cifar10): its models
 # take 20-40 min each on a CPU, so it is not part of the default run.
-BASES = {"mnist": 3, "pneumonia_mnist": 20, "cifar10": 10}
+BASES = {"mnist": 3, "pneumonia_mnist": 20, "cifar10": 10, "cifar10_resnet18": 15,
+         "pet_resnet18": 30}
 # CIFAR-10 learns the patch almost at once (96.7% validation accuracy after one
 # epoch at d = 0), so its range reaches further down. With 10 classes a
 # shortcut noise of 0.8 still points to the true class most often (20% vs
 # about 9% for each wrong class), so the doses stay valid.
 CIFAR_DOSES = [-0.8, -0.6, -0.4, -0.25, -0.1, 0.0]
 CIFAR_SEEDS = [42, 1]
+# Oxford-IIIT Pet (cat vs dog): a binary task, so |d| <= 0.4. CIFAR-10 learned
+# the patch strongly at d = 0, so the doses are negative. They may be adjusted
+# after the first Kaggle model (kaggle/README.md).
+PET_DOSES = [-0.4, -0.3, -0.2, -0.1, -0.05, 0.0]
+PET_SEEDS = [42, 1, 2]
 DEFAULT_BASES = ["mnist", "pneumonia_mnist"]
 # Signed dose: negative = that share of training shortcuts point to a wrong
 # class (less reliance); positive = that share of training images are swapped
@@ -105,6 +122,8 @@ def dose_label(dose):
         return f"{round(percent):+04d}"
     return f"{percent:+.1f}".replace(".", "p")
 MODEL_DIR = CHECKPOINT_DIR / "dose"
+# A GPU is used when available (e.g. on Kaggle); otherwise the CPU, as before.
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 OUT = RESULTS_DIR / "dose_response"
 STEPS = 20
 IMAGE_SEED = 0
@@ -118,6 +137,24 @@ def model_name(base, shortcut, dose, seed):
 
 def configurations(args):
     return list(itertools.product(args.bases, args.shortcuts, args.doses, args.seeds))
+
+
+def metric_options(base):
+    """Blur and inpainting settings for a base dataset. Datasets without their
+    own values (all 28px and 32px ones) get the module defaults, unchanged."""
+    entry = info(base)
+    return {"blur_kernel": entry.get("blur_kernel", BLUR_KERNEL),
+            "blur_sigma": entry.get("blur_sigma", BLUR_SIGMA),
+            "inpaint_iterations": entry.get("inpaint_iterations", INPAINT_ITERATIONS)}
+
+
+def method_options(base, method):
+    """Extra settings for an attribution method (occlusion window and stride;
+    4 and 2 pixels unless the dataset sets its own)."""
+    if method != "occlusion":
+        return {}
+    entry = info(base)
+    return {"window": entry.get("occlusion_window", 4), "stride": entry.get("occlusion_stride", 2)}
 
 
 # ---------------------------------------------------------------- training
@@ -134,9 +171,11 @@ def train_one(base, shortcut, dose, seed, force):
     epochs = BASES[base]
     train_set = shortcut_split(base, shortcut, "train", swap, noise)
     val_set = shortcut_split(base, shortcut, "val", swap, noise)
+    # On a GPU, load batches in background workers so the GPU isn't left waiting.
+    workers = {"num_workers": 2, "pin_memory": True, "persistent_workers": True} if DEVICE.type == "cuda" else {}
     loader = DataLoader(train_set, batch_size=128, shuffle=True,
-                        generator=torch.Generator().manual_seed(seed))
-    model = build_model(base)
+                        generator=torch.Generator().manual_seed(seed), **workers)
+    model = build_model(base).to(DEVICE)
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
     loss_fn = nn.NLLLoss()
 
@@ -145,26 +184,27 @@ def train_one(base, shortcut, dose, seed, force):
     for _ in range(epochs):
         model.train()
         for images, labels in loader:
+            images, labels = images.to(DEVICE), torch.as_tensor(labels).to(DEVICE)
             optimizer.zero_grad()
-            loss_fn(model(images), torch.as_tensor(labels)).backward()
+            loss_fn(model(images), labels).backward()
             optimizer.step()
-        val_acc = accuracy(*predict_all(model, val_set, "cpu"))
+        val_acc = accuracy(*predict_all(model, val_set, DEVICE))
         if val_acc > best:
             best = val_acc
             torch.save(model.state_dict(), path)
-        if base == "cifar10":  # slow models: show progress per epoch
+        if base.startswith(("cifar10", "pet")):  # slow models: show progress per epoch
             print(f"  {name} epoch {_ + 1}/{epochs}: val acc {val_acc:.1f}%", flush=True)
 
-    model.load_state_dict(torch.load(path))
+    model.load_state_dict(torch.load(path, map_location=DEVICE))
     conflicting = shortcut_split(base, shortcut, "test", mode="conflicting")
-    conf_preds, conf_labels = predict_all(model, conflicting, "cpu")
+    conf_preds, conf_labels = predict_all(model, conflicting, DEVICE)
     metrics = {
         "base": base, "shortcut": shortcut, "dose": dose, "swap_fraction": swap,
         "shortcut_noise": noise, "seed": seed, "epochs": epochs,
         "best_val_accuracy": round(best, 2),
-        "test_accuracy": round(accuracy(*predict_all(model, shortcut_split(base, shortcut, "test"), "cpu")), 2),
+        "test_accuracy": round(accuracy(*predict_all(model, shortcut_split(base, shortcut, "test"), DEVICE)), 2),
         "test_accuracy_no_shortcut": round(accuracy(*predict_all(
-            model, shortcut_split(base, shortcut, "test", mode="none"), "cpu")), 2),
+            model, shortcut_split(base, shortcut, "test", mode="none"), DEVICE)), 2),
         "test_accuracy_conflicting": round(accuracy(conf_preds, conf_labels), 2),
         "reliance": round(accuracy(conf_preds, conflicting.patch_class), 2),
         "training_minutes": round((time.perf_counter() - start) / 60, 2),
@@ -183,7 +223,9 @@ def train(args):
 
 def load(base, shortcut, dose, seed):
     model = build_model(base)
-    model.load_state_dict(torch.load(MODEL_DIR / f"{model_name(base, shortcut, dose, seed)}.pt"))
+    model.load_state_dict(torch.load(MODEL_DIR / f"{model_name(base, shortcut, dose, seed)}.pt",
+                                     map_location=DEVICE))
+    model.to(DEVICE)
     model.eval()
     return model
 
@@ -199,6 +241,22 @@ def size_matched(object_values, k):
     return matched.reshape(object_values.shape)
 
 
+def compact_matched(object_values, k):
+    """Size-matched control for binary object masks (Oxford-IIIT Pet): the k
+    object pixels nearest the object's centroid, a compact region like the
+    shortcut patch. A binary mask has no "brightest" pixels, so size_matched
+    would pick k pixels in an arbitrary tie order. Ties in distance are broken
+    in row-major order. Fewer than k object pixels: all of them are used."""
+    rows, cols = np.nonzero(object_values > 0)
+    matched = np.zeros(object_values.shape, dtype=np.float64)
+    if len(rows) == 0:
+        return matched
+    distance = (rows - rows.mean()) ** 2 + (cols - cols.mean()) ** 2
+    nearest = np.argsort(distance, kind="stable")[:k]
+    matched[rows[nearest], cols[nearest]] = 1.0
+    return matched
+
+
 def evaluate_one(base, shortcut, dose, seed, samples):
     model = load(base, shortcut, dose, seed)
     test_set = shortcut_split(base, shortcut, "test")  # aligned: shortcut and image agree
@@ -207,23 +265,25 @@ def evaluate_one(base, shortcut, dose, seed, samples):
     rng = np.random.default_rng(0)
     oracle_rows, method_rows = [], []
     config = {"base": base, "shortcut": shortcut, "dose": dose, "seed": seed}
+    matcher = compact_matched if info(base).get("matched") == "compact" else size_matched
+    options = metric_options(base)
 
     for index in indices:
         image, label = test_set[index]
-        x = image.unsqueeze(0)
+        x = image.unsqueeze(0).to(DEVICE)
         mask = test_set.mask(index)
         object_values = test_set.object_map(index)
         maps = {"shortcut": mask.astype(np.float64), "object": object_values,
-                "object_matched": size_matched(object_values, int(mask.sum()))}
+                "object_matched": matcher(object_values, int(mask.sum()))}
         row = dict(config, index=index, label=label)
         for metric, (_, mode, fill, _) in FAITHFULNESS_METRICS.items():
             for which, attribution in maps.items():
-                curve = perturbation_curve(model, x, label, attribution, mode, fill, STEPS, rng)
+                curve = perturbation_curve(model, x, label, attribution, mode, fill, STEPS, rng, **options)
                 row[f"{metric}_{which}"] = area_under_curve(curve)
         oracle_rows.append(row)
 
         for method in METHODS:
-            attribution = explain(model, x, label, method)
+            attribution = explain(model, x, label, method, **method_options(base, method))
             method_rows.append(dict(config, index=index, method=method,
                                     shortcut_mass=relevance_mass_accuracy(attribution, mask)))
     return oracle_rows, method_rows
@@ -257,24 +317,42 @@ def placebo_map(test_set, index, label):
     return test_set.mask_for_class(wrong).astype(np.float64)
 
 
-def evaluate_placebo_one(base, shortcut, dose, seed, samples):
-    """Score the placebo map with every metric on the same images as evaluate_one."""
+def random_map(test_set, index, label):
+    """Random control: independent uniform scores for every pixel, i.e. a random
+    pixel ordering with no ties. If the placebo behaves like this map, the
+    placebo's effect comes from the random ordering of its tied pixels."""
+    rng = np.random.default_rng(10_000 + index)
+    return rng.random((test_set.size, test_set.size))
+
+
+# Control maps scored by `dose_response.py placebo`: name -> (builder, rng seed).
+CONTROL_MAPS = {"placebo": (placebo_map, 1), "random": (random_map, 2)}
+
+
+def evaluate_control_one(base, shortcut, dose, seed, samples, control):
+    """Score one control map with every metric on the same images as evaluate_one."""
+    builder, rng_seed = CONTROL_MAPS[control]
     model = load(base, shortcut, dose, seed)
     test_set = shortcut_split(base, shortcut, "test")
     generator = torch.Generator().manual_seed(IMAGE_SEED)
     indices = torch.randperm(len(test_set), generator=generator)[:samples].tolist()
-    rng = np.random.default_rng(1)
+    rng = np.random.default_rng(rng_seed)
     rows = []
     for index in indices:
         image, label = test_set[index]
-        x = image.unsqueeze(0)
-        attribution = placebo_map(test_set, index, label)
+        x = image.unsqueeze(0).to(DEVICE)
+        attribution = builder(test_set, index, label)
         row = {"base": base, "shortcut": shortcut, "dose": dose, "seed": seed, "index": index}
         for metric, (_, mode, fill, _) in FAITHFULNESS_METRICS.items():
-            curve = perturbation_curve(model, x, label, attribution, mode, fill, STEPS, rng)
-            row[f"{metric}_placebo"] = area_under_curve(curve)
+            curve = perturbation_curve(model, x, label, attribution, mode, fill, STEPS, rng,
+                                       **metric_options(base))
+            row[f"{metric}_{control}"] = area_under_curve(curve)
         rows.append(row)
     return rows
+
+
+def evaluate_placebo_one(base, shortcut, dose, seed, samples):
+    return evaluate_control_one(base, shortcut, dose, seed, samples, "placebo")
 
 
 def all_cached_models():
@@ -290,16 +368,18 @@ def all_cached_models():
 
 
 def placebo(args):
-    """Placebo control for every evaluated model (all datasets), cached per model."""
+    """Placebo and random controls for every evaluated model (all datasets),
+    cached per model. Already computed controls are skipped (--force redoes them)."""
     cache = OUT / "per_model"
     for config in all_cached_models():
         name = model_name(*config)
-        path = cache / f"{name}_placebo.csv"
-        if path.exists() and not args.force:
-            continue
-        start = time.perf_counter()
-        pd.DataFrame(evaluate_placebo_one(*config, args.samples)).to_csv(path, index=False)
-        print(f"placebo {name} ({time.perf_counter() - start:.0f} s)", flush=True)
+        for control in CONTROL_MAPS:
+            path = cache / f"{name}_{control}.csv"
+            if path.exists() and not args.force:
+                continue
+            start = time.perf_counter()
+            pd.DataFrame(evaluate_control_one(*config, args.samples, control)).to_csv(path, index=False)
+            print(f"{control} {name} ({time.perf_counter() - start:.0f} s)", flush=True)
     combine(args)
 
 
@@ -307,7 +387,7 @@ def combine(args):
     """Check the selected configurations are evaluated, then merge EVERY cached
     model (so evaluating cifar10 separately keeps the MNIST/PneumoniaMNIST results)."""
     cache = OUT / "per_model"
-    selected = [model_name(*config) for config in configurations(args)]
+    selected = [model_name(*config) for config in configurations(args)] if args is not None else []
     missing = [n for n in selected if not (cache / f"{n}_oracle.csv").exists()]
     if missing:
         raise SystemExit(f"{len(missing)} models not evaluated yet, e.g. {missing[0]}. Run evaluate again.")
@@ -317,10 +397,11 @@ def combine(args):
     if stale:
         raise SystemExit(f"{len(stale)} cached results predate the size-matched control. Run: evaluate --force")
     oracle = pd.concat([pd.read_csv(cache / f"{n}_oracle.csv") for n in names])
-    # Placebo scores are added when every model has them (dose_response.py placebo).
-    if all((cache / f"{n}_placebo.csv").exists() for n in names):
-        placebo_scores = pd.concat([pd.read_csv(cache / f"{n}_placebo.csv") for n in names])
-        oracle = oracle.merge(placebo_scores, on=["base", "shortcut", "dose", "seed", "index"], how="left")
+    # Control scores are added when every model has them (dose_response.py placebo).
+    for control in CONTROL_MAPS:
+        if all((cache / f"{n}_{control}.csv").exists() for n in names):
+            scores = pd.concat([pd.read_csv(cache / f"{n}_{control}.csv") for n in names])
+            oracle = oracle.merge(scores, on=["base", "shortcut", "dose", "seed", "index"], how="left")
     oracle.to_csv(OUT / "scores_oracle.csv", index=False)
     pd.concat([pd.read_csv(cache / f"{n}_methods.csv") for n in names]).to_csv(OUT / "scores_methods.csv", index=False)
 
@@ -341,8 +422,15 @@ COMPARISONS = [
     ("shortcut", "object_matched", "shortcut vs size-matched object", "_size_matched",
      "rise from 0 to 1, crossing 0.5 at 50% reliance"),
     ("placebo", "object", "placebo vs full object", "_placebo_vs_object",
-     "stay low at every reliance (the placebo is never evidence)"),
+     "low at low reliance; a rise at high reliance can be correct, since the object map then explains nothing"),
     ("shortcut", "placebo", "shortcut vs placebo", "_shortcut_vs_placebo",
+     "about 0.5 at 0% reliance, rising to 1"),
+    # Random-map controls: does the placebo act like a random pixel ordering?
+    ("random", "object", "random vs full object", "_random_vs_object",
+     "low at low reliance (the object explains the model better than random)"),
+    ("placebo", "random", "placebo vs random", "_placebo_vs_random",
+     "about 0.5 at every reliance if the placebo carries no information"),
+    ("shortcut", "random", "shortcut vs random", "_shortcut_vs_random",
      "about 0.5 at 0% reliance, rising to 1"),
 ]
 
@@ -497,6 +585,9 @@ def markdown(frame):
 
 
 def analyze(_args=None):
+    # Rebuild the combined score files from every cached model first, so models
+    # added from elsewhere (e.g. the Kaggle ResNet-18 results) are included.
+    combine(None)
     models = load_models()
     oracle = pd.read_csv(OUT / "scores_oracle.csv")
     methods = pd.read_csv(OUT / "scores_methods.csv")
@@ -537,8 +628,11 @@ def analyze(_args=None):
              "comparison: which two oracle maps are compared (preference = share of images where the metric "
              "rates the first above the second). Size-matched object: a binary map of the object's brightest "
              "pixels, as many as the shortcut. Placebo: the shortcut's shape at a wrong class's position, which "
-             "never carries evidence. For 'placebo vs full object' the ideal is a LOW preference at every "
-             "reliance, so responsiveness should be near 0. "
+             "never carries evidence. Random: independent uniform scores per pixel (a fully random ordering). "
+             "The placebo's non-patch pixels are tied and ordered randomly, so it behaves almost like the random "
+             "map ('placebo vs random' stays near 0.5). 'Placebo vs full object' and 'random vs full object' "
+             "should be LOW at low reliance; a rise at high reliance is correct, because the object map then "
+             "explains the model worse than a random ordering. "
              f"switch_ci_low/high and rho_ci_low/high: 95% bootstrap intervals ({BOOTSTRAP_REPS} resamples of "
              "the seeds within each dose). switch_found_share: share of resamples in which preference crosses "
              "0.5 at all (the switch interval is left empty below 0.5).", "",
