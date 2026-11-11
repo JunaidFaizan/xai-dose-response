@@ -47,3 +47,16 @@ and Insertion (blur).
   outside a useful range. Any such change will be reported together with the
   reason.
 - All results will be reported whether or not these predictions hold.
+
+## Amendment: dose change after the first model
+
+The first Kaggle model (dose -0.4, seed 42; 30 epochs, 23.2 min on a Tesla T4)
+reached a reliance of 24.8%, 84.7% test accuracy and 80.1% accuracy without the
+shortcut. No metric, oracle or method results were computed or seen. Because
+reliance did not reach the low end of the range, the doses were changed to:
+
+PET_DOSES = [-0.5, -0.4, -0.3, -0.2, -0.1, 0.0]
+
+Dose -0.05 was dropped and -0.5 added. At -0.5 half the training shortcuts
+point to the wrong class, so the shortcut carries no information about the
+label. The predictions P1–P4 above are unchanged.

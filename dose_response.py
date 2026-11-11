@@ -50,7 +50,7 @@ Oxford-IIIT Pet (pet_resnet18, run on a Kaggle GPU via kaggle/dose_response_pet.
     (sigma 16, kernel 97), inpainting (1600 steps) and occlusion (16x16, stride
     8) are scaled to the image size. PET_DOSES x PET_SEEDS = 18 models:
         python dose_response.py all --bases pet_resnet18 --shortcuts patch \\
-            --doses -0.4 -0.3 -0.2 -0.1 -0.05 0 --seeds 42 1 2
+            --doses -0.5 -0.4 -0.3 -0.2 -0.1 0 --seeds 42 1 2
 
 Output
     checkpoint/dose/<base>_<shortcut>_dose<+NNN>_seed<N>.pt (+ _metrics.json)
@@ -97,7 +97,11 @@ CIFAR_SEEDS = [42, 1]
 # Oxford-IIIT Pet (cat vs dog): a binary task, so |d| <= 0.4. CIFAR-10 learned
 # the patch strongly at d = 0, so the doses are negative. They may be adjusted
 # after the first Kaggle model (kaggle/README.md).
-PET_DOSES = [-0.4, -0.3, -0.2, -0.1, -0.05, 0.0]
+# Adjusted after the first Kaggle model (dose -0.4, seed 42: reliance 24.8%):
+# -0.05 dropped and -0.5 added. At -0.5 half the training shortcuts point to
+# the wrong class, so the shortcut carries no information about the label,
+# which gives the low-reliance end of the range.
+PET_DOSES = [-0.5, -0.4, -0.3, -0.2, -0.1, 0.0]
 PET_SEEDS = [42, 1, 2]
 DEFAULT_BASES = ["mnist", "pneumonia_mnist"]
 # Signed dose: negative = that share of training shortcuts point to a wrong

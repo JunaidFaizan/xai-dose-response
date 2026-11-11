@@ -9,7 +9,7 @@ SELECTION = ("--bases cifar10_resnet18 --shortcuts patch "
              "--doses -0.8 -0.6 -0.4 -0.25 -0.1 0 --seeds 42 1 2")
 # Matches PET_DOSES and PET_SEEDS in dose_response.py.
 PET_SELECTION = ("--bases pet_resnet18 --shortcuts patch "
-                 "--doses -0.4 -0.3 -0.2 -0.1 -0.05 0 --seeds 42 1 2")
+                 "--doses -0.5 -0.4 -0.3 -0.2 -0.1 0 --seeds 42 1 2")
 
 CIFAR_INTRO = """# Dose-response study: CIFAR-10 with ResNet-18
 
