@@ -1,6 +1,6 @@
 # Synopsis
 
-**Project Title:** Do XAI Metrics Notice When a Model Starts Cheating? A Dose-Response Evaluation of Explanation Metrics under Controlled Shortcut Reliance
+**Project Title:** A Dose-Response Evaluation of Explanation Metrics under Controlled Shortcut Reliance in CNN Image Classifiers
 
 **Area:** Explainable Neural Networks (Explainable AI)
 
@@ -33,8 +33,8 @@ Existing studies test explanation methods against a shortcut of one fixed streng
 In two literature searches (September–October 2026) we did not find published work that:
 
 1. **varies a model's reliance on a shortcut in controlled steps** (a "dose-response" design) to test the evaluation metrics, rather than the explanation methods;
-2. scores **fixed oracle explanations** (shortcut-only, object-only, size-matched and placebo maps), so that the metrics are tested independently of any explanation method;
-3. reports when metrics **switch their verdict** relative to the model's measured reliance, and whether a correct ranking also means a correct verdict (calibration).
+2. scores **fixed oracle explanations** (shortcut-only, object-only, size-matched, placebo and random maps), so that the metrics are tested independently of any explanation method;
+3. reports when metrics **switch their verdict** relative to the model's measured reliance, and separates genuine responses to the model from biases caused by the size and form of the explanation being scored.
 
 The closest related work covers parts of this: shortcut or backdoor ground truth for evaluating explanation methods at a fixed strength [16, 17, 18], meta-evaluation of metrics without ground truth [10, 13], hand-designed networks with known explanations [19], and baseline effects in deletion metrics [14]. This claim of novelty is based on our searches and will be confirmed by a full literature search with the guide before submission.
 
@@ -44,7 +44,7 @@ The closest related work covers parts of this: shortcut or backdoor ground truth
 2. Control and measure how much each trained model relies on the shortcut, from about 0% to about 100%.
 3. Test whether four faithfulness metrics follow this change, using fixed oracle explanations and controls for explanation size and shape.
 4. Measure how five explanation methods respond to the same change in reliance.
-5. Repeat on a natural-image dataset, a medical dataset and a colour dataset with a larger network, with several random seeds.
+5. Repeat on a handwriting dataset, a medical dataset and a colour natural-image dataset, including a standard ResNet-18, with several random seeds.
 6. Provide an interactive dashboard for generating and evaluating explanations live.
 
 ## Methodology
@@ -65,14 +65,16 @@ The closest related work covers parts of this: shortcut or backdoor ground truth
 - Reliance is measured, not assumed: the share of test predictions that follow a shortcut placed at a wrong class's position.
 
 **Models**
-- A custom CNN with four convolutional layers for 28×28 images, and a larger CNN with batch normalisation (0.77M parameters) for CIFAR-10
-- 156 trained models in total: 12 reliance levels × 3 seeds × 2 shortcuts × 2 datasets, plus 6 levels × 2 seeds on CIFAR-10
+- A custom CNN with four convolutional layers for 28×28 images; for CIFAR-10, a larger CNN with batch normalisation (0.77M parameters) and a standard ResNet-18 (11.2M parameters)
+- 174 trained models in total: 12 reliance levels × 3 seeds × 2 shortcuts × 2 datasets (144), plus on CIFAR-10 6 levels × 2 seeds with the larger CNN (12) and 6 levels × 3 seeds with ResNet-18 (18)
+- ResNet-18 was trained on a free Kaggle GPU (NVIDIA T4); everything else on a laptop CPU
 
 **Oracle explanations** (scored by every metric)
 - Shortcut map: the shortcut pixels
 - Object map: the object's own pixels
 - Size-matched object map: the same number of pixels as the shortcut, to control for size
 - Placebo map: the shortcut's shape at a position the model does not use, to control for shape
+- Random map: a fully random pixel ordering, to check what the placebo's effect comes from
 
 **Evaluation metrics under test**
 - Deletion curves [6] with three replacement values: black, blurred and inpainted (ROAD-inspired [9])
@@ -99,13 +101,13 @@ The closest related work covers parts of this: shortcut or backdoor ground truth
 
 ## Preliminary Findings
 
-All 156 models have been trained and evaluated, including the placebo control:
+All 174 models have been trained and evaluated, including the placebo and random-map controls:
 
 1. **Metric reliability depends on the data.** On MNIST, every metric tracks the model's reliance closely (ρ = 0.91–0.98). On chest X-rays, responsiveness falls to ρ = 0.07–0.84, and some metrics do not respond significantly.
 2. **Explanation size distorts the metrics.** When the object explanation is matched in size to the shortcut, the metrics switch their verdict at only 6–15% reliance, instead of 30–42%.
-3. **The metrics also reward a meaningless placebo.** A placebo map (the shortcut's shape at a position the model never uses) should never beat the object map. Yet on MNIST, the metrics prefer the placebo more and more as reliance grows (ρ = 0.89–0.97), and on CIFAR-10, black-fill deletion prefers it 82% of the time at only 4% reliance. Part of what the metrics reward is a small, compact map, not the evidence the model uses. Insertion on the diffuse MNIST shortcut even prefers the placebo over the real shortcut (ρ = −0.81).
-4. **A correct ranking is not a correct verdict.** On CIFAR-10, black and blur deletion rank models correctly (ρ ≈ 0.9), yet prefer the shortcut explanation 74–82% of the time even when the model relies on the shortcut only 4% of the time.
-5. **Insertion fails on a diffuse shortcut,** switching only at about 98% reliance.
+3. **The metrics judge explanations of the same form well, but not explanations of different forms.** When the shortcut map is compared with a placebo or a random map, which have the same compact or scattered form, every metric on the patch shortcut starts near 0.5 at low reliance and rises to 0.93–0.99, which is the correct behaviour. The errors appear when maps of different form are compared, such as a small patch against a broad object map.
+4. **On natural images, black and blur deletion rate a random explanation above the object explanation.** On CIFAR-10, at only 4% reliance, they prefer a fully random pixel ordering over the object map 75–82% of the time, exactly as often as they prefer the real shortcut. This is why they appeared to "detect" a shortcut the model ignores. Inpainting deletion and insertion don't show this bias (18–23%). The same pattern holds with a standard ResNet-18 (56–72% for black and blur, against 13–21% for inpainting and insertion), so it isn't specific to small networks. A likely cause is that removing scattered pixels damages natural images more than removing a compact region; this is a hypothesis, since the CIFAR-10 object map is a centred Gaussian, not a real object mask.
+5. **Insertion fails on a diffuse shortcut,** switching only at about 98% reliance. On the MNIST texture shortcut, blur deletion and insertion can't distinguish the real shortcut from a random map at all (ρ = 0.09 and −0.59).
 6. **Inpainting-based deletion is the most robust variant tested.**
 7. **Explanation methods differ:** Integrated Gradients follows the shortcut in every setting, while Saliency, SmoothGrad and Grad-CAM move away from a diffuse shortcut as the model relies on it more.
 8. **Supporting study:** the model-randomization sanity check does not rank explanation methods in line with the ground truth (Kendall τ = −0.20 to 0.07).
@@ -122,20 +124,20 @@ All 156 models have been trained and evaluated, including the placebo control:
 | Matplotlib | Heatmaps, perturbation curves and dose-response figures |
 | Flask, HTML, JavaScript | The interactive dashboard |
 
-All tools are free and open source, and all experiments run on a laptop CPU.
+All tools are free and open source. Experiments run on a laptop CPU, except the ResNet-18 models, which were trained on a free Kaggle GPU.
 
 ## Expected Outcomes
 
 - A dose-response protocol for testing XAI evaluation metrics against a controlled, measured change in model behaviour
 - Evidence of when common metrics can and cannot be trusted, on natural, medical and colour images
 - Controls for explanation size and shape that other evaluation studies can reuse
-- 156 trained models, result tables and figures, with code for full reproduction
+- 174 trained models, result tables and figures, with code for full reproduction
 - An interactive explainability dashboard
 - A research paper submitted to a peer-reviewed venue, and the M.Tech thesis
 
 ## Limitations
 
-- Small images (up to 32×32) and small CNNs
+- Small images (up to 32×32); the largest network is ResNet-18
 - Synthetic shortcuts, which are simpler than real-world shortcuts
 - The 50% switch point and the size-matching rule are modelling choices
 - The inpainting variant approximates ROAD rather than reproducing it exactly

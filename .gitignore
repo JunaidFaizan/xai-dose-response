@@ -17,3 +17,6 @@ Thumbs.db
 desktop.ini
 kaggle/xai_dose_bundle.zip
 kaggle/xai_pet_bundle.zip
+
+# Scratch files from AI workflow runs (plans, reviews, backups)
+.agents/
