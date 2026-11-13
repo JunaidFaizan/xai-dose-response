@@ -42,11 +42,40 @@ def synthetic(base="pet_resnet18", seed=0):
                 for method in METHODS:
                     methods.append({**key, "index": int(i), "method": method, "shortcut_mass": reliance + i})
                 conflict = 1
-                behaviour.append({**key, "index": int(i), "conflict_class": conflict,
+                behaviour.append({**key, "index": int(i), "label": int(i % 2), "conflict_class": conflict,
                                   "pred_conflicting": conflict if f else 0,
                                   "pred_none": conflict if i == 100 else 0,
                                   "follows_shortcut": int(f), "shortcut_dominant": int(f)})
     return pd.DataFrame(models), pd.DataFrame(oracle), pd.DataFrame(methods), pd.DataFrame(behaviour)
+
+
+def class_tied_synthetic():
+    '''Two classes with the label tied to the class (PneumoniaMNIST-patch-like): class 0
+    images are mostly followed, class 1 mostly not, and class 1 has the larger AUC gap.
+    Within each class the gap ranks followed images first (stratified AUROC 1), but over
+    both classes the followed images have the smaller gaps (unstratified AUROC 7/16).'''
+    models, oracle, behaviour = [], [], []
+    follows = {100: 1, 102: 1, 104: 1, 106: 0, 101: 0, 103: 0, 105: 0, 107: 1}
+    for dose in DOSES:
+        for s in SEEDS:
+            key = {"base": "pneumonia_mnist", "shortcut": "patch", "dose": dose, "seed": s}
+            reliance = 50 + 80 * dose + s
+            models.append({**key, "reliance": reliance, "reliance_corrected": reliance,
+                           "test_accuracy_no_shortcut": 90.0})
+            for i, f in follows.items():
+                cls = i % 2
+                gap = (0.1 if f else 0.0) + 0.4 * cls
+                row = {**key, "index": i}
+                for metric, (_, _, _, higher) in FAITHFULNESS_METRICS.items():
+                    row[f"{metric}_shortcut"] = 0.5 + gap if higher else 0.5 - gap
+                    row[f"{metric}_object"] = 0.5
+                    row[f"{metric}_random"] = 0.5
+                oracle.append(row)
+                conflict = 1 - cls
+                behaviour.append({**key, "index": i, "label": cls, "conflict_class": conflict,
+                                  "pred_conflicting": conflict if f else cls, "pred_none": cls,
+                                  "follows_shortcut": f, "shortcut_dominant": f})
+    return pd.DataFrame(models), pd.DataFrame(oracle), pd.DataFrame(behaviour)
 
 
 def setting(reps=20):
@@ -102,11 +131,37 @@ class BehaviourTests(unittest.TestCase):
         self.assertEqual(len(primary), len(FAITHFULNESS_METRICS))
         np.testing.assert_allclose(primary.auroc_pooled, 1.0)
         np.testing.assert_allclose(primary.median_model_auroc, 1.0)
+        np.testing.assert_allclose(primary.auroc_pooled_strat, 1.0)
+        np.testing.assert_allclose(primary.median_model_auroc_strat, 1.0)
         # index 100 is predicted as the shortcut's class without shortcut: undetermined everywhere
         np.testing.assert_allclose(primary.undetermined_rate, 1 / IMAGES)
         used = bands[bands.label == dose_analysis.PRIMARY_LABEL]
         self.assertEqual(int((used.n_images + used.n_undetermined).sum()),
                          len(FAITHFULNESS_METRICS) * 6 * IMAGES)
+
+    def test_class_tied_label_is_stratified(self):
+        '''label tied to the class: unstratified AUROC 7/16 (below 0.5, two-sided, direction
+        "below 0.5"); class-stratified AUROC 1 with a one-sided p; the bootstrap keeps classes'''
+        models, oracle, behaviour = class_tied_synthetic()
+        settings = dose_analysis.build_settings(oracle, None, models, 50, 0, 1e-4)
+        model_frame, summary, bands = dose_analysis.behaviour_tables(settings, behaviour, COMPARISONS, TITLES)
+        primary = summary[summary.label == dose_analysis.PRIMARY_LABEL]
+        np.testing.assert_allclose(primary.median_model_auroc, 7 / 16)
+        np.testing.assert_allclose(primary.auroc_pooled, 7 / 16)
+        self.assertTrue((primary.direction_within == "below 0.5").all())
+        np.testing.assert_allclose(primary.median_model_auroc_strat, 1.0)
+        np.testing.assert_allclose(primary.auroc_pooled_strat, 1.0)
+        self.assertTrue((primary.direction_within_strat == "above 0.5").all())
+        self.assertTrue((primary.models_with_both_labels_in_a_class == 6).all())
+        # every resampled class still ranks followed images first, so all replicates stay >= 0.5
+        self.assertTrue((primary.median_model_auroc_strat_ci_low >= 0.5).all())
+        self.assertTrue((primary.p_auroc_within_strat < 0.5).all())
+        np.testing.assert_allclose(bands[bands.label == dose_analysis.PRIMARY_LABEL].auroc_strat, 1.0)
+        column = f"auroc_strat_{dose_analysis.PRIMARY_LABEL}_{next(iter(FAITHFULNESS_METRICS))}_full"
+        np.testing.assert_allclose(model_frame[column], 1.0)
+        resp = pd.DataFrame({"headline": [True], "p_rho_rc": [0.01]})
+        _, headline = dose_analysis.headline_holm(resp, summary)
+        self.assertEqual(int(headline.p_holm_headline_within_strat.notna().sum()), len(FAITHFULNESS_METRICS))
 
     def test_mismatched_labels_raise(self):
         settings, behaviour = setting()
@@ -143,6 +198,11 @@ class SwitchTests(unittest.TestCase):
         boot = np.random.default_rng(0).normal(0.8, 0.05, 2000)
         self.assertLess(stats.bootstrap_z_p(0.8, boot, 0.5), 1e-6)
         self.assertGreater(stats.bootstrap_z_p(0.5, boot, 0.5), 0.99)
+        '''one-sided (H1: > null): an estimate far below the null is not significant'''
+        low = np.random.default_rng(0).normal(0.2, 0.05, 2000)
+        self.assertLess(stats.bootstrap_z_p(0.2, low, 0.5), 1e-6)
+        self.assertGreater(stats.bootstrap_z_p(0.2, low, 0.5, "greater"), 0.999)
+        self.assertLess(stats.bootstrap_z_p(0.8, boot, 0.5, "greater"), 1e-6)
 
 
 class PetTests(unittest.TestCase):

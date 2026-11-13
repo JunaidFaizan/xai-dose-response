@@ -27,18 +27,23 @@ p-values and families
     min(1, 2 min(P(d <= 0), P(d >= 0))), floored at 1/(reps + 1).
     Behaviour AUROC p-values (vs 0.5) are normal-approximation z-tests with the
     two-level bootstrap SE (stats.bootstrap_z_p), so they are not floored; the
-    floored percentile value is kept as p_auroc_boot.
+    floored percentile value is kept as p_auroc_boot. The class-stratified
+    AUROCs (*_strat, PRIMARY) use a one-sided test (H1: AUROC > 0.5); the
+    unstratified ones are two-sided and carry a direction column.
     BH and Holm are applied within each family:
         responsiveness:<comparison>   all settings x metrics of one comparison
         methods                       all settings x methods
         metric_pairs:<comparison>     all settings x metric pairs
         behaviour:<label>             all settings x comparisons x metrics
-                                      (pooled and within-model AUROC adjusted
-                                      separately: p_bh, p_bh_within)
-    p_holm_headline is Holm over the union of the headline rows
-    ("shortcut vs full object" and "shortcut vs random" responsiveness, and
-    both the pooled and the within-model primary-label behaviour AUROC for
-    "shortcut vs full object").
+                                      (each AUROC column adjusted separately:
+                                      p_bh, p_bh_within, p_bh_strat,
+                                      p_bh_within_strat)
+    Holm over the union of the headline rows ("shortcut vs full object" and
+    "shortcut vs random" responsiveness, and both the pooled and the
+    within-model class-stratified one-sided primary-label behaviour AUROC for
+    "shortcut vs full object"): p_holm_headline in the responsiveness table,
+    p_holm_headline_strat and p_holm_headline_within_strat in the behaviour
+    summary.
 
 Switch status
     "identified": a model within +-IDENTIFY_WINDOW of the switch (as specified).
@@ -503,31 +508,65 @@ def _label_matrix(s, behaviour, column):
     return values.reshape(s.n_models, s.n_images)
 
 
-def _boot_auroc(s, gaps, labels):
+def _stratified_rows(scores, labels, valid, classes, class_values):
+    """Row-wise class-stratified AUROC: mean over the true classes that have
+    both labels in a row of the within-class AUROC; NaN if no class has both."""
+    total, count = np.zeros(len(scores)), np.zeros(len(scores))
+    for c in class_values:
+        a = stats.auroc_rows(scores, labels, valid & (classes == c))
+        ok = ~np.isnan(a)
+        total += np.where(ok, a, 0.0)
+        count += ok
+    with np.errstate(invalid="ignore", divide="ignore"):
+        return np.where(count > 0, total / count, np.nan)
+
+
+def _boot_auroc(s, gaps, labels, classes):
     """Two-level bootstrap AUROC per replicate, ignoring undetermined (NaN) labels.
 
-    Returns (pooled, within): pooled = AUROC over the resampled images of all
-    slots together; within = median over slots of the per-slot AUROC (slots
-    with one class only are skipped). Both (reps,)."""
-    pooled, within = [], []
+    Returns a dict of (reps,) arrays: pooled = AUROC over the resampled images
+    of all slots together; within = median over slots of the per-slot AUROC
+    (slots with one label only are skipped); pooled_strat and within_strat =
+    the same with the AUROC computed within each true class (classes, same
+    shape as labels; images keep their class when resampled) and averaged
+    over the classes that have both labels."""
+    class_values = np.unique(classes)
+    out = {"pooled": [], "within": [], "pooled_strat": [], "within_strat": []}
     for r0 in range(0, s.reps, CHUNK):
         picks, images = s.P[r0:r0 + CHUNK, :, None], s.I[r0:r0 + CHUNK]
         n = len(images)
-        g, y = gaps[picks, images], labels[picks, images]
+        g, y, k = gaps[picks, images], labels[picks, images], classes[picks, images]
         valid = ~np.isnan(y)
         y = np.nan_to_num(y)
-        pooled.append(stats.auroc_rows(g.reshape(n, -1), y.reshape(n, -1), valid.reshape(n, -1)))
-        per_slot = stats.auroc_rows(g.reshape(-1, s.n_images), y.reshape(-1, s.n_images),
-                                    valid.reshape(-1, s.n_images)).reshape(n, s.n_models)
+        flat = [a.reshape(n, -1) for a in (g, y, valid, k)]
+        slot = [a.reshape(-1, s.n_images) for a in (g, y, valid, k)]
+        out["pooled"].append(stats.auroc_rows(*flat[:3]))
+        out["pooled_strat"].append(_stratified_rows(*flat, class_values))
+        per_slot = stats.auroc_rows(*slot[:3]).reshape(n, s.n_models)
+        per_slot_strat = _stratified_rows(*slot, class_values).reshape(n, s.n_models)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
-            within.append(np.nanmedian(per_slot, axis=1))
-    return np.concatenate(pooled), np.concatenate(within)
+            out["within"].append(np.nanmedian(per_slot, axis=1))
+            out["within_strat"].append(np.nanmedian(per_slot_strat, axis=1))
+    return {name: np.concatenate(values) for name, values in out.items()}
 
 
 def _auroc_masked(scores, labels):
     keep = ~np.isnan(labels)
     return stats.auroc(scores[keep], labels[keep])
+
+
+def _auroc_stratified(scores, labels, classes):
+    """Mean over true classes (with both labels) of the within-class AUROC; NaN if none."""
+    values = [_auroc_masked(scores[classes == c], labels[classes == c]) for c in np.unique(classes)]
+    values = [v for v in values if not np.isnan(v)]
+    return float(np.mean(values)) if values else NAN
+
+
+def _direction(estimate):
+    if np.isnan(estimate):
+        return ""
+    return "above 0.5" if estimate > 0.5 else ("below 0.5" if estimate < 0.5 else "at 0.5")
 
 
 def _soft_accuracy(wins, labels):
@@ -561,7 +600,18 @@ def behaviour_tables(settings, behaviour, comparisons, metric_titles):
     auroc_pooled mixes between-model and within-model signal (high-reliance
     models have both larger gaps and more label-1 images). median_model_auroc
     (median over models of the per-model AUROC) measures detection inside a
-    model; both have two-level CIs and z-test p-values.
+    model; both have two-level CIs and two-sided z-test p-values, with a
+    direction column (above / below 0.5).
+
+    On binary tasks the label is tied to the true class (a model that fails
+    without its shortcut predicts one class), and the AUC gap also differs by
+    class, so the unstratified AUROCs can be pushed far below 0.5 by class
+    differences alone (Simpson's paradox). The *_strat columns (PRIMARY,
+    headline) compute the AUROC within each true class and average over the
+    classes that have both labels: auroc_pooled_strat over the pooled images,
+    median_model_auroc_strat per model then median over models. Their
+    p-values are one-sided z-tests (H1: AUROC > 0.5, "the metric detects
+    followed images"), so a result below 0.5 is never significant.
     """
     if "follows_shortcut_causal" not in behaviour:
         behaviour = add_causal_label(behaviour)
@@ -569,6 +619,7 @@ def behaviour_tables(settings, behaviour, comparisons, metric_titles):
     model_rows, summary_rows, band_rows = [], [], []
     for s in settings:
         labels = {name: _label_matrix(s, behaviour, name) for name in BEHAVIOUR_LABELS}
+        classes = _label_matrix(s, behaviour, "label")  # true class of each scored image
         rates = {name: _nanmean_rows(values) for name, values in labels.items()}
         undetermined = np.isnan(labels[PRIMARY_LABEL]).mean(axis=1)
         base_frame = s.models[KEYS + ["reliance", "reliance_corrected"]].copy()
@@ -587,28 +638,48 @@ def behaviour_tables(settings, behaviour, comparisons, metric_titles):
                 base_frame[f"pref_{metric}_{tag}"] = c["pref"]
                 for name in BEHAVIOUR_LABELS:
                     y, rate = labels[name], rates[name]
-                    per_model = np.array([_auroc_masked(c["gaps"][m], y[m]) for m in range(s.n_models)])
+                    gaps = c["gaps"]
+                    per_model = np.array([_auroc_masked(gaps[m], y[m]) for m in range(s.n_models)])
+                    per_model_strat = np.array([_auroc_stratified(gaps[m], y[m], classes[m])
+                                                for m in range(s.n_models)])
                     base_frame[f"auroc_{name}_{metric}_{tag}"] = per_model
-                    boot, boot_within = _boot_auroc(s, c["gaps"], y)
+                    base_frame[f"auroc_strat_{name}_{metric}_{tag}"] = per_model_strat
+                    boot = _boot_auroc(s, gaps, y, classes)
                     accuracy, balanced = _soft_accuracy(c["wins"].ravel(), y.ravel())
                     switch, status, distance, _, _, bracketed, edge = switch_status(100 * rate, c["pref"])
                     observed, observed_status = stats.isotonic_switch(s.rc, rate)
-                    pooled = _auroc_masked(c["gaps"].ravel(), y.ravel())
+                    pooled = _auroc_masked(gaps.ravel(), y.ravel())
+                    pooled_strat = _auroc_stratified(gaps.ravel(), y.ravel(), classes.ravel())
                     with warnings.catch_warnings():
                         warnings.simplefilter("ignore", RuntimeWarning)
                         within = float(np.nanmedian(per_model))
+                        within_strat = float(np.nanmedian(per_model_strat))
                     row = {"comparison": label, "base": s.base, "shortcut": s.shortcut,
                            "metric": metric_titles[metric], "label": name, "models": s.n_models,
                            "label_rate": float(np.nanmean(y)),
                            "undetermined_rate": float(np.isnan(y).mean()),
                            "auroc_pooled": pooled}
-                    row["auroc_ci_low"], row["auroc_ci_high"] = _ci(boot)
-                    row["p_auroc"] = stats.bootstrap_z_p(pooled, boot, 0.5)
-                    row["p_auroc_boot"] = _boot_p(boot, 0.5)
+                    row["auroc_ci_low"], row["auroc_ci_high"] = _ci(boot["pooled"])
+                    row["p_auroc"] = stats.bootstrap_z_p(pooled, boot["pooled"], 0.5)
+                    row["p_auroc_boot"] = _boot_p(boot["pooled"], 0.5)
+                    row["direction"] = _direction(pooled)
                     row["median_model_auroc"] = within
-                    row["median_model_auroc_ci_low"], row["median_model_auroc_ci_high"] = _ci(boot_within)
-                    row["p_auroc_within"] = stats.bootstrap_z_p(within, boot_within, 0.5)
+                    row["median_model_auroc_ci_low"], row["median_model_auroc_ci_high"] = _ci(boot["within"])
+                    row["p_auroc_within"] = stats.bootstrap_z_p(within, boot["within"], 0.5)
+                    row["direction_within"] = _direction(within)
                     row["models_with_both_classes"] = int((~np.isnan(per_model)).sum())
+                    # class-stratified (PRIMARY for the headline test): one-sided H1 AUROC > 0.5
+                    row["auroc_pooled_strat"] = pooled_strat
+                    row["auroc_strat_ci_low"], row["auroc_strat_ci_high"] = _ci(boot["pooled_strat"])
+                    row["p_auroc_strat"] = stats.bootstrap_z_p(pooled_strat, boot["pooled_strat"], 0.5, "greater")
+                    row["direction_strat"] = _direction(pooled_strat)
+                    row["median_model_auroc_strat"] = within_strat
+                    row["median_model_auroc_strat_ci_low"], row["median_model_auroc_strat_ci_high"] = _ci(
+                        boot["within_strat"])
+                    row["p_auroc_within_strat"] = stats.bootstrap_z_p(
+                        within_strat, boot["within_strat"], 0.5, "greater")
+                    row["direction_within_strat"] = _direction(within_strat)
+                    row["models_with_both_labels_in_a_class"] = int((~np.isnan(per_model_strat)).sum())
                     row.update({"accuracy": accuracy, "balanced_accuracy": balanced,
                                 "calibration_gap": float(np.nanmean(c["pref"] - rate)),
                                 "calibration_mae": float(np.nanmean(np.abs(c["pref"] - rate))),
@@ -631,36 +702,42 @@ def behaviour_tables(settings, behaviour, comparisons, metric_titles):
                                           "models": len(inside), "n_images": int(determined.sum()),
                                           "n_undetermined": int((~determined).sum()),
                                           "n_pos": int(np.nansum(yb)), "n_neg": int(determined.sum() - np.nansum(yb)),
-                                          "auroc": _auroc_masked(gb, yb), "accuracy": acc_b,
+                                          "auroc": _auroc_masked(gb, yb),
+                                          "auroc_strat": _auroc_stratified(gb, yb, classes[inside].ravel()),
+                                          "accuracy": acc_b,
                                           "balanced_accuracy": bal_b})
         model_rows.append(base_frame)
     summary = pd.DataFrame(summary_rows)
     summary["family"] = "behaviour:" + summary.label
     summary = _adjust(summary, p_column="p_auroc")
     summary = _adjust(summary, p_column="p_auroc_within", suffix="_within")
+    summary = _adjust(summary, p_column="p_auroc_strat", suffix="_strat")
+    summary = _adjust(summary, p_column="p_auroc_within_strat", suffix="_within_strat")
     summary["headline"] = (summary.label == PRIMARY_LABEL) & (summary.comparison == "shortcut vs full object")
     return pd.concat(model_rows, ignore_index=True), summary, pd.DataFrame(band_rows)
 
 
 def headline_holm(responsiveness, behaviour_summary=None):
-    """Holm over the union of headline rows; adds p_holm_headline to both tables
-    (and p_holm_headline_within for the within-model behaviour AUROC)."""
+    """Holm over the union of headline rows; adds p_holm_headline to the
+    responsiveness table and, for the behaviour test, p_holm_headline_strat
+    (pooled) and p_holm_headline_within_strat (within-model) on the
+    class-stratified one-sided AUROC p-values."""
     responsiveness = responsiveness.copy()
     p = [responsiveness.loc[responsiveness.headline, "p_rho_rc"].to_numpy(dtype=float)]
     if behaviour_summary is not None:
         behaviour_summary = behaviour_summary.copy()
-        p.append(behaviour_summary.loc[behaviour_summary.headline, "p_auroc"].to_numpy(dtype=float))
-        p.append(behaviour_summary.loc[behaviour_summary.headline, "p_auroc_within"].to_numpy(dtype=float))
+        p.append(behaviour_summary.loc[behaviour_summary.headline, "p_auroc_strat"].to_numpy(dtype=float))
+        p.append(behaviour_summary.loc[behaviour_summary.headline, "p_auroc_within_strat"].to_numpy(dtype=float))
     adjusted = stats.holm(np.concatenate(p))
     responsiveness["p_holm_headline"] = np.nan
     n = int(responsiveness.headline.sum())
     responsiveness.loc[responsiveness.headline, "p_holm_headline"] = adjusted[:n]
     if behaviour_summary is not None:
         k = int(behaviour_summary.headline.sum())
-        behaviour_summary["p_holm_headline"] = np.nan
-        behaviour_summary["p_holm_headline_within"] = np.nan
-        behaviour_summary.loc[behaviour_summary.headline, "p_holm_headline"] = adjusted[n:n + k]
-        behaviour_summary.loc[behaviour_summary.headline, "p_holm_headline_within"] = adjusted[n + k:]
+        behaviour_summary["p_holm_headline_strat"] = np.nan
+        behaviour_summary["p_holm_headline_within_strat"] = np.nan
+        behaviour_summary.loc[behaviour_summary.headline, "p_holm_headline_strat"] = adjusted[n:n + k]
+        behaviour_summary.loc[behaviour_summary.headline, "p_holm_headline_within_strat"] = adjusted[n + k:]
     return responsiveness, behaviour_summary
 
 

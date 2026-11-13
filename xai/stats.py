@@ -219,15 +219,20 @@ def holm(p):
     return out
 
 
-def bootstrap_z_p(estimate, boot, null=0.0):
-    """Two-sided normal-approximation p-value 2 * sf(|estimate - null| / SE),
-    with SE the standard deviation of the bootstrap replicates. Unlike a
-    percentile bootstrap p it is not floored at 1/(reps + 1)."""
+def bootstrap_z_p(estimate, boot, null=0.0, alternative="two-sided"):
+    """Normal-approximation p-value with SE the standard deviation of the
+    bootstrap replicates: two-sided 2 * sf(|estimate - null| / SE), or
+    one-sided ("greater", H1: estimate > null) sf((estimate - null) / SE).
+    Unlike a percentile bootstrap p it is not floored at 1/(reps + 1)."""
     boot = np.asarray(boot, dtype=float)
     boot = boot[~np.isnan(boot)]
     if np.isnan(estimate) or len(boot) < 2:
         return float("nan")
     se = float(boot.std(ddof=1))
+    if alternative == "greater":
+        if se == 0:
+            return 0.0 if estimate > null else 1.0
+        return float(norm.sf((estimate - null) / se))
     if se == 0:
         return 0.0 if estimate != null else 1.0
     return float(2 * norm.sf(abs(estimate - null) / se))

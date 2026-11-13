@@ -792,14 +792,14 @@ def plot_behaviour_auroc(bands, path):
     fig, axes = plt.subplots(1, len(groups), figsize=(4.3 * len(groups), 3.9), squeeze=False, sharey=True)
     for ax, ((base, shortcut), group) in zip(axes[0], groups):
         for metric, rows in group.groupby("metric", sort=False):
-            ax.plot(rows.band_centre, rows.auroc, marker="o", label=metric)
+            ax.plot(rows.band_centre, rows.auroc_strat, marker="o", label=metric)
         ax.axhline(0.5, color="gray", linewidth=0.8)
         ax.set_title(f"{base}, {shortcut} shortcut", fontsize=10)
         ax.set_xlabel("Chance-corrected reliance band (%)")
         ax.set_xlim(-2, 102)
         ax.set_ylim(0, 1)
         ax.grid(alpha=0.3)
-    axes[0, 0].set_ylabel("AUROC vs per-image label (follows shortcut, causal)")
+    axes[0, 0].set_ylabel("Class-stratified AUROC vs per-image label\n(follows shortcut, causal)")
     axes[0, 0].legend(fontsize=7)
     fig.suptitle("Shortcut vs full object: does the per-image AUC gap detect images where the model follows the shortcut?")
     fig.tight_layout()
@@ -876,11 +876,14 @@ def corrected_analysis(oracle, methods, models, reps, out):
         "over the models of a setting, not from the bootstrap (the bootstrap gives only their intervals). "
         "Paired metric differences: two-sided percentile bootstrap, floored at 1/(reps + 1). Behaviour AUROC vs "
         "0.5: z-test with the two-level bootstrap SE (not floored; the floored percentile value is "
-        "`p_auroc_boot`). BH and Holm within families: responsiveness:<comparison>, methods, "
-        "metric_pairs:<comparison>, behaviour:<label> (pooled and within-model AUROC adjusted separately). "
-        "`p_holm_headline`: Holm over the union of the headline rows (shortcut vs full object and shortcut vs "
-        "random responsiveness, and the pooled and within-model primary behaviour AUROC for shortcut vs full "
-        "object). p < 0.001 is printed as '< 0.001'.", ""]
+        "`p_auroc_boot`); one-sided (H1: AUROC > 0.5) for the class-stratified AUROCs (`*_strat`, primary), "
+        "two-sided with a `direction` column for the unstratified ones. BH and Holm within families: "
+        "responsiveness:<comparison>, methods, metric_pairs:<comparison>, behaviour:<label> (each AUROC column "
+        "adjusted separately). Headline Holm: one family over the union of the headline rows (shortcut vs full "
+        "object and shortcut vs random responsiveness, and the pooled and within-model class-stratified "
+        "one-sided primary behaviour AUROC for shortcut vs full object); `p_holm_headline` in the "
+        "responsiveness table, `p_holm_headline_strat` and `p_holm_headline_within_strat` in the behaviour "
+        "table. p < 0.001 is printed as '< 0.001'.", ""]
 
     main = resp[resp.comparison.isin(dose_analysis.SWITCH_COMPARISONS)].copy()
     main["setting"] = setting(main)
@@ -976,16 +979,22 @@ def corrected_analysis(oracle, methods, models, reps, out):
             "without any shortcut (this takes precedence over the moved pass; the rare case moved → other class "
             "and removed → shortcut's class is also undetermined). The removed-pass rule keeps ordinary errors (on "
             "a binary task every error lands on the shortcut's class) from counting as shortcut use, the same floor "
-            "r_c removes from reliance. Caution for the binary settings (PneumoniaMNIST, Pet): which images are "
-            "undetermined, and which are followed, depends strongly on the image's class (a model that fails "
-            "without its shortcut tends to predict one class), so the within-model AUROC there partly reflects "
-            "class differences in the AUC gap, not only shortcut use. "
+            "r_c removes from reliance. "
             "Checks: `follows_shortcut` (moved-shortcut pass only) and `shortcut_dominant` (reviewer 03): "
             "Δ_S > Δ_O, with Δ_S = p_y(aligned) − p_y(no shortcut) and Δ_O = p_y(aligned) − p_y(another-class "
-            "image with the label-y shortcut). auroc_pooled: AUROC of the per-image AUC gap (shortcut vs object) "
-            "against the label, images of all models pooled; it mixes between-model and within-model signal. "
-            "median_model_auroc: median over models of the per-model AUROC, i.e. detection of followed vs "
-            "not-followed images inside one model; both with two-level CIs and z-test p-values. "
+            "image with the label-y shortcut). The score is the per-image AUC gap (shortcut vs object). "
+            "**Class-stratified AUROC (primary):** on the binary settings (PneumoniaMNIST, Pet) which images are "
+            "undetermined and which are followed depends strongly on the image's true class (a model that fails "
+            "without its shortcut predicts one class), and the AUC gap also differs by class, so an AUROC over "
+            "images of both classes can fall far below 0.5 from class differences alone (Simpson's paradox). "
+            "The primary statistics therefore compute the AUROC within each true class and average over the "
+            "classes that have both labels: `auroc_pooled_strat` (images of all models pooled; still mixes "
+            "between-model and within-model signal) and `median_model_auroc_strat` (per model, then median over "
+            "models; detection inside one model; `models_with_both_labels_in_a_class` models contribute). Both "
+            "have two-level CIs and one-sided z-test p-values (H1: AUROC > 0.5), so an AUROC below 0.5 is never "
+            "significant. The unstratified `auroc_pooled` and `median_model_auroc` are kept as checks with "
+            "two-sided p-values and a `direction` column; an unstratified value significantly below 0.5 means "
+            "inverted ranking (on the binary settings, mostly a class effect), not detection. "
             "accuracy = mean(1 − |w − y|). calibration_gap = mean(preference − follow rate) (positive = "
             "over-detection). observed_switch_rc: r_c where the follow rate crosses 0.5 (isotonic), the derived "
             "ideal replacing the assumed 50%. **The per-image test is now primary; the aligned-image preference "
@@ -993,17 +1002,26 @@ def corrected_analysis(oracle, methods, models, reps, out):
         for name in dose_analysis.BEHAVIOUR_LABELS:
             shown = beh_summary[beh_summary.label == name].copy()
             shown["setting"] = setting(shown)
+            shown["auroc_pooled_strat [95% CI]"] = _ci_text(
+                shown, "auroc_pooled_strat", "auroc_strat_ci_low", "auroc_strat_ci_high")
+            shown["median_model_auroc_strat [95% CI]"] = _ci_text(
+                shown, "median_model_auroc_strat", "median_model_auroc_strat_ci_low",
+                "median_model_auroc_strat_ci_high")
             shown["auroc_pooled [95% CI]"] = _ci_text(shown, "auroc_pooled", "auroc_ci_low", "auroc_ci_high")
             shown["median_model_auroc [95% CI]"] = _ci_text(
                 shown, "median_model_auroc", "median_model_auroc_ci_low", "median_model_auroc_ci_high")
             columns = ["comparison", "setting", "metric", "label_rate", "undetermined_rate",
-                       "auroc_pooled [95% CI]", "p_bh", "median_model_auroc [95% CI]", "p_bh_within"]
+                       "auroc_pooled_strat [95% CI]", "p_bh_strat", "median_model_auroc_strat [95% CI]",
+                       "p_bh_within_strat", "models_with_both_labels_in_a_class"]
             if name == dose_analysis.PRIMARY_LABEL:
-                columns += ["p_holm_headline", "p_holm_headline_within"]
-            columns += ["accuracy", "balanced_accuracy", "calibration_gap", "rho_pref_follow", "observed_switch_rc"]
+                columns += ["p_holm_headline_strat", "p_holm_headline_within_strat"]
+            columns += ["auroc_pooled [95% CI]", "direction", "p_bh", "median_model_auroc [95% CI]",
+                        "direction_within", "p_bh_within",
+                        "accuracy", "balanced_accuracy", "calibration_gap", "rho_pref_follow", "observed_switch_rc"]
             lines += [f"Label `{name}`" + (" (primary)" if name == dose_analysis.PRIMARY_LABEL else " (check)") + ":", "",
-                      markdown(_p_text(shown, ["p_auroc", "p_bh", "p_bh_within", "p_holm_headline",
-                                               "p_holm_headline_within"])[columns]), ""]
+                      markdown(_p_text(shown, ["p_auroc", "p_bh", "p_bh_within", "p_bh_strat", "p_bh_within_strat",
+                                               "p_holm_headline_strat", "p_holm_headline_within_strat"])[columns]),
+                      ""]
     return lines
 
 
