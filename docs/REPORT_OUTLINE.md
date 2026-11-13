@@ -18,7 +18,7 @@ A chapter-by-chapter plan for the M.Tech report (about 55–65 pages). The thesi
 
 - Title page, certificate, declaration, acknowledgements
 - An AI assistance statement, following your university's policy
-- Abstract (adapt the draft in `PAPER_OUTLINE.md`)
+- Abstract (adapt the abstract of `paper/paper_draft.docx`)
 - Contents, list of figures, list of tables
 
 ## Chapter 1: Introduction (4–5 pages)

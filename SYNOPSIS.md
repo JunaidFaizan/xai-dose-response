@@ -24,7 +24,7 @@ A common and dangerous failure of neural networks is **shortcut learning**: the 
 
 ## Problem Statement
 
-Existing studies test explanation methods against a shortcut of one fixed strength, or test evaluation metrics without any ground truth. It is not known whether evaluation metrics respond correctly as a model's reliance on a shortcut gradually increases. This project addresses the question:
+Earlier work controlled what a model relies on in order to test attribution methods (BAM [22], SMERF [23]), or meta-evaluated the evaluation metrics without ground truth [10, 13] or in hand-designed settings with a fixed, known explanation [19]. In our searches we did not find a study that varies a model's measured reliance on a shortcut in steps to test the evaluation metrics themselves. This project addresses the question:
 
 > When a model's reliance on a shortcut increases in controlled steps, do XAI evaluation metrics shift their preference from object explanations to shortcut explanations, and at what level of reliance?
 
@@ -110,12 +110,12 @@ The individual pieces are not new. BAM [22] and SMERF [23] already controlled wh
 
 All 234 models have been trained and evaluated, including the placebo, random-map and per-image behavioural controls (numbers from `results/dose_response/*_corrected.csv` and `behaviour_summary.csv`):
 
-1. **The metrics respond to reliance.** Preference for the shortcut map rises with chance-corrected reliance in 27 of 28 metric–setting cells (ρ = 0.27–0.99; natural images 0.88–0.99).
-2. **They over-detect.** Among models that follow the shortcut on at most half of the conflicting images, black and blur deletion still prefer the shortcut map for 75–92% of Pet models and 100% of CIFAR-10 models.
+1. **The metrics respond to reliance.** Preference for the shortcut map rises with chance-corrected reliance in 27 of 28 metric–setting cells (ρ = 0.49–0.99 in those cells; natural images 0.88–0.99).
+2. **They over-detect.** Among models with chance-corrected reliance r_c ≤ 50%, black and blur deletion still prefer the shortcut map for 75–92% of Pet models and 100% of CIFAR-10 models.
 3. **The 50% ideal is replaced by behaviour.** The models follow the shortcut on half of the images at r_c = 52.9–55.0% on Pet, CIFAR-10 and MNIST patch, but at 36.9–41.9% on PneumoniaMNIST. On Pet the metrics switch already at 1.3–5.4%.
 4. **Within a model, per-image detection is weak** (median AUROC 0.43–0.80 on natural images, against 0.75–0.90 pooled over models).
 5. **Explanation size distorts the metrics.** With a size-matched object map, the MNIST patch switch moves from 38.7–39.3% to 0.9–8.6% r_c.
-6. **Explanation form distorts the metrics.** On CIFAR-10 at the lowest dose, black and blur deletion prefer a random pixel ordering over a centred object map 75–82% (small CNN) and 56–72% (ResNet-18) of the time, against 13–22% for inpainting and insertion. With real Pet masks this drops to 49–53%.
+6. **Explanation form distorts the metrics.** On CIFAR-10 at the lowest dose, black and blur deletion prefer a random pixel ordering over a centred object map 75–81% (small CNN) and 56–72% (ResNet-18) of the time, against 13–23% for inpainting and insertion. With real Pet masks this drops to 49–53%.
 7. **Same-form comparisons mostly behave correctly,** but the rise depends on the setting: the preference over a random or placebo map reaches 0.76–1.00 on Pet, 0.91–1.00 on CIFAR-10, 0.93–0.96 on MNIST patch and only 0.73–0.79 on PneumoniaMNIST patch. On diffuse textures, some metrics move the wrong way.
 8. **No variant is best everywhere.** Inpainting deletion responds in all 28 shortcut-map comparisons, but a paired test shows black deletion better than inpainting on PneumoniaMNIST texture.
 9. **Explanation methods differ:** Integrated Gradients follows the shortcut in every setting. Saliency and SmoothGrad move away from the diffuse shortcut on MNIST texture, but towards it on PneumoniaMNIST texture; Grad-CAM's change on MNIST texture is negligible (shortcut mass 0.100 → 0.098).
