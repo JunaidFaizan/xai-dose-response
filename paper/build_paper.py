@@ -288,7 +288,7 @@ REFERENCES = {
     "samek": "Samek W, et al. (2017) Evaluating the visualization of what a deep neural network has learned. IEEE Transactions on Neural Networks and Learning Systems",
     "petsiuk": "Petsiuk V, Das A, Saenko K (2018) RISE: randomized input sampling for explanation of black-box models. In: Proceedings of the British Machine Vision Conference (BMVC)",
     "adebayo2018": "Adebayo J, et al. (2018) Sanity checks for saliency maps. In: Advances in Neural Information Processing Systems (NeurIPS)",
-    "he": "He K, et al. (2015) Deep residual learning for image recognition. arXiv:1512.03385",
+    "he": "He K, Zhang X, Ren S, Sun J (2016) Deep residual learning for image recognition. In: Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), pp 770\u2013778",
     # data
     "medmnist": "Yang J, et al. (2023) MedMNIST v2: a large-scale lightweight benchmark for 2D and 3D biomedical image classification. Scientific Data",
     "kermany": "Kermany DS, et al. (2018) Identifying medical diagnoses and treatable diseases by image-based deep learning. Cell",
@@ -300,39 +300,42 @@ REFERENCES = {
     "bastings": "Bastings J, Ebert S, Zablotskaia P, Sandholm A, Filippova K (2022) \u201cWill you find these shortcuts?\u201d A protocol for evaluating the faithfulness of input salience methods for text classification. In: Proceedings of EMNLP 2022, pp 976\u2013991",
     "zhou": "Zhou Y, et al. (2022) Do feature attribution methods correctly attribute features? In: Proceedings of the AAAI Conference on Artificial Intelligence. arXiv:2104.14403",
     "lin": "Lin Y-S, Lee W-C, Celik ZB (2021) What do you see? Evaluation of explainable artificial intelligence (XAI) interpretability through neural backdoors. In: Proceedings of KDD 2021. arXiv:2009.10639",
-    "backx": "A backdoor-based explainable AI benchmark for high fidelity evaluation of attributions (BackX). arXiv:2405.02344",
+    "backx": "Yang P, Akhtar N, Jiang J, Mian A (2024) A backdoor-based explainable AI benchmark for high fidelity evaluation of attributions (BackX). arXiv:2405.02344",
     "adebayo2022": "Adebayo J, et al. (2022) Post hoc explanations may be ineffective for detecting unknown spurious correlation. In: International Conference on Learning Representations (ICLR)",
     "sun": "Sun S, et al. (2023) Right for the wrong reason: can interpretable ML techniques detect spurious correlations? In: Medical Image Computing and Computer Assisted Intervention (MICCAI). arXiv:2307.12344",
     "arras": "Arras L, Osman A, Samek W (2022) CLEVR-XAI: a benchmark dataset for the ground truth evaluation of neural network explanations. Information Fusion",
     "funnybirds": "Hesse R, Schaub-Meyer S, Roth S (2023) FunnyBirds: a synthetic vision dataset for a part-based analysis of explainable AI methods. In: Proceedings of ICCV 2023. arXiv:2308.06248",
     "xaiunits": "Lee JR, Emami S, Hollins MD, Wong TCH, Villalobos S\u00e1nchez CI, Toni F, Zhang D, Dejl A (2025) XAI-Units: benchmarking explainability methods with unit tests. In: Proceedings of ACM FAccT 2025. arXiv:2506.01059",
-    "attributionlab": "AttributionLab: faithfulness of feature attribution under controllable environments (2023). NeurIPS XAI in Action Workshop. arXiv:2310.06514",
+    "attributionlab": "Zhang Y, Li Y, Brown H, Rezaei M, Bischl B, Torr P, Khakzar A, Kawaguchi K (2023) AttributionLab: faithfulness of feature attribution under controllable environments. NeurIPS 2023 Workshop XAI in Action (XAIA). arXiv:2310.06514",
     "miro2026": "Mir\u00f3-Nicolau M, Spinnato F, Guidotti R (2026) A synthetic ground-truth framework for the evaluation of explainable AI methods. arXiv:2609.30397",
     "oscar": "Achara A, Triantafillou P, Puyol-Ant\u00f3n E, Hammers A, King AP (2025) Localising shortcut learning in pixel space via ordinal scoring correlations for attribution representations (OSCAR). arXiv:2512.18888",
     # meta-evaluation of metrics
     "tomsett": "Tomsett R, et al. (2020) Sanity checks for saliency metrics. In: Proceedings of the AAAI Conference on Artificial Intelligence. arXiv:1912.01451",
     "metaquantus": "Hedstr\u00f6m A, Bommer P, Wickstr\u00f8m KK, Samek W, Lapuschkin S, H\u00f6hne MMC (2023) The meta-evaluation problem in explainable AI: identifying reliable estimators with MetaQuantus. Transactions on Machine Learning Research. arXiv:2302.07265",
     "quantus": "Hedstr\u00f6m A, Weber L, Krakowczyk D, Bareeva D, Motzkus F, Samek W, Lapuschkin S, H\u00f6hne MMC (2023) Quantus: an explainable AI toolkit for responsible evaluation of neural network explanations and beyond. Journal of Machine Learning Research 24(34):1\u201311",
-    "latec": "Klein L, L\u00fcth CT, Schlegel U, Bungert TJ, El-Assady M, J\u00e4ger PF (2024) Navigating the maze of explainable AI: a systematic approach to evaluating methods and metrics. In: Advances in Neural Information Processing Systems (NeurIPS). arXiv:2409.16756",
-    "m4": "M4: a unified XAI benchmark for faithfulness evaluation of feature attribution methods across metrics, modalities and models (2023). In: NeurIPS 2023 Datasets and Benchmarks Track",
-    "gevaert": "Gevaert A, Rousseau A-J, Becker T, Valkenborg D, De Bie T, Saeys Y (2022) Evaluating feature attribution methods in the image domain. arXiv:2202.12270",
+    "latec": "Klein L, L\u00fcth CT, Schlegel U, Bungert TJ, El-Assady M, J\u00e4ger PF (2024) Navigating the maze of explainable AI: a systematic approach to evaluating methods and metrics. In: Advances in Neural Information Processing Systems 37 (NeurIPS 2024), Datasets and Benchmarks Track. arXiv:2409.16756",
+    "m4": "Li X, Du M, Chen J, Chai Y, Lakkaraju H, Xiong H (2023) M4: a unified XAI benchmark for faithfulness evaluation of feature attribution methods across metrics, modalities and models. In: Advances in Neural Information Processing Systems 36 (NeurIPS 2023), Datasets and Benchmarks Track",
+    "gevaert": "Gevaert A, Rousseau A-J, Becker T, Valkenborg D, De Bie T, Saeys Y (2024) Evaluating feature attribution methods in the image domain. Machine Learning 113(9):6019\u20136064. https://doi.org/10.1007/s10994-024-06550-x",
     "fidelity": "Mir\u00f3-Nicolau M, Jaume-i-Cap\u00f3 A, Moy\u00e0-Alcover G (2024) A comprehensive study on fidelity metrics for XAI. arXiv:2401.10640",
+    "refinecam": "Domeniconi L, Stramiglio A, Lombardi M, Salti S (2026) How to evaluate and refine your CAM. Accepted at the International Conference on Pattern Recognition (ICPR 2026). arXiv:2605.14641",
     "hesse2024": "Hesse R, Schaub-Meyer S, Roth S (2024) Benchmarking the attribution quality of vision models. In: NeurIPS 2024 Datasets and Benchmarks Track. arXiv:2407.11910",
     "binder": "Binder A, et al. (2023) Shortcomings of top-down randomization-based sanity checks for evaluations of deep neural network explanations. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)",
     "sanityrevisited": "Hedstr\u00f6m A, Weber L, Lapuschkin S, H\u00f6hne MMC (2023) Sanity checks revisited: an exploration to repair the model parameter randomisation test. NeurIPS 2023 Workshop XAI in Action (XAIA). arXiv:2401.06465",
-    "freshlook": "Hedstr\u00f6m A, Weber L, Lapuschkin S, H\u00f6hne M (2024) A fresh look at sanity checks for saliency maps. arXiv:2405.02383 (text overlaps with arXiv:2401.06465)",
+    "freshlook": "Hedstr\u00f6m A, Weber L, Lapuschkin S, H\u00f6hne M (2024) A fresh look at sanity checks for saliency maps. In: Explainable Artificial Intelligence (xAI 2024). Communications in Computer and Information Science, Springer, pp 403\u2013420. https://doi.org/10.1007/978-3-031-63787-2_21 (extends arXiv:2401.06465)",
     # confounds of perturbation metrics
     "rong": "Rong Y, Leemann T, Borisov V, Kasneci G, Kasneci E (2022) A consistent and efficient evaluation strategy for attribution methods (ROAD). In: Proceedings of the International Conference on Machine Learning (ICML). arXiv:2202.00449",
     "roar": "Hooker S, Erhan D, Kindermans P-J, Kim B (2019) A benchmark for interpretability methods in deep neural networks. In: Advances in Neural Information Processing Systems (NeurIPS). arXiv:1806.10758",
     "roarpitfalls": "Song J, Cha K, Seo J (2026) On pitfalls of RemOve-And-Retrain: data processing inequality perspective. ICML 2026 Workshop on Mechanistic Interpretability. arXiv:2304.13836",
     "blucher": "Bl\u00fccher S, Vielhaben J, Strodthoff N (2024) Decoupling pixel flipping and occlusion strategy for consistent XAI benchmarks. Transactions on Machine Learning Research. arXiv:2401.06654",
-    "baseline": "Back to the baseline: examining baseline effects on explainability metrics (2025). arXiv:2512.11433",
-    "gomez": "Gomez T, Fr\u00e9our T, Mouch\u00e8re H (2022) Metrics for saliency map evaluation of deep learning explanation methods. arXiv:2201.13291",
+    "baseline": "Picard AM, Boissin T, Subhash V, Cad\u00e8ne R, Fel T (2025) Back to the baseline: examining baseline effects on explainability metrics. arXiv:2512.11433",
+    "aim": "Hsieh C-Y, Fang H-Y, Wei C-S (2026) AIM: adversarial information masking for faithfulness evaluation of saliency maps. arXiv:2605.16905",
+    "flexibility": "Wickstr\u00f8m K, H\u00f6hne MM-C, Hedstr\u00f6m A (2024) From flexibility to manipulation: the slippery slope of XAI evaluation. ECCV 2024 Workshop on Explainable Computer Vision. arXiv:2412.05592",
+    "gomez": "Gomez T, Fr\u00e9our T, Mouch\u00e8re H (2022) Metrics for saliency map evaluation of deep learning explanation methods. In: Pattern Recognition and Artificial Intelligence (ICPRAI 2022). Lecture Notes in Computer Science, Springer, pp 84\u201395. https://doi.org/10.1007/978-3-031-09037-0_8",
     "saco": "Wu J, Kang W, Tang H, Hong Y, Yan Y (2024) On the faithfulness of vision transformer explanations. In: Proceedings of CVPR 2024. arXiv:2404.01415",
     "bilodeau": "Bilodeau B, Jaques N, Koh PW, Kim B (2024) Impossibility theorems for feature attribution. Proceedings of the National Academy of Sciences 121(2). arXiv:2212.11870",
     # shortcuts in practice
     "lapuschkin": "Lapuschkin S, W\u00e4ldchen S, Binder A, Montavon G, Samek W, M\u00fcller K-R (2019) Unmasking Clever Hans predictors and assessing what machines really learn. Nature Communications. arXiv:1902.10178",
-    "degrave": "DeGrave AJ, et al. (2021) AI for radiographic COVID-19 detection selects shortcuts over signal. Author manuscript, PubMed Central PMC7523163 [final venue to be confirmed from the published version]",
+    "degrave": "DeGrave AJ, Janizek JD, Lee S-I (2021) AI for radiographic COVID-19 detection selects shortcuts over signal. Nature Machine Intelligence 3(7):610\u2013619. https://doi.org/10.1038/s42256-021-00338-7",
     "hermann": "Hermann KL, Mobahi H, Fel T, Mozer MC (2024) On the foundations of shortcut learning. In: International Conference on Learning Representations (ICLR). arXiv:2310.16228",
     "suhail": "Suhail P, Goel V, Sethi A (2025) Shortcut learning susceptibility in vision classifiers. arXiv:2502.09150",
     # statistics
@@ -612,20 +615,23 @@ def table(caption, header, body, widths=None, note=None, size=8, header_rows=Non
 
 def table_positioning():
     body = [
-        ["Inject a shortcut so the evidence is known",
+        ["Ground-truth benchmarks: inject a shortcut or build data so the evidence is known",
          "Decoy MNIST " + cite("ross") + "; Zhou et al. " + cite("zhou") + "; Lin et al. " + cite("lin")
          + "; BackX " + cite("backx") + "; Adebayo et al. " + cite("adebayo2022") + "; Sun et al. " + cite("sun")
-         + "; Bastings et al. (text) " + cite("bastings"),
+         + "; Bastings et al. (text) " + cite("bastings") + "; synthetic intervention-based ground truth for "
+         "XAI methods " + cite("miro2026"),
          "The object of evaluation is the metric, not the attribution method"],
         ["Graded or controlled model reliance",
          "BAM: models trained with known relative feature importance " + cite("bam") + "; SMERF: controlled "
          "model reasoning " + cite("smerf") + "; OSCAR: shortcut scores that react to the strength of the "
          "shortcut association " + cite("oscar"),
-         "A continuous signed dose, with reliance measured behaviourally from about 0% to 100% and chance-corrected"],
+         "A continuous signed dose, with reliance measured behaviourally from about 0% to 100% and chance-corrected. "
+         "BAM and Adebayo et al. " + cite("adebayo2022") + " report false positives of attribution methods; "
+         "we show over-detection by the metrics, with oracle maps and no attribution method"],
         ["Meta-evaluation of faithfulness metrics",
          "Tomsett et al. " + cite("tomsett") + "; MetaQuantus (no ground truth) " + cite("metaquantus")
-         + "; fidelity metrics vs a decision tree " + cite("fidelity") + "; synthetic intervention-based ground "
-         "truth " + cite("miro2026") + "; Gevaert et al. " + cite("gevaert") + "; LATEC " + cite("latec")
+         + "; fidelity metrics vs a decision tree " + cite("fidelity") + "; CAM evaluation metrics vs synthetic "
+         "ground truth " + cite("refinecam") + "; Gevaert et al. " + cite("gevaert") + "; LATEC " + cite("latec")
          + "; M4 " + cite("m4"),
          "A ground truth that changes with the model, read out as responsiveness, over-detection, a switch "
          "point and per-image AUROC"],
@@ -1146,7 +1152,11 @@ def build():
          "controls the complexity of the model's reasoning " + cite("smerf") + "; OSCAR derives shortcut scores "
          "that are sensitive to the strength of the shortcut association " + cite("oscar") + ". All of these "
          "evaluate attribution methods or detect shortcuts. We evaluate the metrics, against reliance that is "
-         "varied in steps and measured.")
+         "varied in steps and measured. BAM reports that some attribution methods give false-positive "
+         "explanations " + cite("bam") + ", and Adebayo et al. " + cite("adebayo2022") + " that attributions can "
+         "indicate a spurious signal the model does not rely on. These are false positives at the level of the "
+         "method. We show the counterpart at the level of the evaluation metric: scored with oracle maps, so that "
+         "no attribution method is involved, the metrics over-detect a shortcut the model barely uses.")
     heading("2.2. Meta-evaluation of faithfulness metrics", 2)
     para("Tomsett et al. " + cite("tomsett") + " found saliency metrics statistically unreliable. MetaQuantus "
          + cite("metaquantus") + " rates metrics by their resilience to noise and reactivity to randomness "
@@ -1156,7 +1166,9 @@ def build():
          + " report that metrics measure different properties and that results on one dataset need not hold on "
          "another. Mir\u00f3-Nicolau et al. " + cite("fidelity") + " check fidelity metrics against a decision tree "
          "on 52,000 synthetic 128\u00d7128 images, and Hesse et al. " + cite("hesse2024") + " propose a protocol "
-         "that avoids the out-of-domain problem of incremental deletion. The model-randomisation sanity check "
+         "that avoids the out-of-domain problem of incremental deletion. Domeniconi et al. " + cite("refinecam")
+         + " compare CAM evaluation metrics on a synthetic dataset with ground-truth attributions and propose a "
+         "composite metric. The model-randomisation sanity check "
          + cite("adebayo2018") + " has been criticised " + cite("binder") + " and revised "
          + cite("sanityrevisited", "freshlook") + ". None of these varies the model's reliance and reads the "
          "metrics' response to it.")
@@ -1164,9 +1176,14 @@ def build():
     para("ROAD " + cite("rong") + " shows that pixel-perturbation results are driven by information leaking "
          "through the shape of the removed region; ROAR " + cite("roar") + " retrains after removal, and a later "
          "analysis traces ROAR's and ROAD's rankings to a bias towards spatially blurry masks "
-         + cite("roarpitfalls") + ". Bl\u00fccher et al. " + cite("blucher") + " show that the occlusion "
+         + cite("roarpitfalls") + " (a workshop paper). AIM " + cite("aim") + " shows that the masking operator "
+         "confounds removal-based scores: zero masking creates out-of-distribution inputs and interpolation-based "
+         "masking leaves predictive information in place " + cite("rong", "aim") + ". Bl\u00fccher et al. "
+         + cite("blucher") + " show that the occlusion "
          "strategy decides pixel-flipping rankings, and \u201cBack to the Baseline\u201d " + cite("baseline")
-         + " that the replacement baseline favours some methods. Gomez et al. " + cite("gomez") + " note that "
+         + " that the replacement baseline favours some methods. \u201cFrom Flexibility to Manipulation\u201d "
+         + cite("flexibility") + " shows that such free evaluation choices can be exploited to change an evaluation's outcome, which is "
+         "why we report several fills side by side and compare oracle maps in pairs within a fill. Gomez et al. " + cite("gomez") + " note that "
          "deletion and insertion use only the ranking of the map and present out-of-distribution images. SaCo "
          + cite("saco") + " reports that common metrics struggle to separate methods from random attribution, "
          "and Bilodeau et al. " + cite("bilodeau") + " argue that a concrete end task with repeated model "
@@ -1528,11 +1545,15 @@ def build():
          "verdict. A practitioner who reads \u201cthe metric prefers the shortcut explanation\u201d as \u201cthe "
          "model uses the shortcut\u201d would be wrong for most of the low-reliance Pet and CIFAR-10 models under "
          "black and blur deletion. Bilodeau et al. " + cite("bilodeau") + " argue that the end task must be "
-         "defined; our behavioural labels give one such definition, and against it the metrics over-detect.")
+         "defined; our behavioural labels give one such definition, and against it the metrics over-detect. "
+         "BAM " + cite("bam") + " and Adebayo et al. " + cite("adebayo2022") + " found false positives in "
+         "attribution methods; our oracle maps show the same kind of error in the metrics used to evaluate "
+         "those methods, with no attribution method involved.")
     para("**Size and form.** The size-matched control removes much of the preference for the object map at low "
          "reliance, and the random control shows black and blur deletion preferring scattered removal over "
          "compact removal on natural images. Both fit known mechanisms: removal shape leaks class information "
          + cite("rong") + ", removal-based benchmarks favour spatially blurry masks " + cite("roarpitfalls")
+         + ", interpolation-based masking leaves predictive information in place " + cite("rong", "aim")
          + ", the fill strategy decides rankings " + cite("blucher") + ", deletion and insertion read only the "
          "ranking of a map " + cite("gomez") + ", and common metrics struggle to separate methods from random "
          "attribution " + cite("saco") + ". The real Pet masks reduce the CIFAR-10 form bias, so part of it was "

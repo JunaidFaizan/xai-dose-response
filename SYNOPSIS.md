@@ -24,7 +24,7 @@ A common and dangerous failure of neural networks is **shortcut learning**: the 
 
 ## Problem Statement
 
-Earlier work controlled what a model relies on in order to test attribution methods (BAM [22], SMERF [23]), or meta-evaluated the evaluation metrics without ground truth [10, 13] or in hand-designed settings with a fixed, known explanation [19]. In our searches we did not find a study that varies a model's measured reliance on a shortcut in steps to test the evaluation metrics themselves. This project addresses the question:
+Earlier work controlled what a model relies on in order to test attribution methods (BAM [22], SMERF [23]), or meta-evaluated the evaluation metrics without ground truth [10, 13] or against the known explanation of a transparent model, a decision tree [25]. In our searches we did not find a study that varies a model's measured reliance on a shortcut in steps to test the evaluation metrics themselves. This project addresses the question:
 
 > When a model's reliance on a shortcut increases in controlled steps, do XAI evaluation metrics shift their preference from object explanations to shortcut explanations, and at what level of reliance?
 
@@ -40,7 +40,7 @@ In our literature searches (an audit covering 2019 to October 2026, re-checked o
 2. scores **fixed oracle explanations** (shortcut-only, object-only, size-matched, placebo and random maps), so that the metrics are tested independently of any explanation method;
 3. reports when metrics **switch their verdict** relative to the model's measured reliance, and separates genuine responses to the model from biases caused by the size and form of the explanation being scored.
 
-The individual pieces are not new. BAM [22] and SMERF [23] already controlled what a model relies on, to evaluate *attribution methods*; shortcut or backdoor ground truth is used for methods at a fixed strength [16, 17, 18]; metrics are meta-evaluated without ground truth [10, 13]; hand-designed networks have known explanations [19]; and removal shape, fill and baseline confounds are documented [9, 14, 24]. What is new is the combination: graded, measured reliance as ground truth for the metrics, with size and form controls.
+The individual pieces are not new. BAM [22] and SMERF [23] already controlled what a model relies on, to evaluate *attribution methods*; shortcut or backdoor ground truth is used for methods at a fixed strength [16, 17, 18]; metrics are meta-evaluated without ground truth [10, 13]; hand-designed networks with known explanations test attribution methods [19]; fidelity metrics are checked against a decision tree's known explanation [25]; and removal shape, fill and baseline confounds are documented [9, 14, 24]. What is new is the combination: graded, measured reliance as ground truth for the metrics, with size and form controls.
 
 ## Objectives
 
@@ -166,16 +166,17 @@ All tools are free and open source. Experiments run on a laptop CPU, except the 
 9. Rong, Y., et al. (2022). A Consistent and Efficient Evaluation Strategy for Attribution Methods (ROAD). ICML.
 10. Tomsett, R., et al. (2020). Sanity Checks for Saliency Metrics. AAAI.
 11. Binder, A., et al. (2023). Shortcomings of Top-Down Randomization-Based Sanity Checks for Evaluations of Deep Neural Network Explanations. CVPR.
-12. Hedström, A., Weber, L., Lapuschkin, S., and Höhne, M. (2024). A Fresh Look at Sanity Checks for Saliency Maps. arXiv:2405.02383 (overlaps with "Sanity Checks Revisited", NeurIPS XAIA 2023, arXiv:2401.06465).
+12. Hedström, A., Weber, L., Lapuschkin, S., and Höhne, M. (2024). A Fresh Look at Sanity Checks for Saliency Maps. In: Explainable Artificial Intelligence (xAI 2024), CCIS, Springer, pp. 403–420. doi:10.1007/978-3-031-63787-2_21 (extends "Sanity Checks Revisited", NeurIPS XAIA 2023, arXiv:2401.06465).
 13. Hedström, A., et al. (2023). The Meta-Evaluation Problem in Explainable AI: Identifying Reliable Estimators with MetaQuantus. Transactions on Machine Learning Research.
-14. Back to the Baseline: Examining Baseline Effects on Explainability Metrics (2025). arXiv:2512.11433.
+14. Picard, A. M., Boissin, T., Subhash, V., Cadène, R., and Fel, T. (2025). Back to the Baseline: Examining Baseline Effects on Explainability Metrics. arXiv:2512.11433.
 15. Ross, A. S., Hughes, M. C., and Doshi-Velez, F. (2017). Right for the Right Reasons: Training Differentiable Models by Constraining their Explanations. IJCAI.
 16. Sun, S., et al. (2023). Right for the Wrong Reason: Can Interpretable ML Techniques Detect Spurious Correlations? MICCAI. arXiv:2307.12344.
 17. Zhou, Y., et al. (2022). Do Feature Attribution Methods Correctly Attribute Features? AAAI. arXiv:2104.14403.
-18. A Backdoor-based Explainable AI Benchmark for High Fidelity Evaluation of Attributions (BackX). arXiv:2405.02344.
-19. AttributionLab: Faithfulness of Feature Attribution Under Controllable Environments (2023). NeurIPS XAIA Workshop. arXiv:2310.06514.
+18. Yang, P., Akhtar, N., Jiang, J., and Mian, A. (2024). A Backdoor-based Explainable AI Benchmark for High Fidelity Evaluation of Attributions (BackX). arXiv:2405.02344.
+19. Zhang, Y., Li, Y., Brown, H., Rezaei, M., Bischl, B., Torr, P., Khakzar, A., and Kawaguchi, K. (2023). AttributionLab: Faithfulness of Feature Attribution Under Controllable Environments. NeurIPS XAIA Workshop. arXiv:2310.06514.
 20. Yang, J., et al. (2023). MedMNIST v2: A Large-Scale Lightweight Benchmark for 2D and 3D Biomedical Image Classification. Scientific Data.
 21. Smilkov, D., et al. (2017). SmoothGrad: Removing Noise by Adding Noise. arXiv:1706.03825.
 22. Yang, M., and Kim, B. (2019). Benchmarking Attribution Methods with Relative Feature Importance (BAM). arXiv:1907.09701.
 23. Kim, J. S., Plumb, G., and Talwalkar, A. (2022). Sanity Simulations for Saliency Methods (SMERF). ICML.
 24. Blücher, S., Vielhaben, J., and Strodthoff, N. (2024). Decoupling Pixel Flipping and Occlusion Strategy for Consistent XAI Benchmarks. TMLR.
+25. Miró-Nicolau, M., Jaume-i-Capó, A., and Moyà-Alcover, G. (2024). A Comprehensive Study on Fidelity Metrics for XAI. arXiv:2401.10640.
