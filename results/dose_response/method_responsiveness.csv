@@ -9,28 +9,28 @@ cifar10_resnet18,patch,Integrated Gradients,0.856,0.0,0.017,0.084
 cifar10_resnet18,patch,Occlusion,0.948,0.0,0.005,0.338
 cifar10_resnet18,patch,Saliency,0.95,0.0,0.002,0.088
 cifar10_resnet18,patch,SmoothGrad,0.953,0.0,0.004,0.13
-mnist,patch,Grad-CAM,0.861,0.0,0.013,0.038
-mnist,patch,Integrated Gradients,0.972,0.0,0.002,0.696
-mnist,patch,Occlusion,0.935,0.0,0.0,0.531
-mnist,patch,Saliency,0.919,0.0,0.002,0.094
-mnist,patch,SmoothGrad,0.938,0.0,0.002,0.104
-mnist,texture,Grad-CAM,-0.488,0.003,0.1,0.098
-mnist,texture,Integrated Gradients,0.953,0.0,0.147,0.53
-mnist,texture,Occlusion,0.896,0.0,0.104,0.218
-mnist,texture,Saliency,-0.801,0.0,0.118,0.057
-mnist,texture,SmoothGrad,-0.738,0.0,0.11,0.082
+mnist,patch,Grad-CAM,0.863,0.0,0.013,0.038
+mnist,patch,Integrated Gradients,0.987,0.0,0.002,0.696
+mnist,patch,Occlusion,0.973,0.0,0.0,0.531
+mnist,patch,Saliency,0.929,0.0,0.002,0.094
+mnist,patch,SmoothGrad,0.955,0.0,0.002,0.104
+mnist,texture,Grad-CAM,-0.326,0.02,0.1,0.098
+mnist,texture,Integrated Gradients,0.897,0.0,0.147,0.53
+mnist,texture,Occlusion,0.929,0.0,0.104,0.218
+mnist,texture,Saliency,-0.753,0.0,0.118,0.057
+mnist,texture,SmoothGrad,-0.687,0.0,0.11,0.082
 pet_resnet18,patch,Grad-CAM,0.886,0.0,0.006,0.085
 pet_resnet18,patch,Integrated Gradients,0.936,0.0,0.006,0.22
 pet_resnet18,patch,Occlusion,0.979,0.0,0.004,0.598
 pet_resnet18,patch,Saliency,0.969,0.0,0.001,0.304
 pet_resnet18,patch,SmoothGrad,0.907,0.0,0.002,0.14
-pneumonia_mnist,patch,Grad-CAM,0.802,0.0,0.022,0.166
-pneumonia_mnist,patch,Integrated Gradients,0.925,0.0,0.003,0.391
-pneumonia_mnist,patch,Occlusion,0.889,0.0,0.0,0.362
-pneumonia_mnist,patch,Saliency,0.889,0.0,0.001,0.174
-pneumonia_mnist,patch,SmoothGrad,0.853,0.0,0.001,0.132
-pneumonia_mnist,texture,Grad-CAM,-0.491,0.002,0.098,0.093
-pneumonia_mnist,texture,Integrated Gradients,0.855,0.0,0.142,0.397
-pneumonia_mnist,texture,Occlusion,0.709,0.0,0.106,0.126
-pneumonia_mnist,texture,Saliency,0.874,0.0,0.097,0.176
-pneumonia_mnist,texture,SmoothGrad,0.696,0.0,0.091,0.136
+pneumonia_mnist,patch,Grad-CAM,0.808,0.0,0.022,0.166
+pneumonia_mnist,patch,Integrated Gradients,0.945,0.0,0.003,0.391
+pneumonia_mnist,patch,Occlusion,0.928,0.0,0.0,0.362
+pneumonia_mnist,patch,Saliency,0.919,0.0,0.001,0.174
+pneumonia_mnist,patch,SmoothGrad,0.888,0.0,0.001,0.132
+pneumonia_mnist,texture,Grad-CAM,-0.407,0.007,0.098,0.093
+pneumonia_mnist,texture,Integrated Gradients,0.895,0.0,0.142,0.397
+pneumonia_mnist,texture,Occlusion,0.664,0.0,0.106,0.126
+pneumonia_mnist,texture,Saliency,0.897,0.0,0.097,0.176
+pneumonia_mnist,texture,SmoothGrad,0.785,0.0,0.091,0.136
