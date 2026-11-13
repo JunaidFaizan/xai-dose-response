@@ -120,11 +120,13 @@ def dose_params(dose):
 
 
 def dose_label(dose):
-    """'+010' for 0.1, '+0p5' for 0.005 (whole percentages keep the original format)."""
+    """'+010' for 0.1, '+0p5' for 0.005, '+0p75' for 0.0075 (whole percentages keep
+    the original format; fractional ones keep every significant decimal, so
+    nearby doses such as 0.0075 and 0.008 never share a name)."""
     percent = dose * 100
     if abs(percent - round(percent)) < 1e-9:
         return f"{round(percent):+04d}"
-    return f"{percent:+.1f}".replace(".", "p")
+    return f"{round(percent, 6):+g}".replace(".", "p")
 MODEL_DIR = CHECKPOINT_DIR / "dose"
 # A GPU is used when available (e.g. on Kaggle); otherwise the CPU, as before.
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
