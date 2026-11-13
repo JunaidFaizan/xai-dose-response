@@ -915,3 +915,303 @@ responsiveness_rho: Spearman correlation between reliance and preference for the
 | pneumonia_mnist | texture | Occlusion | 0.664 | 0.000 | 0.106 | 0.126 |
 | pneumonia_mnist | texture | Saliency | 0.897 | 0.000 | 0.097 | 0.176 |
 | pneumonia_mnist | texture | SmoothGrad | 0.785 | 0.000 | 0.091 | 0.136 |
+
+
+## Audit-2 additions (M1–M4)
+
+New files (the tables above are unchanged): `intervals_crossed.csv`, `behaviour_switch.csv`, `switch_differences.csv`, `overdetection.csv`, `excess_preference_models.csv`, `behaviour_calibration.csv`, `confound_rc.csv`, `correct_only.csv`, `behaviour_power.csv`.
+
+### Definitions
+
+- Crossed bootstrap (2000 replicates, seed 1): models resampled within each dose as in the two-level bootstrap, but ONE image resample per replicate is shared by every model, because all models of a setting are scored on the same images (models and images are crossed). A shared image effect then moves every model together, so level and switch intervals are wider than the two-level ones.
+- BCa intervals for ρ: bias-corrected and accelerated percentiles of the crossed ρ replicates (acceleration from a leave-one-model-out jackknife). Before ranking, U(0, 1e-9) jitter breaks the ties that duplicated models create (rng seed 2). `rho_rc_share_boot_below`: share of replicates below the estimate (0.5 when unbiased). Significance still comes from the model-level Spearman test (`p_rho_rc`), not from these intervals.
+- Behavioural switch: the r_c where the follow rate (share of determined images with label 1) crosses 0.5 (isotonic), with the same rule as the metric switch: identified if a model lies within ±10 points, bracketed if models lie within ±10 points on both sides. `report_text` is how the switch may be quoted. Labels: `follows_shortcut_causal` (primary) = shortcut sufficient under conflict, errors removed; `follows_shortcut` = moved-shortcut pass only; `shortcut_dominant` = the shortcut is more necessary than the object on aligned images.
+- Switch difference: behavioural − metric switch per bootstrap replicate on the same picks (paired). 'metric earlier' only where the 95% CI excludes 0 from above, 'metric later' where it excludes 0 from below.
+- Over-detection decomposition (lowest dose): S–O = shortcut vs full object, R–O = random vs full object, S–R = shortcut vs random. Excess preference = S–O − R–O per model: how much more the metric prefers the shortcut map than a random map over the object map. ρ(excess, r_c) one-sided (H1: ρ > 0), BH over all settings × metrics.
+- Rates: fpr = share of models with r_c ≤ 50 whose preference (S–O) > 0.5; tpr = the same for r_c > 50; Clopper–Pearson 95% intervals. Margin FPR: a model counts as over-detecting only if the 2.5th percentile of its image bootstrap of preference exceeds 0.5. r_c bands: fpr among models with r_c ≤ 10 and with 10 < r_c ≤ 50.
+
+### Crossed and BCa intervals (shortcut vs full object; all comparisons in intervals_crossed.csv)
+
+| setting | metric | rho_rc [two-level] | rho_rc [BCa crossed] | p_rho_rc | rho_rc_share_boot_below | pref_low [two-level] | pref_low [crossed] | switch [two-level] | switch [crossed] | switch_status |
+|---|---|---|---|---|---|---|---|---|---|---|
+| cifar10 / patch | Deletion (black) | 0.907 [0.590, 0.958] | 0.907 [0.713, 0.986] | < 0.001 | 0.613 | 0.815 [0.760, 0.870] | 0.815 [0.740, 0.880] | – [–, –] | – [–, –] | above 0.5 at lowest reliance |
+| cifar10 / patch | Deletion (blur) | 0.900 [0.664, 0.963] | 0.900 [0.660, 0.979] | < 0.001 | 0.504 | 0.735 [0.675, 0.800] | 0.735 [0.650, 0.820] | – [–, –] | – [–, –] | above 0.5 at lowest reliance |
+| cifar10 / patch | Deletion (inpaint) | 0.986 [0.942, 0.996] | 0.986 [0.979, 1.000] | < 0.001 | 0.868 | 0.265 [0.205, 0.325] | 0.265 [0.190, 0.350] | 4.3 [3.5, 7.3] | 4.3 [3.2, 8.0] | identified at lowest-reliance edge |
+| cifar10 / patch | Insertion (blur) | 0.953 [0.914, 0.993] | 0.953 [0.909, 0.993] | < 0.001 | 0.478 | 0.227 [0.170, 0.287] | 0.227 [0.158, 0.310] | 17.7 [13.4, 21.3] | 17.7 [12.2, 23.0] | identified |
+| cifar10_resnet18 / patch | Deletion (black) | 0.959 [0.843, 0.974] | 0.959 [0.934, 0.990] | < 0.001 | 0.838 | 0.703 [0.633, 0.770] | 0.703 [0.613, 0.790] | – [–, –] | – [–, –] | above 0.5 at lowest reliance |
+| cifar10_resnet18 / patch | Deletion (blur) | 0.968 [0.910, 0.983] | 0.968 [0.926, 0.990] | < 0.001 | 0.607 | 0.610 [0.540, 0.680] | 0.610 [0.520, 0.700] | – [–, –] | – [–, –] | above 0.5 at lowest reliance |
+| cifar10_resnet18 / patch | Deletion (inpaint) | 0.980 [0.922, 0.992] | 0.980 [0.959, 0.998] | < 0.001 | 0.744 | 0.153 [0.113, 0.193] | 0.153 [0.100, 0.213] | 8.7 [4.4, 16.3] | 8.7 [4.3, 16.5] | identified |
+| cifar10_resnet18 / patch | Insertion (blur) | 0.983 [0.945, 0.991] | 0.983 [0.973, 0.998] | < 0.001 | 0.800 | 0.240 [0.177, 0.307] | 0.240 [0.157, 0.330] | 8.6 [6.9, 11.2] | 8.6 [5.1, 12.1] | identified |
+| mnist / patch | Deletion (black) | 0.959 [0.928, 0.968] | 0.959 [0.941, 0.980] | < 0.001 | 0.704 | 0.022 [0.003, 0.045] | 0.022 [0.000, 0.050] | 38.7 [26.9, 46.5] | 38.7 [25.8, 48.4] | identified |
+| mnist / patch | Deletion (blur) | 0.973 [0.939, 0.975] | 0.973 [0.965, 0.987] | < 0.001 | 0.866 | 0.017 [0.003, 0.033] | 0.017 [0.000, 0.043] | 38.8 [27.6, 45.6] | 38.8 [26.7, 46.9] | identified |
+| mnist / patch | Deletion (inpaint) | 0.967 [0.940, 0.976] | 0.967 [0.956, 0.985] | < 0.001 | 0.820 | 0.007 [0.000, 0.023] | 0.007 [0.000, 0.027] | 39.2 [34.7, 52.5] | 39.2 [33.7, 53.4] | identified |
+| mnist / patch | Insertion (blur) | 0.965 [0.932, 0.971] | 0.965 [0.954, 0.984] | < 0.001 | 0.815 | 0.013 [0.003, 0.030] | 0.013 [0.000, 0.040] | 39.3 [33.9, 51.9] | 39.3 [32.8, 52.6] | identified |
+| mnist / texture | Deletion (black) | 0.909 [0.846, 0.942] | 0.909 [0.852, 0.954] | < 0.001 | 0.599 | 0.033 [0.007, 0.067] | 0.033 [0.003, 0.080] | 17.3 [11.4, 22.0] | 17.3 [10.4, 24.2] | identified |
+| mnist / texture | Deletion (blur) | 0.964 [0.920, 0.968] | 0.964 [0.950, 0.984] | < 0.001 | 0.814 | 0.037 [0.013, 0.063] | 0.037 [0.010, 0.077] | 66.5 [49.6, 75.4] | 66.5 [38.3, 76.1] | identified |
+| mnist / texture | Deletion (inpaint) | 0.948 [0.885, 0.958] | 0.948 [0.928, 0.979] | < 0.001 | 0.816 | 0.017 [0.003, 0.037] | 0.017 [0.000, 0.047] | 18.8 [12.4, 25.9] | 18.8 [11.9, 28.8] | identified |
+| mnist / texture | Insertion (blur) | 0.965 [0.920, 0.966] | 0.965 [0.950, 0.987] | < 0.001 | 0.839 | 0.013 [0.000, 0.033] | 0.013 [0.000, 0.040] | 99.7 [94.0, 99.9] | 99.7 [93.2, 100.0] | identified |
+| pet_resnet18 / patch | Deletion (black) | 0.877 [0.609, 0.942] | 0.877 [0.715, 0.972] | < 0.001 | 0.671 | 0.458 [0.393, 0.523] | 0.458 [0.373, 0.547] | 1.3 [-0.3, 4.2] | 1.3 [-0.4, 4.9] | identified at lowest-reliance edge |
+| pet_resnet18 / patch | Deletion (blur) | 0.933 [0.822, 0.964] | 0.933 [0.874, 0.986] | < 0.001 | 0.706 | 0.503 [0.443, 0.563] | 0.503 [0.410, 0.590] | – [–, –] | – [–, –] | above 0.5 at lowest reliance |
+| pet_resnet18 / patch | Deletion (inpaint) | 0.951 [0.853, 0.982] | 0.951 [0.870, 0.986] | < 0.001 | 0.577 | 0.405 [0.350, 0.463] | 0.405 [0.310, 0.493] | 4.6 [2.1, 10.6] | 4.6 [0.2, 15.0] | identified |
+| pet_resnet18 / patch | Insertion (blur) | 0.935 [0.876, 0.968] | 0.935 [0.889, 0.981] | < 0.001 | 0.631 | 0.350 [0.297, 0.405] | 0.350 [0.267, 0.430] | 5.4 [4.0, 9.0] | 5.4 [3.5, 9.8] | identified |
+| pneumonia_mnist / patch | Deletion (black) | 0.645 [0.386, 0.753] | 0.645 [0.430, 0.806] | < 0.001 | 0.517 | 0.377 [0.263, 0.520] | 0.377 [0.243, 0.520] | 5.9 [3.0, 16.2] | 5.9 [3.1, 39.0] | identified |
+| pneumonia_mnist / patch | Deletion (blur) | 0.506 [0.341, 0.655] | 0.506 [0.314, 0.654] | < 0.001 | 0.448 | 0.453 [0.393, 0.517] | 0.453 [0.367, 0.545] | 2.5 [0.4, 4.4] | 2.5 [0.1, 4.7] | identified at lowest-reliance edge |
+| pneumonia_mnist / patch | Deletion (inpaint) | 0.658 [0.457, 0.790] | 0.658 [0.474, 0.813] | < 0.001 | 0.526 | 0.147 [0.100, 0.197] | 0.147 [0.083, 0.213] | 30.0 [7.6, 42.7] | 30.0 [7.4, 64.8] | identified |
+| pneumonia_mnist / patch | Insertion (blur) | 0.488 [0.316, 0.630] | 0.488 [0.314, 0.665] | 0.001 | 0.529 | 0.497 [0.402, 0.597] | 0.497 [0.385, 0.615] | 0.1 [-0.0, 1.2] | 0.1 [-0.1, 2.0] | identified at lowest-reliance edge |
+| pneumonia_mnist / texture | Deletion (black) | 0.848 [0.775, 0.918] | 0.848 [0.783, 0.923] | < 0.001 | 0.650 | 0.328 [0.230, 0.433] | 0.328 [0.217, 0.443] | 12.6 [5.9, 22.9] | 12.6 [5.0, 24.4] | identified |
+| pneumonia_mnist / texture | Deletion (blur) | 0.583 [0.402, 0.732] | 0.583 [0.435, 0.783] | < 0.001 | 0.675 | 0.572 [0.515, 0.627] | 0.572 [0.498, 0.647] | – [–, –] | – [–, –] | above 0.5 at lowest reliance |
+| pneumonia_mnist / texture | Deletion (inpaint) | 0.555 [0.322, 0.694] | 0.555 [0.317, 0.752] | < 0.001 | 0.552 | 0.450 [0.340, 0.597] | 0.450 [0.318, 0.592] | 4.4 [3.9, 6.8] | 4.4 [3.8, 8.1] | identified at lowest-reliance edge |
+| pneumonia_mnist / texture | Insertion (blur) | 0.269 [0.060, 0.488] | 0.269 [0.019, 0.481] | 0.085 | 0.436 | 0.640 [0.560, 0.723] | 0.640 [0.542, 0.740] | – [–, –] | – [–, –] | above 0.5 at lowest reliance |
+
+### Behavioural switch by label (N1, N2)
+
+| setting | label | primary | report_text | status | switch [two-level] | switch [crossed] | switch_found_share | nearest_model_distance | bracketed | follow_rate_min | follow_rate_max | undetermined_rate_mean | undetermined_rate_max | rho_undetermined_rc | p_undetermined_rc |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| cifar10 / patch | follows_shortcut_causal | True | > 42.7 (not identified; no model between 42.7 and 96.0) | not identified (no model within ±10 points) | 55.0 [48.7, 59.2] | 55.0 [47.6, 60.2] | 1.000 | 12.271 | False | 0.000 | 0.969 | 0.022 | 0.080 | 0.183 | 0.570 |
+| cifar10 / patch | follows_shortcut | False | > 42.7 (not identified; no model between 42.7 and 96.0) | not identified (no model within ±10 points) | 54.9 [48.5, 58.7] | 54.9 [46.5, 59.8] | 1.000 | 12.232 | False | 0.010 | 0.970 | 0.000 | 0.000 | – | – |
+| cifar10 / patch | shortcut_dominant | False | > 42.7 (not identified; no model between 42.7 and 96.0) | not identified (no model within ±10 points) | 53.1 [46.0, 59.5] | 53.1 [45.0, 60.6] | 1.000 | 10.376 | False | 0.040 | 0.960 | 0.000 | 0.000 | – | – |
+| cifar10_resnet18 / patch | follows_shortcut_causal | True | > 36.5 (not identified; no model between 36.5 and 95.8) | not identified (no model within ±10 points) | 52.9 [45.0, 57.6] | 52.9 [43.5, 58.7] | 1.000 | 16.367 | False | 0.000 | 0.968 | 0.018 | 0.100 | 0.719 | < 0.001 |
+| cifar10_resnet18 / patch | follows_shortcut | False | > 36.5 (not identified; no model between 36.5 and 95.8) | not identified (no model within ±10 points) | 52.4 [44.4, 57.0] | 52.4 [43.1, 58.1] | 1.000 | 15.869 | False | 0.010 | 0.970 | 0.000 | 0.000 | – | – |
+| cifar10_resnet18 / patch | shortcut_dominant | False | > 36.5 (not identified; no model between 36.5 and 95.8) | not identified (no model within ±10 points) | 56.3 [51.5, 59.5] | 56.3 [50.4, 60.5] | 1.000 | 19.758 | False | 0.020 | 0.980 | 0.000 | 0.000 | – | – |
+| mnist / patch | follows_shortcut_causal | True | 53.9 | identified | 53.9 [43.1, 61.7] | 53.9 [41.0, 64.7] | 1.000 | 3.099 | True | 0.000 | 1.000 | 0.034 | 0.130 | 0.906 | < 0.001 |
+| mnist / patch | follows_shortcut | False | 52.8 | identified | 52.8 [42.5, 59.2] | 52.8 [39.8, 63.9] | 1.000 | 1.996 | True | 0.000 | 1.000 | 0.000 | 0.000 | – | – |
+| mnist / patch | shortcut_dominant | False | 56.0 | identified | 56.0 [43.3, 61.6] | 56.0 [41.9, 62.0] | 1.000 | 5.240 | True | 0.000 | 0.930 | 0.000 | 0.000 | – | – |
+| mnist / texture | follows_shortcut_causal | True | 45.7 | identified | 45.7 [35.9, 54.1] | 45.7 [34.8, 55.1] | 1.000 | 7.086 | True | 0.000 | 1.000 | 0.074 | 0.150 | 0.876 | < 0.001 |
+| mnist / texture | follows_shortcut | False | 38.6 | identified | 38.6 [33.7, 48.8] | 38.6 [31.9, 53.2] | 1.000 | 0.000 | True | 0.000 | 1.000 | 0.000 | 0.000 | – | – |
+| mnist / texture | shortcut_dominant | False | 53.2 | identified | 53.2 [46.9, 58.2] | 53.2 [44.6, 59.6] | 1.000 | 0.000 | True | 0.000 | 1.000 | 0.000 | 0.000 | – | – |
+| pet_resnet18 / patch | follows_shortcut_causal | True | 54.5 (not bracketed) | identified | 54.5 [39.5, 63.8] | 54.5 [38.4, 65.3] | 1.000 | 5.653 | False | 0.000 | 0.961 | 0.327 | 0.490 | 0.823 | < 0.001 |
+| pet_resnet18 / patch | follows_shortcut | False | 29.4 (not bracketed) | identified | 29.4 [20.0, 35.1] | 29.4 [15.3, 38.3] | 1.000 | 6.460 | False | 0.200 | 0.980 | 0.000 | 0.000 | – | – |
+| pet_resnet18 / patch | shortcut_dominant | False | 49.6 (not bracketed) | identified | 49.6 [40.3, 57.8] | 49.6 [39.7, 58.9] | 1.000 | 8.548 | False | 0.080 | 0.980 | 0.000 | 0.000 | – | – |
+| pneumonia_mnist / patch | follows_shortcut_causal | True | 36.9 | identified | 36.9 [30.0, 43.3] | 36.9 [29.9, 46.1] | 1.000 | 4.772 | True | 0.000 | 1.000 | 0.327 | 0.530 | 0.850 | < 0.001 |
+| pneumonia_mnist / patch | follows_shortcut | False | 29.2 | identified | 29.2 [26.5, 32.4] | 29.2 [24.2, 33.9] | 1.000 | 0.000 | True | 0.140 | 1.000 | 0.000 | 0.000 | – | – |
+| pneumonia_mnist / patch | shortcut_dominant | False | 41.7 | identified | 41.7 [37.5, 51.0] | 41.7 [37.3, 73.8] | 1.000 | 0.000 | True | 0.020 | 1.000 | 0.000 | 0.000 | – | – |
+| pneumonia_mnist / texture | follows_shortcut_causal | True | 41.9 | identified | 41.9 [35.6, 49.5] | 41.9 [34.6, 52.6] | 1.000 | 1.742 | True | 0.024 | 1.000 | 0.250 | 0.530 | 0.749 | < 0.001 |
+| pneumonia_mnist / texture | follows_shortcut | False | 34.1 | identified | 34.1 [30.1, 40.8] | 34.1 [26.6, 42.9] | 1.000 | 0.855 | True | 0.160 | 1.000 | 0.000 | 0.000 | – | – |
+| pneumonia_mnist / texture | shortcut_dominant | False | 62.3 (not bracketed) | identified | 62.3 [48.3, 79.5] | 62.3 [45.7, 86.5] | 1.000 | 9.215 | False | 0.050 | 1.000 | 0.000 | 0.000 | – | – |
+
+### Behavioural − metric switch, paired bootstrap (N5; primary label; all labels in switch_differences.csv)
+
+| comparison | setting | metric | metric_switch_rc | behavioural_switch_rc | difference [two-level] | difference [crossed] | both_found_share | verdict |
+|---|---|---|---|---|---|---|---|---|
+| shortcut vs full object | cifar10 / patch | Deletion (black) | – | 54.953 | – [–, –] | – [–, –] | 0.000 | not testable (metric switch: above 0.5 at lowest reliance) |
+| shortcut vs full object | cifar10 / patch | Deletion (blur) | – | 54.953 | – [–, –] | – [–, –] | 0.000 | not testable (metric switch: above 0.5 at lowest reliance) |
+| shortcut vs full object | cifar10 / patch | Deletion (inpaint) | 4.315 | 54.953 | 50.6 [43.5, 54.6] | 50.6 [42.4, 55.6] | 1.000 | metric earlier |
+| shortcut vs full object | cifar10 / patch | Insertion (blur) | 17.671 | 54.953 | 37.3 [30.0, 43.8] | 37.3 [28.7, 45.2] | 1.000 | metric earlier |
+| shortcut vs size-matched object | cifar10 / patch | Deletion (black) | 1.173 | 54.953 | 53.8 [47.1, 57.5] | 53.8 [46.2, 58.6] | 0.632 | metric earlier |
+| shortcut vs size-matched object | cifar10 / patch | Deletion (blur) | – | 54.953 | – [–, –] | – [–, –] | 0.070 | not testable (metric switch: above 0.5 at lowest reliance) |
+| shortcut vs size-matched object | cifar10 / patch | Deletion (inpaint) | – | 54.953 | – [–, –] | – [–, –] | 0.014 | not testable (metric switch: above 0.5 at lowest reliance) |
+| shortcut vs size-matched object | cifar10 / patch | Insertion (blur) | – | 54.953 | – [–, –] | – [–, –] | 0.023 | not testable (metric switch: above 0.5 at lowest reliance) |
+| shortcut vs full object | cifar10_resnet18 / patch | Deletion (black) | – | 52.908 | – [–, –] | – [–, –] | 0.000 | not testable (metric switch: above 0.5 at lowest reliance) |
+| shortcut vs full object | cifar10_resnet18 / patch | Deletion (blur) | – | 52.908 | – [–, –] | – [–, –] | 0.003 | not testable (metric switch: above 0.5 at lowest reliance) |
+| shortcut vs full object | cifar10_resnet18 / patch | Deletion (inpaint) | 8.663 | 52.908 | 44.2 [31.5, 50.2] | 44.2 [31.2, 51.2] | 1.000 | metric earlier |
+| shortcut vs full object | cifar10_resnet18 / patch | Insertion (blur) | 8.633 | 52.908 | 44.3 [36.0, 49.2] | 44.3 [34.8, 50.5] | 1.000 | metric earlier |
+| shortcut vs size-matched object | cifar10_resnet18 / patch | Deletion (black) | 0.874 | 52.908 | 52.0 [44.0, 56.2] | 52.0 [43.7, 57.6] | 0.559 | metric earlier |
+| shortcut vs size-matched object | cifar10_resnet18 / patch | Deletion (blur) | – | 52.908 | – [–, –] | – [–, –] | 0.218 | not testable (metric switch: above 0.5 at lowest reliance) |
+| shortcut vs size-matched object | cifar10_resnet18 / patch | Deletion (inpaint) | – | 52.908 | – [–, –] | – [–, –] | 0.012 | not testable (metric switch: above 0.5 at lowest reliance) |
+| shortcut vs size-matched object | cifar10_resnet18 / patch | Insertion (blur) | – | 52.908 | – [–, –] | – [–, –] | 0.229 | not testable (metric switch: above 0.5 at lowest reliance) |
+| shortcut vs full object | mnist / patch | Deletion (black) | 38.673 | 53.882 | 15.2 [3.7, 28.4] | 15.2 [1.2, 32.6] | 1.000 | metric earlier |
+| shortcut vs full object | mnist / patch | Deletion (blur) | 38.786 | 53.882 | 15.1 [3.6, 27.7] | 15.1 [1.0, 31.5] | 1.000 | metric earlier |
+| shortcut vs full object | mnist / patch | Deletion (inpaint) | 39.193 | 53.882 | 14.7 [-0.6, 22.8] | 14.7 [-2.7, 25.4] | 1.000 | not distinguishable |
+| shortcut vs full object | mnist / patch | Insertion (blur) | 39.297 | 53.882 | 14.6 [-4.2, 23.0] | 14.6 [-6.4, 26.6] | 1.000 | not distinguishable |
+| shortcut vs size-matched object | mnist / patch | Deletion (black) | 0.882 | 53.882 | 53.0 [41.7, 60.9] | 53.0 [38.8, 63.9] | 1.000 | metric earlier |
+| shortcut vs size-matched object | mnist / patch | Deletion (blur) | 8.582 | 53.882 | 45.3 [33.0, 53.9] | 45.3 [18.8, 56.6] | 1.000 | metric earlier |
+| shortcut vs size-matched object | mnist / patch | Deletion (inpaint) | 1.120 | 53.882 | 52.8 [40.5, 60.5] | 52.8 [37.3, 62.9] | 1.000 | metric earlier |
+| shortcut vs size-matched object | mnist / patch | Insertion (blur) | 4.136 | 53.882 | 49.7 [37.1, 58.3] | 49.7 [34.4, 61.8] | 1.000 | metric earlier |
+| shortcut vs full object | mnist / texture | Deletion (black) | 17.260 | 45.655 | 28.4 [18.2, 39.2] | 28.4 [16.5, 40.3] | 1.000 | metric earlier |
+| shortcut vs full object | mnist / texture | Deletion (blur) | 66.452 | 45.655 | -20.8 [-33.0, -4.3] | -20.8 [-34.0, 2.8] | 1.000 | metric later |
+| shortcut vs full object | mnist / texture | Deletion (inpaint) | 18.759 | 45.655 | 26.9 [14.6, 36.1] | 26.9 [13.6, 37.9] | 1.000 | metric earlier |
+| shortcut vs full object | mnist / texture | Insertion (blur) | 99.706 | 45.655 | -54.1 [-63.0, -42.1] | -54.1 [-64.3, -40.6] | 1.000 | metric later |
+| shortcut vs size-matched object | mnist / texture | Deletion (black) | 11.532 | 45.655 | 34.1 [22.0, 42.7] | 34.1 [20.3, 43.3] | 1.000 | metric earlier |
+| shortcut vs size-matched object | mnist / texture | Deletion (blur) | 84.934 | 45.655 | -39.3 [-52.3, -28.1] | -39.3 [-53.8, -26.2] | 1.000 | metric later |
+| shortcut vs size-matched object | mnist / texture | Deletion (inpaint) | 18.078 | 45.655 | 27.6 [14.4, 39.8] | 27.6 [13.1, 39.6] | 1.000 | metric earlier |
+| shortcut vs size-matched object | mnist / texture | Insertion (blur) | 99.709 | 45.655 | -54.1 [-63.2, -44.2] | -54.1 [-64.3, -41.3] | 1.000 | metric later |
+| shortcut vs full object | pet_resnet18 / patch | Deletion (black) | 1.325 | 54.479 | 53.2 [36.6, 62.4] | 53.2 [36.3, 63.7] | 0.956 | metric earlier |
+| shortcut vs full object | pet_resnet18 / patch | Deletion (blur) | – | 54.479 | – [–, –] | – [–, –] | 0.540 | not testable (metric switch: above 0.5 at lowest reliance) |
+| shortcut vs full object | pet_resnet18 / patch | Deletion (inpaint) | 4.647 | 54.479 | 49.8 [33.8, 59.5] | 49.8 [32.6, 60.7] | 1.000 | metric earlier |
+| shortcut vs full object | pet_resnet18 / patch | Insertion (blur) | 5.402 | 54.479 | 49.1 [33.2, 58.3] | 49.1 [32.2, 59.2] | 1.000 | metric earlier |
+| shortcut vs size-matched object | pet_resnet18 / patch | Deletion (black) | 0.150 | 54.479 | 54.3 [38.4, 63.4] | 54.3 [37.8, 64.3] | 0.947 | metric earlier |
+| shortcut vs size-matched object | pet_resnet18 / patch | Deletion (blur) | – | 54.479 | – [–, –] | – [–, –] | 0.271 | not testable (metric switch: above 0.5 at lowest reliance) |
+| shortcut vs size-matched object | pet_resnet18 / patch | Deletion (inpaint) | – | 54.479 | – [–, –] | – [–, –] | 0.172 | not testable (metric switch: above 0.5 at lowest reliance) |
+| shortcut vs size-matched object | pet_resnet18 / patch | Insertion (blur) | -0.372 | 54.479 | 54.9 [39.2, 63.7] | 54.9 [37.7, 64.7] | 0.643 | metric earlier |
+| shortcut vs full object | pneumonia_mnist / patch | Deletion (black) | 5.886 | 36.938 | 31.1 [19.4, 37.6] | 31.1 [-4.2, 39.7] | 1.000 | metric earlier |
+| shortcut vs full object | pneumonia_mnist / patch | Deletion (blur) | 2.522 | 36.938 | 34.4 [27.7, 41.4] | 34.4 [27.1, 43.9] | 0.997 | metric earlier |
+| shortcut vs full object | pneumonia_mnist / patch | Deletion (inpaint) | 29.975 | 36.938 | 7.0 [-9.3, 32.6] | 7.0 [-29.8, 34.6] | 1.000 | not distinguishable |
+| shortcut vs full object | pneumonia_mnist / patch | Insertion (blur) | 0.084 | 36.938 | 36.9 [29.9, 43.1] | 36.9 [29.4, 45.7] | 0.967 | metric earlier |
+| shortcut vs size-matched object | pneumonia_mnist / patch | Deletion (black) | 0.883 | 36.938 | 36.1 [29.3, 42.6] | 36.1 [28.4, 45.0] | 0.934 | metric earlier |
+| shortcut vs size-matched object | pneumonia_mnist / patch | Deletion (blur) | 0.000 | 36.938 | 36.9 [29.9, 43.1] | 36.9 [29.2, 45.2] | 0.815 | metric earlier |
+| shortcut vs size-matched object | pneumonia_mnist / patch | Deletion (inpaint) | 0.223 | 36.938 | 36.7 [29.8, 42.8] | 36.7 [29.0, 45.4] | 0.769 | metric earlier |
+| shortcut vs size-matched object | pneumonia_mnist / patch | Insertion (blur) | 0.000 | 36.938 | 36.9 [30.0, 43.1] | 36.9 [28.4, 45.2] | 0.653 | metric earlier |
+| shortcut vs full object | pneumonia_mnist / texture | Deletion (black) | 12.575 | 41.895 | 29.3 [16.7, 40.3] | 29.3 [17.2, 41.1] | 1.000 | metric earlier |
+| shortcut vs full object | pneumonia_mnist / texture | Deletion (blur) | – | 41.895 | – [–, –] | – [–, –] | 0.029 | not testable (metric switch: above 0.5 at lowest reliance) |
+| shortcut vs full object | pneumonia_mnist / texture | Deletion (inpaint) | 4.437 | 41.895 | 37.5 [30.5, 44.9] | 37.5 [29.0, 47.9] | 0.957 | metric earlier |
+| shortcut vs full object | pneumonia_mnist / texture | Insertion (blur) | – | 41.895 | – [–, –] | – [–, –] | 0.002 | not testable (metric switch: above 0.5 at lowest reliance) |
+| shortcut vs size-matched object | pneumonia_mnist / texture | Deletion (black) | 3.128 | 41.895 | 38.8 [–, –] | 38.8 [–, –] | 0.479 | not testable (both switches found in fewer than half of the replicates) |
+| shortcut vs size-matched object | pneumonia_mnist / texture | Deletion (blur) | – | 41.895 | – [–, –] | – [–, –] | 0.207 | not testable (metric switch: above 0.5 at lowest reliance) |
+| shortcut vs size-matched object | pneumonia_mnist / texture | Deletion (inpaint) | 5.215 | 41.895 | 36.7 [31.2, 45.0] | 36.7 [29.7, 47.9] | 0.846 | metric earlier |
+| shortcut vs size-matched object | pneumonia_mnist / texture | Insertion (blur) | – | 41.895 | – [–, –] | – [–, –] | 0.464 | not testable (metric switch: above 0.5 at lowest reliance) |
+
+### Over-detection decomposition and rates (N3; per-model values in excess_preference_models.csv)
+
+| setting | metric | SO low [CI] | RO low [CI] | SR low [CI] | excess_low [CI] | rho_excess_rc [CI] | p_bh_excess_one_sided | fpr [CP] | fpr_margin [CP] | fpr r_c ≤ 10 (n) | fpr 10 < r_c ≤ 50 (n) | tpr [CP] (n_above) |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| cifar10 / patch | Deletion (black) | 0.815 [0.760, 0.870] | 0.815 [0.765, 0.870] | 0.478 [0.392, 0.555] | 0.000 [-0.025, 0.030] | 0.607 [0.203, 0.818] | 0.036 | 1.00 [0.69, 1.00] (10/10) | 1.00 [0.69, 1.00] (10/10) | 1.00 (4) | 1.00 (6) | 1.00 [0.16, 1.00] (2) |
+| cifar10 / patch | Deletion (blur) | 0.735 [0.675, 0.800] | 0.750 [0.690, 0.810] | 0.562 [0.495, 0.632] | -0.015 [-0.050, 0.025] | 0.690 [0.344, 0.858] | 0.017 | 1.00 [0.69, 1.00] (10/10) | 1.00 [0.69, 1.00] (10/10) | 1.00 (4) | 1.00 (6) | 1.00 [0.16, 1.00] (2) |
+| cifar10 / patch | Deletion (inpaint) | 0.265 [0.205, 0.325] | 0.225 [0.165, 0.285] | 0.617 [0.550, 0.685] | 0.040 [0.005, 0.075] | -0.039 [-0.303, 0.194] | 0.766 | 0.70 [0.35, 0.93] (7/10) | 0.60 [0.26, 0.88] (6/10) | 0.25 (4) | 1.00 (6) | 1.00 [0.16, 1.00] (2) |
+| cifar10 / patch | Insertion (blur) | 0.227 [0.170, 0.287] | 0.185 [0.130, 0.235] | 0.593 [0.520, 0.662] | 0.042 [0.005, 0.083] | 0.133 [-0.046, 0.474] | 0.560 | 0.40 [0.12, 0.74] (4/10) | 0.20 [0.03, 0.56] (2/10) | 0.00 (4) | 0.67 (6) | 1.00 [0.16, 1.00] (2) |
+| cifar10_resnet18 / patch | Deletion (black) | 0.703 [0.633, 0.770] | 0.723 [0.627, 0.803] | 0.492 [0.397, 0.575] | -0.020 [-0.067, 0.033] | 0.265 [0.003, 0.502] | 0.252 | 1.00 [0.78, 1.00] (15/15) | 1.00 [0.78, 1.00] (15/15) | 1.00 (9) | 1.00 (6) | 1.00 [0.29, 1.00] (3) |
+| cifar10_resnet18 / patch | Deletion (blur) | 0.610 [0.540, 0.680] | 0.562 [0.477, 0.638] | 0.520 [0.463, 0.577] | 0.048 [-0.010, 0.107] | -0.333 [-0.636, 0.201] | 1.000 | 1.00 [0.78, 1.00] (15/15) | 0.93 [0.68, 1.00] (14/15) | 1.00 (9) | 1.00 (6) | 1.00 [0.29, 1.00] (3) |
+| cifar10_resnet18 / patch | Deletion (inpaint) | 0.153 [0.113, 0.193] | 0.127 [0.085, 0.170] | 0.578 [0.500, 0.652] | 0.027 [-0.017, 0.065] | 0.073 [-0.171, 0.251] | 0.576 | 0.40 [0.16, 0.68] (6/15) | 0.33 [0.12, 0.62] (5/15) | 0.11 (9) | 0.83 (6) | 1.00 [0.29, 1.00] (3) |
+| cifar10_resnet18 / patch | Insertion (blur) | 0.240 [0.177, 0.307] | 0.212 [0.167, 0.260] | 0.550 [0.487, 0.607] | 0.028 [-0.025, 0.087] | 0.315 [0.080, 0.439] | 0.190 | 0.47 [0.21, 0.73] (7/15) | 0.40 [0.16, 0.68] (6/15) | 0.11 (9) | 1.00 (6) | 1.00 [0.29, 1.00] (3) |
+| mnist / patch | Deletion (black) | 0.022 [0.003, 0.045] | 0.023 [0.007, 0.043] | 0.527 [0.463, 0.587] | -0.002 [-0.015, 0.013] | 0.854 [0.777, 0.892] | < 0.001 | 0.12 [0.04, 0.29] (4/32) | 0.06 [0.01, 0.21] (2/32) | 0.00 (21) | 0.36 (11) | 1.00 [0.82, 1.00] (19) |
+| mnist / patch | Deletion (blur) | 0.017 [0.003, 0.033] | 0.017 [0.003, 0.033] | 0.437 [0.367, 0.517] | 0.000 [-0.010, 0.010] | 0.906 [0.801, 0.925] | < 0.001 | 0.09 [0.02, 0.25] (3/32) | 0.03 [0.00, 0.16] (1/32) | 0.00 (21) | 0.27 (11) | 1.00 [0.82, 1.00] (19) |
+| mnist / patch | Deletion (inpaint) | 0.007 [0.000, 0.023] | 0.013 [0.003, 0.030] | 0.390 [0.333, 0.453] | -0.007 [-0.020, 0.000] | 0.909 [0.827, 0.929] | < 0.001 | 0.06 [0.01, 0.21] (2/32) | 0.03 [0.00, 0.16] (1/32) | 0.00 (21) | 0.18 (11) | 0.95 [0.74, 1.00] (19) |
+| mnist / patch | Insertion (blur) | 0.013 [0.003, 0.030] | 0.020 [0.003, 0.040] | 0.463 [0.390, 0.533] | -0.007 [-0.020, 0.000] | 0.645 [0.517, 0.743] | < 0.001 | 0.03 [0.00, 0.16] (1/32) | 0.03 [0.00, 0.16] (1/32) | 0.00 (21) | 0.09 (11) | 1.00 [0.82, 1.00] (19) |
+| mnist / texture | Deletion (black) | 0.033 [0.007, 0.067] | 0.027 [0.007, 0.057] | 0.553 [0.477, 0.630] | 0.007 [-0.013, 0.027] | 0.663 [0.523, 0.753] | < 0.001 | 0.15 [0.03, 0.38] (3/20) | 0.15 [0.03, 0.38] (3/20) | 0.00 (15) | 0.60 (5) | 1.00 [0.89, 1.00] (31) |
+| mnist / texture | Deletion (blur) | 0.037 [0.013, 0.063] | 0.043 [0.017, 0.077] | 0.443 [0.363, 0.527] | -0.007 [-0.033, 0.020] | -0.123 [-0.302, 0.169] | 1.000 | 0.00 [0.00, 0.17] (0/20) | 0.00 [0.00, 0.17] (0/20) | 0.00 (15) | 0.00 (5) | 0.90 [0.74, 0.98] (31) |
+| mnist / texture | Deletion (inpaint) | 0.017 [0.003, 0.037] | 0.043 [0.010, 0.080] | 0.433 [0.373, 0.500] | -0.027 [-0.060, 0.000] | 0.552 [0.460, 0.690] | < 0.001 | 0.15 [0.03, 0.38] (3/20) | 0.15 [0.03, 0.38] (3/20) | 0.00 (15) | 0.60 (5) | 1.00 [0.89, 1.00] (31) |
+| mnist / texture | Insertion (blur) | 0.013 [0.000, 0.033] | 0.010 [0.000, 0.027] | 0.430 [0.370, 0.490] | 0.003 [-0.010, 0.017] | -0.694 [-0.744, -0.447] | 1.000 | 0.00 [0.00, 0.17] (0/20) | 0.00 [0.00, 0.17] (0/20) | 0.00 (15) | 0.00 (5) | 0.35 [0.19, 0.55] (31) |
+| pet_resnet18 / patch | Deletion (black) | 0.458 [0.393, 0.523] | 0.528 [0.460, 0.597] | 0.450 [0.378, 0.525] | -0.070 [-0.153, 0.010] | 0.519 [0.144, 0.761] | 0.032 | 0.75 [0.43, 0.95] (9/12) | 0.50 [0.21, 0.79] (6/12) | 0.50 (6) | 1.00 (6) | 1.00 [0.54, 1.00] (6) |
+| pet_resnet18 / patch | Deletion (blur) | 0.503 [0.443, 0.563] | 0.490 [0.430, 0.553] | 0.527 [0.462, 0.593] | 0.013 [-0.037, 0.057] | 0.717 [0.314, 0.817] | 0.001 | 0.92 [0.62, 1.00] (11/12) | 0.58 [0.28, 0.85] (7/12) | 0.83 (6) | 1.00 (6) | 1.00 [0.54, 1.00] (6) |
+| pet_resnet18 / patch | Deletion (inpaint) | 0.405 [0.350, 0.463] | 0.383 [0.327, 0.443] | 0.528 [0.467, 0.592] | 0.022 [-0.013, 0.055] | 0.813 [0.562, 0.890] | < 0.001 | 0.58 [0.28, 0.85] (7/12) | 0.17 [0.02, 0.48] (2/12) | 0.17 (6) | 1.00 (6) | 1.00 [0.54, 1.00] (6) |
+| pet_resnet18 / patch | Insertion (blur) | 0.350 [0.297, 0.405] | 0.350 [0.297, 0.403] | 0.533 [0.467, 0.593] | 0.000 [-0.042, 0.043] | 0.503 [0.281, 0.695] | 0.036 | 0.58 [0.28, 0.85] (7/12) | 0.50 [0.21, 0.79] (6/12) | 0.17 (6) | 1.00 (6) | 1.00 [0.54, 1.00] (6) |
+| pneumonia_mnist / patch | Deletion (black) | 0.377 [0.263, 0.520] | 0.363 [0.237, 0.520] | 0.495 [0.427, 0.570] | 0.013 [-0.033, 0.063] | 0.044 [-0.298, 0.281] | 0.576 | 0.68 [0.45, 0.86] (15/22) | 0.05 [0.00, 0.23] (1/22) | 0.22 (9) | 1.00 (13) | 1.00 [0.83, 1.00] (20) |
+| pneumonia_mnist / patch | Deletion (blur) | 0.453 [0.393, 0.517] | 0.443 [0.368, 0.518] | 0.527 [0.468, 0.585] | 0.010 [-0.028, 0.052] | -0.279 [-0.507, 0.005] | 1.000 | 0.73 [0.50, 0.89] (16/22) | 0.50 [0.28, 0.72] (11/22) | 0.33 (9) | 1.00 (13) | 1.00 [0.83, 1.00] (20) |
+| pneumonia_mnist / patch | Deletion (inpaint) | 0.147 [0.100, 0.197] | 0.163 [0.120, 0.213] | 0.505 [0.448, 0.558] | -0.017 [-0.047, 0.013] | -0.318 [-0.457, -0.067] | 1.000 | 0.23 [0.08, 0.45] (5/22) | 0.09 [0.01, 0.29] (2/22) | 0.11 (9) | 0.31 (13) | 0.85 [0.62, 0.97] (20) |
+| pneumonia_mnist / patch | Insertion (blur) | 0.497 [0.402, 0.597] | 0.497 [0.385, 0.607] | 0.438 [0.388, 0.488] | 0.000 [-0.053, 0.052] | -0.118 [-0.371, 0.184] | 1.000 | 0.82 [0.60, 0.95] (18/22) | 0.73 [0.50, 0.89] (16/22) | 0.56 (9) | 1.00 (13) | 1.00 [0.83, 1.00] (20) |
+| pneumonia_mnist / texture | Deletion (black) | 0.328 [0.230, 0.433] | 0.273 [0.170, 0.410] | 0.693 [0.593, 0.800] | 0.055 [-0.000, 0.112] | -0.590 [-0.697, -0.324] | 1.000 | 0.67 [0.41, 0.87] (12/18) | 0.33 [0.13, 0.59] (6/18) | 0.17 (6) | 0.92 (12) | 1.00 [0.86, 1.00] (24) |
+| pneumonia_mnist / texture | Deletion (blur) | 0.572 [0.515, 0.627] | 0.567 [0.492, 0.638] | 0.528 [0.453, 0.608] | 0.005 [-0.063, 0.082] | -0.282 [-0.629, -0.054] | 1.000 | 1.00 [0.81, 1.00] (18/18) | 0.83 [0.59, 0.96] (15/18) | 1.00 (6) | 1.00 (12) | 1.00 [0.86, 1.00] (24) |
+| pneumonia_mnist / texture | Deletion (inpaint) | 0.450 [0.340, 0.597] | 0.430 [0.297, 0.590] | 0.532 [0.475, 0.585] | 0.020 [-0.047, 0.080] | 0.600 [0.330, 0.693] | < 0.001 | 0.89 [0.65, 0.99] (16/18) | 0.72 [0.47, 0.90] (13/18) | 0.67 (6) | 1.00 (12) | 0.96 [0.79, 1.00] (24) |
+| pneumonia_mnist / texture | Insertion (blur) | 0.640 [0.560, 0.723] | 0.582 [0.497, 0.663] | 0.527 [0.465, 0.588] | 0.058 [-0.005, 0.118] | 0.483 [0.203, 0.665] | 0.002 | 1.00 [0.81, 1.00] (18/18) | 0.94 [0.73, 1.00] (17/18) | 1.00 (6) | 1.00 (12) | 1.00 [0.86, 1.00] (24) |
+
+### Calibration on determined images (N6; primary label, shortcut vs full object)
+
+calibration_gap_determined = mean over models of (mean win score over the model's determined images − follow rate); `calibration_gap` (all aligned images) is repeated for reference.
+
+| setting | metric | calibration_gap | calibration_gap_determined | calibration_mae_determined | determined_share |
+|---|---|---|---|---|---|
+| cifar10 / patch | Deletion (black) | 0.628 | 0.628 | 0.628 | 0.978 |
+| cifar10 / patch | Deletion (blur) | 0.579 | 0.578 | 0.578 | 0.978 |
+| cifar10 / patch | Deletion (inpaint) | 0.398 | 0.396 | 0.396 | 0.978 |
+| cifar10 / patch | Insertion (blur) | 0.272 | 0.270 | 0.270 | 0.978 |
+| cifar10_resnet18 / patch | Deletion (black) | 0.613 | 0.613 | 0.613 | 0.982 |
+| cifar10_resnet18 / patch | Deletion (blur) | 0.589 | 0.588 | 0.588 | 0.982 |
+| cifar10_resnet18 / patch | Deletion (inpaint) | 0.325 | 0.323 | 0.323 | 0.982 |
+| cifar10_resnet18 / patch | Insertion (blur) | 0.356 | 0.353 | 0.353 | 0.982 |
+| mnist / patch | Deletion (black) | 0.078 | 0.071 | 0.091 | 0.966 |
+| mnist / patch | Deletion (blur) | 0.080 | 0.072 | 0.092 | 0.966 |
+| mnist / patch | Deletion (inpaint) | 0.052 | 0.044 | 0.063 | 0.966 |
+| mnist / patch | Insertion (blur) | 0.063 | 0.055 | 0.077 | 0.966 |
+| mnist / texture | Deletion (black) | 0.044 | 0.034 | 0.101 | 0.926 |
+| mnist / texture | Deletion (blur) | -0.098 | -0.100 | 0.131 | 0.926 |
+| mnist / texture | Deletion (inpaint) | 0.041 | 0.035 | 0.071 | 0.926 |
+| mnist / texture | Insertion (blur) | -0.319 | -0.319 | 0.329 | 0.926 |
+| pet_resnet18 / patch | Deletion (black) | 0.340 | 0.297 | 0.345 | 0.673 |
+| pet_resnet18 / patch | Deletion (blur) | 0.369 | 0.315 | 0.329 | 0.673 |
+| pet_resnet18 / patch | Deletion (inpaint) | 0.317 | 0.218 | 0.218 | 0.673 |
+| pet_resnet18 / patch | Insertion (blur) | 0.330 | 0.260 | 0.264 | 0.673 |
+| pneumonia_mnist / patch | Deletion (black) | 0.033 | -0.141 | 0.418 | 0.673 |
+| pneumonia_mnist / patch | Deletion (blur) | 0.156 | 0.063 | 0.383 | 0.673 |
+| pneumonia_mnist / patch | Deletion (inpaint) | -0.028 | -0.234 | 0.358 | 0.673 |
+| pneumonia_mnist / patch | Insertion (blur) | 0.264 | 0.188 | 0.385 | 0.673 |
+| pneumonia_mnist / texture | Deletion (black) | 0.145 | 0.122 | 0.140 | 0.750 |
+| pneumonia_mnist / texture | Deletion (blur) | 0.282 | 0.281 | 0.300 | 0.750 |
+| pneumonia_mnist / texture | Deletion (inpaint) | 0.064 | -0.011 | 0.327 | 0.750 |
+| pneumonia_mnist / texture | Insertion (blur) | 0.251 | 0.239 | 0.328 | 0.750 |
+
+### Partial correlation on r_c given competence (N7)
+
+Partial Spearman of r_c (and of raw reliance) with preference (shortcut vs full object), controlling for accuracy without the shortcut; BH over all rows of each column.
+
+| setting | models | metric | rho_rc_competence | partial_rc_given_acc | p_partial_rc_given_acc | p_bh_rc | partial_rel_given_acc | p_partial_rel_given_acc | p_bh_raw |
+|---|---|---|---|---|---|---|---|---|---|
+| cifar10 / patch | 12 | Deletion (black) | -0.636 | 0.839 | 0.001 | 0.004 | 0.879 | < 0.001 | 0.001 |
+| cifar10 / patch | 12 | Deletion (blur) | -0.636 | 0.829 | 0.002 | 0.004 | 0.776 | 0.005 | 0.009 |
+| cifar10 / patch | 12 | Deletion (inpaint) | -0.636 | 0.977 | < 0.001 | < 0.001 | 0.979 | < 0.001 | < 0.001 |
+| cifar10 / patch | 12 | Insertion (blur) | -0.636 | 0.926 | < 0.001 | < 0.001 | 0.960 | < 0.001 | < 0.001 |
+| pneumonia_mnist / texture | 42 | Deletion (black) | -0.777 | 0.611 | < 0.001 | < 0.001 | 0.609 | < 0.001 | < 0.001 |
+| pneumonia_mnist / texture | 42 | Deletion (blur) | -0.777 | 0.584 | < 0.001 | < 0.001 | 0.602 | < 0.001 | < 0.001 |
+| pneumonia_mnist / texture | 42 | Deletion (inpaint) | -0.777 | 0.474 | 0.002 | 0.004 | 0.492 | 0.001 | 0.002 |
+| pneumonia_mnist / texture | 42 | Insertion (blur) | -0.777 | 0.250 | 0.115 | 0.124 | 0.256 | 0.106 | 0.110 |
+| pneumonia_mnist / patch | 42 | Deletion (black) | -0.817 | 0.314 | 0.045 | 0.058 | 0.400 | 0.010 | 0.013 |
+| pneumonia_mnist / patch | 42 | Deletion (blur) | -0.817 | 0.309 | 0.049 | 0.060 | 0.418 | 0.006 | 0.010 |
+| pneumonia_mnist / patch | 42 | Deletion (inpaint) | -0.817 | 0.244 | 0.124 | 0.124 | 0.333 | 0.034 | 0.039 |
+| pneumonia_mnist / patch | 42 | Insertion (blur) | -0.817 | 0.504 | < 0.001 | 0.003 | 0.495 | 0.001 | 0.002 |
+| pet_resnet18 / patch | 18 | Deletion (black) | -0.924 | 0.643 | 0.005 | 0.010 | 0.568 | 0.017 | 0.023 |
+| pet_resnet18 / patch | 18 | Deletion (blur) | -0.924 | 0.540 | 0.025 | 0.035 | 0.675 | 0.003 | 0.005 |
+| pet_resnet18 / patch | 18 | Deletion (inpaint) | -0.924 | 0.687 | 0.002 | 0.005 | 0.636 | 0.006 | 0.010 |
+| pet_resnet18 / patch | 18 | Insertion (blur) | -0.924 | 0.685 | 0.002 | 0.005 | 0.701 | 0.002 | 0.003 |
+| mnist / texture | 51 | Deletion (black) | -0.974 | -0.246 | 0.085 | 0.095 | -0.262 | 0.066 | 0.071 |
+| mnist / texture | 51 | Deletion (blur) | -0.974 | 0.357 | 0.011 | 0.019 | 0.376 | 0.007 | 0.010 |
+| mnist / texture | 51 | Deletion (inpaint) | -0.974 | 0.222 | 0.122 | 0.124 | 0.226 | 0.115 | 0.115 |
+| mnist / texture | 51 | Insertion (blur) | -0.974 | 0.533 | < 0.001 | < 0.001 | 0.530 | < 0.001 | < 0.001 |
+| cifar10_resnet18 / patch | 18 | Deletion (black) | -0.981 | 0.462 | 0.062 | 0.073 | 0.462 | 0.062 | 0.070 |
+| cifar10_resnet18 / patch | 18 | Deletion (blur) | -0.981 | 0.545 | 0.024 | 0.035 | 0.545 | 0.024 | 0.030 |
+| cifar10_resnet18 / patch | 18 | Deletion (inpaint) | -0.981 | 0.785 | < 0.001 | < 0.001 | 0.785 | < 0.001 | < 0.001 |
+| cifar10_resnet18 / patch | 18 | Insertion (blur) | -0.981 | 0.517 | 0.033 | 0.045 | 0.517 | 0.033 | 0.039 |
+| mnist / patch | 51 | Deletion (black) | -0.978 | 0.340 | 0.016 | 0.024 | 0.475 | < 0.001 | 0.001 |
+| mnist / patch | 51 | Deletion (blur) | -0.978 | 0.628 | < 0.001 | < 0.001 | 0.618 | < 0.001 | < 0.001 |
+| mnist / patch | 51 | Deletion (inpaint) | -0.978 | 0.344 | 0.014 | 0.024 | 0.451 | 0.001 | 0.002 |
+| mnist / patch | 51 | Insertion (blur) | -0.978 | 0.429 | 0.002 | 0.004 | 0.533 | < 0.001 | < 0.001 |
+
+### Correctly classified aligned images only (N8; shortcut vs full object)
+
+misclassified_share: share of scored aligned images with pred_aligned ≠ label (all models; _rc_le20: models with r_c ≤ 20). The `_correct` columns recompute preference per model over the correctly classified images only.
+
+| setting | metric | misclassified_share | misclassified_share_rc_le20 | rho_rc_correct | p_rho_rc_correct | rho_rc | pref_low_correct | pref_low | fpr_correct | n_below_correct | fpr |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| cifar10 / patch | Deletion (black) | 0.068 | 0.128 | 0.860 | < 0.001 | 0.907 | 0.810 | 0.815 | 1.000 | 10 | 1.000 |
+| cifar10 / patch | Deletion (blur) | 0.068 | 0.128 | 0.909 | < 0.001 | 0.900 | 0.724 | 0.735 | 1.000 | 10 | 1.000 |
+| cifar10 / patch | Deletion (inpaint) | 0.068 | 0.128 | 0.986 | < 0.001 | 0.986 | 0.196 | 0.265 | 0.600 | 10 | 0.700 |
+| cifar10 / patch | Insertion (blur) | 0.068 | 0.128 | 0.951 | < 0.001 | 0.953 | 0.230 | 0.227 | 0.400 | 10 | 0.400 |
+| cifar10_resnet18 / patch | Deletion (black) | 0.023 | 0.031 | 0.957 | < 0.001 | 0.959 | 0.699 | 0.703 | 1.000 | 15 | 1.000 |
+| cifar10_resnet18 / patch | Deletion (blur) | 0.023 | 0.031 | 0.965 | < 0.001 | 0.968 | 0.585 | 0.610 | 1.000 | 15 | 1.000 |
+| cifar10_resnet18 / patch | Deletion (inpaint) | 0.023 | 0.031 | 0.979 | < 0.001 | 0.980 | 0.117 | 0.153 | 0.400 | 15 | 0.400 |
+| cifar10_resnet18 / patch | Insertion (blur) | 0.023 | 0.031 | 0.983 | < 0.001 | 0.983 | 0.209 | 0.240 | 0.467 | 15 | 0.467 |
+| mnist / patch | Deletion (black) | 0.009 | 0.013 | 0.966 | < 0.001 | 0.959 | 0.010 | 0.022 | 0.125 | 32 | 0.125 |
+| mnist / patch | Deletion (blur) | 0.009 | 0.013 | 0.977 | < 0.001 | 0.973 | 0.000 | 0.017 | 0.125 | 32 | 0.094 |
+| mnist / patch | Deletion (inpaint) | 0.009 | 0.013 | 0.976 | < 0.001 | 0.967 | 0.000 | 0.007 | 0.062 | 32 | 0.062 |
+| mnist / patch | Insertion (blur) | 0.009 | 0.013 | 0.974 | < 0.001 | 0.965 | 0.000 | 0.013 | 0.031 | 32 | 0.031 |
+| mnist / texture | Deletion (black) | 0.004 | 0.011 | 0.910 | < 0.001 | 0.909 | 0.024 | 0.033 | 0.150 | 20 | 0.150 |
+| mnist / texture | Deletion (blur) | 0.004 | 0.011 | 0.964 | < 0.001 | 0.964 | 0.030 | 0.037 | 0.000 | 20 | 0.000 |
+| mnist / texture | Deletion (inpaint) | 0.004 | 0.011 | 0.947 | < 0.001 | 0.948 | 0.014 | 0.017 | 0.150 | 20 | 0.150 |
+| mnist / texture | Insertion (blur) | 0.004 | 0.011 | 0.969 | < 0.001 | 0.965 | 0.003 | 0.013 | 0.000 | 20 | 0.000 |
+| pet_resnet18 / patch | Deletion (black) | 0.129 | 0.207 | 0.833 | < 0.001 | 0.877 | 0.426 | 0.458 | 0.667 | 12 | 0.750 |
+| pet_resnet18 / patch | Deletion (blur) | 0.129 | 0.207 | 0.919 | < 0.001 | 0.933 | 0.436 | 0.503 | 0.750 | 12 | 0.917 |
+| pet_resnet18 / patch | Deletion (inpaint) | 0.129 | 0.207 | 0.953 | < 0.001 | 0.951 | 0.248 | 0.405 | 0.417 | 12 | 0.583 |
+| pet_resnet18 / patch | Insertion (blur) | 0.129 | 0.207 | 0.936 | < 0.001 | 0.935 | 0.223 | 0.350 | 0.500 | 12 | 0.583 |
+| pneumonia_mnist / patch | Deletion (black) | 0.059 | 0.124 | 0.538 | < 0.001 | 0.645 | 0.387 | 0.377 | 0.682 | 22 | 0.682 |
+| pneumonia_mnist / patch | Deletion (blur) | 0.059 | 0.124 | 0.439 | 0.004 | 0.506 | 0.516 | 0.453 | 0.864 | 22 | 0.727 |
+| pneumonia_mnist / patch | Deletion (inpaint) | 0.059 | 0.124 | 0.633 | < 0.001 | 0.658 | 0.098 | 0.147 | 0.273 | 22 | 0.227 |
+| pneumonia_mnist / patch | Insertion (blur) | 0.059 | 0.124 | 0.494 | < 0.001 | 0.488 | 0.505 | 0.497 | 0.864 | 22 | 0.818 |
+| pneumonia_mnist / texture | Deletion (black) | 0.031 | 0.106 | 0.852 | < 0.001 | 0.848 | 0.268 | 0.328 | 0.667 | 18 | 0.667 |
+| pneumonia_mnist / texture | Deletion (blur) | 0.031 | 0.106 | 0.553 | < 0.001 | 0.583 | 0.606 | 0.572 | 1.000 | 18 | 1.000 |
+| pneumonia_mnist / texture | Deletion (inpaint) | 0.031 | 0.106 | 0.598 | < 0.001 | 0.555 | 0.415 | 0.450 | 0.889 | 18 | 0.889 |
+| pneumonia_mnist / texture | Insertion (blur) | 0.031 | 0.106 | 0.275 | 0.078 | 0.269 | 0.701 | 0.640 | 1.000 | 18 | 1.000 |
+
+### Power of the per-model behaviour AUROC (N9)
+
+Medians over models: minority-label count among determined images, smallest within-class minority count (classes with both labels), and the Hanley–McNeil SE of an AUROC at 0.5, sqrt((n1 + n0 + 1) / (12 n1 n0)).
+
+| setting | label | models | median_minority_count | median_within_class_minority_count | median_hanley_mcneil_se | models_with_both_labels |
+|---|---|---|---|---|---|---|
+| cifar10 / patch | follows_shortcut_causal | 12 | 6.500 | 1.000 | 0.097 | 11 |
+| cifar10 / patch | follows_shortcut | 12 | 8.500 | 1.000 | 0.111 | 12 |
+| cifar10 / patch | shortcut_dominant | 12 | 6.500 | 1.000 | 0.118 | 12 |
+| cifar10_resnet18 / patch | follows_shortcut_causal | 18 | 5.000 | 1.000 | 0.122 | 17 |
+| cifar10_resnet18 / patch | follows_shortcut | 18 | 6.000 | 1.000 | 0.127 | 18 |
+| cifar10_resnet18 / patch | shortcut_dominant | 18 | 4.000 | 1.000 | 0.148 | 18 |
+| mnist / patch | follows_shortcut_causal | 51 | 10.000 | 1.000 | 0.068 | 32 |
+| mnist / patch | follows_shortcut | 51 | 10.000 | 1.000 | 0.066 | 32 |
+| mnist / patch | shortcut_dominant | 51 | 10.000 | 1.000 | 0.069 | 35 |
+| mnist / texture | follows_shortcut_causal | 51 | 2.000 | 1.000 | 0.093 | 29 |
+| mnist / texture | follows_shortcut | 51 | 2.000 | 1.000 | 0.093 | 29 |
+| mnist / texture | shortcut_dominant | 51 | 3.000 | 1.000 | 0.097 | 35 |
+| pet_resnet18 / patch | follows_shortcut_causal | 18 | 8.000 | 2.000 | 0.097 | 15 |
+| pet_resnet18 / patch | follows_shortcut | 18 | 26.000 | 8.500 | 0.066 | 18 |
+| pet_resnet18 / patch | shortcut_dominant | 18 | 17.500 | 6.500 | 0.076 | 18 |
+| pneumonia_mnist / patch | follows_shortcut_causal | 42 | 6.500 | 10.000 | 0.083 | 31 |
+| pneumonia_mnist / patch | follows_shortcut | 42 | 18.500 | 5.500 | 0.073 | 36 |
+| pneumonia_mnist / patch | shortcut_dominant | 42 | 34.500 | 3.000 | 0.060 | 41 |
+| pneumonia_mnist / texture | follows_shortcut_causal | 42 | 5.000 | 3.000 | 0.103 | 30 |
+| pneumonia_mnist / texture | follows_shortcut | 42 | 9.000 | 4.500 | 0.073 | 30 |
+| pneumonia_mnist / texture | shortcut_dominant | 42 | 19.000 | 5.000 | 0.071 | 39 |
