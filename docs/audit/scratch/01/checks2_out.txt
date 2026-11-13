@@ -1,0 +1,86 @@
+=== D. seed-only vs seed+image bootstrap (shortcut vs full object) ===
+mnist            patch   deletion_zero     switch seed-only [31.2,41.6] found 100% | seed+image [29.2,43.6] found 100% | rho seed-only (np.float64(0.914), np.float64(0.981)) seed+image (np.float64(0.887), np.float64(0.97))
+mnist            patch   deletion_blur     switch seed-only [30.2,40.9] found 100% | seed+image [25.7,42.1] found 100% | rho seed-only (np.float64(0.923), np.float64(0.987)) seed+image (np.float64(0.89), np.float64(0.972))
+mnist            patch   deletion_inpaint  switch seed-only [32.4,49.6] found 100% | seed+image [30.2,52.7] found 100% | rho seed-only (np.float64(0.937), np.float64(0.984)) seed+image (np.float64(0.921), np.float64(0.975))
+mnist            patch   insertion_blur    switch seed-only [30.0,51.4] found 100% | seed+image [28.5,54.2] found 100% | rho seed-only (np.float64(0.933), np.float64(0.977)) seed+image (np.float64(0.893), np.float64(0.971))
+mnist            texture deletion_zero     switch seed-only [19.9,38.8] found 100% | seed+image [17.8,39.4] found 100% | rho seed-only (np.float64(0.904), np.float64(0.971)) seed+image (np.float64(0.891), np.float64(0.968))
+mnist            texture deletion_blur     switch seed-only [54.6,72.9] found 100% | seed+image [51.6,73.6] found 100% | rho seed-only (np.float64(0.944), np.float64(0.983)) seed+image (np.float64(0.897), np.float64(0.971))
+mnist            texture deletion_inpaint  switch seed-only [22.8,40.6] found 100% | seed+image [21.2,41.2] found 100% | rho seed-only (np.float64(0.916), np.float64(0.978)) seed+image (np.float64(0.873), np.float64(0.961))
+mnist            texture insertion_blur    switch seed-only [97.7,99.8] found 100% | seed+image [96.6,99.9] found 100% | rho seed-only (np.float64(0.92), np.float64(0.981)) seed+image (np.float64(0.878), np.float64(0.964))
+pet_resnet18     patch   deletion_zero     switch seed-only [17.4,20.5] found 100% | seed+image [16.7,21.7] found 92% | rho seed-only (np.float64(0.71), np.float64(0.947)) seed+image (np.float64(0.597), np.float64(0.928))
+pet_resnet18     patch   deletion_blur     switch seed-only [16.5,17.1] found 37% | seed+image [16.6,19.6] found 49% | rho seed-only (np.float64(0.922), np.float64(0.988)) seed+image (np.float64(0.852), np.float64(0.975))
+pet_resnet18     patch   deletion_inpaint  switch seed-only [20.8,26.2] found 100% | seed+image [19.7,28.3] found 100% | rho seed-only (np.float64(0.886), np.float64(0.988)) seed+image (np.float64(0.848), np.float64(0.979))
+pet_resnet18     patch   insertion_blur    switch seed-only [23.1,26.3] found 100% | seed+image [21.8,26.8] found 100% | rho seed-only (np.float64(0.89), np.float64(0.973)) seed+image (np.float64(0.872), np.float64(0.969))
+pneumonia_mnist  patch   deletion_zero     switch seed-only [14.7,28.3] found 100% | seed+image [14.0,33.3] found 100% | rho seed-only (np.float64(0.58), np.float64(0.8)) seed+image (np.float64(0.457), np.float64(0.773))
+pneumonia_mnist  patch   deletion_blur     switch seed-only [17.6,21.0] found 100% | seed+image [13.8,21.6] found 100% | rho seed-only (np.float64(0.453), np.float64(0.69)) seed+image (np.float64(0.435), np.float64(0.695))
+pneumonia_mnist  patch   deletion_inpaint  switch seed-only [28.7,50.0] found 100% | seed+image [27.6,57.0] found 100% | rho seed-only (np.float64(0.481), np.float64(0.793)) seed+image (np.float64(0.469), np.float64(0.779))
+pneumonia_mnist  patch   insertion_blur    switch seed-only [14.8,19.4] found 87% | seed+image [14.5,18.6] found 80% | rho seed-only (np.float64(0.343), np.float64(0.647)) seed+image (np.float64(0.315), np.float64(0.628))
+pneumonia_mnist  texture deletion_zero     switch seed-only [21.6,32.4] found 100% | seed+image [21.0,33.0] found 100% | rho seed-only (np.float64(0.696), np.float64(0.892)) seed+image (np.float64(0.694), np.float64(0.891))
+pneumonia_mnist  texture deletion_blur     switch seed-only [nan,nan] found 0% | seed+image [19.9,19.9] found 0% | rho seed-only (np.float64(0.388), np.float64(0.75)) seed+image (np.float64(0.39), np.float64(0.749))
+pneumonia_mnist  texture deletion_inpaint  switch seed-only [18.5,20.1] found 76% | seed+image [18.2,20.9] found 78% | rho seed-only (np.float64(0.413), np.float64(0.742)) seed+image (np.float64(0.371), np.float64(0.732))
+pneumonia_mnist  texture insertion_blur    switch seed-only [nan,nan] found 0% | seed+image [nan,nan] found 0% | rho seed-only (np.float64(0.03), np.float64(0.458)) seed+image (np.float64(0.016), np.float64(0.47))
+
+=== K. switch point: interpolation (paper) vs logistic fit on model-level wins ===
+cifar10          patch   deletion_z interp nan logit -47.3 interp(norm-rel) nan | deletion_b interp nan logit -41.7 interp(norm-rel) nan | deletion_i interp 8.4 logit 10.3 interp(norm-rel) 5.0 | insertion_ interp 19.7 logit 20.6 interp(norm-rel) 17.1
+cifar10_resnet18 patch   deletion_z interp nan logit -9.0 interp(norm-rel) nan | deletion_b interp nan logit -4.1 interp(norm-rel) nan | deletion_i interp 11.6 logit 15.3 interp(norm-rel) 9.4 | insertion_ interp 11.0 logit 12.9 interp(norm-rel) 8.8
+mnist            patch   deletion_z interp 35.3 logit 48.8 interp(norm-rel) 34.4 | deletion_b interp 30.3 logit 48.6 interp(norm-rel) 29.5 | deletion_i interp 41.7 logit 52.1 interp(norm-rel) 40.6 | insertion_ interp 38.8 logit 51.1 interp(norm-rel) 37.8
+mnist            texture deletion_z interp 30.5 logit 41.3 interp(norm-rel) 29.1 | deletion_b interp 63.4 logit 64.0 interp(norm-rel) 61.8 | deletion_i interp 33.8 logit 41.7 interp(norm-rel) 32.3 | insertion_ interp 98.8 logit 97.2 interp(norm-rel) 98.7
+pet_resnet18     patch   deletion_z interp 18.9 logit 8.7 interp(norm-rel) 1.4 | deletion_b interp nan logit 14.6 interp(norm-rel) nan | deletion_i interp 22.1 logit 25.6 interp(norm-rel) 4.4 | insertion_ interp 24.7 logit 25.2 interp(norm-rel) 6.8
+pneumonia_mnist  patch   deletion_z interp 26.6 logit 43.1 interp(norm-rel) 11.3 | deletion_b interp 19.0 logit 12.2 interp(norm-rel) 3.8 | deletion_i interp 31.9 logit 64.7 interp(norm-rel) 16.4 | insertion_ interp 16.8 logit -10.6 interp(norm-rel) 1.4
+pneumonia_mnist  texture deletion_z interp 28.4 logit 28.0 interp(norm-rel) 16.6 | deletion_b interp nan logit -4.8 interp(norm-rel) nan | deletion_i interp 19.2 logit -4.6 interp(norm-rel) 5.2 | insertion_ interp nan logit -36.8 interp(norm-rel) nan
+
+=== E. lowest-dose preferences with seed+image CI (P2, P3 on Pet; CIFAR for comparison) ===
+random vs object   pet_resnet18     deletion_z 0.528 [0.460,0.600] | deletion_b 0.490 [0.430,0.547] | deletion_i 0.383 [0.323,0.440] | insertion_ 0.350 [0.297,0.407]
+random vs object   cifar10          deletion_z 0.815 [0.755,0.870] | deletion_b 0.750 [0.690,0.810] | deletion_i 0.225 [0.170,0.285] | insertion_ 0.185 [0.130,0.245]
+random vs object   cifar10_resnet18 deletion_z 0.723 [0.617,0.807] | deletion_b 0.562 [0.473,0.642] | deletion_i 0.127 [0.085,0.170] | insertion_ 0.212 [0.168,0.253]
+shortcut vs random   pet_resnet18     deletion_z 0.450 [0.380,0.518] | deletion_b 0.527 [0.458,0.593] | deletion_i 0.528 [0.467,0.588] | insertion_ 0.533 [0.467,0.600]
+shortcut vs random   cifar10          deletion_z 0.477 [0.390,0.560] | deletion_b 0.562 [0.490,0.630] | deletion_i 0.618 [0.550,0.682] | insertion_ 0.593 [0.520,0.662]
+shortcut vs random   cifar10_resnet18 deletion_z 0.492 [0.398,0.573] | deletion_b 0.520 [0.463,0.577] | deletion_i 0.578 [0.503,0.653] | insertion_ 0.550 [0.487,0.610]
+shortcut vs placebo  pet_resnet18     deletion_z 0.552 [0.487,0.627] | deletion_b 0.572 [0.510,0.628] | deletion_i 0.523 [0.440,0.615] | insertion_ 0.520 [0.457,0.587]
+shortcut vs placebo  cifar10          deletion_z 0.530 [0.463,0.598] | deletion_b 0.535 [0.453,0.615] | deletion_i 0.625 [0.550,0.700] | insertion_ 0.578 [0.510,0.645]
+shortcut vs placebo  cifar10_resnet18 deletion_z 0.575 [0.513,0.640] | deletion_b 0.525 [0.468,0.580] | deletion_i 0.597 [0.530,0.658] | insertion_ 0.550 [0.460,0.640]
+shortcut vs object   pet_resnet18     deletion_z 0.458 [0.397,0.523] | deletion_b 0.503 [0.447,0.563] | deletion_i 0.405 [0.347,0.460] | insertion_ 0.350 [0.297,0.407]
+shortcut vs object   cifar10          deletion_z 0.815 [0.755,0.870] | deletion_b 0.735 [0.675,0.795] | deletion_i 0.265 [0.205,0.325] | insertion_ 0.228 [0.170,0.288]
+shortcut vs object   cifar10_resnet18 deletion_z 0.703 [0.633,0.770] | deletion_b 0.610 [0.533,0.673] | deletion_i 0.153 [0.113,0.197] | insertion_ 0.240 [0.177,0.310]
+
+=== E2. P2 contrast on Pet lowest dose: mean(black, blur) - mean(inpaint, insertion), random vs object ===
+contrast 0.142 95% CI [0.088 0.198]
+  deletion_zero - deletion_inpaint: 0.145 CI [0.057 0.24 ]
+  deletion_zero - insertion_blur: 0.178 CI [0.097 0.263]
+  deletion_blur - deletion_inpaint: 0.107 CI [0.043 0.17 ]
+  deletion_blur - insertion_blur: 0.140 CI [0.073 0.203]
+
+=== F. paired difference in rho, inpaint minus black/blur (shortcut vs full object), seed bootstrap ===
+cifar10          patch   inpaint-deletion_zer +0.051 [-0.005,+0.187] | inpaint-deletion_blu +0.089 [+0.000,+0.170] | inpaint-insertion_bl +0.005 [-0.002,+0.057]
+cifar10_resnet18 patch   inpaint-deletion_zer +0.021 [-0.028,+0.069] | inpaint-deletion_blu +0.012 [-0.031,+0.028] | inpaint-insertion_bl -0.003 [-0.030,+0.007]
+mnist            patch   inpaint-deletion_zer +0.011 [-0.032,+0.051] | inpaint-deletion_blu +0.007 [-0.023,+0.041] | inpaint-insertion_bl +0.007 [-0.020,+0.030]
+mnist            texture inpaint-deletion_zer +0.010 [-0.028,+0.042] | inpaint-deletion_blu -0.011 [-0.056,+0.025] | inpaint-insertion_bl -0.001 [-0.043,+0.037]
+pet_resnet18     patch   inpaint-deletion_zer +0.100 [+0.007,+0.235] | inpaint-deletion_blu -0.009 [-0.087,+0.050] | inpaint-insertion_bl +0.016 [-0.069,+0.069]
+pneumonia_mnist  patch   inpaint-deletion_zer -0.047 [-0.198,+0.078] | inpaint-deletion_blu +0.062 [-0.094,+0.228] | inpaint-insertion_bl +0.157 [-0.003,+0.313]
+pneumonia_mnist  texture inpaint-deletion_zer -0.197 [-0.385,-0.039] | inpaint-deletion_blu +0.032 [-0.181,+0.245] | inpaint-insertion_bl +0.347 [+0.085,+0.592]
+
+=== H. method responsiveness with seed-bootstrap CI ===
+mnist            texture grad_cam     rho -0.488 CI [-0.667,-0.305]
+mnist            texture integrated_gradients rho +0.953 CI [+0.928,+0.977]
+mnist            texture occlusion    rho +0.896 CI [+0.836,+0.946]
+mnist            texture saliency     rho -0.801 CI [-0.896,-0.688]
+mnist            texture smoothgrad   rho -0.738 CI [-0.859,-0.567]
+pneumonia_mnist  texture grad_cam     rho -0.491 CI [-0.697,-0.248]
+pneumonia_mnist  texture integrated_gradients rho +0.855 CI [+0.750,+0.935]
+pneumonia_mnist  texture occlusion    rho +0.709 CI [+0.546,+0.823]
+pneumonia_mnist  texture saliency     rho +0.874 CI [+0.795,+0.931]
+pneumonia_mnist  texture smoothgrad   rho +0.696 CI [+0.585,+0.827]
+
+=== J. seed spread of reliance at the steepest doses ===
+                                 min   max   std
+base            shortcut dose                   
+mnist           patch    0.005   0.8  23.0  12.6
+                         0.010   9.1  62.2  28.5
+                         0.020  45.2  68.5  11.9
+                texture  0.005  14.2  76.8  31.8
+                         0.010  38.9  92.0  27.9
+pneumonia_mnist patch    0.000  52.1  80.1  14.2
+                         0.005  54.3  80.0  13.0
+                         0.010  78.5  98.4  11.1
+                         0.020  57.0  77.6  10.5
+                texture  0.010  77.9  95.7  10.1

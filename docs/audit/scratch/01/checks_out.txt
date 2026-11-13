@@ -1,0 +1,153 @@
+=== A. chance-corrected reliance (errors that land on the shortcut class by chance) ===
+                                 reliance  chance_floor  excess
+base            shortcut dose                                  
+pet_resnet18    patch    -0.500      17.5          17.6    -0.2
+                         -0.400      22.3          18.6     3.7
+                         -0.300      33.2          21.4    11.8
+                         -0.200      46.6          25.0    21.6
+                         -0.100      81.5          31.4    50.1
+                          0.000      99.0          34.8    64.2
+pneumonia_mnist patch    -0.400      14.8          14.3     0.5
+                         -0.250      16.6          15.6     1.0
+                         -0.100      21.3          15.9     5.4
+                         -0.050      32.4          18.1    14.4
+                          0.000      64.9          27.4    37.5
+                          0.005      68.3          37.6    30.7
+                          0.010      85.6          40.9    44.7
+                          0.020      68.6          34.5    34.1
+                          0.050      94.8          49.7    45.1
+                          0.100      98.9          47.7    51.2
+                          0.250      98.9          53.2    45.7
+                          0.400      99.7          62.4    37.3
+                texture  -0.400      18.4          15.1     3.3
+                         -0.250      21.4          14.3     7.1
+                         -0.100      30.9          13.9    17.0
+                         -0.050      38.6          12.9    25.8
+                          0.000      92.7          22.4    70.3
+                          0.005      98.6          21.3    77.2
+                          0.010      89.6          20.1    69.4
+                          0.020      96.8          23.0    73.8
+                          0.050      99.0          32.6    66.4
+                          0.100      99.9          44.2    55.8
+                          0.250     100.0          48.4    51.6
+                          0.400      99.9          47.9    52.0
+                                 reliance  chance_floor  excess
+base             shortcut dose                                 
+cifar10          patch    -0.80       4.0           3.2     0.8
+                          -0.60       7.6           3.5     4.0
+                          -0.40      15.5           3.1    12.4
+                          -0.25      22.9           3.2    19.7
+                          -0.10      44.2           4.1    40.2
+                           0.00      96.5           7.8    88.6
+cifar10_resnet18 patch    -0.80       3.0           2.0     1.0
+                          -0.60       6.1           2.1     4.0
+                          -0.40      10.6           2.4     8.2
+                          -0.25      18.9           2.8    16.2
+                          -0.10      36.3           3.7    32.6
+                           0.00      96.8           8.3    88.6
+
+=== B. reliance coverage per setting ===
+cifar10            patch    n=12 in[35,65]= 2 >50= 2 largest gap 45.1->96.3  min=3.7
+cifar10_resnet18   patch    n=18 in[35,65]= 2 >50= 3 largest gap 39.0->96.2  min=2.7
+mnist              patch    n=36 in[35,65]= 3 >50=15 largest gap 23.0->45.2  min=0.1
+mnist              texture  n=36 in[35,65]= 2 >50=19 largest gap 55.6->76.8  min=0.1
+pet_resnet18       patch    n=18 in[35,65]= 3 >50= 7 largest gap 57.1->72.3  min=15.5
+pneumonia_mnist    patch    n=36 in[35,65]= 5 >50=24 largest gap 36.2->52.1  min=12.8
+pneumonia_mnist    texture  n=36 in[35,65]= 3 >50=24 largest gap 40.7->77.9  min=16.4
+
+=== C. multiple comparisons over all reported Spearman tests ===
+tests: 231 metric tests: 196
+significant raw: 201  holm: 187  BH: 199
+lose significance under Holm:
+       kind                       comparison             base shortcut              metric  responsiveness_rho  p_value   holm     bh
+23   metric          shortcut vs full object  pneumonia_mnist    patch    Insertion (blur)               0.490    0.002  0.088  0.002
+53   metric  shortcut vs size-matched object  pneumonia_mnist  texture     Deletion (blur)               0.372    0.025  0.850  0.029
+55   metric  shortcut vs size-matched object  pneumonia_mnist  texture    Insertion (blur)               0.432    0.009  0.342  0.011
+109  metric              shortcut vs placebo  pneumonia_mnist  texture     Deletion (blur)               0.413    0.012  0.444  0.014
+112  metric            random vs full object          cifar10    patch    Deletion (black)               0.579    0.049  1.000  0.056
+113  metric            random vs full object          cifar10    patch     Deletion (blur)               0.655    0.021  0.735  0.025
+138  metric            random vs full object  pneumonia_mnist  texture  Deletion (inpaint)               0.346    0.038  1.000  0.044
+159  metric                placebo vs random     pet_resnet18    patch    Insertion (blur)              -0.671    0.002  0.088  0.002
+162  metric                placebo vs random  pneumonia_mnist    patch  Deletion (inpaint)              -0.330    0.049  1.000  0.056
+167  metric                placebo vs random  pneumonia_mnist  texture    Insertion (blur)              -0.496    0.002  0.088  0.002
+193  metric               shortcut vs random  pneumonia_mnist  texture     Deletion (blur)               0.392    0.018  0.648  0.021
+0    method                           method          cifar10    patch            Grad-CAM               0.741    0.006  0.234  0.007
+15   method                           method            mnist  texture            Grad-CAM              -0.488    0.003  0.120  0.004
+30   method                           method  pneumonia_mnist  texture            Grad-CAM              -0.491    0.002  0.088  0.002
+note: p_value in responsiveness.csv is rounded to 3 decimals; recomputing exact p from preference.csv
+exact metric tests: raw<.05 166 holm 154 bh 164
+                          comparison             base shortcut            metric     rho       p    holm      bh
+47                 placebo vs random     pet_resnet18    patch    insertion_blur -0.6711  0.0023  0.0932  0.0029
+50                 placebo vs random  pneumonia_mnist    patch  deletion_inpaint -0.3319  0.0480  1.0000  0.0570
+55                 placebo vs random  pneumonia_mnist  texture    insertion_blur -0.4926  0.0023  0.0932  0.0029
+56             random vs full object          cifar10    patch     deletion_zero  0.5790  0.0486  1.0000  0.0573
+57             random vs full object          cifar10    patch     deletion_blur  0.6550  0.0208  0.7278  0.0252
+82             random vs full object  pneumonia_mnist  texture  deletion_inpaint  0.3463  0.0386  1.0000  0.0461
+107          shortcut vs full object  pneumonia_mnist    patch    insertion_blur  0.4896  0.0024  0.0952  0.0030
+137              shortcut vs placebo  pneumonia_mnist  texture     deletion_blur  0.4163  0.0116  0.4279  0.0142
+164               shortcut vs random  pneumonia_mnist  texture     deletion_zero -0.5166  0.0013  0.0528  0.0016
+165               shortcut vs random  pneumonia_mnist  texture     deletion_blur  0.3975  0.0164  0.5888  0.0199
+193  shortcut vs size-matched object  pneumonia_mnist  texture     deletion_blur  0.3728  0.0251  0.8545  0.0302
+195  shortcut vs size-matched object  pneumonia_mnist  texture    insertion_blur  0.4317  0.0086  0.3257  0.0106
+
+=== C2. rho on dose-level means (the doses are the design points) ===
+cifar10 patch deletion_zer 0.94 (p=0.005, n=6) | deletion_blu 0.94 (p=0.005, n=6) | deletion_inp 1.00 (p=0.000, n=6) | insertion_bl 1.00 (p=0.000, n=6)
+cifar10_resnet18 patch deletion_zer 1.00 (p=0.000, n=6) | deletion_blu 1.00 (p=0.000, n=6) | deletion_inp 1.00 (p=0.000, n=6) | insertion_bl 1.00 (p=0.000, n=6)
+mnist patch deletion_zer 0.94 (p=0.000, n=12) | deletion_blu 0.99 (p=0.000, n=12) | deletion_inp 0.95 (p=0.000, n=12) | insertion_bl 0.97 (p=0.000, n=12)
+mnist texture deletion_zer 1.00 (p=0.000, n=12) | deletion_blu 0.97 (p=0.000, n=12) | deletion_inp 0.98 (p=0.000, n=12) | insertion_bl 0.99 (p=0.000, n=12)
+pet_resnet18 patch deletion_zer 0.94 (p=0.005, n=6) | deletion_blu 1.00 (p=0.000, n=6) | deletion_inp 1.00 (p=0.000, n=6) | insertion_bl 0.94 (p=0.005, n=6)
+pneumonia_mnist patch deletion_zer 0.85 (p=0.000, n=12) | deletion_blu 0.72 (p=0.008, n=12) | deletion_inp 0.83 (p=0.001, n=12) | insertion_bl 0.63 (p=0.028, n=12)
+pneumonia_mnist texture deletion_zer 0.68 (p=0.016, n=12) | deletion_blu 0.73 (p=0.007, n=12) | deletion_inp 0.69 (p=0.013, n=12) | insertion_bl 0.51 (p=0.090, n=12)
+
+=== G. decision accuracy vs balanced decision accuracy (shortcut vs full object) ===
+                base shortcut            metric  share_hi  dec_acc  balanced    TPR    TNR
+0            cifar10    patch     deletion_zero     0.167    0.167     0.500  1.000  0.000
+1            cifar10    patch     deletion_blur     0.167    0.167     0.500  1.000  0.000
+2            cifar10    patch  deletion_inpaint     0.167    0.417     0.650  1.000  0.300
+3            cifar10    patch    insertion_blur     0.167    0.667     0.800  1.000  0.600
+4   cifar10_resnet18    patch     deletion_zero     0.167    0.167     0.500  1.000  0.000
+5   cifar10_resnet18    patch     deletion_blur     0.167    0.167     0.500  1.000  0.000
+6   cifar10_resnet18    patch  deletion_inpaint     0.167    0.667     0.800  1.000  0.600
+7   cifar10_resnet18    patch    insertion_blur     0.167    0.611     0.767  1.000  0.533
+8              mnist    patch     deletion_zero     0.417    0.972     0.976  1.000  0.952
+9              mnist    patch     deletion_blur     0.417    0.972     0.976  1.000  0.952
+10             mnist    patch  deletion_inpaint     0.417    0.944     0.943  0.933  0.952
+11             mnist    patch    insertion_blur     0.417    1.000     1.000  1.000  1.000
+12             mnist  texture     deletion_zero     0.528    0.972     0.971  1.000  0.941
+13             mnist  texture     deletion_blur     0.528    0.972     0.974  0.947  1.000
+14             mnist  texture  deletion_inpaint     0.528    0.972     0.971  1.000  0.941
+15             mnist  texture    insertion_blur     0.528    0.750     0.763  0.526  1.000
+16      pet_resnet18    patch     deletion_zero     0.389    0.556     0.636  1.000  0.273
+17      pet_resnet18    patch     deletion_blur     0.389    0.444     0.545  1.000  0.091
+18      pet_resnet18    patch  deletion_inpaint     0.389    0.667     0.727  1.000  0.455
+19      pet_resnet18    patch    insertion_blur     0.389    0.667     0.727  1.000  0.455
+20   pneumonia_mnist    patch     deletion_zero     0.667    0.861     0.792  1.000  0.583
+21   pneumonia_mnist    patch     deletion_blur     0.667    0.833     0.750  1.000  0.500
+22   pneumonia_mnist    patch  deletion_inpaint     0.667    0.861     0.875  0.833  0.917
+23   pneumonia_mnist    patch    insertion_blur     0.667    0.778     0.667  1.000  0.333
+24   pneumonia_mnist  texture     deletion_zero     0.667    0.833     0.750  1.000  0.500
+25   pneumonia_mnist  texture     deletion_blur     0.667    0.667     0.500  1.000  0.000
+26   pneumonia_mnist  texture  deletion_inpaint     0.667    0.694     0.562  0.958  0.167
+27   pneumonia_mnist  texture    insertion_blur     0.667    0.667     0.500  1.000  0.000
+
+=== I. tie rates ===
+deletion_zero mean 0.011 max 0.52
+deletion_blur mean 0.032 max 0.49
+deletion_inpaint mean 0.021 max 0.46
+insertion_blur mean 0.033 max 0.47
+                                                          deletion_zero_ties  deletion_blur_ties  deletion_inpaint_ties  insertion_blur_ties
+comparison                      base            shortcut                                                                                    
+placebo vs full object          pneumonia_mnist patch                  0.003               0.089                  0.019                0.087
+                                                texture                0.021               0.063                  0.034                0.042
+placebo vs random               pneumonia_mnist patch                  0.038               0.130                  0.107                0.126
+                                                texture                0.018               0.077                  0.047                0.083
+random vs full object           pneumonia_mnist patch                  0.002               0.089                  0.011                0.089
+                                                texture                0.016               0.059                  0.039                0.047
+shortcut vs full object         pneumonia_mnist patch                  0.003               0.079                  0.004                0.089
+                                                texture                0.012               0.040                  0.030                0.062
+shortcut vs placebo             pneumonia_mnist patch                  0.046               0.114                  0.094                0.125
+                                                texture                0.016               0.057                  0.042                0.064
+shortcut vs random              pneumonia_mnist patch                  0.044               0.121                  0.100                0.126
+                                                texture                0.013               0.054                  0.043                0.065
+shortcut vs size-matched object pneumonia_mnist patch                  0.042               0.116                  0.093                0.115
+                                                texture                0.012               0.056                  0.036                0.061

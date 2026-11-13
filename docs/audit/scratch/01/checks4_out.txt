@@ -1,0 +1,16 @@
+== shortcut vs full object
+cifar10          patch   rho(reliance, acc_no_shortcut)=-0.72 | deletion_zer raw +0.93 partial +0.88 | deletion_blu raw +0.90 partial +0.78 | deletion_inp raw +0.99 partial +0.98 | insertion_bl raw +0.98 partial +0.96
+cifar10_resnet18 patch   rho(reliance, acc_no_shortcut)=-0.98 | deletion_zer raw +0.96 partial +0.46 | deletion_blu raw +0.97 partial +0.54 | deletion_inp raw +0.98 partial +0.78 | insertion_bl raw +0.98 partial +0.52
+mnist            patch   rho(reliance, acc_no_shortcut)=-0.99 | deletion_zer raw +0.96 partial +0.15 | deletion_blu raw +0.96 partial +0.51 | deletion_inp raw +0.97 partial +0.11 | insertion_bl raw +0.96 partial +0.34
+mnist            texture rho(reliance, acc_no_shortcut)=-0.99 | deletion_zer raw +0.94 partial -0.28 | deletion_blu raw +0.96 partial +0.15 | deletion_inp raw +0.95 partial +0.18 | insertion_bl raw +0.95 partial +0.36
+pet_resnet18     patch   rho(reliance, acc_no_shortcut)=-0.96 | deletion_zer raw +0.85 partial +0.57 | deletion_blu raw +0.96 partial +0.68 | deletion_inp raw +0.95 partial +0.64 | insertion_bl raw +0.93 partial +0.70
+pneumonia_mnist  patch   rho(reliance, acc_no_shortcut)=-0.88 | deletion_zer raw +0.69 partial +0.29 | deletion_blu raw +0.58 partial +0.40 | deletion_inp raw +0.65 partial +0.14 | insertion_bl raw +0.49 partial +0.31
+pneumonia_mnist  texture rho(reliance, acc_no_shortcut)=-0.81 | deletion_zer raw +0.80 partial +0.44 | deletion_blu raw +0.57 partial +0.57 | deletion_inp raw +0.60 partial +0.53 | insertion_bl raw +0.25 partial +0.17
+== shortcut vs random
+cifar10          patch   rho(reliance, acc_no_shortcut)=-0.72 | deletion_zer raw +0.92 partial +0.88 | deletion_blu raw +0.92 partial +0.94 | deletion_inp raw +0.96 partial +0.96 | insertion_bl raw +0.92 partial +0.88
+cifar10_resnet18 patch   rho(reliance, acc_no_shortcut)=-0.98 | deletion_zer raw +0.96 partial +0.41 | deletion_blu raw +0.95 partial +0.31 | deletion_inp raw +0.95 partial +0.18 | insertion_bl raw +0.98 partial +0.42
+mnist            patch   rho(reliance, acc_no_shortcut)=-0.99 | deletion_zer raw +0.93 partial +0.32 | deletion_blu raw +0.93 partial +0.34 | deletion_inp raw +0.93 partial +0.34 | insertion_bl raw +0.98 partial +0.58
+mnist            texture rho(reliance, acc_no_shortcut)=-0.99 | deletion_zer raw +0.88 partial -0.12 | deletion_blu raw +0.09 partial -0.12 | deletion_inp raw +0.85 partial -0.06 | insertion_bl raw -0.59 partial +0.04
+pet_resnet18     patch   rho(reliance, acc_no_shortcut)=-0.96 | deletion_zer raw +0.75 partial +0.53 | deletion_blu raw +0.88 partial +0.54 | deletion_inp raw +0.96 partial +0.80 | insertion_bl raw +0.95 partial +0.79
+pneumonia_mnist  patch   rho(reliance, acc_no_shortcut)=-0.88 | deletion_zer raw +0.63 partial +0.18 | deletion_blu raw +0.70 partial +0.38 | deletion_inp raw +0.71 partial +0.34 | insertion_bl raw +0.74 partial +0.47
+pneumonia_mnist  texture rho(reliance, acc_no_shortcut)=-0.81 | deletion_zer raw -0.52 partial -0.11 | deletion_blu raw +0.40 partial +0.55 | deletion_inp raw +0.70 partial +0.62 | insertion_bl raw +0.57 partial +0.57

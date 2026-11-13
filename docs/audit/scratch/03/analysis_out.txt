@@ -1,0 +1,198 @@
+== 1. Reliance floor vs base error (lowest dose) ==
+                           reliance  chance_floor  test_accuracy_conflicting
+base             shortcut                                                   
+cifar10          patch         3.98          3.18                      70.26
+cifar10_resnet18 patch         2.99          2.01                      81.14
+mnist            patch         0.14          0.13                      98.78
+                 texture       0.17          0.14                      98.62
+pet_resnet18     patch        17.45         17.64                      82.55
+pneumonia_mnist  patch        14.85         14.32                      85.15
+                 texture      18.38         15.06                      81.62
+                           min    max
+base             shortcut            
+cifar10          patch     0.8   96.3
+cifar10_resnet18 patch     0.8   97.0
+mnist            patch    -0.0   99.8
+                 texture  -0.0  100.0
+pet_resnet18     patch    -0.8   99.2
+pneumonia_mnist  patch    -0.2  100.0
+                 texture   3.0  100.0
+
+== 2. Is preference tracking reliance or object competence (no-shortcut acc)? ==
+                base shortcut            metric  rho_rel  rho_accnone  partial_rel|acc  partial_acc|rel  rho(rel,acc)
+0            cifar10    patch     deletion_zero    0.935       -0.668            0.879            0.023        -0.720
+1            cifar10    patch     deletion_blur    0.897       -0.753            0.776           -0.349        -0.720
+2            cifar10    patch  deletion_inpaint    0.986       -0.664            0.979            0.397        -0.720
+3            cifar10    patch    insertion_blur    0.981       -0.729            0.960           -0.163        -0.720
+4   cifar10_resnet18    patch     deletion_zero    0.959       -0.949            0.462           -0.138        -0.981
+5   cifar10_resnet18    patch     deletion_blur    0.968       -0.954            0.545           -0.094        -0.981
+6   cifar10_resnet18    patch  deletion_inpaint    0.980       -0.951            0.785            0.280        -0.981
+7   cifar10_resnet18    patch    insertion_blur    0.983       -0.983            0.517           -0.517        -0.981
+8              mnist    patch     deletion_zero    0.956       -0.963            0.147           -0.424        -0.985
+9              mnist    patch     deletion_blur    0.960       -0.946            0.507            0.003        -0.985
+10             mnist    patch  deletion_inpaint    0.967       -0.977            0.107           -0.563        -0.985
+11             mnist    patch    insertion_blur    0.960       -0.957            0.336           -0.237        -0.985
+12             mnist  texture     deletion_zero    0.943       -0.967           -0.275           -0.683        -0.986
+13             mnist  texture     deletion_blur    0.964       -0.971            0.151           -0.461        -0.986
+14             mnist  texture  deletion_inpaint    0.953       -0.958            0.177           -0.352        -0.986
+15             mnist  texture    insertion_blur    0.954       -0.948            0.357           -0.146        -0.986
+16      pet_resnet18    patch     deletion_zero    0.850       -0.784            0.568            0.243        -0.963
+17      pet_resnet18    patch     deletion_blur    0.960       -0.925            0.675           -0.007        -0.963
+18      pet_resnet18    patch  deletion_inpaint    0.950       -0.915            0.636           -0.002        -0.963
+19      pet_resnet18    patch    insertion_blur    0.934       -0.875            0.701            0.252        -0.963
+20   pneumonia_mnist    patch     deletion_zero    0.693       -0.671            0.295           -0.180        -0.878
+21   pneumonia_mnist    patch     deletion_blur    0.585       -0.474            0.399            0.099        -0.878
+22   pneumonia_mnist    patch  deletion_inpaint    0.646       -0.682            0.137           -0.313        -0.878
+23   pneumonia_mnist    patch    insertion_blur    0.490       -0.404            0.309            0.062        -0.878
+24   pneumonia_mnist  texture     deletion_zero    0.797       -0.783            0.444           -0.387        -0.811
+25   pneumonia_mnist  texture     deletion_blur    0.567       -0.306            0.572            0.319        -0.811
+26   pneumonia_mnist  texture  deletion_inpaint    0.599       -0.389            0.526            0.207        -0.811
+27   pneumonia_mnist  texture    insertion_blur    0.253       -0.188            0.174            0.029        -0.811
+
+== 3. Significance (p<0.05, rho>0) per comparison/metric across the 7 settings ==
+                                                    sig
+comparison                      metric                 
+placebo vs full object          Deletion (black)      6
+                                Deletion (blur)       7
+                                Deletion (inpaint)    6
+                                Insertion (blur)      6
+placebo vs random               Deletion (black)      1
+                                Deletion (blur)       0
+                                Deletion (inpaint)    0
+                                Insertion (blur)      2
+random vs full object           Deletion (black)      7
+                                Deletion (blur)       7
+                                Deletion (inpaint)    7
+                                Insertion (blur)      6
+shortcut vs full object         Deletion (black)      7
+                                Deletion (blur)       7
+                                Deletion (inpaint)    7
+                                Insertion (blur)      6
+shortcut vs placebo             Deletion (black)      6
+                                Deletion (blur)       6
+                                Deletion (inpaint)    7
+                                Insertion (blur)      6
+shortcut vs random              Deletion (black)      6
+                                Deletion (blur)       6
+                                Deletion (inpaint)    7
+                                Insertion (blur)      6
+shortcut vs size-matched object Deletion (black)      6
+                                Deletion (blur)       7
+                                Deletion (inpaint)    7
+                                Insertion (blur)      7
+
+Number of settings: 7
+
+== 4. Form-matched comparisons: low/high preference ==
+            base shortcut             metric  responsiveness_rho  p_value  preference_low_reliance  preference_high_reliance
+         cifar10    patch   Deletion (black)               0.918    0.000                    0.478                     0.955
+         cifar10    patch    Deletion (blur)               0.921    0.000                    0.562                     0.975
+         cifar10    patch Deletion (inpaint)               0.963    0.000                    0.617                     0.990
+         cifar10    patch   Insertion (blur)               0.923    0.000                    0.592                     0.905
+cifar10_resnet18    patch   Deletion (black)               0.958    0.000                    0.492                     0.963
+cifar10_resnet18    patch    Deletion (blur)               0.954    0.000                    0.520                     0.977
+cifar10_resnet18    patch Deletion (inpaint)               0.954    0.000                    0.578                     0.983
+cifar10_resnet18    patch   Insertion (blur)               0.977    0.000                    0.550                     1.000
+           mnist    patch   Deletion (black)               0.928    0.000                    0.527                     0.935
+           mnist    patch    Deletion (blur)               0.933    0.000                    0.437                     0.940
+           mnist    patch Deletion (inpaint)               0.929    0.000                    0.390                     0.933
+           mnist    patch   Insertion (blur)               0.979    0.000                    0.463                     0.930
+           mnist  texture   Deletion (black)               0.881    0.000                    0.553                     0.960
+           mnist  texture    Deletion (blur)               0.089    0.607                    0.443                     0.443
+           mnist  texture Deletion (inpaint)               0.851    0.000                    0.433                     0.953
+           mnist  texture   Insertion (blur)              -0.593    0.000                    0.430                     0.363
+    pet_resnet18    patch   Deletion (black)               0.750    0.000                    0.450                     0.763
+    pet_resnet18    patch    Deletion (blur)               0.884    0.000                    0.527                     0.910
+    pet_resnet18    patch Deletion (inpaint)               0.960    0.000                    0.528                     0.993
+    pet_resnet18    patch   Insertion (blur)               0.948    0.000                    0.533                     0.967
+ pneumonia_mnist    patch   Deletion (black)               0.629    0.000                    0.495                     0.727
+ pneumonia_mnist    patch    Deletion (blur)               0.705    0.000                    0.527                     0.747
+ pneumonia_mnist    patch Deletion (inpaint)               0.710    0.000                    0.505                     0.737
+ pneumonia_mnist    patch   Insertion (blur)               0.742    0.000                    0.438                     0.753
+ pneumonia_mnist  texture   Deletion (black)              -0.517    0.001                    0.693                     0.427
+ pneumonia_mnist  texture    Deletion (blur)               0.392    0.018                    0.528                     0.845
+ pneumonia_mnist  texture Deletion (inpaint)               0.694    0.000                    0.532                     0.938
+ pneumonia_mnist  texture   Insertion (blur)               0.568    0.000                    0.527                     0.950
+            base shortcut             metric  responsiveness_rho  p_value  preference_low_reliance  preference_high_reliance
+         cifar10    patch   Deletion (black)               0.890    0.000                    0.530                     0.955
+         cifar10    patch    Deletion (blur)               0.944    0.000                    0.535                     0.965
+         cifar10    patch Deletion (inpaint)               0.907    0.000                    0.625                     0.985
+         cifar10    patch   Insertion (blur)               0.919    0.000                    0.577                     0.945
+cifar10_resnet18    patch   Deletion (black)               0.984    0.000                    0.575                     0.980
+cifar10_resnet18    patch    Deletion (blur)               0.971    0.000                    0.525                     0.977
+cifar10_resnet18    patch Deletion (inpaint)               0.925    0.000                    0.597                     0.983
+cifar10_resnet18    patch   Insertion (blur)               0.955    0.000                    0.550                     1.000
+           mnist    patch   Deletion (black)               0.937    0.000                    0.570                     0.943
+           mnist    patch    Deletion (blur)               0.954    0.000                    0.437                     0.960
+           mnist    patch Deletion (inpaint)               0.933    0.000                    0.433                     0.932
+           mnist    patch   Insertion (blur)               0.954    0.000                    0.553                     0.940
+           mnist  texture   Deletion (black)               0.866    0.000                    0.577                     0.963
+           mnist  texture    Deletion (blur)               0.005    0.977                    0.407                     0.417
+           mnist  texture Deletion (inpaint)               0.868    0.000                    0.427                     0.930
+           mnist  texture   Insertion (blur)              -0.810    0.000                    0.467                     0.300
+    pet_resnet18    patch   Deletion (black)               0.727    0.001                    0.552                     0.773
+    pet_resnet18    patch    Deletion (blur)               0.889    0.000                    0.572                     0.943
+    pet_resnet18    patch Deletion (inpaint)               0.952    0.000                    0.523                     0.997
+    pet_resnet18    patch   Insertion (blur)               0.930    0.000                    0.520                     0.973
+ pneumonia_mnist    patch   Deletion (black)               0.756    0.000                    0.528                     0.758
+ pneumonia_mnist    patch    Deletion (blur)               0.677    0.000                    0.517                     0.783
+ pneumonia_mnist    patch Deletion (inpaint)               0.569    0.000                    0.518                     0.773
+ pneumonia_mnist    patch   Insertion (blur)               0.752    0.000                    0.487                     0.785
+ pneumonia_mnist  texture   Deletion (black)              -0.615    0.000                    0.827                     0.453
+ pneumonia_mnist  texture    Deletion (blur)               0.413    0.012                    0.577                     0.843
+ pneumonia_mnist  texture Deletion (inpaint)               0.708    0.000                    0.550                     0.963
+ pneumonia_mnist  texture   Insertion (blur)               0.560    0.000                    0.558                     0.950
+            base shortcut             metric  responsiveness_rho  p_value  preference_low_reliance  preference_high_reliance
+         cifar10    patch   Deletion (black)               0.186    0.564                    0.522                     0.480
+         cifar10    patch    Deletion (blur)              -0.085    0.794                    0.492                     0.462
+         cifar10    patch Deletion (inpaint)               0.399    0.198                    0.455                     0.522
+         cifar10    patch   Insertion (blur)              -0.540    0.070                    0.465                     0.397
+cifar10_resnet18    patch   Deletion (black)               0.375    0.125                    0.443                     0.518
+cifar10_resnet18    patch    Deletion (blur)              -0.239    0.340                    0.523                     0.517
+cifar10_resnet18    patch Deletion (inpaint)               0.140    0.580                    0.485                     0.490
+cifar10_resnet18    patch   Insertion (blur)               0.068    0.788                    0.495                     0.463
+           mnist    patch   Deletion (black)               0.150    0.384                    0.457                     0.500
+           mnist    patch    Deletion (blur)               0.152    0.377                    0.450                     0.510
+           mnist    patch Deletion (inpaint)              -0.236    0.167                    0.493                     0.492
+           mnist    patch   Insertion (blur)               0.870    0.000                    0.393                     0.520
+           mnist  texture   Deletion (black)              -0.102    0.554                    0.492                     0.487
+           mnist  texture    Deletion (blur)               0.245    0.150                    0.480                     0.497
+           mnist  texture Deletion (inpaint)               0.208    0.223                    0.470                     0.477
+           mnist  texture   Insertion (blur)               0.822    0.000                    0.393                     0.563
+    pet_resnet18    patch   Deletion (black)               0.440    0.067                    0.407                     0.485
+    pet_resnet18    patch    Deletion (blur)               0.202    0.420                    0.467                     0.467
+    pet_resnet18    patch Deletion (inpaint)              -0.067    0.791                    0.443                     0.452
+    pet_resnet18    patch   Insertion (blur)              -0.671    0.002                    0.492                     0.338
+ pneumonia_mnist    patch   Deletion (black)               0.092    0.594                    0.457                     0.480
+ pneumonia_mnist    patch    Deletion (blur)               0.265    0.118                    0.440                     0.405
+ pneumonia_mnist    patch Deletion (inpaint)              -0.330    0.049                    0.470                     0.395
+ pneumonia_mnist    patch   Insertion (blur)               0.153    0.374                    0.440                     0.425
+ pneumonia_mnist  texture   Deletion (black)               0.765    0.000                    0.365                     0.498
+ pneumonia_mnist  texture    Deletion (blur)              -0.132    0.443                    0.473                     0.437
+ pneumonia_mnist  texture Deletion (inpaint)              -0.311    0.065                    0.477                     0.473
+ pneumonia_mnist  texture   Insertion (blur)              -0.496    0.002                    0.438                     0.373
+
+== 5. Residual shortcut after blur fill (patch pixels mean value) ==
+28px patch 3: blurred patch mean 0.202, max elsewhere-corner 0.0000
+32px patch 3: blurred patch mean 0.202, max elsewhere-corner 0.0000
+128px patch 12: blurred patch mean 0.245, max elsewhere-corner 0.0000
+texture 28px: blurred value on pattern 0.0325 vs off 0.0285
+
+== 6. Ties and sample size ==
+count    192.0
+mean     100.0
+std        0.0
+min      100.0
+25%      100.0
+50%      100.0
+75%      100.0
+max      100.0
+dtype: float64
+unique test indices per base/shortcut: {('cifar10', 'patch'): 100, ('cifar10_resnet18', 'patch'): 100, ('mnist', 'patch'): 100, ('mnist', 'texture'): 100, ('pet_resnet18', 'patch'): 100, ('pneumonia_mnist', 'patch'): 100, ('pneumonia_mnist', 'texture'): 100}
+
+== 7. Dose-reliance monotonicity: seed spread near d=0 ==
+                        min    max
+base  shortcut dose               
+mnist patch    0.010   9.13  62.21
+      texture  0.005  14.24  76.75
+               0.010  38.88  92.03
