@@ -56,3 +56,17 @@ Total: 42 new models (234 with the existing 192). Model names follow
   later, they will be recorded in a new dated amendment before training.
 - Analyses are reported both for the original 192 models (as before) and for
   all models including these, labelled clearly.
+
+### Completion record (added 2026-11-13, after training)
+
+This section records what happened; it does not change the design above.
+
+- Training started at 2026-11-13 10:31:36 +05:30, after this amendment was
+  committed (8738b32, 10:30:56 +05:30). Training, evaluation, placebo and
+  random controls finished at 12:04 the same day (about 1.5 CPU hours).
+- All 42 models listed above were trained, evaluated and controlled. None was
+  dropped or re-run.
+- Extra seeds: the six seeds (42, 1, 2, 3, 4, 5) at the steepest MNIST doses
+  0.0075 and 0.015 are the ones listed above. That is the maximum of six seeds
+  per dose allowed by the plan, so no further seeds or doses were added and no
+  further amendment was needed.
