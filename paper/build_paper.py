@@ -185,8 +185,8 @@ def f3(x):
 
 
 def pct(x):
-    """A share (0-1) as a whole percentage."""
-    return f"{100 * x:.0f}%"
+    """A share (0-1) as a whole percentage, rounded like f2 so text and tables agree."""
+    return f"{100 * float(f'{x:.2f}'):.0f}%"
 
 
 def span(values, fmt=f2, unit=""):
@@ -199,7 +199,7 @@ def span(values, fmt=f2, unit=""):
 def pct_span(values):
     """'a-b%' range of shares (0-1) as whole percentages."""
     values = [v for v in values if not pd.isna(v)]
-    lo, hi = f"{100 * min(values):.0f}", f"{100 * max(values):.0f}"
+    lo, hi = pct(min(values))[:-1], pct(max(values))[:-1]
     return f"{lo}%" if lo == hi else f"{lo}{DASH}{hi}%"
 
 
@@ -292,7 +292,7 @@ REFERENCES = {
     # data
     "medmnist": "Yang J, et al. (2023) MedMNIST v2: a large-scale lightweight benchmark for 2D and 3D biomedical image classification. Scientific Data",
     "kermany": "Kermany DS, et al. (2018) Identifying medical diagnoses and treatable diseases by image-based deep learning. Cell",
-    "pets": "Parkhi OM, Vedaldi A, Zisserman A, Jawahar CV (2012) The Oxford-IIIT Pet dataset. IEEE Conference on Computer Vision and Pattern Recognition (CVPR). https://www.robots.ox.ac.uk/~vgg/data/pets/",
+    "pets": "Parkhi OM, Vedaldi A, Zisserman A, Jawahar CV (2012) Cats and dogs. In: IEEE Conference on Computer Vision and Pattern Recognition (CVPR). Dataset: https://www.robots.ox.ac.uk/~vgg/data/pets/",
     # controlled reliance and ground-truth benchmarks
     "ross": "Ross AS, Hughes MC, Doshi-Velez F (2017) Right for the right reasons: training differentiable models by constraining their explanations. In: Proceedings of the International Joint Conference on Artificial Intelligence (IJCAI)",
     "bam": "Yang M, Kim B (2019) Benchmarking attribution methods with relative feature importance. arXiv:1907.09701",
@@ -932,6 +932,7 @@ def build():
     full_nat = rows([FULL], NATURAL)
     n_full_sig, n_full = sig_positive(full), len(full)
     full_weak = full[~((full.rho_rc > 0) & (full.p_bh < 0.05))]
+    full_sig = full.drop(full_weak.index)
     n_tpr1, n_fpr_pos = int((full.tpr == 1).sum()), int((full.fpr > 0).sum())
     nat_bb_fpr = rows([FULL], NATURAL, BB).fpr
     nat_ii_fpr = rows([FULL], NATURAL, II).fpr
@@ -1048,8 +1049,8 @@ def build():
         "shortcut, on Oxford-IIIT Pet with real object masks, CIFAR-10, MNIST and "
         "PneumoniaMNIST, and scored fixed oracle explanations with four metric variants. The metrics respond to "
         "reliance: the preference for the shortcut map over the object map rises with chance-corrected reliance "
-        f"in {n_full_sig} of {n_full} metric\u2013setting cells (Spearman \u03c1 = {span(full.rho_rc)}). They are "
-        "not calibrated to it. Among models that follow the shortcut on at most half of the conflicting images, "
+        f"in {n_full_sig} of {n_full} metric\u2013setting cells (Spearman \u03c1 = {span(full_sig.rho_rc)} in "
+        "those cells). They are not calibrated to it. Among models with chance-corrected reliance at most 50%, "
         f"black and blur deletion still prefer the shortcut map for {pct_span(pet_bb_fpr)} of Pet models and "
         f"{pct_span(cifar_bb_fpr)} of CIFAR-10 models, and on Pet the metrics switch at "
         f"{span(pet_switch, f1)}% chance-corrected reliance, while the models follow the "
