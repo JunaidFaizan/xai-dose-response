@@ -88,6 +88,12 @@ Output
         metric_pairs.csv, pet_preregistered.csv, confound.csv,
         behaviour_models.csv, behaviour_summary.csv, behaviour_by_reliance.csv,
         behaviour_auroc.png
+    results/dose_response/intervals_crossed.csv, behaviour_switch.csv,
+        switch_differences.csv, overdetection.csv, excess_preference_models.csv,
+        behaviour_calibration.csv, confound_rc.csv, correct_only.csv,
+        behaviour_power.csv (audit-2 additions M1-M4, new files only; the
+        behaviour-based ones need behaviour labels), and an appended
+        "Audit-2 additions" section at the end of summary.md
     analyze --model-set original writes the same files for the 192 models
     from before amendment A1 to results/dose_response/original_models/, and
     analyze --model-set pre_a2 the 234 models from before amendment A2 to
@@ -867,7 +873,8 @@ def plot_behaviour_auroc(bands, path):
 
 
 def corrected_analysis(oracle, methods, models, reps, out):
-    """MD2/MD3/MD4/MD7 outputs (written to `out`); returns the summary.md lines."""
+    """MD2/MD3/MD4/MD7 outputs and the audit-2 (M1-M4) tables (written to `out`);
+    returns (summary.md lines, lines of the appended audit-2 section)."""
     settings = dose_analysis.build_settings(oracle, methods, models, reps, BOOTSTRAP_SEED, TIE_TOLERANCE)
     resp = dose_analysis.responsiveness_corrected(settings, COMPARISONS, METRIC_TITLES)
     effects = dose_analysis.effect_sizes(settings, COMPARISONS, METRIC_TITLES)
@@ -896,6 +903,23 @@ def corrected_analysis(oracle, methods, models, reps, out):
         beh_summary.to_csv(out / "behaviour_summary.csv", index=False)
         beh_bands.to_csv(out / "behaviour_by_reliance.csv", index=False)
         plot_behaviour_auroc(beh_bands, out / "behaviour_auroc.png")
+
+    # Audit-2 additions (M1-M4): NEW files only, computed after the existing
+    # outputs are written; their random draws use their own generators.
+    audit = {"intervals_crossed": dose_analysis.intervals_crossed(settings, COMPARISONS, METRIC_TITLES),
+             "overdetection": dose_analysis.overdetection(settings, COMPARISONS, METRIC_TITLES),
+             "excess_preference_models": dose_analysis.excess_preference_models(settings, COMPARISONS, METRIC_TITLES),
+             "confound_rc": dose_analysis.confound_rc(confound)}
+    if beh_summary is not None:
+        audit.update({
+            "behaviour_switch": dose_analysis.behaviour_switch(settings, behaviour),
+            "switch_differences": dose_analysis.switch_differences(settings, behaviour, COMPARISONS, METRIC_TITLES),
+            "behaviour_calibration": dose_analysis.behaviour_calibration(
+                settings, behaviour, COMPARISONS, METRIC_TITLES),
+            "correct_only": dose_analysis.correct_only(settings, behaviour, COMPARISONS, METRIC_TITLES),
+            "behaviour_power": dose_analysis.behaviour_power(settings, behaviour)})
+    for name, frame in audit.items():
+        frame.to_csv(out / f"{name}.csv", index=False)
 
     setting = lambda f: f.base + " / " + f.shortcut  # noqa: E731
     lines = [
@@ -1081,6 +1105,155 @@ def corrected_analysis(oracle, methods, models, reps, out):
                       markdown(_p_text(shown, ["p_auroc", "p_bh", "p_bh_within", "p_bh_strat", "p_bh_within_strat",
                                                "p_holm_headline_strat", "p_holm_headline_within_strat"])[columns]),
                       ""]
+    return lines, audit_lines(audit, resp, reps)
+
+
+def audit_lines(audit, resp, reps):
+    """The 'Audit-2 additions (M1-M4)' section appended to summary.md."""
+    setting = lambda f: f.base + " / " + f.shortcut  # noqa: E731
+    lines = [
+        "## Audit-2 additions (M1–M4)", "",
+        "New files (the tables above are unchanged): `intervals_crossed.csv`, `behaviour_switch.csv`, "
+        "`switch_differences.csv`, `overdetection.csv`, `excess_preference_models.csv`, "
+        "`behaviour_calibration.csv`, `confound_rc.csv`, `correct_only.csv`, `behaviour_power.csv`.", "",
+        "### Definitions", "",
+        f"- Crossed bootstrap ({reps} replicates, seed {BOOTSTRAP_SEED + 1}): models resampled within each dose "
+        "as in the two-level bootstrap, but ONE image resample per replicate is shared by every model, because "
+        "all models of a setting are scored on the same images (models and images are crossed). A shared image "
+        "effect then moves every model together, so level and switch intervals are wider than the two-level ones.",
+        "- BCa intervals for ρ: bias-corrected and accelerated percentiles of the crossed ρ replicates "
+        "(acceleration from a leave-one-model-out jackknife). Before ranking, U(0, 1e-9) jitter breaks the ties "
+        f"that duplicated models create (rng seed {BOOTSTRAP_SEED + 2}). `rho_rc_share_boot_below`: share of "
+        "replicates below the estimate (0.5 when unbiased). Significance still comes from the model-level "
+        "Spearman test (`p_rho_rc`), not from these intervals.",
+        f"- Behavioural switch: the r_c where the follow rate (share of determined images with label 1) crosses "
+        f"0.5 (isotonic), with the same rule as the metric switch: identified if a model lies within "
+        f"±{dose_analysis.IDENTIFY_WINDOW} points, bracketed if models lie within ±{dose_analysis.IDENTIFY_WINDOW} "
+        "points on both sides. `report_text` is how the switch may be quoted. Labels: `follows_shortcut_causal` "
+        "(primary) = shortcut sufficient under conflict, errors removed; `follows_shortcut` = moved-shortcut pass "
+        "only; `shortcut_dominant` = the shortcut is more necessary than the object on aligned images.",
+        "- Switch difference: behavioural − metric switch per bootstrap replicate on the same picks (paired). "
+        "'metric earlier' only where the 95% CI excludes 0 from above, 'metric later' where it excludes 0 from "
+        "below.",
+        "- Over-detection decomposition (lowest dose): S–O = shortcut vs full object, R–O = random vs full object, "
+        "S–R = shortcut vs random. Excess preference = S–O − R–O per model: how much more the metric prefers the "
+        "shortcut map than a random map over the object map. ρ(excess, r_c) one-sided (H1: ρ > 0), BH over all "
+        "settings × metrics.",
+        "- Rates: fpr = share of models with r_c ≤ 50 whose preference (S–O) > 0.5; tpr = the same for r_c > 50; "
+        "Clopper–Pearson 95% intervals. Margin FPR: a model counts as over-detecting only if the 2.5th percentile "
+        "of its image bootstrap of preference exceeds 0.5. r_c bands: fpr among models with r_c ≤ 10 and "
+        "with 10 < r_c ≤ 50.", ""]
+
+    shown = audit["intervals_crossed"]
+    shown = shown[shown.comparison == "shortcut vs full object"].merge(
+        resp[resp.comparison == "shortcut vs full object"][
+            ["base", "shortcut", "metric", "rho_rc_ci_low", "rho_rc_ci_high", "pref_low_ci_low", "pref_low_ci_high",
+             "switch_iso_rc_ci_low", "switch_iso_rc_ci_high"]], on=["base", "shortcut", "metric"])
+    shown["setting"] = setting(shown)
+    shown["rho_rc [two-level]"] = _ci_text(shown, "rho_rc")
+    shown["rho_rc [BCa crossed]"] = _ci_text(shown, "rho_rc", "rho_rc_bca_ci_low", "rho_rc_bca_ci_high")
+    shown["pref_low [two-level]"] = _ci_text(shown, "pref_low")
+    shown["pref_low [crossed]"] = _ci_text(shown, "pref_low", "pref_low_crossed_ci_low", "pref_low_crossed_ci_high")
+    shown["switch [two-level]"] = _ci_text(shown, "switch_iso_rc", "switch_iso_rc_ci_low", "switch_iso_rc_ci_high", 1)
+    shown["switch [crossed]"] = _ci_text(shown, "switch_iso_rc", "switch_crossed_ci_low", "switch_crossed_ci_high", 1)
+    lines += ["### Crossed and BCa intervals (shortcut vs full object; all comparisons in intervals_crossed.csv)", "",
+              markdown(_p_text(shown, ["p_rho_rc"])[
+                  ["setting", "metric", "rho_rc [two-level]", "rho_rc [BCa crossed]", "p_rho_rc",
+                   "rho_rc_share_boot_below", "pref_low [two-level]", "pref_low [crossed]", "switch [two-level]",
+                   "switch [crossed]", "switch_status"]]), ""]
+
+    if "behaviour_switch" in audit:
+        shown = audit["behaviour_switch"].copy()
+        shown["setting"] = setting(shown)
+        shown["switch [two-level]"] = _ci_text(shown, "behavioural_switch_rc", "switch_ci_low", "switch_ci_high", 1)
+        shown["switch [crossed]"] = _ci_text(shown, "behavioural_switch_rc", "switch_crossed_ci_low",
+                                             "switch_crossed_ci_high", 1)
+        lines += ["### Behavioural switch by label (N1, N2)", "",
+                  markdown(_p_text(shown, ["p_undetermined_rc"])[
+                      ["setting", "label", "primary", "report_text", "status", "switch [two-level]",
+                       "switch [crossed]", "switch_found_share", "nearest_model_distance", "bracketed",
+                       "follow_rate_min", "follow_rate_max", "undetermined_rate_mean", "undetermined_rate_max",
+                       "rho_undetermined_rc", "p_undetermined_rc"]]), ""]
+        shown = audit["switch_differences"]
+        shown = shown[shown.primary].copy()
+        shown["setting"] = setting(shown)
+        shown["difference [two-level]"] = _ci_text(shown, "difference", "diff_ci_low", "diff_ci_high", 1)
+        shown["difference [crossed]"] = _ci_text(shown, "difference", "diff_crossed_ci_low",
+                                                 "diff_crossed_ci_high", 1)
+        lines += ["### Behavioural − metric switch, paired bootstrap (N5; primary label; all labels in "
+                  "switch_differences.csv)", "",
+                  markdown(shown[["comparison", "setting", "metric", "metric_switch_rc", "behavioural_switch_rc",
+                                  "difference [two-level]", "difference [crossed]", "both_found_share",
+                                  "verdict"]]), ""]
+
+    shown = audit["overdetection"].copy()
+    if len(shown):
+        shown["setting"] = setting(shown)
+        for k in ("so", "ro", "sr"):
+            shown[f"{k.upper()} low [CI]"] = _ci_text(shown, f"pref_{k}_low")
+        shown["excess_low [CI]"] = _ci_text(shown, "excess_low")
+        shown["rho_excess_rc [CI]"] = _ci_text(shown, "rho_excess_rc", "rho_excess_ci_low", "rho_excess_ci_high")
+        shown["fpr [CP]"] = [f"{t} ({k}/{n})" for t, k, n in zip(
+            _ci_text(shown, "fpr", "fpr_cp_low", "fpr_cp_high", 2), shown.k_fpr, shown.n_below)]
+        shown["fpr_margin [CP]"] = [f"{t} ({k}/{n})" for t, k, n in zip(
+            _ci_text(shown, "fpr_margin", "fpr_margin_cp_low", "fpr_margin_cp_high", 2), shown.k_fpr_margin,
+            shown.n_below)]
+        shown["fpr r_c ≤ 10 (n)"] = [f"{'–' if pd.isna(v) else f'{v:.2f}'} ({n})"
+                                     for v, n in zip(shown.fpr_rc_le10, shown.n_rc_le10)]
+        shown["fpr 10 < r_c ≤ 50 (n)"] = [f"{'–' if pd.isna(v) else f'{v:.2f}'} ({n})"
+                                          for v, n in zip(shown.fpr_rc_10_50, shown.n_rc_10_50)]
+        shown["tpr [CP] (n_above)"] = [f"{t} ({n})" for t, n in zip(
+            _ci_text(shown, "tpr", "tpr_cp_low", "tpr_cp_high", 2), shown.n_above)]
+        lines += ["### Over-detection decomposition and rates (N3; per-model values in "
+                  "excess_preference_models.csv)", "",
+                  markdown(_p_text(shown, ["p_bh_excess_one_sided"])[
+                      ["setting", "metric", "SO low [CI]", "RO low [CI]", "SR low [CI]", "excess_low [CI]",
+                       "rho_excess_rc [CI]", "p_bh_excess_one_sided", "fpr [CP]", "fpr_margin [CP]",
+                       "fpr r_c ≤ 10 (n)", "fpr 10 < r_c ≤ 50 (n)", "tpr [CP] (n_above)"]]), ""]
+
+    if "behaviour_calibration" in audit:
+        shown = audit["behaviour_calibration"]
+        shown = shown[(shown.label == dose_analysis.PRIMARY_LABEL)
+                      & (shown.comparison == "shortcut vs full object")].copy()
+        shown["setting"] = setting(shown)
+        lines += ["### Calibration on determined images (N6; primary label, shortcut vs full object)", "",
+                  "calibration_gap_determined = mean over models of (mean win score over the model's determined "
+                  "images − follow rate); `calibration_gap` (all aligned images) is repeated for reference.", "",
+                  markdown(shown[["setting", "metric", "calibration_gap", "calibration_gap_determined",
+                                  "calibration_mae_determined", "determined_share"]]), ""]
+
+    shown = audit["confound_rc"].copy()
+    shown["setting"] = setting(shown)
+    lines += ["### Partial correlation on r_c given competence (N7)", "",
+              "Partial Spearman of r_c (and of raw reliance) with preference (shortcut vs full object), "
+              "controlling for accuracy without the shortcut; BH over all rows of each column.", "",
+              markdown(_p_text(shown, ["p_partial_rc_given_acc", "p_bh_rc", "p_partial_rel_given_acc", "p_bh_raw"])[
+                  ["setting", "models", "metric", "rho_rc_competence", "partial_rc_given_acc",
+                   "p_partial_rc_given_acc", "p_bh_rc", "partial_rel_given_acc", "p_partial_rel_given_acc",
+                   "p_bh_raw"]]), ""]
+
+    if "correct_only" in audit:
+        shown = audit["correct_only"].copy()
+        shown["setting"] = setting(shown)
+        lines += ["### Correctly classified aligned images only (N8; shortcut vs full object)", "",
+                  "misclassified_share: share of scored aligned images with pred_aligned ≠ label (all models; "
+                  "_rc_le20: models with r_c ≤ 20). The `_correct` columns recompute preference per model over "
+                  "the correctly classified images only.", "",
+                  markdown(_p_text(shown, ["p_rho_rc_correct"])[
+                      ["setting", "metric", "misclassified_share", "misclassified_share_rc_le20", "rho_rc_correct",
+                       "p_rho_rc_correct", "rho_rc", "pref_low_correct", "pref_low", "fpr_correct",
+                       "n_below_correct", "fpr"]]), ""]
+
+    if "behaviour_power" in audit:
+        shown = audit["behaviour_power"].copy()
+        shown["setting"] = setting(shown)
+        lines += ["### Power of the per-model behaviour AUROC (N9)", "",
+                  "Medians over models: minority-label count among determined images, smallest within-class "
+                  "minority count (classes with both labels), and the Hanley–McNeil SE of an AUROC at 0.5, "
+                  "sqrt((n1 + n0 + 1) / (12 n1 n0)).", "",
+                  markdown(shown[["setting", "label", "models", "median_minority_count",
+                                  "median_within_class_minority_count", "median_hanley_mcneil_se",
+                                  "models_with_both_labels"]]), ""]
     return lines
 
 
@@ -1135,7 +1308,7 @@ def analyze(args=None):
     plot_panels(mass, list(METHODS), METHOD_TITLES, "Share of positive attribution on shortcut",
                 out / "method_dose_response.png", "Do explanation methods follow the shortcut as reliance grows?",
                 line=None)
-    corrected = corrected_analysis(oracle, methods, models, reps, out)
+    corrected, extra = corrected_analysis(oracle, methods, models, reps, out)
 
     level = models.groupby(["base", "shortcut", "dose"])[
         ["reliance", "test_accuracy", "test_accuracy_no_shortcut"]].agg(["mean", "std"]).round(2)
@@ -1171,10 +1344,12 @@ def analyze(args=None):
                  "; the 234 models before amendment A2)." if model_set == "pre_a2" else
                  "; the pre-amendment check promised in docs/PREDICTIONS_amendments.md)."), ""]
     lines = header + corrected + lines
-    (out / "summary.md").write_text("\n".join(lines), encoding="utf-8")
+    # The audit-2 section is appended, so the earlier content stays an exact prefix.
+    text = "\n".join(lines) + "\n\n" + "\n".join(extra)
+    (out / "summary.md").write_text(text, encoding="utf-8")
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(errors="replace")  # e.g. a cp1252 Windows console
-    print("\n".join(lines))
+    print(text)
 
 
 def keep_awake():

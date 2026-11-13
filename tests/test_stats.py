@@ -121,6 +121,48 @@ class StatsTests(unittest.TestCase):
         self.assertTrue((I >= 0).all() and (I < 100).all())
         self.assertTrue(np.all(P[:, 5] == 5))
 
+    def test_crossed_picks(self):
+        '''models stay inside their dose; every slot of a replicate shares one image draw'''
+        doses = np.array([-0.4, -0.4, -0.4, 0.0, 0.0, 0.1])
+        P, I = stats.crossed_picks(doses, 100, 200, 0)
+        self.assertEqual(P.shape, (200, 6))
+        self.assertEqual(I.shape, (200, 6, 100))
+        self.assertTrue(np.all(np.isclose(doses[P], doses[None, :])))
+        self.assertTrue((I == I[:, :1]).all())
+        self.assertFalse((I[0] == I[1]).all())
+        self.assertTrue((I >= 0).all() and (I < 100).all())
+
+    def test_clopper_pearson(self):
+        '''k = 0 of 4: low 0; k = 3 of 4: about [0.194, 0.994]; n = 0: nan'''
+        low, high = stats.clopper_pearson(0, 4)
+        self.assertEqual(low, 0.0)
+        self.assertAlmostEqual(high, 0.6024, places=3)
+        low, high = stats.clopper_pearson(3, 4)
+        self.assertAlmostEqual(low, 0.194, places=3)
+        self.assertAlmostEqual(high, 0.994, places=3)
+        self.assertEqual(stats.clopper_pearson(4, 4)[1], 1.0)
+        self.assertTrue(np.isnan(stats.clopper_pearson(0, 0)[0]))
+
+    def test_bca(self):
+        '''symmetric normal replicates: BCa close to the percentile interval; constant: nan'''
+        rng = np.random.default_rng(0)
+        boot = rng.normal(0.0, 1.0, 4000)
+        jack = rng.normal(0.0, 0.01, 50)
+        low, high = stats.bca_interval(0.0, boot, jack)
+        p_low, p_high = np.percentile(boot, [2.5, 97.5])
+        self.assertLess(abs(low - p_low), 0.1)
+        self.assertLess(abs(high - p_high), 0.1)
+        self.assertTrue(np.isnan(stats.bca_interval(0.5, np.full(100, 0.5), jack)[0]))
+        self.assertTrue(np.isnan(stats.bca_interval(np.nan, boot, jack)[0]))
+
+    def test_jitter(self):
+        '''jitter breaks ties without changing the order of distinct values'''
+        x = np.array([1.0, 1.0, 2.0, 3.0])
+        out = stats.jitter(x, np.random.default_rng(0))
+        self.assertEqual(len(np.unique(out)), 4)
+        np.testing.assert_array_equal(np.argsort(out)[2:], [2, 3])
+        self.assertLess(np.abs(out - x).max(), 1e-8)
+
 
 if __name__ == "__main__":
     unittest.main()

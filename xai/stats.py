@@ -35,6 +35,23 @@ Decision rates (replacing the unbalanced decision accuracy)
 Two-level bootstrap
     two_level_picks resamples models (seeds) within each dose and, for every
     picked model, its image rows, independently per model.
+
+Crossed bootstrap (audit N4)
+    All models of a setting are scored on the same images, so models and
+    images are crossed factors. crossed_picks resamples models within dose as
+    two_level_picks does, but draws ONE image resample per replicate and uses
+    it for every slot, so a shared image effect enters every model at once.
+
+BCa intervals and jitter
+    bca_interval: bias-corrected and accelerated percentile interval from the
+    bootstrap replicates (bias z0 from the share of replicates below the
+    estimate, acceleration from a jackknife). jitter adds U(0, 1e-9) noise to
+    break the rank ties that duplicated models create before a Spearman
+    correlation is computed.
+
+Clopper-Pearson
+    clopper_pearson(k, n): exact binomial interval for a rate k / n (e.g. an
+    over-detection rate over the models below 50% r_c).
 """
 
 import itertools
@@ -42,7 +59,7 @@ import itertools
 import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
-from scipy.stats import false_discovery_control, norm, pearsonr, rankdata, t as t_dist
+from scipy.stats import beta, false_discovery_control, norm, pearsonr, rankdata, t as t_dist
 
 
 # ------------------------------------------------------------ reliance
@@ -368,3 +385,67 @@ def two_level_picks(dose_of_model, n_images, reps, seed):
         P[:, members] = members[rng.integers(0, len(members), size=(reps, len(members)))]
     I = rng.integers(0, n_images, size=(reps, len(doses), n_images)).astype(np.int32)
     return P, I
+
+
+def crossed_picks(dose_of_model, n_images, reps, seed):
+    """(P, I) for a crossed (models x images) bootstrap (audit N4).
+
+    P is drawn exactly as in two_level_picks (models within their dose). All
+    models of a setting are scored on the same images, so images are a
+    crossed factor: I[r, m, :] is ONE image resample per replicate r, shared
+    by every slot m (a read-only broadcast view, int32).
+    """
+    doses = np.asarray(dose_of_model)
+    rng = np.random.default_rng(seed)
+    P = np.empty((reps, len(doses)), dtype=np.int64)
+    for dose in pd.unique(doses):
+        members = np.flatnonzero(np.isclose(doses.astype(float), float(dose)))
+        P[:, members] = members[rng.integers(0, len(members), size=(reps, len(members)))]
+    shared = rng.integers(0, n_images, size=(reps, 1, n_images)).astype(np.int32)
+    return P, np.broadcast_to(shared, (reps, len(doses), n_images))
+
+
+def clopper_pearson(k, n, level=0.95):
+    """Exact (Clopper-Pearson) interval (low, high) for the rate k / n; (nan, nan) if n = 0."""
+    k, n = int(k), int(n)
+    if n == 0:
+        return float("nan"), float("nan")
+    alpha = 1 - level
+    low = 0.0 if k == 0 else float(beta.ppf(alpha / 2, k, n - k + 1))
+    high = 1.0 if k == n else float(beta.ppf(1 - alpha / 2, k + 1, n - k))
+    return low, high
+
+
+def bca_interval(estimate, boot, jackknife, level=0.95):
+    """Bias-corrected and accelerated percentile interval (low, high).
+
+    z0 = Phi^-1(share of boot below the estimate + half the share equal to it),
+    the share clipped to [0.5 / B, 1 - 0.5 / B]; acceleration
+    a = sum(d^3) / (6 (sum(d^2))^1.5) with d = mean(jackknife) - jackknife.
+    NaN replicates are dropped; (nan, nan) with fewer than 2 replicates, a NaN
+    estimate or no spread in the replicates."""
+    nan = (float("nan"), float("nan"))
+    boot = np.asarray(boot, dtype=float)
+    boot = boot[~np.isnan(boot)]
+    if np.isnan(estimate) or len(boot) < 2 or np.ptp(boot) == 0:
+        return nan
+    b = len(boot)
+    share = np.mean(boot < estimate) + 0.5 * np.mean(boot == estimate)
+    z0 = norm.ppf(np.clip(share, 0.5 / b, 1 - 0.5 / b))
+    jackknife = np.asarray(jackknife, dtype=float)
+    jackknife = jackknife[~np.isnan(jackknife)]
+    a = 0.0
+    if len(jackknife) > 1:
+        d = jackknife.mean() - jackknife
+        denominator = 6 * (d ** 2).sum() ** 1.5
+        a = float((d ** 3).sum() / denominator) if denominator > 0 else 0.0
+    z = norm.ppf([(1 - level) / 2, 1 - (1 - level) / 2])
+    adjusted = norm.cdf(z0 + (z0 + z) / (1 - a * (z0 + z)))
+    low, high = np.percentile(boot, 100 * adjusted)
+    return float(low), float(high)
+
+
+def jitter(values, rng, scale=1e-9):
+    """values + U(0, scale) noise: breaks rank ties (e.g. from duplicated models)."""
+    values = np.asarray(values, dtype=float)
+    return values + rng.uniform(0, scale, values.shape)

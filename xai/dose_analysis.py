@@ -64,6 +64,30 @@ Per-image behaviour labels (MD4)
     counts as shortcut use (the error floor that r_c removes from reliance).
     follows_shortcut (check): moved-shortcut pass only.
     shortcut_dominant (check): delta_s > delta_o.
+
+Audit-2 additions (M1-M4; new tables only, existing ones unchanged)
+    Crossed bootstrap (N4): Setting.crossed holds picks from
+    stats.crossed_picks (seed + 1): models within dose, ONE image resample per
+    replicate shared by all models, because every model is scored on the same
+    images. comparison_crossed gives the crossed preference replicates and
+    rho replicates computed after jittering ties (rng seed + 2); rho intervals
+    are BCa with a leave-one-model-out jackknife. Significance still comes
+    from the model-level Spearman test. Table: intervals_crossed.
+    Behavioural switch (N1, N2, N5): behaviour_switch applies switch_status
+    (+-IDENTIFY_WINDOW identification and bracketing) to the follow-rate
+    switch of every label, with two-level and crossed CIs and the
+    undetermined share; switch_differences is the paired bootstrap of
+    (behavioural - metric) switch on the same replicates.
+    Over-detection (N3): overdetection splits the lowest-dose preference into
+    S-O (shortcut vs object), R-O (random vs object) and S-R (shortcut vs
+    random); excess = S-O - R-O; FPR/TPR with Clopper-Pearson intervals, a
+    margin FPR (a model over-detects only if its image-bootstrap 95% lower
+    bound of preference exceeds 0.5) and FPR in the r_c bands <= 10 and
+    10-50. excess_preference_models has the per-model values.
+    Small analyses: behaviour_calibration (N6, calibration on determined
+    images), confound_rc (N7, partial rho on r_c with BH), correct_only (N8,
+    correctly classified aligned images only), behaviour_power (N9, minority
+    label counts and the Hanley-McNeil SE of a per-model AUROC at 0.5).
 """
 
 import itertools
@@ -169,7 +193,16 @@ class Setting:
         self.low = np.flatnonzero(np.isclose(self.dose, self.dose.min()))
         self.high = np.flatnonzero(np.isclose(self.dose, self.dose.max()))
         self.P, self.I = stats.two_level_picks(self.dose, self.n_images, reps, seed)
+        self.seed = seed
+        self._crossed = None
         self._cache = {}
+
+    @property
+    def crossed(self):
+        """(P, I) of the crossed bootstrap (seed + 1), drawn on first use."""
+        if self._crossed is None:
+            self._crossed = stats.crossed_picks(self.dose, self.n_images, self.reps, self.seed + 1)
+        return self._crossed
 
     def has(self, column):
         return column in self.oracle and not self.oracle[column].isna().any()
@@ -184,21 +217,24 @@ class Setting:
             raise ValueError(f"{self.base}/{self.shortcut}: method scores use other images")
         return values
 
-    def resample(self, values, reducer):
-        """Apply reducer(sub, axis=2) to values[P, I] in chunks: (reps, models)."""
-        out = np.empty(self.P.shape)
+    def resample(self, values, reducer, picks=None):
+        """Apply reducer(sub, axis=2) to values[P, I] in chunks: (reps, models).
+        picks: optional (P, I), default the two-level (self.P, self.I)."""
+        P, I = (self.P, self.I) if picks is None else picks
+        out = np.empty(P.shape)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
             for s in range(0, self.reps, CHUNK):
-                sub = values[self.P[s:s + CHUNK, :, None], self.I[s:s + CHUNK]]
+                sub = values[P[s:s + CHUNK, :, None], I[s:s + CHUNK]]
                 out[s:s + CHUNK] = reducer(sub, axis=2)
         return out
 
-    def pooled(self, values, slots, reducer):
+    def pooled(self, values, slots, reducer, picks=None):
         """reducer over the pooled resampled images of the given slots: (reps,)."""
+        P, I = (self.P, self.I) if picks is None else picks
         out = np.empty(self.reps)
         for s in range(0, self.reps, CHUNK):
-            sub = values[self.P[s:s + CHUNK, slots, None], self.I[s:s + CHUNK][:, slots]]
+            sub = values[P[s:s + CHUNK, slots, None], I[s:s + CHUNK][:, slots]]
             out[s:s + CHUNK] = reducer(sub.reshape(sub.shape[0], -1))
         return out
 
@@ -216,6 +252,21 @@ class Setting:
                 "pref": wins.mean(axis=1), "boot": boot,
                 "rho_rc_boot": stats.spearman_rows(self.rc[self.P], boot),
                 "rho_raw_boot": stats.spearman_rows(self.raw[self.P], boot),
+            }
+        return self._cache[key]
+
+    def comparison_crossed(self, first, second, metric):
+        """Crossed-bootstrap model preferences (boot) and jittered rho replicates."""
+        key = ("crossed", first, second, metric)
+        if key not in self._cache:
+            wins = self.comparison(first, second, metric)["wins"]
+            P = self.crossed[0]
+            boot = self.resample(wins, np.mean, self.crossed)
+            rng = np.random.default_rng(self.seed + 2)
+            self._cache[key] = {
+                "boot": boot,
+                "rho_rc_boot": stats.spearman_rows(stats.jitter(self.rc[P], rng), stats.jitter(boot, rng)),
+                "rho_raw_boot": stats.spearman_rows(stats.jitter(self.raw[P], rng), stats.jitter(boot, rng)),
             }
         return self._cache[key]
 
@@ -769,3 +820,398 @@ def confound_table(settings, comparisons, metric_titles):
     frame = pd.DataFrame(rows)
     frame["_order"] = frame.rho_reliance_competence.abs()
     return frame.sort_values(["_order", "base", "shortcut"], kind="stable").drop(columns="_order").reset_index(drop=True)
+
+
+# ------------------------------------------------------------ audit-2 additions (M1-M4)
+
+LABEL_MEASURES = {
+    "follows_shortcut_causal": "shortcut sufficient under conflict, errors removed",
+    "follows_shortcut": "shortcut sufficient under conflict (moved-shortcut pass only)",
+    "shortcut_dominant": "shortcut more necessary than the object on aligned images",
+}
+OVERDETECTION_MAPS = {"so": "shortcut vs full object", "ro": "random vs full object", "sr": "shortcut vs random"}
+KINDS = ("two_level", "crossed")
+
+
+def _picks(s, kind):
+    return (s.P, s.I) if kind == "two_level" else s.crossed
+
+
+def _switch_boot(s, values_boot, picks):
+    """Isotonic switch on r_c in every replicate of a (reps, models) array."""
+    P = picks[0]
+    return np.array([stats.isotonic_switch(s.rc[P[r]], values_boot[r])[0] for r in range(s.reps)])
+
+
+def _switch_ci(switch, boot):
+    """(low, high, found_share) by the _switch_columns rule: no interval when
+    the full-data switch is NaN or fewer than half of the replicates cross."""
+    share = float((~np.isnan(boot)).mean())
+    low, high = _ci(boot) if share >= 0.5 and not np.isnan(switch) else (NAN, NAN)
+    return low, high, share
+
+
+def _metric_switch_boot(s, first, second, metric, kind):
+    key = ("switch_boot", first, second, metric, kind)
+    if key not in s._cache:
+        boot = (s.comparison(first, second, metric) if kind == "two_level"
+                else s.comparison_crossed(first, second, metric))["boot"]
+        s._cache[key] = _switch_boot(s, boot, _picks(s, kind))
+    return s._cache[key]
+
+
+def _follow_boot(s, name, labels, kind):
+    """(follow-rate replicates, switch replicates) of one label matrix; the
+    follow rate of a slot is the nanmean of its resampled images' labels.
+    Cached per label name: one behaviour frame per run."""
+    key = ("follow_boot", name, kind)
+    if key not in s._cache:
+        picks = _picks(s, kind)
+        rate_boot = s.resample(labels, np.nanmean, picks)
+        s._cache[key] = (rate_boot, _switch_boot(s, rate_boot, picks))
+    return s._cache[key]
+
+
+def _with_causal(behaviour):
+    return behaviour if "follows_shortcut_causal" in behaviour else add_causal_label(behaviour)
+
+
+def _jackknife_rho(x, y):
+    """Leave-one-model-out Spearman correlations."""
+    x, y = np.asarray(x, dtype=float), np.asarray(y, dtype=float)
+    return np.array([_spearman(np.delete(x, m), np.delete(y, m))[0] for m in range(len(x))])
+
+
+def _report_text(switch, status, below, above, bracketed):
+    """How a switch should be quoted: '54.5', '54.5 (not bracketed)' or
+    '> 42.7 (not identified; no model between 42.7 and 96.0)'."""
+    if np.isnan(switch):
+        return status
+    if status.startswith("not identified"):
+        low, high = switch - below, switch + above
+        return f"> {low:.1f} (not identified; no model between {low:.1f} and {high:.1f})"
+    if status == EDGE_STATUS:
+        return f"{switch:.1f} (at lowest-reliance edge" + ("" if bracketed else "; not bracketed") + ")"
+    return f"{switch:.1f}" if bracketed else f"{switch:.1f} (not bracketed)"
+
+
+def intervals_crossed(settings, comparisons, metric_titles):
+    """N4: crossed (models x images) bootstrap intervals for levels and switch
+    points, BCa intervals (jittered, crossed replicates) for rho. Point values
+    are those of responsiveness_corrected."""
+    rows = []
+    for first, second, label in _available(settings, comparisons):
+        for s in settings:
+            for metric in FAITHFULNESS_METRICS:
+                c = s.comparison(first, second, metric)
+                cc = s.comparison_crossed(first, second, metric)
+                pref = c["pref"]
+                rho_rc, p_rc = _spearman(s.rc, pref)
+                rho_raw = _spearman(s.raw, pref)[0]
+                row = {"comparison": label, "base": s.base, "shortcut": s.shortcut,
+                       "metric": metric_titles[metric], "models": s.n_models,
+                       "rho_rc": rho_rc, "p_rho_rc": p_rc}
+                row["rho_rc_bca_ci_low"], row["rho_rc_bca_ci_high"] = stats.bca_interval(
+                    rho_rc, cc["rho_rc_boot"], _jackknife_rho(s.rc, pref))
+                boot = cc["rho_rc_boot"][~np.isnan(cc["rho_rc_boot"])]
+                row["rho_rc_share_boot_below"] = (float(np.mean(boot < rho_rc))
+                                                  if len(boot) and not np.isnan(rho_rc) else NAN)
+                row["rho_raw"] = rho_raw
+                row["rho_raw_bca_ci_low"], row["rho_raw_bca_ci_high"] = stats.bca_interval(
+                    rho_raw, cc["rho_raw_boot"], _jackknife_rho(s.raw, pref))
+                row["pref_low"] = float(pref[s.low].mean())
+                row["pref_low_crossed_ci_low"], row["pref_low_crossed_ci_high"] = _ci(
+                    cc["boot"][:, s.low].mean(axis=1))
+                row["pref_high"] = float(pref[s.high].mean())
+                row["pref_high_crossed_ci_low"], row["pref_high_crossed_ci_high"] = _ci(
+                    cc["boot"][:, s.high].mean(axis=1))
+                if label in SWITCH_COMPARISONS:
+                    switch, status = switch_status(s.rc, pref)[:2]
+                    low, high, share = _switch_ci(switch, _metric_switch_boot(s, first, second, metric, "crossed"))
+                else:
+                    switch, status, low, high, share = NAN, "not applicable", NAN, NAN, NAN
+                row.update({"switch_iso_rc": switch, "switch_status": status, "switch_crossed_ci_low": low,
+                            "switch_crossed_ci_high": high, "switch_crossed_found_share": share})
+                rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def behaviour_switch(settings, behaviour):
+    """N1/N2: behavioural (follow-rate) switch on r_c per setting x label, with
+    the identification and bracketing rule, two-level and crossed CIs and the
+    undetermined share. The switch equals behaviour_summary's observed_switch_rc."""
+    behaviour = _with_causal(behaviour)
+    rows = []
+    for s in settings:
+        for name in BEHAVIOUR_LABELS:
+            labels = _label_matrix(s, behaviour, name)
+            rate = _nanmean_rows(labels)
+            switch, status, distance, below, above, bracketed, _ = switch_status(s.rc, rate)
+            undetermined = np.isnan(labels).mean(axis=1)
+            rho_u, p_u = _spearman(s.rc, undetermined)
+            row = {"base": s.base, "shortcut": s.shortcut, "label": name, "primary": name == PRIMARY_LABEL,
+                   "measures": LABEL_MEASURES[name], "models": s.n_models,
+                   "follow_rate_min": float(np.nanmin(rate)), "follow_rate_max": float(np.nanmax(rate)),
+                   "behavioural_switch_rc": switch, "status": status, "nearest_model_distance": distance,
+                   "distance_below": below, "distance_above": above, "bracketed": bracketed,
+                   "report_text": _report_text(switch, status, below, above, bracketed)}
+            for kind, prefix in (("two_level", "switch"), ("crossed", "switch_crossed")):
+                low, high, share = _switch_ci(switch, _follow_boot(s, name, labels, kind)[1])
+                row[f"{prefix}_ci_low"], row[f"{prefix}_ci_high"] = low, high
+                if kind == "two_level":
+                    row["switch_found_share"] = share
+            row.update({"undetermined_rate_mean": float(undetermined.mean()),
+                        "undetermined_rate_max": float(undetermined.max()),
+                        "rho_undetermined_rc": rho_u, "p_undetermined_rc": p_u})
+            rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def _verdict(metric_switch, metric_status, behavioural_switch, behavioural_status, low, high):
+    missing = []
+    if np.isnan(metric_switch):
+        missing.append(f"metric switch: {metric_status}")
+    if np.isnan(behavioural_switch):
+        missing.append(f"behavioural switch: {behavioural_status}")
+    if missing:
+        return f"not testable ({'; '.join(missing)})"
+    if np.isnan(low):
+        return "not testable (both switches found in fewer than half of the replicates)"
+    if low > 0:
+        return "metric earlier"
+    if high < 0:
+        return "metric later"
+    return "not distinguishable"
+
+
+def switch_differences(settings, behaviour, comparisons, metric_titles):
+    """N5: paired bootstrap of (behavioural - metric) switch on r_c. In every
+    replicate the metric's preference and the follow rate use the same model
+    and image picks, so the difference is paired."""
+    behaviour = _with_causal(behaviour)
+    maps = {label: (first, second) for first, second, label in _available(settings, comparisons)}
+    rows = []
+    for s in settings:
+        labels = {name: _label_matrix(s, behaviour, name) for name in BEHAVIOUR_LABELS}
+        for label in SWITCH_COMPARISONS:
+            if label not in maps:
+                continue
+            first, second = maps[label]
+            for metric in FAITHFULNESS_METRICS:
+                pref = s.comparison(first, second, metric)["pref"]
+                m_switch, m_status = switch_status(s.rc, pref)[:2]
+                for name in BEHAVIOUR_LABELS:
+                    b_switch, b_status = switch_status(s.rc, _nanmean_rows(labels[name]))[:2]
+                    row = {"comparison": label, "base": s.base, "shortcut": s.shortcut,
+                           "metric": metric_titles[metric], "label": name, "primary": name == PRIMARY_LABEL,
+                           "models": s.n_models, "metric_switch_rc": m_switch, "metric_switch_status": m_status,
+                           "behavioural_switch_rc": b_switch, "behavioural_status": b_status,
+                           "difference": b_switch - m_switch}
+                    defined = not (np.isnan(m_switch) or np.isnan(b_switch))
+                    for kind, prefix in (("two_level", "diff"), ("crossed", "diff_crossed")):
+                        diff = (_follow_boot(s, name, labels[name], kind)[1]
+                                - _metric_switch_boot(s, first, second, metric, kind))
+                        share = float((~np.isnan(diff)).mean())
+                        low, high = _ci(diff) if defined and share >= 0.5 else (NAN, NAN)
+                        row[f"{prefix}_ci_low"], row[f"{prefix}_ci_high"] = low, high
+                        if kind == "two_level":
+                            row["both_found_share"] = share
+                    row["verdict"] = _verdict(m_switch, m_status, b_switch, b_status,
+                                              row["diff_ci_low"], row["diff_ci_high"])
+                    rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def _overdetection_models(s, maps, metric):
+    """Per-model S-O, R-O, S-R preferences, excess and the image-only
+    bootstrap CI of S-O (model fixed, images from the two-level I)."""
+    key = ("overdetection", metric)
+    if key not in s._cache:
+        c = {k: s.comparison(*maps[label], metric) for k, label in OVERDETECTION_MAPS.items()}
+        fixed = (np.broadcast_to(np.arange(s.n_models), s.P.shape), s.I)
+        image_boot = s.resample(c["so"]["wins"], np.mean, fixed)
+        low, high = np.percentile(image_boot, [2.5, 97.5], axis=0)
+        s._cache[key] = {"c": c, "pref_so": c["so"]["pref"], "pref_ro": c["ro"]["pref"],
+                         "pref_sr": c["sr"]["pref"], "excess": c["so"]["pref"] - c["ro"]["pref"],
+                         "so_ci_low": low, "so_ci_high": high}
+    return s._cache[key]
+
+
+def _rate_cp(says, mask, prefix):
+    k, n = int((says & mask).sum()), int(mask.sum())
+    low, high = stats.clopper_pearson(k, n)
+    return {prefix: k / n if n else NAN, f"k_{prefix}": k, f"n_{prefix}": n,
+            f"{prefix}_cp_low": low, f"{prefix}_cp_high": high}
+
+
+def overdetection(settings, comparisons, metric_titles):
+    """N3: what the low-reliance over-detection (shortcut vs full object) is
+    made of, and its rates with intervals, a margin rule and r_c bands."""
+    maps = {label: (first, second) for first, second, label in _available(settings, comparisons)}
+    if not all(label in maps for label in OVERDETECTION_MAPS.values()):
+        return pd.DataFrame()
+    rows = []
+    for s in settings:
+        for metric in FAITHFULNESS_METRICS:
+            d = _overdetection_models(s, maps, metric)
+            boots = {k: d["c"][k]["boot"] for k in OVERDETECTION_MAPS}
+            row = {"comparison": "shortcut vs full object", "base": s.base, "shortcut": s.shortcut,
+                   "metric": metric_titles[metric], "models": s.n_models,
+                   "dose_low": float(s.dose[s.low][0]), "models_low": len(s.low)}
+            for k in OVERDETECTION_MAPS:
+                row[f"pref_{k}_low"] = float(d[f"pref_{k}"][s.low].mean())
+                row[f"pref_{k}_low_ci_low"], row[f"pref_{k}_low_ci_high"] = _ci(boots[k][:, s.low].mean(axis=1))
+            excess_boot = boots["so"] - boots["ro"]
+            row["excess_low"] = float(d["excess"][s.low].mean())
+            row["excess_low_ci_low"], row["excess_low_ci_high"] = _ci(excess_boot[:, s.low].mean(axis=1))
+            rho, p = _spearman(s.rc, d["excess"])
+            row["rho_excess_rc"], row["p_excess_two_sided"] = rho, p
+            row["p_excess_one_sided"] = NAN if np.isnan(p) else (p / 2 if rho > 0 else 1 - p / 2)
+            row["rho_excess_ci_low"], row["rho_excess_ci_high"] = _ci(stats.spearman_rows(s.rc[s.P], excess_boot))
+            rates = stats.decision_rates(d["pref_so"], s.rc)
+            says, above = d["pref_so"] > 0.5, s.rc > 50
+            margin = d["so_ci_low"] > 0.5
+            fpr, tpr = _rate_cp(says, ~above, "fpr"), _rate_cp(says, above, "tpr")
+            row.update({"fpr": rates["fpr"], "k_fpr": fpr["k_fpr"], "n_below": rates["n_below"],
+                        "fpr_cp_low": fpr["fpr_cp_low"], "fpr_cp_high": fpr["fpr_cp_high"],
+                        "tpr": rates["tpr"], "n_above": rates["n_above"],
+                        "tpr_cp_low": tpr["tpr_cp_low"], "tpr_cp_high": tpr["tpr_cp_high"]})
+            m = _rate_cp(margin, ~above, "fpr_margin")
+            row.update({"fpr_margin": m["fpr_margin"], "k_fpr_margin": m["k_fpr_margin"],
+                        "fpr_margin_cp_low": m["fpr_margin_cp_low"], "fpr_margin_cp_high": m["fpr_margin_cp_high"]})
+            for band, mask in (("rc_le10", s.rc <= 10), ("rc_10_50", (s.rc > 10) & (s.rc <= 50))):
+                b = _rate_cp(says, mask, f"fpr_{band}")
+                row.update({f"fpr_{band}": b[f"fpr_{band}"], f"n_{band}": b[f"n_fpr_{band}"],
+                            f"fpr_{band}_cp_low": b[f"fpr_{band}_cp_low"],
+                            f"fpr_{band}_cp_high": b[f"fpr_{band}_cp_high"]})
+            rows.append(row)
+    frame = pd.DataFrame(rows)
+    frame.insert(frame.columns.get_loc("p_excess_one_sided") + 1, "p_bh_excess_one_sided",
+                 stats.bh(frame.p_excess_one_sided.to_numpy(dtype=float)))
+    return frame
+
+
+def excess_preference_models(settings, comparisons, metric_titles):
+    """N3: per-model S-O, R-O, S-R preferences, excess = S-O - R-O and both
+    over-detection decisions (point > 0.5; image-bootstrap lower bound > 0.5)."""
+    maps = {label: (first, second) for first, second, label in _available(settings, comparisons)}
+    if not all(label in maps for label in OVERDETECTION_MAPS.values()):
+        return pd.DataFrame()
+    frames = []
+    for s in settings:
+        for metric in FAITHFULNESS_METRICS:
+            d = _overdetection_models(s, maps, metric)
+            frame = s.models[KEYS + ["reliance_corrected"]].copy()
+            frame["metric"] = metric_titles[metric]
+            for column in ("pref_so", "pref_ro", "pref_sr", "excess"):
+                frame[column] = d[column]
+            frame["pref_so_ci_low"], frame["pref_so_ci_high"] = d["so_ci_low"], d["so_ci_high"]
+            frame["says_shortcut"] = d["pref_so"] > 0.5
+            frame["says_shortcut_margin"] = d["so_ci_low"] > 0.5
+            frames.append(frame)
+    return pd.concat(frames, ignore_index=True)
+
+
+def behaviour_calibration(settings, behaviour, comparisons, metric_titles):
+    """N6: calibration of the preference against the follow rate on the
+    determined images only (the existing calibration_gap mixes in the win
+    scores of undetermined images)."""
+    behaviour = _with_causal(behaviour)
+    maps = {label: (first, second) for first, second, label in _available(settings, comparisons)}
+    rows = []
+    for label in SWITCH_COMPARISONS:
+        if label not in maps:
+            continue
+        for s in settings:
+            labels = {name: _label_matrix(s, behaviour, name) for name in BEHAVIOUR_LABELS}
+            for metric in FAITHFULNESS_METRICS:
+                c = s.comparison(*maps[label], metric)
+                for name, y in labels.items():
+                    rate = _nanmean_rows(y)
+                    determined = ~np.isnan(y)
+                    gap = _nanmean_rows(np.where(determined, c["wins"], np.nan)) - rate
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore", RuntimeWarning)
+                        rows.append({"comparison": label, "base": s.base, "shortcut": s.shortcut,
+                                     "metric": metric_titles[metric], "label": name, "models": s.n_models,
+                                     "calibration_gap": float(np.nanmean(c["pref"] - rate)),
+                                     "calibration_gap_determined": float(np.nanmean(gap)),
+                                     "calibration_mae_determined": float(np.nanmean(np.abs(gap))),
+                                     "determined_share": float(determined.mean())})
+    return pd.DataFrame(rows)
+
+
+def confound_rc(confound):
+    """N7: the confound table's partial correlations on r_c and on raw
+    reliance, each with BH over all rows (same row order as confound)."""
+    frame = confound[["base", "shortcut", "models", "metric", "rho_rc_competence", "partial_rc_given_acc",
+                      "p_partial_rc_given_acc", "partial_rel_given_acc", "p_partial_rel_given_acc"]].copy()
+    frame.insert(frame.columns.get_loc("p_partial_rc_given_acc") + 1, "p_bh_rc",
+                 stats.bh(frame.p_partial_rc_given_acc.to_numpy(dtype=float)))
+    frame["p_bh_raw"] = stats.bh(frame.p_partial_rel_given_acc.to_numpy(dtype=float))
+    return frame.reset_index(drop=True)
+
+
+def correct_only(settings, behaviour, comparisons, metric_titles):
+    """N8: shortcut vs full object on correctly classified aligned images only
+    (pred_aligned == label), next to the all-image values."""
+    maps = {label: (first, second) for first, second, label in _available(settings, comparisons)}
+    first, second = maps["shortcut vs full object"]
+    rows = []
+    for s in settings:
+        correct = _label_matrix(s, behaviour, "pred_aligned") == _label_matrix(s, behaviour, "label")
+        low20 = s.rc <= 20
+        for metric in FAITHFULNESS_METRICS:
+            c = s.comparison(first, second, metric)
+            pref_c = _nanmean_rows(np.where(correct, c["wins"], np.nan))
+            keep = ~np.isnan(pref_c)
+            rho_c, p_c = _spearman(s.rc, pref_c)
+            rates_c = stats.decision_rates(pref_c[keep], s.rc[keep])
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", RuntimeWarning)
+                pref_low_c = float(np.nanmean(pref_c[s.low]))
+            rows.append({"comparison": "shortcut vs full object", "base": s.base, "shortcut": s.shortcut,
+                         "metric": metric_titles[metric], "models": s.n_models,
+                         "misclassified_share": float(1 - correct.mean()),
+                         "misclassified_share_rc_le20": float(1 - correct[low20].mean()) if low20.any() else NAN,
+                         "rho_rc_correct": rho_c, "p_rho_rc_correct": p_c, "pref_low_correct": pref_low_c,
+                         "fpr_correct": rates_c["fpr"], "n_below_correct": rates_c["n_below"],
+                         "rho_rc": _spearman(s.rc, c["pref"])[0], "pref_low": float(c["pref"][s.low].mean()),
+                         "fpr": stats.decision_rates(c["pref"], s.rc)["fpr"]})
+    return pd.DataFrame(rows)
+
+
+def behaviour_power(settings, behaviour):
+    """N9: how many images a per-model behaviour AUROC rests on: median over
+    models of the minority-label count (determined images), of the smallest
+    within-class minority count (classes with both labels), and of the
+    Hanley-McNeil SE at AUROC 0.5, sqrt((n1 + n0 + 1) / (12 n1 n0))."""
+    behaviour = _with_causal(behaviour)
+    rows = []
+    for s in settings:
+        classes = _label_matrix(s, behaviour, "label")
+        for name in BEHAVIOUR_LABELS:
+            y = _label_matrix(s, behaviour, name)
+            minority, within, se = [], [], []
+            for m in range(s.n_models):
+                determined = ~np.isnan(y[m])
+                n1 = int((y[m][determined] == 1).sum())
+                n0 = int(determined.sum()) - n1
+                minority.append(min(n1, n0))
+                se.append(np.sqrt((n1 + n0 + 1) / (12 * n1 * n0)) if n1 and n0 else NAN)
+                counts = []
+                for c in np.unique(classes[m]):
+                    inside = determined & (classes[m] == c)
+                    c1 = int((y[m][inside] == 1).sum())
+                    c0 = int(inside.sum()) - c1
+                    if c1 and c0:
+                        counts.append(min(c1, c0))
+                within.append(min(counts) if counts else NAN)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore", RuntimeWarning)
+                rows.append({"base": s.base, "shortcut": s.shortcut, "label": name, "models": s.n_models,
+                             "median_minority_count": float(np.median(minority)),
+                             "median_within_class_minority_count": float(np.nanmedian(within)),
+                             "median_hanley_mcneil_se": float(np.nanmedian(se)),
+                             "models_with_both_labels": int(np.sum(~np.isnan(se)))})
+    return pd.DataFrame(rows)

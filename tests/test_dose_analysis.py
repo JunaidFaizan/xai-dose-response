@@ -43,6 +43,7 @@ def synthetic(base="pet_resnet18", seed=0):
                     methods.append({**key, "index": int(i), "method": method, "shortcut_mass": reliance + i})
                 conflict = 1
                 behaviour.append({**key, "index": int(i), "label": int(i % 2), "conflict_class": conflict,
+                                  "pred_aligned": int(i % 2) if i != 103 else 1 - int(i % 2),
                                   "pred_conflicting": conflict if f else 0,
                                   "pred_none": conflict if i == 100 else 0,
                                   "follows_shortcut": int(f), "shortcut_dominant": int(f)})
@@ -203,6 +204,124 @@ class SwitchTests(unittest.TestCase):
         self.assertLess(stats.bootstrap_z_p(0.2, low, 0.5), 1e-6)
         self.assertGreater(stats.bootstrap_z_p(0.2, low, 0.5, "greater"), 0.999)
         self.assertLess(stats.bootstrap_z_p(0.8, boot, 0.5, "greater"), 1e-6)
+
+
+STATUSES = {"identified", dose_analysis.EDGE_STATUS, "no crossing", "above 0.5 at lowest reliance"}
+
+
+def known_status(status):
+    return status in STATUSES or status.startswith("not identified")
+
+
+class AuditTwoTests(unittest.TestCase):
+    '''M1-M4 tables (audit 2) on synthetic data'''
+
+    def test_intervals_crossed_points(self):
+        '''point values equal responsiveness_corrected; crossed picks share images'''
+        settings, _ = setting()
+        frame = dose_analysis.intervals_crossed(settings, COMPARISONS, TITLES)
+        resp = dose_analysis.responsiveness_corrected(settings, COMPARISONS, TITLES)
+        for column in ("rho_rc_bca_ci_low", "rho_rc_share_boot_below", "pref_low_crossed_ci_high",
+                       "switch_crossed_ci_low", "switch_crossed_found_share"):
+            self.assertIn(column, frame)
+        self.assertEqual(len(frame), len(resp))
+        for column in ("rho_rc", "p_rho_rc", "rho_raw", "pref_low", "pref_high", "switch_iso_rc"):
+            np.testing.assert_allclose(frame[column], resp[column])
+        self.assertEqual(list(frame.switch_status), list(resp.switch_status))
+        P, I = settings[0].crossed
+        self.assertTrue((I == I[:, :1]).all())
+
+    def test_crossed_wider_with_shared_image_effect(self):
+        '''a shared image effect: the crossed CI of a level is wider than the two-level one'''
+        models, oracle, methods, _ = synthetic()
+        (s,) = dose_analysis.build_settings(oracle, methods, models, 500, 0, 1e-4)
+        rng = np.random.default_rng(3)
+        values = rng.normal(size=s.n_images)[None, :] + 0.01 * rng.normal(size=(s.n_models, s.n_images))
+        two = s.resample(values, np.mean)[:, s.low].mean(axis=1)
+        crossed = s.resample(values, np.mean, s.crossed)[:, s.low].mean(axis=1)
+        width = lambda v: np.subtract(*np.percentile(v, [97.5, 2.5]))  # noqa: E731
+        self.assertGreater(width(crossed), width(two))
+
+    def test_behaviour_switch(self):
+        '''primary switch equals behaviour_summary observed_switch_rc; statuses from the known set'''
+        settings, behaviour = setting()
+        frame = dose_analysis.behaviour_switch(settings, behaviour)
+        self.assertEqual(len(frame), len(dose_analysis.BEHAVIOUR_LABELS))
+        for column in ("status", "bracketed", "report_text", "switch_ci_low", "switch_crossed_ci_high",
+                       "undetermined_rate_mean", "rho_undetermined_rc"):
+            self.assertIn(column, frame)
+        _, summary, _ = dose_analysis.behaviour_tables(settings, behaviour, COMPARISONS, TITLES)
+        for name in dose_analysis.BEHAVIOUR_LABELS:
+            expected = summary[summary.label == name].observed_switch_rc.iloc[0]
+            np.testing.assert_allclose(frame[frame.label == name].behavioural_switch_rc.iloc[0], expected)
+        self.assertTrue(all(known_status(v) for v in frame.status))
+        self.assertEqual(int(frame.primary.sum()), 1)
+        np.testing.assert_allclose(frame[frame.primary].undetermined_rate_mean, 1 / IMAGES)
+
+    def test_report_text(self):
+        self.assertEqual(dose_analysis._report_text(54.5, "identified", 13.4, 5.6, False), "54.5 (not bracketed)")
+        self.assertEqual(dose_analysis._report_text(54.5, "identified", 3.0, 5.6, True), "54.5")
+        text = dose_analysis._report_text(55.0, "not identified (no model within ±10 points)", 12.3, 41.0, False)
+        self.assertEqual(text, "> 42.7 (not identified; no model between 42.7 and 96.0)")
+
+    def test_switch_differences(self):
+        '''difference = behavioural - metric; verdicts follow the CI signs'''
+        settings, behaviour = setting(reps=50)
+        frame = dose_analysis.switch_differences(settings, behaviour, COMPARISONS, TITLES)
+        self.assertEqual(len(frame), len(FAITHFULNESS_METRICS) * len(dose_analysis.BEHAVIOUR_LABELS))
+        np.testing.assert_allclose(frame.difference, frame.behavioural_switch_rc - frame.metric_switch_rc)
+        for _, r in frame.iterrows():
+            if r.verdict == "metric earlier":
+                self.assertGreater(r.diff_ci_low, 0)
+            elif r.verdict == "metric later":
+                self.assertLess(r.diff_ci_high, 0)
+            elif r.verdict == "not distinguishable":
+                self.assertTrue(r.diff_ci_low <= 0 <= r.diff_ci_high)
+            else:
+                self.assertTrue(r.verdict.startswith("not testable"))
+            self.assertTrue(known_status(r.metric_switch_status) and known_status(r.behavioural_status))
+
+    def test_overdetection(self):
+        '''fpr equals responsiveness_corrected; excess = S-O - R-O; CP bounds contain the rates'''
+        settings, _ = setting()
+        frame = dose_analysis.overdetection(settings, COMPARISONS, TITLES)
+        resp = dose_analysis.responsiveness_corrected(settings, COMPARISONS, TITLES)
+        resp = resp[resp.comparison == "shortcut vs full object"]
+        merged = frame.merge(resp, on=["base", "shortcut", "metric"], suffixes=("", "_resp"))
+        self.assertEqual(len(merged), len(FAITHFULNESS_METRICS))
+        np.testing.assert_allclose(merged.fpr, merged.fpr_resp)
+        np.testing.assert_allclose(merged.pref_so_low, merged.pref_low)
+        np.testing.assert_allclose(frame.excess_low, frame.pref_so_low - frame.pref_ro_low)
+        self.assertTrue(((frame.fpr_cp_low <= frame.fpr) & (frame.fpr <= frame.fpr_cp_high)).all())
+        self.assertTrue(((frame.fpr_margin_cp_low <= frame.fpr_margin)
+                         & (frame.fpr_margin <= frame.fpr_margin_cp_high)).all())
+        self.assertTrue((frame.fpr_margin <= frame.fpr).all())
+        self.assertIn("p_bh_excess_one_sided", frame)
+        models = dose_analysis.excess_preference_models(settings, COMPARISONS, TITLES)
+        self.assertEqual(len(models), 6 * len(FAITHFULNESS_METRICS))
+        np.testing.assert_allclose(models.excess, models.pref_so - models.pref_ro)
+        self.assertTrue((models.says_shortcut | ~models.says_shortcut_margin).all())
+
+    def test_small_analyses(self):
+        '''N6-N9 tables: columns and simple identities'''
+        settings, behaviour = setting()
+        calibration = dose_analysis.behaviour_calibration(settings, behaviour, COMPARISONS, TITLES)
+        primary = calibration[calibration.label == dose_analysis.PRIMARY_LABEL]
+        np.testing.assert_allclose(primary.determined_share, 1 - 1 / IMAGES)
+        # the metric rates the shortcut better exactly on followed images: calibrated on determined images
+        np.testing.assert_allclose(primary.calibration_gap_determined, 0.0, atol=1e-12)
+        confound = dose_analysis.confound_table(settings, COMPARISONS, TITLES)
+        rc = dose_analysis.confound_rc(confound)
+        self.assertEqual(list(rc.metric), list(confound.metric))
+        np.testing.assert_allclose(rc.p_bh_rc, stats.bh(confound.p_partial_rc_given_acc))
+        correct = dose_analysis.correct_only(settings, behaviour, COMPARISONS, TITLES)
+        np.testing.assert_allclose(correct.misclassified_share, 1 / IMAGES)
+        for column in ("rho_rc_correct", "pref_low_correct", "fpr_correct", "n_below_correct", "fpr"):
+            self.assertIn(column, correct)
+        power = dose_analysis.behaviour_power(settings, behaviour)
+        self.assertEqual(len(power), len(dose_analysis.BEHAVIOUR_LABELS))
+        self.assertTrue((power.models_with_both_labels <= power.models).all())
+        self.assertTrue((power.median_minority_count <= IMAGES / 2).all())
 
 
 class PetTests(unittest.TestCase):
