@@ -437,9 +437,12 @@ def swap_partner(labels, i):
 def behaviour_one(base, shortcut, dose, seed, samples, sets=None):
     """Per-image behavioural labels on the scored aligned images (forward passes only).
 
-    follows_shortcut (primary, reviewer 05): the model predicts the shortcut's
-        class when the shortcut of the same image is moved to a wrong class's
-        position (the conflicting test image).
+    follows_shortcut (moved-shortcut pass, reviewer 05): the model predicts the
+        shortcut's class when the shortcut of the same image is moved to a wrong
+        class's position (the conflicting test image). The PRIMARY label,
+        follows_shortcut_causal, is derived from this and pred_none in the
+        analysis (xai.dose_analysis.add_causal_label): images the model already
+        assigns to the shortcut's class without any shortcut are undetermined.
     shortcut_dominant (check, reviewer 03): delta_s > delta_o, where
         delta_s = p_y(aligned) - p_y(same image without shortcut) and
         delta_o = p_y(aligned) - p_y(image of another class with the label-y shortcut).
@@ -796,7 +799,7 @@ def plot_behaviour_auroc(bands, path):
         ax.set_xlim(-2, 102)
         ax.set_ylim(0, 1)
         ax.grid(alpha=0.3)
-    axes[0, 0].set_ylabel("AUROC vs per-image label (follows shortcut)")
+    axes[0, 0].set_ylabel("AUROC vs per-image label (follows shortcut, causal)")
     axes[0, 0].legend(fontsize=7)
     fig.suptitle("Shortcut vs full object: does the per-image AUC gap detect images where the model follows the shortcut?")
     fig.tight_layout()
@@ -859,15 +862,25 @@ def corrected_analysis(oracle, methods, models, reps, out):
         "- Switch point (only for comparisons whose ideal crosses 0.5 at 50%: shortcut vs full / size-matched "
         "object): increasing isotonic fit (PAVA) of model preference on r_c, first r_c where the fit reaches 0.5 "
         f"(linear interpolation). 'not identified' when no model lies within ±{dose_analysis.IDENTIFY_WINDOW} "
-        "points. Sensitivity: 4-parameter logistic with free asymptotes (`switch_4pl_rc`). `switch_interp_rc`: "
+        f"points. `switch_bracketed` (sensitivity): models within ±{dose_analysis.IDENTIFY_WINDOW} points on both "
+        "sides; a switch inside a wider gap between models can be 'identified' from one edge but is not bracketed, "
+        "and should not be quoted as located. 'identified at lowest-reliance edge': the switch lies within "
+        f"{dose_analysis.EDGE_WINDOW} points of the lowest-reliance model, i.e. the metric already prefers the "
+        "shortcut near the bottom of the reliance range (over-detection), not a mid-range switch. The switch CI "
+        "is empty when the full-data switch is undefined or fewer than half of the replicates cross. "
+        "Sensitivity: 4-parameter logistic with free asymptotes (`switch_4pl_rc`). `switch_interp_rc`: "
         "the legacy first-crossing rule applied to r_c dose means.",
         "- Effect size: per-image AUC gap g (positive = shortcut map rated better; AUC_B − AUC_A for deletion, "
         "AUC_A − AUC_B for insertion); medians at the lowest and highest dose in `effect_sizes.csv`.",
-        "- p-values: Spearman (models) for correlations; two-sided bootstrap for paired differences and AUROC vs "
-        "0.5 (floored at 1/(reps + 1)). BH and Holm within families: responsiveness:<comparison>, methods, "
-        "metric_pairs:<comparison>, behaviour:<label>. `p_holm_headline`: Holm over the union of the headline "
-        "rows (shortcut vs full object and shortcut vs random responsiveness, and the primary behaviour AUROC "
-        "for shortcut vs full object). p < 0.001 is printed as '< 0.001'.", ""]
+        "- p-values come from two sources. Correlations (responsiveness, methods): Spearman's t approximation "
+        "over the models of a setting, not from the bootstrap (the bootstrap gives only their intervals). "
+        "Paired metric differences: two-sided percentile bootstrap, floored at 1/(reps + 1). Behaviour AUROC vs "
+        "0.5: z-test with the two-level bootstrap SE (not floored; the floored percentile value is "
+        "`p_auroc_boot`). BH and Holm within families: responsiveness:<comparison>, methods, "
+        "metric_pairs:<comparison>, behaviour:<label> (pooled and within-model AUROC adjusted separately). "
+        "`p_holm_headline`: Holm over the union of the headline rows (shortcut vs full object and shortcut vs "
+        "random responsiveness, and the pooled and within-model primary behaviour AUROC for shortcut vs full "
+        "object). p < 0.001 is printed as '< 0.001'.", ""]
 
     main = resp[resp.comparison.isin(dose_analysis.SWITCH_COMPARISONS)].copy()
     main["setting"] = setting(main)
@@ -897,7 +910,8 @@ def corrected_analysis(oracle, methods, models, reps, out):
     main["switch_iso_rc [CI]"] = _ci_text(main, "switch_iso_rc", "switch_iso_rc_ci_low", "switch_iso_rc_ci_high", 1)
     lines += ["### Switch points on r_c (isotonic primary, 4PL sensitivity)", "",
               markdown(main[["comparison", "setting", "metric", "switch_iso_rc [CI]", "switch_found_share",
-                             "switch_status", "nearest_model_distance", "switch_4pl_rc", "fit_4pl_ok",
+                             "switch_status", "nearest_model_distance", "switch_bracketed",
+                             "switch_distance_below", "switch_distance_above", "switch_4pl_rc", "fit_4pl_ok",
                              "switch_iso_raw", "switch_interp_rc"]]), ""]
 
     sig_pairs = pairs[pairs.p_bh < 0.05].copy()
@@ -954,24 +968,42 @@ def corrected_analysis(oracle, methods, models, reps, out):
         lines += [f"Skipped: {len(missing)} models have no behaviour labels. Run `dose_response.py behaviour`.", ""]
     else:
         lines += [
-            "Each scored aligned image gets a label from forward passes only. Primary (`follows_shortcut`, "
-            "reviewer 05): the model predicts the shortcut's class when the same image's shortcut is moved to a "
-            "wrong class's position. Check (`shortcut_dominant`, reviewer 03): Δ_S > Δ_O, with Δ_S = p_y(aligned) "
-            "− p_y(no shortcut) and Δ_O = p_y(aligned) − p_y(another-class image with the label-y shortcut). "
-            "auroc_pooled: AUROC of the per-image AUC gap (shortcut vs object) against the label, images of all "
-            "models pooled. accuracy = mean(1 − |w − y|). calibration_gap = mean(preference − follow rate) "
-            "(positive = over-detection). observed_switch_rc: r_c where the follow rate crosses 0.5 (isotonic), "
-            "the derived ideal replacing the assumed 50%. **The per-image test is now primary; the aligned-image "
-            "preference curves are secondary.**", ""]
+            "Each scored aligned image gets a label from forward passes only. Primary "
+            "(`follows_shortcut_causal`, reviewer 05's moved-shortcut design plus the shortcut-removed pass): 1 if "
+            "the model predicts the shortcut's class when the same image's shortcut is moved to a wrong class's "
+            "position and does not predict that class with the shortcut removed; 0 if the moved shortcut does not "
+            "win; undetermined (excluded, `undetermined_rate`) if the model already predicts the shortcut's class "
+            "without any shortcut (this takes precedence over the moved pass; the rare case moved → other class "
+            "and removed → shortcut's class is also undetermined). The removed-pass rule keeps ordinary errors (on "
+            "a binary task every error lands on the shortcut's class) from counting as shortcut use, the same floor "
+            "r_c removes from reliance. Caution for the binary settings (PneumoniaMNIST, Pet): which images are "
+            "undetermined, and which are followed, depends strongly on the image's class (a model that fails "
+            "without its shortcut tends to predict one class), so the within-model AUROC there partly reflects "
+            "class differences in the AUC gap, not only shortcut use. "
+            "Checks: `follows_shortcut` (moved-shortcut pass only) and `shortcut_dominant` (reviewer 03): "
+            "Δ_S > Δ_O, with Δ_S = p_y(aligned) − p_y(no shortcut) and Δ_O = p_y(aligned) − p_y(another-class "
+            "image with the label-y shortcut). auroc_pooled: AUROC of the per-image AUC gap (shortcut vs object) "
+            "against the label, images of all models pooled; it mixes between-model and within-model signal. "
+            "median_model_auroc: median over models of the per-model AUROC, i.e. detection of followed vs "
+            "not-followed images inside one model; both with two-level CIs and z-test p-values. "
+            "accuracy = mean(1 − |w − y|). calibration_gap = mean(preference − follow rate) (positive = "
+            "over-detection). observed_switch_rc: r_c where the follow rate crosses 0.5 (isotonic), the derived "
+            "ideal replacing the assumed 50%. **The per-image test is now primary; the aligned-image preference "
+            "curves are secondary.**", ""]
         for name in dose_analysis.BEHAVIOUR_LABELS:
             shown = beh_summary[beh_summary.label == name].copy()
             shown["setting"] = setting(shown)
-            shown["auroc [95% CI]"] = _ci_text(shown, "auroc_pooled", "auroc_ci_low", "auroc_ci_high")
+            shown["auroc_pooled [95% CI]"] = _ci_text(shown, "auroc_pooled", "auroc_ci_low", "auroc_ci_high")
+            shown["median_model_auroc [95% CI]"] = _ci_text(
+                shown, "median_model_auroc", "median_model_auroc_ci_low", "median_model_auroc_ci_high")
+            columns = ["comparison", "setting", "metric", "label_rate", "undetermined_rate",
+                       "auroc_pooled [95% CI]", "p_bh", "median_model_auroc [95% CI]", "p_bh_within"]
+            if name == dose_analysis.PRIMARY_LABEL:
+                columns += ["p_holm_headline", "p_holm_headline_within"]
+            columns += ["accuracy", "balanced_accuracy", "calibration_gap", "rho_pref_follow", "observed_switch_rc"]
             lines += [f"Label `{name}`" + (" (primary)" if name == dose_analysis.PRIMARY_LABEL else " (check)") + ":", "",
-                      markdown(_p_text(shown, ["p_auroc", "p_bh", "p_holm_headline"])[
-                          ["comparison", "setting", "metric", "label_rate", "auroc [95% CI]", "p_bh",
-                           "p_holm_headline", "median_model_auroc", "accuracy", "balanced_accuracy",
-                           "calibration_gap", "rho_pref_follow", "observed_switch_rc"]]), ""]
+                      markdown(_p_text(shown, ["p_auroc", "p_bh", "p_bh_within", "p_holm_headline",
+                                               "p_holm_headline_within"])[columns]), ""]
     return lines
 
 

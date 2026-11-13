@@ -23,6 +23,7 @@ Switch points
     step function reaches 0.5, by linear interpolation between consecutive
     distinct x values. switch_identification: a switch counts as identified
     only if some model lies within +-10 reliance points of it.
+    switch_bracketing (sensitivity): models within +-10 points on BOTH sides.
     logistic4_switch: p(r) = a + (b - a) / (1 + exp(-(r - c) / s)) with free
     asymptotes 0 <= a < b <= 1, s > 0; the switch solves p(r) = 0.5.
 
@@ -41,7 +42,7 @@ import itertools
 import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
-from scipy.stats import false_discovery_control, pearsonr, rankdata, t as t_dist
+from scipy.stats import false_discovery_control, norm, pearsonr, rankdata, t as t_dist
 
 
 # ------------------------------------------------------------ reliance
@@ -131,6 +132,23 @@ def switch_identification(switch, x, window=10):
     return distance, status
 
 
+def switch_bracketing(switch, x, window=10):
+    """(distance below, distance above, bracketed): the distance from the switch
+    to the nearest model at or below it and at or above it; bracketed when both
+    are within +-window. A switch inside a gap wider than 2 x window can pass
+    switch_identification from one edge but is never bracketed."""
+    x = np.asarray(x, dtype=float)
+    x = x[~np.isnan(x)]
+    nan = float("nan")
+    if np.isnan(switch) or len(x) == 0:
+        return nan, nan, False
+    below, above = x[x <= switch], x[x >= switch]
+    d_below = float(switch - below.max()) if len(below) else nan
+    d_above = float(above.min() - switch) if len(above) else nan
+    bracketed = bool(len(below) and len(above) and d_below <= window and d_above <= window)
+    return d_below, d_above, bracketed
+
+
 def _logistic4(r, a, b, c, s):
     with np.errstate(over="ignore"):
         return a + (b - a) / (1 + np.exp(-(r - c) / s))
@@ -201,6 +219,20 @@ def holm(p):
     return out
 
 
+def bootstrap_z_p(estimate, boot, null=0.0):
+    """Two-sided normal-approximation p-value 2 * sf(|estimate - null| / SE),
+    with SE the standard deviation of the bootstrap replicates. Unlike a
+    percentile bootstrap p it is not floored at 1/(reps + 1)."""
+    boot = np.asarray(boot, dtype=float)
+    boot = boot[~np.isnan(boot)]
+    if np.isnan(estimate) or len(boot) < 2:
+        return float("nan")
+    se = float(boot.std(ddof=1))
+    if se == 0:
+        return 0.0 if estimate != null else 1.0
+    return float(2 * norm.sf(abs(estimate - null) / se))
+
+
 def format_p(p):
     """'< 0.001' below 0.001, else 3 decimals ('–' for NaN)."""
     if p is None or np.isnan(p):
@@ -240,12 +272,22 @@ def partial_spearman(x, y, z):
     return rho, float(2 * t_dist.sf(abs(stat), n - 3))
 
 
-def auroc_rows(scores, labels):
-    """Row-wise AUROC of two (reps, n) matrices (midrank); NaN where a row has one class."""
-    scores, labels = np.atleast_2d(scores), np.atleast_2d(labels).astype(bool)
+def auroc_rows(scores, labels, valid=None):
+    """Row-wise AUROC of two (reps, n) matrices (midrank); NaN where a row has one class.
+
+    valid: optional boolean (reps, n) mask; entries outside it are ignored.
+    They are given score +inf, which ranks them above every valid entry and
+    so leaves the ranks of the valid entries unchanged."""
+    scores = np.atleast_2d(np.asarray(scores, dtype=float))
+    labels = np.atleast_2d(labels)
+    if valid is not None:
+        valid = np.atleast_2d(valid).astype(bool)
+        scores = np.where(valid, scores, np.inf)
+        labels = np.where(valid, labels, 0)
+    labels = labels.astype(bool)
     ranks = rankdata(scores, axis=1)
     pos = labels.sum(axis=1).astype(float)
-    neg = labels.shape[1] - pos
+    neg = (labels.shape[1] if valid is None else valid.sum(axis=1)) - pos
     u = (ranks * labels).sum(axis=1) - pos * (pos + 1) / 2
     with np.errstate(invalid="ignore", divide="ignore"):
         return np.where((pos > 0) & (neg > 0), u / (pos * neg), np.nan)

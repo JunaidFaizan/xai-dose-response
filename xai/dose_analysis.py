@@ -20,17 +20,45 @@ Two-level bootstrap (MD3)
     half find one (switch_found_share).
 
 p-values and families
-    Correlation p-values are Spearman's (t approximation over models).
-    Bootstrap p-values (metric pairs, AUROC vs 0.5) are two-sided:
+    Correlation p-values (responsiveness, methods) are Spearman's t
+    approximation over the models of a setting; they do NOT come from the
+    two-level bootstrap (only their intervals do).
+    Metric-pair p-values are percentile bootstrap: two-sided
     min(1, 2 min(P(d <= 0), P(d >= 0))), floored at 1/(reps + 1).
+    Behaviour AUROC p-values (vs 0.5) are normal-approximation z-tests with the
+    two-level bootstrap SE (stats.bootstrap_z_p), so they are not floored; the
+    floored percentile value is kept as p_auroc_boot.
     BH and Holm are applied within each family:
         responsiveness:<comparison>   all settings x metrics of one comparison
         methods                       all settings x methods
         metric_pairs:<comparison>     all settings x metric pairs
         behaviour:<label>             all settings x comparisons x metrics
+                                      (pooled and within-model AUROC adjusted
+                                      separately: p_bh, p_bh_within)
     p_holm_headline is Holm over the union of the headline rows
     ("shortcut vs full object" and "shortcut vs random" responsiveness, and
-    the primary-label behaviour AUROC for "shortcut vs full object").
+    both the pooled and the within-model primary-label behaviour AUROC for
+    "shortcut vs full object").
+
+Switch status
+    "identified": a model within +-IDENTIFY_WINDOW of the switch (as specified).
+    switch_bracketed (sensitivity): models within +-IDENTIFY_WINDOW on both
+    sides. Identified switches within EDGE_WINDOW points of the lowest-reliance
+    model get the status "identified at lowest-reliance edge": the metric
+    already prefers the shortcut near the lowest reliance (over-detection),
+    which is not a mid-range switch. Switch CIs are empty when the full-data
+    switch is NaN.
+
+Per-image behaviour labels (MD4)
+    follows_shortcut_causal (PRIMARY): 1 if the moved shortcut wins (the
+    conflicting image is predicted as the shortcut's class) and the image
+    without shortcut is not predicted as that class; 0 if the moved shortcut
+    does not win; undetermined (NaN, excluded and counted in
+    undetermined_rate) if the model predicts the shortcut's class already
+    without the shortcut. Without this rule an ordinary error on a binary task
+    counts as shortcut use (the error floor that r_c removes from reliance).
+    follows_shortcut (check): moved-shortcut pass only.
+    shortcut_dominant (check): delta_s > delta_o.
 """
 
 import itertools
@@ -51,9 +79,10 @@ SWITCH_COMPARISONS = ("shortcut vs full object", "shortcut vs size-matched objec
 PAIR_COMPARISONS = ("shortcut vs full object", "shortcut vs size-matched object", "random vs full object")
 HEADLINE_COMPARISONS = ("shortcut vs full object", "shortcut vs random")
 BEHAVIOUR_COMPARISONS = SWITCH_COMPARISONS
-BEHAVIOUR_LABELS = ("follows_shortcut", "shortcut_dominant")  # primary, check
-PRIMARY_LABEL = "follows_shortcut"
+BEHAVIOUR_LABELS = ("follows_shortcut_causal", "follows_shortcut", "shortcut_dominant")  # primary, checks
+PRIMARY_LABEL = "follows_shortcut_causal"
 IDENTIFY_WINDOW = 10
+EDGE_WINDOW = 5
 RELIANCE_BANDS = [-np.inf, 20, 40, 60, 80, np.inf]
 BAND_LABELS = ["<20", "20-40", "40-60", "60-80", ">=80"]
 BAND_CENTRES = [10, 30, 50, 70, 90]
@@ -98,14 +127,15 @@ def _first_crossing(reliance, preference):
     return NAN
 
 
-def _adjust(frame, family_column="family", p_column="p"):
-    """Append p_bh and p_holm, computed within each family."""
+def _adjust(frame, family_column="family", p_column="p", suffix=""):
+    """Append p_bh<suffix> and p_holm<suffix>, computed within each family."""
     frame = frame.copy()
-    frame["p_bh"], frame["p_holm"] = np.nan, np.nan
+    bh_col, holm_col = f"p_bh{suffix}", f"p_holm{suffix}"
+    frame[bh_col], frame[holm_col] = np.nan, np.nan
     for _, index in frame.groupby(family_column).groups.items():
         p = frame.loc[index, p_column].to_numpy(dtype=float)
-        frame.loc[index, "p_bh"] = stats.bh(p)
-        frame.loc[index, "p_holm"] = stats.holm(p)
+        frame.loc[index, bh_col] = stats.bh(p)
+        frame.loc[index, holm_col] = stats.holm(p)
     return frame
 
 
@@ -213,27 +243,48 @@ def _available(settings, comparisons):
             yield first, second, label
 
 
+EDGE_STATUS = "identified at lowest-reliance edge"
+
+
+def switch_status(x, y):
+    """Isotonic switch of y on x with its identification columns:
+    (switch, status, nearest distance, distance below, distance above, bracketed, at_edge)."""
+    x = np.asarray(x, dtype=float)
+    switch, status = stats.isotonic_switch(x, y)
+    distance, below, above, bracketed, edge = NAN, NAN, NAN, False, False
+    if status == "crossed":
+        distance, status = stats.switch_identification(switch, x, IDENTIFY_WINDOW)
+        below, above, bracketed = stats.switch_bracketing(switch, x, IDENTIFY_WINDOW)
+        edge = bool(switch - np.nanmin(x) <= EDGE_WINDOW)
+        if status == "identified" and edge:
+            status = EDGE_STATUS
+    return switch, status, distance, below, above, bracketed, edge
+
+
 def _switch_columns(s, c, label):
     nan_row = {"switch_iso_rc": NAN, "switch_iso_rc_ci_low": NAN, "switch_iso_rc_ci_high": NAN,
                "switch_found_share": NAN, "switch_status": "not applicable",
-               "nearest_model_distance": NAN, "switch_4pl_rc": NAN, "fit_4pl_ok": False,
+               "nearest_model_distance": NAN, "switch_distance_below": NAN, "switch_distance_above": NAN,
+               "switch_bracketed": False, "switch_at_low_edge": False,
+               "switch_4pl_rc": NAN, "fit_4pl_ok": False,
                "switch_iso_raw": NAN, "switch_interp_rc": NAN}
     if label not in SWITCH_COMPARISONS:
         return nan_row
     pref = c["pref"]
-    switch, status = stats.isotonic_switch(s.rc, pref)
-    distance = NAN
-    if status == "crossed":
-        distance, status = stats.switch_identification(switch, s.rc, IDENTIFY_WINDOW)
+    switch, status, distance, below, above, bracketed, edge = switch_status(s.rc, pref)
     boot = np.array([stats.isotonic_switch(s.rc[s.P[r]], c["boot"][r])[0] for r in range(s.reps)])
     found = ~np.isnan(boot)
     share = float(found.mean())
-    low, high = _ci(boot) if share >= 0.5 else (NAN, NAN)
+    # No interval without a full-data switch (a CI from the crossing replicates
+    # alone would be conditional on crossing).
+    low, high = _ci(boot) if share >= 0.5 and not np.isnan(switch) else (NAN, NAN)
     switch_4pl, _, ok = stats.logistic4_switch(s.rc, pref)
     levels = pd.DataFrame({"dose": s.dose, "rc": s.rc, "p": pref}).groupby("dose").mean()
     return {"switch_iso_rc": switch, "switch_iso_rc_ci_low": low, "switch_iso_rc_ci_high": high,
             "switch_found_share": share, "switch_status": status,
-            "nearest_model_distance": distance, "switch_4pl_rc": switch_4pl, "fit_4pl_ok": bool(ok),
+            "nearest_model_distance": distance, "switch_distance_below": below,
+            "switch_distance_above": above, "switch_bracketed": bracketed, "switch_at_low_edge": edge,
+            "switch_4pl_rc": switch_4pl, "fit_4pl_ok": bool(ok),
             "switch_iso_raw": stats.isotonic_switch(s.raw, pref)[0],
             "switch_interp_rc": _first_crossing(levels.rc, levels.p)}
 
@@ -428,6 +479,21 @@ def pet_preregistered(settings, comparisons, metric_titles, method_titles, base=
 
 # ------------------------------------------------------------ MD4 behaviour
 
+def add_causal_label(behaviour):
+    """Add follows_shortcut_causal (PRIMARY) from the stored passes; no new forward passes.
+
+    1 = the moved shortcut wins and the image without shortcut is not
+    predicted as the shortcut's class; 0 = the moved shortcut does not win;
+    NaN (undetermined) = the image without shortcut is already predicted as
+    the shortcut's class, so the moved pass cannot separate shortcut use from
+    an ordinary error."""
+    behaviour = behaviour.copy()
+    moved = behaviour.pred_conflicting.to_numpy() == behaviour.conflict_class.to_numpy()
+    undetermined = behaviour.pred_none.to_numpy() == behaviour.conflict_class.to_numpy()
+    behaviour["follows_shortcut_causal"] = np.where(undetermined, np.nan, moved.astype(float))
+    return behaviour
+
+
 def _label_matrix(s, behaviour, column):
     frame = behaviour.merge(s.models[KEYS], on=KEYS).sort_values(["dose", "seed", "index"])
     values = frame[column].to_numpy(dtype=float)
@@ -438,21 +504,49 @@ def _label_matrix(s, behaviour, column):
 
 
 def _boot_auroc(s, gaps, labels):
-    """Pooled AUROC per two-level bootstrap replicate: (reps,)."""
-    out = []
+    """Two-level bootstrap AUROC per replicate, ignoring undetermined (NaN) labels.
+
+    Returns (pooled, within): pooled = AUROC over the resampled images of all
+    slots together; within = median over slots of the per-slot AUROC (slots
+    with one class only are skipped). Both (reps,)."""
+    pooled, within = [], []
     for r0 in range(0, s.reps, CHUNK):
         picks, images = s.P[r0:r0 + CHUNK, :, None], s.I[r0:r0 + CHUNK]
         n = len(images)
-        out.append(stats.auroc_rows(gaps[picks, images].reshape(n, -1), labels[picks, images].reshape(n, -1)))
-    return np.concatenate(out)
+        g, y = gaps[picks, images], labels[picks, images]
+        valid = ~np.isnan(y)
+        y = np.nan_to_num(y)
+        pooled.append(stats.auroc_rows(g.reshape(n, -1), y.reshape(n, -1), valid.reshape(n, -1)))
+        per_slot = stats.auroc_rows(g.reshape(-1, s.n_images), y.reshape(-1, s.n_images),
+                                    valid.reshape(-1, s.n_images)).reshape(n, s.n_models)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            within.append(np.nanmedian(per_slot, axis=1))
+    return np.concatenate(pooled), np.concatenate(within)
+
+
+def _auroc_masked(scores, labels):
+    keep = ~np.isnan(labels)
+    return stats.auroc(scores[keep], labels[keep])
 
 
 def _soft_accuracy(wins, labels):
-    """accuracy = mean(1 - |w - y|); balanced = mean of mean(w | y = 1) and mean(1 - w | y = 0)."""
+    """accuracy = mean(1 - |w - y|); balanced = mean of mean(w | y = 1) and
+    mean(1 - w | y = 0). Undetermined (NaN) labels are ignored."""
+    keep = ~np.isnan(labels)
+    wins, labels = wins[keep], labels[keep]
+    if len(labels) == 0:
+        return NAN, NAN
     accuracy = float(np.mean(1 - np.abs(wins - labels)))
     pos, neg = labels == 1, labels == 0
     balanced = (float(wins[pos].mean()) + float((1 - wins[neg]).mean())) / 2 if pos.any() and neg.any() else NAN
     return accuracy, balanced
+
+
+def _nanmean_rows(values):
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        return np.nanmean(values, axis=1)
 
 
 def behaviour_tables(settings, behaviour, comparisons, metric_titles):
@@ -461,15 +555,26 @@ def behaviour_tables(settings, behaviour, comparisons, metric_titles):
     The per-image label replaces the assumed 50% ideal. AUROC uses the
     per-image AUC gap (positive = shortcut map rated better) as the score of
     "the model follows the shortcut on this image"; accuracy uses the win
-    score w (1, 0 or 0.5 for a tie).
+    score w (1, 0 or 0.5 for a tie). Undetermined labels (NaN) are excluded
+    everywhere; label rates are over the determined images of each model.
+
+    auroc_pooled mixes between-model and within-model signal (high-reliance
+    models have both larger gaps and more label-1 images). median_model_auroc
+    (median over models of the per-model AUROC) measures detection inside a
+    model; both have two-level CIs and z-test p-values.
     """
+    if "follows_shortcut_causal" not in behaviour:
+        behaviour = add_causal_label(behaviour)
     maps = {label: (first, second) for first, second, label in _available(settings, comparisons)}
     model_rows, summary_rows, band_rows = [], [], []
     for s in settings:
         labels = {name: _label_matrix(s, behaviour, name) for name in BEHAVIOUR_LABELS}
-        rates = {name: values.mean(axis=1) for name, values in labels.items()}
+        rates = {name: _nanmean_rows(values) for name, values in labels.items()}
+        undetermined = np.isnan(labels[PRIMARY_LABEL]).mean(axis=1)
         base_frame = s.models[KEYS + ["reliance", "reliance_corrected"]].copy()
-        base_frame["follow_rate"] = rates["follows_shortcut"]
+        base_frame["follow_rate"] = rates[PRIMARY_LABEL]
+        base_frame["undetermined_rate"] = undetermined
+        base_frame["follow_rate_moved_only"] = rates["follows_shortcut"]
         base_frame["dominant_rate"] = rates["shortcut_dominant"]
         band = pd.cut(s.rc, RELIANCE_BANDS, right=False, labels=BAND_LABELS)
         for label in BEHAVIOUR_COMPARISONS:
@@ -482,31 +587,35 @@ def behaviour_tables(settings, behaviour, comparisons, metric_titles):
                 base_frame[f"pref_{metric}_{tag}"] = c["pref"]
                 for name in BEHAVIOUR_LABELS:
                     y, rate = labels[name], rates[name]
-                    per_model = np.array([stats.auroc(c["gaps"][m], y[m]) for m in range(s.n_models)])
+                    per_model = np.array([_auroc_masked(c["gaps"][m], y[m]) for m in range(s.n_models)])
                     base_frame[f"auroc_{name}_{metric}_{tag}"] = per_model
-                    boot = _boot_auroc(s, c["gaps"], y)
+                    boot, boot_within = _boot_auroc(s, c["gaps"], y)
                     accuracy, balanced = _soft_accuracy(c["wins"].ravel(), y.ravel())
-                    switch, status = stats.isotonic_switch(100 * rate, c["pref"])
-                    distance = NAN
-                    if status == "crossed":
-                        distance, status = stats.switch_identification(switch, 100 * rate, IDENTIFY_WINDOW)
+                    switch, status, distance, _, _, bracketed, edge = switch_status(100 * rate, c["pref"])
                     observed, observed_status = stats.isotonic_switch(s.rc, rate)
-                    row = {"comparison": label, "base": s.base, "shortcut": s.shortcut,
-                           "metric": metric_titles[metric], "label": name, "models": s.n_models,
-                           "label_rate": float(y.mean()),
-                           "auroc_pooled": stats.auroc(c["gaps"].ravel(), y.ravel())}
-                    row["auroc_ci_low"], row["auroc_ci_high"] = _ci(boot)
-                    row["p_auroc"] = _boot_p(boot, 0.5)
+                    pooled = _auroc_masked(c["gaps"].ravel(), y.ravel())
                     with warnings.catch_warnings():
                         warnings.simplefilter("ignore", RuntimeWarning)
-                        row["median_model_auroc"] = float(np.nanmedian(per_model))
+                        within = float(np.nanmedian(per_model))
+                    row = {"comparison": label, "base": s.base, "shortcut": s.shortcut,
+                           "metric": metric_titles[metric], "label": name, "models": s.n_models,
+                           "label_rate": float(np.nanmean(y)),
+                           "undetermined_rate": float(np.isnan(y).mean()),
+                           "auroc_pooled": pooled}
+                    row["auroc_ci_low"], row["auroc_ci_high"] = _ci(boot)
+                    row["p_auroc"] = stats.bootstrap_z_p(pooled, boot, 0.5)
+                    row["p_auroc_boot"] = _boot_p(boot, 0.5)
+                    row["median_model_auroc"] = within
+                    row["median_model_auroc_ci_low"], row["median_model_auroc_ci_high"] = _ci(boot_within)
+                    row["p_auroc_within"] = stats.bootstrap_z_p(within, boot_within, 0.5)
                     row["models_with_both_classes"] = int((~np.isnan(per_model)).sum())
                     row.update({"accuracy": accuracy, "balanced_accuracy": balanced,
-                                "calibration_gap": float(np.mean(c["pref"] - rate)),
-                                "calibration_mae": float(np.mean(np.abs(c["pref"] - rate))),
+                                "calibration_gap": float(np.nanmean(c["pref"] - rate)),
+                                "calibration_mae": float(np.nanmean(np.abs(c["pref"] - rate))),
                                 "rho_pref_follow": _spearman(rate, c["pref"])[0],
                                 "switch_on_follow_rate": switch, "switch_on_follow_rate_status": status,
                                 "switch_on_follow_rate_distance": distance,
+                                "switch_on_follow_rate_bracketed": bracketed,
                                 "observed_switch_rc": observed, "observed_switch_rc_status": observed_status})
                     summary_rows.append(row)
                     for band_label, centre in zip(BAND_LABELS, BAND_CENTRES):
@@ -514,36 +623,44 @@ def behaviour_tables(settings, behaviour, comparisons, metric_titles):
                         if len(inside) == 0:
                             continue
                         yb, gb, wb = y[inside].ravel(), c["gaps"][inside].ravel(), c["wins"][inside].ravel()
+                        determined = ~np.isnan(yb)
                         acc_b, bal_b = _soft_accuracy(wb, yb)
                         band_rows.append({"comparison": label, "base": s.base, "shortcut": s.shortcut,
                                           "metric": metric_titles[metric], "label": name,
                                           "band": band_label, "band_centre": centre,
-                                          "models": len(inside), "n_images": len(yb),
-                                          "n_pos": int(yb.sum()), "n_neg": int(len(yb) - yb.sum()),
-                                          "auroc": stats.auroc(gb, yb), "accuracy": acc_b,
+                                          "models": len(inside), "n_images": int(determined.sum()),
+                                          "n_undetermined": int((~determined).sum()),
+                                          "n_pos": int(np.nansum(yb)), "n_neg": int(determined.sum() - np.nansum(yb)),
+                                          "auroc": _auroc_masked(gb, yb), "accuracy": acc_b,
                                           "balanced_accuracy": bal_b})
         model_rows.append(base_frame)
     summary = pd.DataFrame(summary_rows)
     summary["family"] = "behaviour:" + summary.label
     summary = _adjust(summary, p_column="p_auroc")
+    summary = _adjust(summary, p_column="p_auroc_within", suffix="_within")
     summary["headline"] = (summary.label == PRIMARY_LABEL) & (summary.comparison == "shortcut vs full object")
     return pd.concat(model_rows, ignore_index=True), summary, pd.DataFrame(band_rows)
 
 
 def headline_holm(responsiveness, behaviour_summary=None):
-    """Holm over the union of headline rows; adds p_holm_headline to both tables."""
+    """Holm over the union of headline rows; adds p_holm_headline to both tables
+    (and p_holm_headline_within for the within-model behaviour AUROC)."""
     responsiveness = responsiveness.copy()
     p = [responsiveness.loc[responsiveness.headline, "p_rho_rc"].to_numpy(dtype=float)]
     if behaviour_summary is not None:
         behaviour_summary = behaviour_summary.copy()
         p.append(behaviour_summary.loc[behaviour_summary.headline, "p_auroc"].to_numpy(dtype=float))
+        p.append(behaviour_summary.loc[behaviour_summary.headline, "p_auroc_within"].to_numpy(dtype=float))
     adjusted = stats.holm(np.concatenate(p))
     responsiveness["p_holm_headline"] = np.nan
     n = int(responsiveness.headline.sum())
     responsiveness.loc[responsiveness.headline, "p_holm_headline"] = adjusted[:n]
     if behaviour_summary is not None:
+        k = int(behaviour_summary.headline.sum())
         behaviour_summary["p_holm_headline"] = np.nan
-        behaviour_summary.loc[behaviour_summary.headline, "p_holm_headline"] = adjusted[n:]
+        behaviour_summary["p_holm_headline_within"] = np.nan
+        behaviour_summary.loc[behaviour_summary.headline, "p_holm_headline"] = adjusted[n:n + k]
+        behaviour_summary.loc[behaviour_summary.headline, "p_holm_headline_within"] = adjusted[n + k:]
     return responsiveness, behaviour_summary
 
 
