@@ -1,0 +1,22 @@
+20
+                          comparison              base shortcut              metric  models  rho_rc  rho_rc_ci_low  rho_rc_ci_high
+36   shortcut vs size-matched object             mnist    patch    Deletion (black)      51   0.970          0.923           0.969
+37   shortcut vs size-matched object             mnist    patch     Deletion (blur)      51   0.973          0.931           0.972
+38   shortcut vs size-matched object             mnist    patch  Deletion (inpaint)      51   0.974          0.925           0.970
+39   shortcut vs size-matched object             mnist    patch    Insertion (blur)      51   0.970          0.924           0.970
+67            placebo vs full object             mnist    patch    Insertion (blur)      51   0.970          0.906           0.965
+70            placebo vs full object             mnist  texture  Deletion (inpaint)      51   0.977          0.917           0.971
+71            placebo vs full object             mnist  texture    Insertion (blur)      51   0.979          0.938           0.977
+88               shortcut vs placebo  cifar10_resnet18    patch    Deletion (black)      18   0.984          0.907           0.984
+92               shortcut vs placebo             mnist    patch    Deletion (black)      51   0.960          0.879           0.949
+93               shortcut vs placebo             mnist    patch     Deletion (blur)      51   0.969          0.916           0.966
+94               shortcut vs placebo             mnist    patch  Deletion (inpaint)      51   0.962          0.901           0.960
+95               shortcut vs placebo             mnist    patch    Insertion (blur)      51   0.963          0.885           0.952
+126            random vs full object             mnist  texture  Deletion (inpaint)      51   0.966          0.902           0.966
+127            random vs full object             mnist  texture    Insertion (blur)      51   0.978          0.940           0.977
+130            random vs full object      pet_resnet18    patch  Deletion (inpaint)      18   0.974          0.815           0.968
+151                placebo vs random             mnist    patch    Insertion (blur)      51   0.898          0.562           0.819
+155                placebo vs random             mnist  texture    Insertion (blur)      51   0.818          0.531           0.799
+176               shortcut vs random             mnist    patch    Deletion (black)      51   0.962          0.885           0.950
+178               shortcut vs random             mnist    patch  Deletion (inpaint)      51   0.961          0.913           0.960
+179               shortcut vs random             mnist    patch    Insertion (blur)      51   0.967          0.908           0.962

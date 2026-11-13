@@ -1,0 +1,43 @@
+2308.06248v1 | FunnyBirds: A Synthetic Vision Dataset for a Part-Based Analysis of Explainable AI Methods | Robin Hesse; Simone Schaub-Meyer; Stefan Roth | 2023-08-11 | JREF:  | COMMENT: 
+2302.07265v2 | The Meta-Evaluation Problem in Explainable AI: Identifying Reliable Estimators with MetaQuantus | Anna Hedström; Philine Bommer; Kristoffer K. Wickstrøm; Wojciech Samek; Sebastian Lapuschkin; Marina M. -C. Höhne | 2023-02-14 | JREF:  | COMMENT: 
+2201.13291v3 | Metrics for saliency map evaluation of deep learning explanation methods | Tristan Gomez; Thomas Fréour; Harold Mouchère | 2022-01-31 | JREF:  | COMMENT: 
+2105.06506v3 | Sanity Simulations for Saliency Methods | Joon Sik Kim; Gregory Plumb; Ameet Talwalkar | 2021-05-13 | JREF:  | COMMENT: 
+2412.05592v1 | From Flexibility to Manipulation: The Slippery Slope of XAI Evaluation | Kristoffer Wickstrøm; Marina Marie-Claire Höhne; Anna Hedström | 2024-12-07 | JREF:  | COMMENT: 
+1512.03385v1 | Deep Residual Learning for Image Recognition | Kaiming He; Xiangyu Zhang; Shaoqing Ren; Jian Sun | 2015-12-10 | JREF:  | COMMENT: 
+1706.03825v1 | SmoothGrad: removing noise by adding noise | Daniel Smilkov; Nikhil Thorat; Been Kim; Fernanda Viégas; Martin Wattenberg | 2017-06-12 | JREF:  | COMMENT: 
+2405.02344v2 | A Backdoor-based Explainable AI Benchmark for High Fidelity Evaluation of Attributions | Peiyu Yang; Naveed Akhtar; Jiantong Jiang; Ajmal Mian | 2024-05-02 | JREF:  | COMMENT: 
+2304.13836v5 | On Pitfalls of $\textit{RemOve-And-Retrain}$: Data Processing Inequality Perspective | Junhwa Song; Keumgang Cha; Junghoon Seo | 2023-04-26 | JREF:  | COMMENT: 
+2512.18888v1 | Localising Shortcut Learning in Pixel Space via Ordinal Scoring Correlations for Attribution Representations (OSCAR) | Akshit Achara; Peter Triantafillou; Esther Puyol-Antón; Alexander Hammers; Andrew P. King | 2025-12-21 | JREF:  | COMMENT: 
+1907.09701v2 | Benchmarking Attribution Methods with Relative Feature Importance | Mengjiao Yang; Been Kim | 2019-07-23 | JREF:  | COMMENT: 
+2211.07650v1 | Explainer Divergence Scores (EDS): Some Post-Hoc Explanations May be Effective for Detecting Unknown Spurious Correlations | Shea Cardozo; Gabriel Islas Montero; Dmitry Kazhdan; Botty Dimanov; Maleakhi Wijaya; Mateja Jamnik; Pietro Lio | 2022-11-14 | JREF:  | COMMENT: 
+2307.12344v2 | Right for the Wrong Reason: Can Interpretable ML Techniques Detect Spurious Correlations? | Susu Sun; Lisa M. Koch; Christian F. Baumgartner | 2023-07-23 | JREF:  | COMMENT: 
+2212.04629v1 | Post hoc Explanations may be Ineffective for Detecting Unknown Spurious Correlation | Julius Adebayo; Michael Muelly; Hal Abelson; Been Kim | 2022-12-09 | JREF:  | COMMENT: 
+2401.06465v1 | Sanity Checks Revisited: An Exploration to Repair the Model Parameter Randomisation Test | Anna Hedström; Leander Weber; Sebastian Lapuschkin; Marina MC Höhne | 2024-01-12 | JREF:  | COMMENT: 
+2409.16756v3 | Navigating the Maze of Explainable AI: A Systematic Approach to Evaluating Methods and Metrics | Lukas Klein; Carsten T. Lüth; Udo Schlegel; Till J. Bungert; Mennatallah El-Assady; Paul F. Jäger | 2024-09-25 | JREF:  | COMMENT: 
+2410.02970v2 | F-Fidelity: A Robust Framework for Faithfulness Evaluation of Explainable AI | Xu Zheng; Farhad Shirani; Zhuomin Chen; Chaohao Lin; Wei Cheng; Wenbo Guo; Dongsheng Luo | 2024-10-03 | JREF:  | COMMENT: 
+2502.09150v2 | Shortcut Learning Susceptibility in Vision Classifiers | Pirzada Suhail; Vrinda Goel; Amit Sethi | 2025-02-13 | JREF:  | COMMENT: 
+2605.25052v1 | Faithfulness Metrics Don't Measure Faithfulness: A Meta-Evaluation with Ground Truth | Yoav Gur-Arieh; Ana Marasović; Mor Geva | 2026-05-24 | JREF:  | COMMENT: 
+2512.11433v1 | Back to the Baseline: Examining Baseline Effects on Explainability Metrics | Agustin Martin Picard; Thibaut Boissin; Varshini Subhash; Rémi Cadène; Thomas Fel | 2025-12-12 | JREF:  | COMMENT: 
+2609.30397v1 | A Synthetic Ground-Truth Framework for the Evaluation of Explainable AI Methods | Miquel Miró-Nicolau; Francesco Spinnato; Riccardo Guidotti | 2026-09-24 | JREF:  | COMMENT: 
+2212.11870v3 | Impossibility Theorems for Feature Attribution | Blair Bilodeau; Natasha Jaques; Pang Wei Koh; Been Kim | 2022-12-22 | JREF:  | COMMENT: 
+2104.14403v2 | Do Feature Attribution Methods Correctly Attribute Features? | Yilun Zhou; Serena Booth; Marco Tulio Ribeiro; Julie Shah | 2021-04-27 | JREF:  | COMMENT: 
+2108.13264v4 | Deep Reinforcement Learning at the Edge of the Statistical Precipice | Rishabh Agarwal; Max Schwarzer; Pablo Samuel Castro; Aaron Courville; Marc G. Bellemare | 2021-08-30 | JREF:  | COMMENT: 
+1912.01451v1 | Sanity Checks for Saliency Metrics | Richard Tomsett; Dan Harborne; Supriyo Chakraborty; Prudhvi Gurram; Alun Preece | 2019-11-29 | JREF:  | COMMENT: 
+2401.10640v1 | A comprehensive study on fidelity metrics for XAI | Miquel Miró-Nicolau; Antoni Jaume-i-Capó; Gabriel Moyà-Alcover | 2024-01-19 | JREF:  | COMMENT: 
+2407.11910v2 | Benchmarking the Attribution Quality of Vision Models | Robin Hesse; Simone Schaub-Meyer; Stefan Roth | 2024-07-16 | JREF:  | COMMENT: 
+2202.12270v2 | Evaluating Feature Attribution Methods in the Image Domain | Arne Gevaert; Axel-Jan Rousseau; Thijs Becker; Dirk Valkenborg; Tijl De Bie; Yvan Saeys | 2022-02-22 | JREF:  | COMMENT: 
+2310.06514v2 | AttributionLab: Faithfulness of Feature Attribution Under Controllable Environments | Yang Zhang; Yawei Li; Hannah Brown; Mina Rezaei; Bernd Bischl; Philip Torr; Ashkan Khakzar; Kenji Kawaguchi | 2023-10-10 | JREF:  | COMMENT: 
+2202.00449v2 | A Consistent and Efficient Evaluation Strategy for Attribution Methods | Yao Rong; Tobias Leemann; Vadim Borisov; Gjergji Kasneci; Enkelejda Kasneci | 2022-02-01 | JREF:  | COMMENT: 
+2009.10639v1 | What Do You See? Evaluation of Explainable Artificial Intelligence (XAI) Interpretability through Neural Backdoors | Yi-Shan Lin; Wen-Chuan Lee; Z. Berkay Celik | 2020-09-22 | JREF:  | COMMENT: 
+2106.00786v2 | The Out-of-Distribution Problem in Explainability and Search Methods for Feature Importance Explanations | Peter Hase; Harry Xie; Mohit Bansal | 2021-06-01 | JREF:  | COMMENT: 
+2405.02383v1 | A Fresh Look at Sanity Checks for Saliency Maps | Anna Hedström; Leander Weber; Sebastian Lapuschkin; Marina Höhne | 2024-05-03 | JREF:  | COMMENT: 
+2009.07896v1 | Captum: A unified and generic model interpretability library for PyTorch | Narine Kokhlikyan; Vivek Miglani; Miguel Martin; Edward Wang; Bilal Alsallakh; Jonathan Reynolds; Alexander Melnikov; Natalia Kliushkina; Carlos Araya; Siqi Yan; Orion Reblitz-Richardson | 2020-09-16 | JREF:  | COMMENT: 
+2007.07797v2 | Application of the hierarchical bootstrap to multi-level data in neuroscience | Varun Saravanan; Gordon J Berman; Samuel J Sober | 2020-07-15 | JREF:  | COMMENT: 
+1902.10178v1 | Unmasking Clever Hans Predictors and Assessing What Machines Really Learn | Sebastian Lapuschkin; Stephan Wäldchen; Alexander Binder; Grégoire Montavon; Wojciech Samek; Klaus-Robert Müller | 2019-02-26 | JREF:  | COMMENT: 
+1806.10758v3 | A Benchmark for Interpretability Methods in Deep Neural Networks | Sara Hooker; Dumitru Erhan; Pieter-Jan Kindermans; Been Kim | 2018-06-28 | JREF:  | COMMENT: 
+2003.07258v2 | Ground Truth Evaluation of Neural Network Explanations with CLEVR-XAI | Leila Arras; Ahmed Osman; Wojciech Samek | 2020-03-16 | JREF:  | COMMENT: 
+2310.16228v2 | On the Foundations of Shortcut Learning | Katherine L. Hermann; Hossein Mobahi; Thomas Fel; Michael C. Mozer | 2023-10-24 | JREF:  | COMMENT: 
+2401.06654v1 | Decoupling Pixel Flipping and Occlusion Strategy for Consistent XAI Benchmarks | Stefan Blücher; Johanna Vielhaben; Nils Strodthoff | 2024-01-12 | JREF:  | COMMENT: 
+2506.01059v1 | XAI-Units: Benchmarking Explainability Methods with Unit Tests | Jun Rui Lee; Sadegh Emami; Michael David Hollins; Timothy C. H. Wong; Carlos Ignacio Villalobos Sánchez; Francesca Toni; Dekai Zhang; Adam Dejl | 2025-06-01 | JREF:  | COMMENT: 
+2404.01415v2 | On the Faithfulness of Vision Transformer Explanations | Junyi Wu; Weitai Kang; Hao Tang; Yuan Hong; Yan Yan | 2024-04-01 | JREF:  | COMMENT: 
+2103.03098v1 | Accounting for Variance in Machine Learning Benchmarks | Xavier Bouthillier; Pierre Delaunay; Mirko Bronzi; Assya Trofimov; Brennan Nichyporuk; Justin Szeto; Naz Sepah; Edward Raff; Kanika Madan; Vikram Voleti; Samira Ebrahimi Kahou; Vincent Michalski; Dmitriy Serdyuk; Tal Arbel; Chris Pal; Gaël Varoquaux; Pascal Vincent | 2021-03-01 | JREF:  | COMMENT: 

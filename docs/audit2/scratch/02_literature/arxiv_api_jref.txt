@@ -1,0 +1,25 @@
+2302.07265v2 | JREF: Transactions on Machine Learning Research, Volume 2023, (2023), ISSN: 2835-8856 | DOI:  | COMMENT: 35 pages, 15 figures, 5 tables
+2201.13291v3 | JREF:  | DOI:  | COMMENT: 
+2105.06506v3 | JREF:  | DOI:  | COMMENT: Accepted to International Conference on Machine Learning (ICML 2022)
+2405.02344v2 | JREF:  | DOI:  | COMMENT: 
+2304.13836v5 | JREF:  | DOI:  | COMMENT: Accepted at the 2026 ICML Workshop on Mechanistic Interpretability
+2307.12344v2 | JREF:  | DOI:  | COMMENT: Accepted to MICCAI 2023
+2212.04629v1 | JREF: ICLR 2022 conference paper | DOI:  | COMMENT: 
+2401.06465v1 | JREF:  | DOI:  | COMMENT: 19 pages, 12 figures, NeurIPS XAIA 2023
+2409.16756v3 | JREF:  | DOI:  | COMMENT: Accepted at NeurIPS 2024
+2502.09150v2 | JREF:  | DOI:  | COMMENT: 
+2212.11870v3 | JREF: Proceedings of the National Academy of Sciences; 121(2); 2024 | DOI: 10.1073/pnas.2304406120 | COMMENT: 38 pages, 4 figures. Updated for PNAS publication
+2104.14403v2 | JREF:  | DOI:  | COMMENT: AAAI 2022. Video summary at https://www.youtube.com/watch?v=kAodFw6jvvo
+1912.01451v1 | JREF:  | DOI:  | COMMENT: Accepted for publication at the Thirty Fourth AAAI conference on Artificial Intelligence (AAAI-20)
+2401.10640v1 | JREF:  | DOI:  | COMMENT: 
+2407.11910v2 | JREF:  | DOI:  | COMMENT: NeurIPS 2024 Datasets and Benchmarks Track, project page and code: https://github.com/visinf/idsds
+2202.12270v2 | JREF:  | DOI:  | COMMENT: Updated based on reviewer comments: added discussion on sanity checks, application to tabular datasets, and minor changes
+2310.06514v2 | JREF:  | DOI:  | COMMENT: Appear at NeurIPS 2023 Workshop XAIA
+2009.10639v1 | JREF:  | DOI:  | COMMENT: 
+2405.02383v1 | JREF:  | DOI:  | COMMENT: arXiv admin note: text overlap with arXiv:2401.06465
+2007.07797v2 | JREF:  | DOI:  | COMMENT: 
+2003.07258v2 | JREF:  | DOI: 10.1016/j.inffus.2021.11.008 | COMMENT: 37 pages, 9 tables, 2 figures (plus appendix 14 pages)
+2310.16228v2 | JREF:  | DOI:  | COMMENT: ICLR 2024
+2401.06654v1 | JREF: Version published by Transactions on Machine Learning Research in 2024 (TMLR ISSN 2835-8856) https://openreview.net/forum?id=bIiLXdtUVM | DOI:  | COMMENT: 28 pages, 8 figures
+2506.01059v1 | JREF:  | DOI: 10.1145/3715275.3732186 | COMMENT: Accepted at FAccT 2025
+2404.01415v2 | JREF:  | DOI:  | COMMENT: CVPR 2024

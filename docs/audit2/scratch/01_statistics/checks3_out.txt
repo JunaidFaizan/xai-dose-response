@@ -1,0 +1,41 @@
+== Pneumonia patch bands above r_c 60 ==
+                 metric   band  models  n_pos  n_neg  auroc_strat
+531    Deletion (black)  60-80       5    214     89        0.054
+532    Deletion (black)   >=80      13    644     18        0.073
+546     Deletion (blur)  60-80       5    214     89        0.078
+547     Deletion (blur)   >=80      13    644     18        0.005
+561  Deletion (inpaint)  60-80       5    214     89        0.035
+562  Deletion (inpaint)   >=80      13    644     18        0.009
+576    Insertion (blur)  60-80       5    214     89        0.042
+577    Insertion (blur)   >=80      13    644     18        0.007
+
+== calibration gap: all images (as in paper) vs determined images only ==
+                base shortcut            metric  gap_all_images  gap_determined_only
+0            cifar10    patch     deletion_zero           0.628                0.628
+1            cifar10    patch     deletion_blur           0.579                0.578
+2            cifar10    patch  deletion_inpaint           0.398                0.396
+3            cifar10    patch    insertion_blur           0.272                0.270
+4   cifar10_resnet18    patch     deletion_zero           0.613                0.613
+5   cifar10_resnet18    patch     deletion_blur           0.589                0.588
+6   cifar10_resnet18    patch  deletion_inpaint           0.325                0.323
+7   cifar10_resnet18    patch    insertion_blur           0.356                0.353
+8              mnist    patch     deletion_zero           0.078                0.071
+9              mnist    patch     deletion_blur           0.080                0.072
+10             mnist    patch  deletion_inpaint           0.052                0.044
+11             mnist    patch    insertion_blur           0.063                0.055
+12             mnist  texture     deletion_zero           0.044                0.034
+13             mnist  texture     deletion_blur          -0.098               -0.100
+14             mnist  texture  deletion_inpaint           0.041                0.035
+15             mnist  texture    insertion_blur          -0.319               -0.319
+16      pet_resnet18    patch     deletion_zero           0.340                0.297
+17      pet_resnet18    patch     deletion_blur           0.369                0.315
+18      pet_resnet18    patch  deletion_inpaint           0.317                0.218
+19      pet_resnet18    patch    insertion_blur           0.330                0.260
+20   pneumonia_mnist    patch     deletion_zero           0.033               -0.141
+21   pneumonia_mnist    patch     deletion_blur           0.156                0.063
+22   pneumonia_mnist    patch  deletion_inpaint          -0.028               -0.234
+23   pneumonia_mnist    patch    insertion_blur           0.264                0.188
+24   pneumonia_mnist  texture     deletion_zero           0.145                0.122
+25   pneumonia_mnist  texture     deletion_blur           0.282                0.281
+26   pneumonia_mnist  texture  deletion_inpaint           0.064               -0.011
+27   pneumonia_mnist  texture    insertion_blur           0.251                0.239

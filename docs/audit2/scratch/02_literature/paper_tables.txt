@@ -1,0 +1,302 @@
+Ingredient | Prior work that already has it | What this study adds
+Inject a shortcut so the evidence is known | Decoy MNIST [15]; Zhou et al. [23]; Lin et al. [24]; BackX [25]; Adebayo et al. [26]; Sun et al. [18]; Bastings et al. (text) [21] | The object of evaluation is the metric, not the attribution method
+Graded or controlled model reliance | BAM: models trained with known relative feature importance [19]; SMERF: controlled model reasoning [20]; OSCAR: shortcut scores that react to the strength of the shortcut association [22] | A continuous signed dose, with reliance measured behaviourally from about 0% to 100% and chance-corrected
+Meta-evaluation of faithfulness metrics | Tomsett et al. [8]; MetaQuantus (no ground truth) [9]; fidelity metrics vs a decision tree [34]; synthetic intervention-based ground truth [31]; Gevaert et al. [11]; LATEC [10]; M4 [33] | A ground truth that changes with the model, read out as responsiveness, over-detection, a switch point and per-image AUROC
+Shape, size and fill confounds | ROAD [12]; ROAR pitfalls [41]; Blücher et al. [13]; Back to the Baseline [14]; Gomez et al. [42] | Size-matched, placebo and random oracle maps that show the confounds as reliance varies; real masks on Pet
+Pre-registration | In our searches we did not find an XAI-evaluation benchmark that pre-registers its predictions | Pre-registered Pet predictions and a dated amendment, with commit hashes
+Setting | Network | Models | Dose range | Raw reliance R (%) | rᴄ (%) | Accuracy without shortcut (%), low → high reliance
+Oxford-IIIT Pet, patch (ResNet-18) | ResNet-18 (11.2M) | 18 (6 doses) | −0.50 to 0.00 | 15.5–99.5 | −0.8–99.2 | 82.4 → 65.2
+CIFAR-10, patch (ResNet-18) | ResNet-18 (11.2M) | 18 (6 doses) | −0.80 to 0.00 | 2.7–97.2 | 0.8–97.0 | 81.9 → 25.7
+CIFAR-10, patch (small CNN) | CIFAR CNN (0.77M) | 12 (6 doses) | −0.80 to 0.00 | 3.7–96.6 | 0.8–96.3 | 71.3 → 29.6
+MNIST, patch | Small CNN | 51 (15 doses), incl. 15 A1 | −0.40 to 0.40 | 0.1–99.8 | 0.0–99.8 | 98.8 → 13.3
+MNIST, texture | Small CNN | 51 (15 doses), incl. 15 A1 | −0.40 to 0.40 | 0.1–100.0 | 0.0–100.0 | 98.7 → 17.4
+PneumoniaMNIST, patch | Small CNN | 42 (14 doses), incl. 6 A1 | −0.40 to 0.40 | 12.8–100.0 | −0.2–100.0 | 85.7 → 37.6
+PneumoniaMNIST, texture | Small CNN | 42 (14 doses), incl. 6 A1 | −0.40 to 0.40 | 16.4–100.0 | 3.0–100.0 | 84.9 → 51.6
+Setting | Metric | ρ with rᴄ [95% CI] | Preference, lowest dose [CI] → highest | Median AUC gap, lowest dose | Over-detection FPR (n models) | Balanced accuracy | Switch, rᴄ % [CI]
+Pet | Deletion (black) | 0.88 [0.61, 0.94] | 0.46 [0.39, 0.52] → 0.87 | −0.01 | 0.75 (12) | 0.62 | 1.3 [−0.3, 4.2] (e)
+ | Deletion (blur) | 0.93 [0.82, 0.96] | 0.50 [0.44, 0.56] → 0.94 | 0.00 | 0.92 (12) | 0.54 | none (> 0.5 at lowest)
+ | Deletion (inpaint) | 0.95 [0.85, 0.98] | 0.40 [0.35, 0.46] → 0.99 | −0.05 | 0.58 (12) | 0.71 | 4.6 [2.1, 10.6]
+ | Insertion (blur) | 0.94 [0.88, 0.97] | 0.35 [0.30, 0.40] → 0.96 | −0.06 | 0.58 (12) | 0.71 | 5.4 [4.0, 9.0]
+CIFAR ResNet-18 | Deletion (black) | 0.96 [0.84, 0.97] | 0.70 [0.63, 0.77] → 1.00 | 0.05 | 1.00 (15) | 0.50 | none (> 0.5 at lowest)
+ | Deletion (blur) | 0.97 [0.91, 0.98] | 0.61 [0.54, 0.68] → 1.00 | 0.06 | 1.00 (15) | 0.50 | none (> 0.5 at lowest)
+ | Deletion (inpaint) | 0.98 [0.92, 0.99] | 0.15 [0.11, 0.19] → 0.99 | −0.17 | 0.40 (15) | 0.80 | 8.7 [4.4, 16.3]
+ | Insertion (blur) | 0.98 [0.95, 0.99] | 0.24 [0.18, 0.31] → 1.00 | −0.23 | 0.47 (15) | 0.77 | 8.6 [6.9, 11.2]
+CIFAR CNN | Deletion (black) | 0.91 [0.59, 0.96] | 0.81 [0.76, 0.87] → 0.99 | 0.10 | 1.00 (10) | 0.50 | none (> 0.5 at lowest)
+ | Deletion (blur) | 0.90 [0.66, 0.96] | 0.73 [0.68, 0.80] → 0.97 | 0.13 | 1.00 (10) | 0.50 | none (> 0.5 at lowest)
+ | Deletion (inpaint) | 0.99 [0.94, 1.00] | 0.27 [0.20, 0.33] → 0.98 | −0.08 | 0.70 (10) | 0.65 | 4.3 [3.5, 7.3] (e)
+ | Insertion (blur) | 0.95 [0.91, 0.99] | 0.23 [0.17, 0.29] → 0.98 | −0.18 | 0.40 (10) | 0.80 | 17.7 [13.4, 21.3]
+MNIST patch | Deletion (black) | 0.96 [0.93, 0.97] | 0.02 [0.00, 0.04] → 0.89 | −0.48 | 0.12 (32) | 0.94 | 38.7 [26.9, 46.5]
+ | Deletion (blur) | 0.97 [0.94, 0.97] | 0.02 [0.00, 0.03] → 0.89 | −0.19 | 0.09 (32) | 0.95 | 38.8 [27.6, 45.6]
+ | Deletion (inpaint) | 0.97 [0.94, 0.98] | 0.01 [0.00, 0.02] → 0.90 | −0.68 | 0.06 (32) | 0.94 | 39.2 [34.7, 52.5]
+ | Insertion (blur) | 0.97 [0.93, 0.97] | 0.01 [0.00, 0.03] → 0.89 | −0.19 | 0.03 (32) | 0.98 | 39.3 [33.9, 51.9]
+MNIST texture | Deletion (black) | 0.91 [0.85, 0.94] | 0.03 [0.01, 0.07] → 0.96 | −0.44 | 0.15 (20) | 0.93 | 17.3 [11.4, 22.0] (nb)
+ | Deletion (blur) | 0.96 [0.92, 0.97] | 0.04 [0.01, 0.06] → 0.88 | −0.16 | 0.00 (20) | 0.95 | 66.5 [49.6, 75.4]
+ | Deletion (inpaint) | 0.95 [0.88, 0.96] | 0.02 [0.00, 0.04] → 0.97 | −0.33 | 0.15 (20) | 0.93 | 18.8 [12.4, 25.9]
+ | Insertion (blur) | 0.96 [0.92, 0.97] | 0.01 [0.00, 0.03] → 0.60 | −0.18 | 0.00 (20) | 0.68 | 99.7 [94.0, 99.9]
+Pneumonia patch | Deletion (black) | 0.64 [0.39, 0.75] | 0.38 [0.26, 0.52] → 0.61 | −0.07 | 0.68 (22) | 0.66 | 5.9 [3.0, 16.2]
+ | Deletion (blur) | 0.51 [0.34, 0.66] | 0.45 [0.39, 0.52] → 0.58 | 0.00 | 0.73 (22) | 0.64 | 2.5 [0.4, 4.4] (e)
+ | Deletion (inpaint) | 0.66 [0.46, 0.79] | 0.15 [0.10, 0.20] → 0.56 | −0.05 | 0.23 (22) | 0.81 | 30.0 [7.6, 42.7]
+ | Insertion (blur) | 0.49 [0.32, 0.63] | 0.50 [0.40, 0.60] → 0.71 | 0.00 | 0.82 (22) | 0.59 | 0.1 [0.0, 1.2] (e)
+Pneumonia texture | Deletion (black) | 0.85 [0.77, 0.92] | 0.33 [0.23, 0.43] → 0.94 | −0.03 | 0.67 (18) | 0.67 | 12.6 [5.9, 22.9]
+ | Deletion (blur) | 0.58 [0.40, 0.73] | 0.57 [0.52, 0.63] → 1.00 | 0.00 | 1.00 (18) | 0.50 | none (> 0.5 at lowest)
+ | Deletion (inpaint) | 0.56 [0.32, 0.69] | 0.45 [0.34, 0.60] → 0.93 | 0.00 | 0.89 (18) | 0.53 | 4.4 [3.9, 6.8] (e)
+ | Insertion (blur) | 0.27† [0.06, 0.49] | 0.64 [0.56, 0.72] → 0.95 | 0.00 | 1.00 (18) | 0.50 | none (> 0.5 at lowest)
+Setting (lowest model rᴄ) | Metric | S–O | R–O | P–O | S–R | P–R
+Pet (−0.8%) | Deletion (black) | 0.46 | 0.53 [0.46, 0.60] | 0.48 | 0.45 | 0.41
+ | Deletion (blur) | 0.50 | 0.49 [0.43, 0.55] | 0.46 | 0.53 | 0.47
+ | Deletion (inpaint) | 0.40 | 0.38 [0.33, 0.44] | 0.38 | 0.53 | 0.44
+ | Insertion (blur) | 0.35 | 0.35 [0.30, 0.40] | 0.34 | 0.53 | 0.49
+CIFAR ResNet-18 (0.8%) | Deletion (black) | 0.70 | 0.72 [0.63, 0.80] | 0.72 | 0.49 | 0.44
+ | Deletion (blur) | 0.61 | 0.56 [0.48, 0.64] | 0.61 | 0.52 | 0.52
+ | Deletion (inpaint) | 0.15 | 0.13 [0.09, 0.17] | 0.11 | 0.58 | 0.48
+ | Insertion (blur) | 0.24 | 0.21 [0.17, 0.26] | 0.20 | 0.55 | 0.49
+CIFAR CNN (0.8%) | Deletion (black) | 0.81 | 0.81 [0.76, 0.87] | 0.81 | 0.48 | 0.52
+ | Deletion (blur) | 0.73 | 0.75 [0.69, 0.81] | 0.71 | 0.56 | 0.49
+ | Deletion (inpaint) | 0.27 | 0.23 [0.17, 0.28] | 0.22 | 0.62 | 0.45
+ | Insertion (blur) | 0.23 | 0.18 [0.13, 0.23] | 0.18 | 0.59 | 0.46
+Pred. | Comparison | Metric or method | Statistic | Estimate [two-level 95% CI] | ρ on rᴄ | Threshold | Original verdict
+P1 | shortcut vs full object | Deletion (black) | spearman rho (raw reliance) | 0.850 [0.582, 0.934] | 0.877 | > 0.8 | Holds
+P1 | shortcut vs full object | Deletion (blur) | spearman rho (raw reliance) | 0.960 [0.842, 0.973] | 0.933 | > 0.8 | Holds
+P1 | shortcut vs full object | Deletion (inpaint) | spearman rho (raw reliance) | 0.950 [0.854, 0.979] | 0.951 | > 0.8 | Holds
+P1 | shortcut vs full object | Insertion (blur) | spearman rho (raw reliance) | 0.934 [0.877, 0.969] | 0.935 | > 0.8 | Holds
+P2 | random vs full object | Deletion (black) | preference at lowest dose (-0.5) | 0.528 [0.460, 0.597] | – | black, blur > inpaint, insertion | Holds
+P2 | random vs full object | Deletion (blur) | preference at lowest dose (-0.5) | 0.490 [0.430, 0.553] | – | black, blur > inpaint, insertion | Holds
+P2 | random vs full object | Deletion (inpaint) | preference at lowest dose (-0.5) | 0.383 [0.327, 0.443] | – | black, blur > inpaint, insertion | Holds
+P2 | random vs full object | Insertion (blur) | preference at lowest dose (-0.5) | 0.350 [0.297, 0.403] | – | black, blur > inpaint, insertion | Holds
+P2 | random vs full object | mean(black, blur) - mean(inpaint, insertion) | preference contrast at lowest dose | 0.142 [0.086, 0.202] | – | > 0 | Holds
+P3 | shortcut vs random | Deletion (black) | preference at lowest dose (-0.5) | 0.450 [0.378, 0.525] | – | 0.5 ± 0.15 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs random | Deletion (blur) | preference at lowest dose (-0.5) | 0.527 [0.462, 0.593] | – | 0.5 ± 0.15 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs random | Deletion (inpaint) | preference at lowest dose (-0.5) | 0.528 [0.467, 0.592] | – | 0.5 ± 0.15 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs random | Insertion (blur) | preference at lowest dose (-0.5) | 0.533 [0.467, 0.593] | – | 0.5 ± 0.15 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs random | Deletion (black) | spearman rho (raw reliance) | 0.750 [0.459, 0.902] | 0.772 | > 0.8 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs random | Deletion (blur) | spearman rho (raw reliance) | 0.884 [0.774, 0.945] | 0.889 | > 0.8 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs random | Deletion (inpaint) | spearman rho (raw reliance) | 0.960 [0.858, 0.983] | 0.966 | > 0.8 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs random | Insertion (blur) | spearman rho (raw reliance) | 0.948 [0.817, 0.970] | 0.955 | > 0.8 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs placebo | Deletion (black) | preference at lowest dose (-0.5) | 0.552 [0.487, 0.620] | – | 0.5 ± 0.15 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs placebo | Deletion (blur) | preference at lowest dose (-0.5) | 0.572 [0.513, 0.630] | – | 0.5 ± 0.15 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs placebo | Deletion (inpaint) | preference at lowest dose (-0.5) | 0.523 [0.437, 0.620] | – | 0.5 ± 0.15 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs placebo | Insertion (blur) | preference at lowest dose (-0.5) | 0.520 [0.457, 0.583] | – | 0.5 ± 0.15 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs placebo | Deletion (black) | spearman rho (raw reliance) | 0.727 [0.381, 0.879] | 0.730 | > 0.8 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs placebo | Deletion (blur) | spearman rho (raw reliance) | 0.889 [0.785, 0.957] | 0.912 | > 0.8 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs placebo | Deletion (inpaint) | spearman rho (raw reliance) | 0.952 [0.877, 0.979] | 0.968 | > 0.8 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs placebo | Insertion (blur) | spearman rho (raw reliance) | 0.930 [0.825, 0.970] | 0.942 | > 0.8 | Fails for Deletion (black); holds for the other three metrics
+P4 | shortcut mass | Integrated Gradients | spearman rho (raw reliance) | 0.936 [0.897, 0.975] | 0.946 | > 0.8 | Holds
+P4 | shortcut mass | Occlusion | spearman rho (raw reliance) | 0.979 [0.958, 0.991] | 0.969 | > 0.8 | Holds
+Setting | Metric | Pooled AUROC [CI] | Within-model median AUROC [CI] | Calibration gap | Metric switch on follow rate (%) | Behavioural switch, rᴄ (%)
+Pet | Deletion (black) | 0.75 [0.71, 0.79] | 0.65 [0.58, 0.75] | 0.34 | 2.2 (e) | 54.5
+ | Deletion (blur) | 0.81 [0.75, 0.85] | 0.70 [0.57, 0.84] | 0.37 | none (> 0.5 at lowest) | 
+ | Deletion (inpaint) | 0.90 [0.87, 0.92] | 0.78 [0.71, 0.87] | 0.32 | 6.1 | 
+ | Insertion (blur) | 0.82 [0.78, 0.86] | 0.80 [0.69, 0.87] | 0.33 | 7.5 | 
+CIFAR ResNet-18 | Deletion (black) | 0.86 [0.84, 0.89] | 0.60 [0.49, 0.70] | 0.61 | none (> 0.5 at lowest) | 52.9
+ | Deletion (blur) | 0.82 [0.79, 0.85] | 0.56 [0.49, 0.71] | 0.59 | none (> 0.5 at lowest) | 
+ | Deletion (inpaint) | 0.88 [0.86, 0.91] | 0.68 [0.55, 0.79] | 0.33 | 8.0 | 
+ | Insertion (blur) | 0.87 [0.84, 0.89] | 0.56 [0.50, 0.70] | 0.36 | 8.2 | 
+CIFAR CNN | Deletion (black) | 0.84 [0.80, 0.88] | 0.43 [0.34, 0.55] | 0.63 | none (> 0.5 at lowest) | 55.0
+ | Deletion (blur) | 0.84 [0.81, 0.87] | 0.57 [0.50, 0.71] | 0.58 | none (> 0.5 at lowest) | 
+ | Deletion (inpaint) | 0.89 [0.86, 0.91] | 0.62 [0.55, 0.74] | 0.40 | 5.5 | 
+ | Insertion (blur) | 0.89 [0.86, 0.91] | 0.68 [0.58, 0.78] | 0.27 | 16.2 | 
+MNIST patch | Deletion (black) | 0.83 [0.80, 0.85] | 0.53 [0.48, 0.58] | 0.08 | 35.4 | 53.9
+ | Deletion (blur) | 0.79 [0.77, 0.82] | 0.52 [0.46, 0.59] | 0.08 | 35.6 | 
+ | Deletion (inpaint) | 0.87 [0.85, 0.89] | 0.53 [0.48, 0.58] | 0.05 | 37.5 | 
+ | Insertion (blur) | 0.81 [0.78, 0.83] | 0.52 [0.46, 0.56] | 0.06 | 37.8 | 
+MNIST texture | Deletion (black) | 0.91 [0.89, 0.93] | 0.56 [0.47, 0.66] | 0.04 | 18.7 (nb) | 45.7
+ | Deletion (blur) | 0.89 [0.87, 0.90] | 0.53 [0.43, 0.60] | −0.10 | 71.8 | 
+ | Deletion (inpaint) | 0.92 [0.90, 0.93] | 0.45 [0.40, 0.58] | 0.04 | 21.0 (nb) | 
+ | Insertion (blur) | 0.88 [0.86, 0.90] | 0.66 [0.57, 0.71] | −0.32 | 96.3 | 
+Pneumonia patch | Deletion (black) | 0.46 [0.39, 0.54] | 0.70 [0.54, 0.76] | 0.03 | 6.2 | 36.9
+ | Deletion (blur) | 0.50 [0.41, 0.60] | 0.56 [0.34, 0.72] | 0.16 | 3.0 (e) | 
+ | Deletion (inpaint) | 0.65 [0.59, 0.73] | 0.67 [0.44, 0.80] | −0.03 | 19.5 | 
+ | Insertion (blur) | 0.41 [0.33, 0.50] | 0.61 [0.46, 0.74] | 0.26 | 0.3 (e) | 
+Pneumonia texture | Deletion (black) | 0.85 [0.81, 0.88] | 0.73 [0.62, 0.78] | 0.14 | 13.5 | 41.9
+ | Deletion (blur) | 0.72 [0.66, 0.79] | 0.86 [0.79, 0.89] | 0.28 | none (> 0.5 at lowest) | 
+ | Deletion (inpaint) | 0.72 [0.65, 0.79] | 0.83 [0.77, 0.88] | 0.06 | 5.9 (e) | 
+ | Insertion (blur) | 0.68 [0.62, 0.75] | 0.79 [0.73, 0.86] | 0.25 | none (> 0.5 at lowest) | 
+Setting | Metric | ρ with rᴄ [95% CI] | Preference, lowest dose [CI] → highest | Median AUC gap, lowest dose | Over-detection FPR (n models) | Balanced accuracy | Switch, rᴄ % [CI]
+Pet | Deletion (black) | 0.82 [0.52, 0.92] | 0.46 [0.39, 0.53] → 0.75 | 0.00 | 0.83 (12) | 0.58 | 0.2 [−0.4, 3.6] (e)
+ | Deletion (blur) | 0.86 [0.74, 0.94] | 0.54 [0.46, 0.62] → 0.91 | 0.00 | 0.92 (12) | 0.54 | none (> 0.5 at lowest)
+ | Deletion (inpaint) | 0.97 [0.88, 0.98] | 0.55 [0.49, 0.60] → 0.99 | 0.00 | 1.00 (12) | 0.50 | none (> 0.5 at lowest)
+ | Insertion (blur) | 0.95 [0.85, 0.97] | 0.50 [0.43, 0.57] → 0.97 | 0.00 | 0.83 (12) | 0.58 | −0.4 [−0.7, 2.1] (e)
+CIFAR ResNet-18 | Deletion (black) | 0.95 [0.88, 0.98] | 0.51 [0.45, 0.57] → 0.97 | 0.00 | 0.93 (15) | 0.53 | 0.9 [0.8, 1.8] (e)
+ | Deletion (blur) | 0.94 [0.80, 0.97] | 0.54 [0.47, 0.60] → 0.98 | 0.01 | 1.00 (15) | 0.50 | none (> 0.5 at lowest)
+ | Deletion (inpaint) | 0.91 [0.78, 0.96] | 0.62 [0.56, 0.68] → 0.97 | 0.02 | 1.00 (15) | 0.50 | none (> 0.5 at lowest)
+ | Insertion (blur) | 0.96 [0.91, 0.98] | 0.53 [0.45, 0.60] → 1.00 | 0.01 | 0.93 (15) | 0.53 | none (> 0.5 at lowest)
+CIFAR CNN | Deletion (black) | 0.99 [0.86, 0.99] | 0.48 [0.40, 0.56] → 0.96 | 0.00 | 0.90 (10) | 0.55 | 1.2 [0.8, 2.6] (e)
+ | Deletion (blur) | 0.89 [0.78, 0.97] | 0.59 [0.51, 0.67] → 0.97 | 0.01 | 1.00 (10) | 0.50 | none (> 0.5 at lowest)
+ | Deletion (inpaint) | 0.89 [0.65, 0.98] | 0.60 [0.53, 0.67] → 0.97 | 0.01 | 1.00 (10) | 0.50 | none (> 0.5 at lowest)
+ | Insertion (blur) | 0.85 [0.69, 0.93] | 0.58 [0.50, 0.66] → 0.90 | 0.01 | 1.00 (10) | 0.50 | none (> 0.5 at lowest)
+MNIST patch | Deletion (black) | 0.97 [0.92, 0.97] | 0.37 [0.31, 0.43] → 0.93 | −0.03 | 0.50 (32) | 0.75 | 0.9 [0.1, 4.6] (e)
+ | Deletion (blur) | 0.97 [0.93, 0.97] | 0.28 [0.23, 0.33] → 0.94 | −0.03 | 0.34 (32) | 0.83 | 8.6 [5.5, 16.0]
+ | Deletion (inpaint) | 0.97 [0.93, 0.97] | 0.33 [0.28, 0.39] → 0.94 | −0.02 | 0.50 (32) | 0.75 | 1.1 [0.6, 6.2] (e)
+ | Insertion (blur) | 0.97 [0.92, 0.97] | 0.30 [0.25, 0.36] → 0.92 | −0.03 | 0.41 (32) | 0.80 | 4.1 [0.3, 8.2] (e)
+MNIST texture | Deletion (black) | 0.92 [0.85, 0.94] | 0.02 [0.00, 0.03] → 0.94 | −0.39 | 0.25 (20) | 0.88 | 11.5 [9.8, 19.2]
+ | Deletion (blur) | 0.94 [0.90, 0.95] | 0.03 [0.01, 0.06] → 0.71 | −0.15 | 0.00 (20) | 0.84 | 84.9 [76.2, 92.8]
+ | Deletion (inpaint) | 0.95 [0.89, 0.96] | 0.07 [0.03, 0.11] → 0.98 | −0.20 | 0.20 (20) | 0.90 | 18.1 [11.6, 27.0] (nb)
+ | Insertion (blur) | 0.95 [0.91, 0.96] | 0.01 [0.00, 0.03] → 0.60 | −0.18 | 0.00 (20) | 0.66 | 99.7 [94.2, 100.0]
+Pneumonia patch | Deletion (black) | 0.83 [0.60, 0.85] | 0.50 [0.43, 0.58] → 0.79 | 0.00 | 0.82 (22) | 0.59 | 0.9 [0.0, 2.6] (e)
+ | Deletion (blur) | 0.54 [0.32, 0.72] | 0.51 [0.45, 0.57] → 0.72 | 0.00 | 0.86 (22) | 0.57 | 0.0 [−0.1, 1.2] (e)
+ | Deletion (inpaint) | 0.58 [0.36, 0.72] | 0.50 [0.41, 0.58] → 0.73 | 0.00 | 0.91 (22) | 0.55 | 0.2 [−0.1, 1.7] (e)
+ | Insertion (blur) | 0.73 [0.53, 0.80] | 0.50 [0.45, 0.56] → 0.71 | 0.00 | 0.82 (22) | 0.59 | 0.0 [−0.1, 3.4] (e)
+Pneumonia texture | Deletion (black) | 0.02† [−0.22, 0.29] | 0.55 [0.47, 0.62] → 0.52 | 0.00 | 0.83 (18) | 0.56 | 3.1 [–] (e)
+ | Deletion (blur) | 0.38 [0.18, 0.56] | 0.55 [0.49, 0.61] → 0.90 | 0.00 | 1.00 (18) | 0.50 | none (> 0.5 at lowest)
+ | Deletion (inpaint) | 0.61 [0.42, 0.73] | 0.48 [0.42, 0.53] → 0.93 | 0.00 | 0.83 (18) | 0.58 | 5.2 [3.3, 6.0] (e)
+ | Insertion (blur) | 0.48 [0.30, 0.63] | 0.54 [0.47, 0.62] → 0.92 | 0.00 | 1.00 (18) | 0.50 | none (> 0.5 at lowest)
+Comparison | Setting | Metric A | Metric B | Δρ on rᴄ (A − B) [CI] | p_bh | p_holm | Δ preference, lowest dose [CI]
+random vs full object | CIFAR ResNet-18 | Deletion (black) | Deletion (blur) | −0.159 [−0.374, −0.024] | 0.049 | 0.416 | 0.162 [0.100, 0.223]
+random vs full object | CIFAR CNN | Deletion (black) | Deletion (inpaint) | −0.433 [−0.806, −0.087] | 0.038 | 0.297 | 0.590 [0.515, 0.670]
+random vs full object | CIFAR CNN | Deletion (black) | Insertion (blur) | −0.397 [−0.805, −0.069] | 0.037 | 0.272 | 0.630 [0.545, 0.720]
+random vs full object | CIFAR CNN | Deletion (blur) | Deletion (inpaint) | −0.291 [−0.708, −0.080] | 0.030 | 0.185 | 0.525 [0.445, 0.610]
+random vs full object | CIFAR CNN | Deletion (blur) | Insertion (blur) | −0.254 [−0.704, −0.062] | 0.032 | 0.210 | 0.565 [0.470, 0.665]
+random vs full object | MNIST texture | Deletion (black) | Insertion (blur) | −0.069 [−0.142, −0.020] | 0.030 | 0.185 | 0.017 [−0.003, 0.043]
+random vs full object | Pneumonia patch | Deletion (blur) | Deletion (inpaint) | −0.174 [−0.292, −0.040] | 0.049 | 0.434 | 0.280 [0.185, 0.372]
+random vs full object | Pneumonia patch | Deletion (inpaint) | Insertion (blur) | 0.225 [0.091, 0.342] | 0.004 | 0.021 | −0.333 [−0.467, −0.205]
+random vs full object | Pneumonia texture | Deletion (black) | Deletion (inpaint) | 0.585 [0.373, 0.881] | 0.004 | 0.021 | −0.157 [−0.248, −0.058]
+random vs full object | Pneumonia texture | Deletion (black) | Insertion (blur) | 0.765 [0.500, 1.047] | 0.004 | 0.021 | −0.308 [−0.462, −0.112]
+random vs full object | Pneumonia texture | Deletion (blur) | Deletion (inpaint) | 0.464 [0.232, 0.786] | 0.004 | 0.021 | 0.137 [−0.028, 0.305]
+random vs full object | Pneumonia texture | Deletion (blur) | Insertion (blur) | 0.644 [0.422, 0.869] | 0.004 | 0.021 | −0.015 [−0.095, 0.077]
+shortcut vs full object | Pneumonia texture | Deletion (black) | Deletion (blur) | 0.266 [0.093, 0.458] | 0.021 | 0.078 | −0.243 [−0.365, −0.108]
+shortcut vs full object | Pneumonia texture | Deletion (black) | Deletion (inpaint) | 0.293 [0.162, 0.530] | 0.007 | 0.021 | −0.122 [−0.217, −0.020]
+shortcut vs full object | Pneumonia texture | Deletion (black) | Insertion (blur) | 0.579 [0.335, 0.806] | 0.007 | 0.021 | −0.312 [−0.427, −0.165]
+shortcut vs full object | Pneumonia texture | Deletion (blur) | Insertion (blur) | 0.313 [0.144, 0.461] | 0.007 | 0.021 | −0.068 [−0.153, 0.008]
+shortcut vs size-matched object | Pneumonia texture | Deletion (black) | Deletion (inpaint) | −0.593 [−0.819, −0.272] | 0.021 | 0.021 | 0.067 [−0.032, 0.165]
+shortcut vs size-matched object | Pneumonia texture | Deletion (black) | Insertion (blur) | −0.456 [−0.683, −0.166] | 0.021 | 0.041 | 0.002 [−0.068, 0.067]
+Method | Pet | CIFAR ResNet-18 | CIFAR CNN | MNIST patch | MNIST texture | Pneumonia patch | Pneumonia texture
+Saliency | 0.98
+[0.95, 0.99]
+0.001 → 0.304 | 0.95
+[0.88, 0.98]
+0.002 → 0.088 | 0.99
+[0.98, 1.00]
+0.003 → 0.115 | 0.93
+[0.88, 0.95]
+0.002 → 0.094 | −0.75
+[−0.85, −0.62]
+0.118 → 0.057 | 0.92
+[0.87, 0.96]
+0.001 → 0.174 | 0.89
+[0.84, 0.93]
+0.097 → 0.176
+SmoothGrad | 0.92
+[0.83, 0.98]
+0.002 → 0.140 | 0.95
+[0.93, 0.99]
+0.004 → 0.130 | 0.99
+[0.98, 1.00]
+0.004 → 0.103 | 0.95
+[0.91, 0.97]
+0.002 → 0.104 | −0.68
+[−0.82, −0.49]
+0.110 → 0.082 | 0.90
+[0.84, 0.94]
+0.001 → 0.132 | 0.78
+[0.69, 0.87]
+0.091 → 0.136
+Integrated Gradients | 0.95
+[0.90, 0.98]
+0.006 → 0.220 | 0.86
+[0.67, 0.93]
+0.017 → 0.084 | 1.00
+[0.98, 1.00]
+0.013 → 0.320 | 0.99
+[0.97, 0.99]
+0.002 → 0.696 | 0.90
+[0.85, 0.93]
+0.147 → 0.530 | 0.93
+[0.89, 0.95]
+0.003 → 0.391 | 0.90
+[0.82, 0.94]
+0.142 → 0.397
+Grad-CAM | 0.89
+[0.77, 0.95]
+0.006 → 0.085 | 0.78
+[0.48, 0.93]
+0.012 → 0.022 | 0.78
+[0.27, 0.88]
+0.012 → 0.080 | 0.86
+[0.77, 0.90]
+0.013 → 0.038 | −0.32
+[−0.46, −0.01]
+0.100 → 0.098 | 0.76
+[0.61, 0.88]
+0.022 → 0.166 | −0.38
+[−0.58, −0.09]
+0.098 → 0.093
+Occlusion | 0.97
+[0.95, 0.99]
+0.004 → 0.598 | 0.95
+[0.92, 0.98]
+0.005 → 0.338 | 0.99
+[0.97, 1.00]
+0.008 → 0.467 | 0.98
+[0.96, 0.98]
+0.000 → 0.531 | 0.93
+[0.85, 0.95]
+0.104 → 0.218 | 0.91
+[0.83, 0.95]
+0.000 → 0.362 | 0.66
+[0.47, 0.79]
+0.106 → 0.126
+Setting | Models | ρ(R, acc) | Deletion (black) | Deletion (blur) | Deletion (inpaint) | Insertion (blur)
+CIFAR CNN | 12 | −0.72 | 0.93 / 0.88 (< 0.001) | 0.90 / 0.78 (0.005) | 0.99 / 0.98 (< 0.001) | 0.98 / 0.96 (< 0.001)
+Pneumonia texture | 42 | −0.80 | 0.86 / 0.61 (< 0.001) | 0.58 / 0.60 (< 0.001) | 0.56 / 0.49 (0.001) | 0.27 / 0.26 (0.106)
+Pneumonia patch | 42 | −0.86 | 0.69 / 0.40 (0.010) | 0.55 / 0.42 (0.006) | 0.71 / 0.33 (0.034) | 0.46 / 0.49 (0.001)
+Pet | 18 | −0.96 | 0.85 / 0.57 (0.017) | 0.96 / 0.68 (0.003) | 0.95 / 0.64 (0.006) | 0.93 / 0.70 (0.002)
+MNIST texture | 51 | −0.98 | 0.91 / −0.26 (0.066) | 0.97 / 0.38 (0.007) | 0.95 / 0.23 (0.115) | 0.97 / 0.53 (< 0.001)
+CIFAR ResNet-18 | 18 | −0.98 | 0.96 / 0.46 (0.062) | 0.97 / 0.54 (0.024) | 0.98 / 0.78 (< 0.001) | 0.98 / 0.52 (0.033)
+MNIST patch | 51 | −0.99 | 0.97 / 0.48 (< 0.001) | 0.97 / 0.62 (< 0.001) | 0.98 / 0.45 (0.001) | 0.97 / 0.53 (< 0.001)
+Dataset | Metric | Mean τ (3 seeds) | Exact one-sided p of the mean | τ per seed (42, 1, 2)
+Decoy MNIST | Deletion (black) | 0.80 | < 0.001 | 0.80, 0.80, 0.80
+Decoy MNIST | Deletion (blur) | 0.87 | < 0.001 | 1.00, 0.60, 1.00
+Decoy MNIST | Deletion (inpaint) | 0.67 | 0.003 | 0.80, 0.40, 0.80
+Decoy MNIST | Insertion (blur) | 0.60 | 0.007 | 0.80, 0.20, 0.80
+Decoy MNIST | Sanity (object px) | −0.20 | 0.836 | −0.20, −0.40, 0.00
+Decoy Pneumonia | Deletion (black) | −0.33 | 0.940 | 0.40, −0.80, −0.60
+Decoy Pneumonia | Deletion (blur) | −0.33 | 0.940 | 0.00, −0.60, −0.40
+Decoy Pneumonia | Deletion (inpaint) | 0.33 | 0.103 | 0.60, 0.20, 0.20
+Decoy Pneumonia | Insertion (blur) | 0.00 | 0.555 | 0.60, −0.40, −0.20
+Decoy Pneumonia | Sanity (object px) | 0.07 | 0.445 | −0.20, 0.20, 0.20
+Setting | Metric | ρ with raw R [seed-only CI] | p (unadjusted) | Decision accuracy (unbalanced) | Switch, raw R % [CI]
+Pet | Deletion (black) | 0.85 [0.71, 0.95] | < 0.001 | 0.56 | 18.9 [17.4, 20.4]
+ | Deletion (blur) | 0.96 [0.92, 0.99] | < 0.001 | 0.44 | none [–]
+ | Deletion (inpaint) | 0.95 [0.87, 0.99] | < 0.001 | 0.67 | 22.1 [20.8, 26.1]
+ | Insertion (blur) | 0.93 [0.89, 0.98] | < 0.001 | 0.67 | 24.7 [23.1, 26.2]
+CIFAR ResNet-18 | Deletion (black) | 0.96 [0.92, 0.99] | < 0.001 | 0.17 | none [–]
+ | Deletion (blur) | 0.97 [0.96, 0.99] | < 0.001 | 0.17 | none [–]
+ | Deletion (inpaint) | 0.98 [0.95, 1.00] | < 0.001 | 0.67 | 11.6 [9.6, 14.9]
+ | Insertion (blur) | 0.98 [0.97, 1.00] | < 0.001 | 0.61 | 11.0 [9.3, 12.7]
+CIFAR CNN | Deletion (black) | 0.94 [0.82, 1.00] | < 0.001 | 0.17 | none [–]
+ | Deletion (blur) | 0.90 [0.83, 0.99] | < 0.001 | 0.17 | none [–]
+ | Deletion (inpaint) | 0.99 [0.99, 1.00] | < 0.001 | 0.42 | 8.4 [7.1, 10.3]
+ | Insertion (blur) | 0.98 [0.94, 1.00] | < 0.001 | 0.67 | 19.7 [18.3, 21.6]
+MNIST patch | Deletion (black) | 0.97 [0.95, 0.98] | < 0.001 | 0.92 | 38.1 [25.8, 46.3]
+ | Deletion (blur) | 0.97 [0.95, 0.98] | < 0.001 | 0.94 | 38.6 [27.0, 46.0]
+ | Deletion (inpaint) | 0.98 [0.96, 0.98] | < 0.001 | 0.94 | 43.8 [32.4, 52.9]
+ | Insertion (blur) | 0.97 [0.96, 0.98] | < 0.001 | 0.98 | 45.1 [29.8, 51.3]
+MNIST texture | Deletion (black) | 0.91 [0.87, 0.95] | < 0.001 | 0.94 | 30.5 [19.4, 35.3]
+ | Deletion (blur) | 0.97 [0.95, 0.98] | < 0.001 | 0.94 | 61.2 [54.7, 72.2]
+ | Deletion (inpaint) | 0.95 [0.92, 0.97] | < 0.001 | 0.94 | 33.8 [22.8, 38.7]
+ | Insertion (blur) | 0.96 [0.94, 0.98] | < 0.001 | 0.61 | 96.8 [93.0, 99.8]
+Pneumonia patch | Deletion (black) | 0.69 [0.58, 0.81] | < 0.001 | 0.74 | 24.2 [13.9, 26.5]
+ | Deletion (blur) | 0.56 [0.42, 0.66] | < 0.001 | 0.71 | 19.0 [17.7, 20.6]
+ | Deletion (inpaint) | 0.71 [0.57, 0.82] | < 0.001 | 0.86 | 31.8 [28.8, 50.7]
+ | Insertion (blur) | 0.46 [0.31, 0.62] | = 0.002 | 0.67 | 16.8 [14.7, 19.4]
+Pneumonia texture | Deletion (black) | 0.86 [0.79, 0.93] | < 0.001 | 0.74 | 28.4 [21.6, 32.3]
+ | Deletion (blur) | 0.58 [0.41, 0.73] | < 0.001 | 0.59 | none [–]
+ | Deletion (inpaint) | 0.56 [0.36, 0.71] | < 0.001 | 0.62 | 19.2 [18.6, 20.1]
+ | Insertion (blur) | 0.27 [0.06, 0.47] | = 0.087 | 0.59 | none [–]
+Setting | Metric | ρ on rᴄ | Over-detection FPR | Balanced accuracy | Switch, rᴄ %
+MNIST patch | Deletion (black) | 0.927 → 0.959 | 0.048 → 0.125 | 0.976 → 0.938 | 32.0 (nb) → 38.7
+ | Deletion (blur) | 0.965 → 0.973 | 0.048 → 0.094 | 0.976 → 0.953 | 34.9 (nb) → 38.8
+ | Deletion (inpaint) | 0.941 → 0.967 | 0.048 → 0.062 | 0.943 → 0.942 | 38.1 (nb) → 39.2
+ | Insertion (blur) | 0.939 → 0.965 | 0.000 → 0.031 | 1.000 → 0.984 | 48.7 → 39.3
+MNIST texture | Deletion (black) | 0.937 → 0.909 | 0.059 → 0.150 | 0.971 → 0.925 | 17.3 (nb) → 17.3 (nb)
+ | Deletion (blur) | 0.956 → 0.964 | 0.000 → 0.000 | 0.974 → 0.952 | 71.8 (nb) → 66.5
+ | Deletion (inpaint) | 0.948 → 0.948 | 0.059 → 0.150 | 0.971 → 0.925 | 20.1 (nb) → 18.8
+ | Insertion (blur) | 0.951 → 0.965 | 0.000 → 0.000 | 0.763 → 0.677 | 99.7 → 99.7
+Pneumonia patch | Deletion (black) | 0.670 → 0.645 | 0.562 → 0.682 | 0.719 → 0.659 | 6.2 → 5.9
+ | Deletion (blur) | 0.567 → 0.506 | 0.625 → 0.727 | 0.688 → 0.636 | 2.5 (e) → 2.5 (e)
+ | Deletion (inpaint) | 0.624 → 0.658 | 0.250 → 0.227 | 0.800 → 0.811 | 30.0 → 30.0
+ | Insertion (blur) | 0.492 → 0.488 | 0.750 → 0.818 | 0.625 → 0.591 | 0.1 (e) → 0.1 (e)
+Pneumonia texture | Deletion (black) | 0.790 → 0.848 | 0.500 → 0.667 | 0.750 → 0.667 | 13.4 → 12.6
+ | Deletion (blur) | 0.569 → 0.583 | 1.000 → 1.000 | 0.500 → 0.500 | none (> 0.5 at lowest) → none (> 0.5 at lowest)
+ | Deletion (inpaint) | 0.598 → 0.555 | 0.833 → 0.889 | 0.562 → 0.535 | 4.4 (e) → 4.4 (e)
+ | Insertion (blur) | 0.253 → 0.269 | 1.000 → 1.000 | 0.500 → 0.500 | none (> 0.5 at lowest) → none (> 0.5 at lowest)

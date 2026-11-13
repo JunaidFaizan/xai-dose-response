@@ -1,0 +1,545 @@
+DRAFT for guide review — not for submission
+Provisional target journal: Neurocomputing (Elsevier), Q1 in Artificial Intelligence, SJR 1.47 according to the SCImago widget recorded in docs/audit/00_combined_audit.md §7. The free (subscription, no article processing charge) route is UNVERIFIED and must be confirmed by the author in a normal browser before submission. Layout: single-column Elsevier-style draft (A4, Times New Roman 12 pt, 1.5 line spacing); an elsarticle LaTeX version was not prepared. All numbers are generated from the project's result files by paper/build_paper.py.
+A Dose-Response Evaluation of Explanation Metrics under Controlled Shortcut Reliance in CNN Image Classifiers
+Md Junaid Faizan Shaikh
+Department of Computer Science and Engineering, Khaja Bandanawaz University, Kalaburagi, India
+E-mail: [email]
+Abstract Deletion and insertion curves are used to decide which explanation of an image classifier is faithful, but whether their verdicts follow what a model relies on is rarely tested. We trained 234 CNNs in which a signed training dose sets the measured reliance on an injected class-coded shortcut, on Oxford-IIIT Pet with real object masks, CIFAR-10, MNIST and PneumoniaMNIST, and scored fixed oracle explanations with four metric variants. The metrics respond to reliance: the preference for the shortcut map over the object map rises with chance-corrected reliance in 27 of 28 metric–setting cells (Spearman ρ = 0.49–0.99 in those cells). They are not calibrated to it. Among models with chance-corrected reliance at most 50%, black and blur deletion still prefer the shortcut map for 75–92% of Pet models and 100% of CIFAR-10 models, and on Pet the metrics switch at 1.3–5.4% chance-corrected reliance, while the models follow the shortcut on half of the images only at 54.5%. Against per-image behavioural labels, the metrics reach a class-stratified AUROC of 0.75–0.90 on natural images, but within a model only 0.43–0.80. Their verdicts depend on explanation size and form: a size-matched object map moves the MNIST switch points from 38.7–39.3% to 0.9–8.6%, and on CIFAR-10 black deletion prefers a random ordering over a centred object map 81% of the time at low reliance. A pre-registered test on Pet confirmed three of four predictions; black deletion failed the form-matched control.
+Highlights (at most 85 characters each, following the usual Elsevier rule; confirm in the Neurocomputing Guide for Authors)
+234 CNNs with measured, chance-corrected shortcut reliance test four metrics
+Deletion and insertion track reliance but over-detect shortcuts models barely use
+Per-image behavioural labels replace the assumed 50% switch point
+Explanation size and form change which map the metrics prefer
+Pre-registered Pet test: three of four predictions held; black deletion failed
+Keywords Explainable AI · Faithfulness metrics · Deletion and insertion · Shortcut learning · Meta-evaluation · Pre-registration
+1. Introduction
+Attribution methods such as Saliency [1], SmoothGrad [2], Integrated Gradients [3], Grad-CAM [4] and Occlusion [5] explain an image classifier's prediction with a heatmap. Because the methods disagree, they are compared with evaluation metrics, most often perturbation metrics: deletion [6] removes the pixels a map ranks first and measures how fast the model's confidence falls, and insertion [7] restores them into a blurred image. These metrics decide which methods are trusted, yet they are rarely validated, because the true explanation of a trained network is normally unknown. Metrics disagree with one another [8, 9, 10], their results do not transfer across datasets [11], and they depend on how removed pixels are filled [12, 13, 14].
+One of the main uses of explanations is to find shortcut learning, where a model uses a cue that is unrelated to the task, such as a marker on a radiograph [15, 16, 17, 18]. A metric that is fit for this use should change its verdict when the model's reasoning moves from the object to a shortcut. Earlier work controlled what a model relies on in order to test attribution methods [19, 20, 21], or measured how strongly a model uses a shortcut [22]. In our searches we did not find a study that varies a model's measured reliance in controlled steps to test the evaluation metrics themselves. We ask:
+When a model's reliance on a shortcut increases in controlled steps, do faithfulness metrics shift their preference from object explanations to shortcut explanations, and at what reliance?
+Our answer is one thesis: the metrics respond to reliance but are not calibrated to it, and their verdicts depend on the size and form of the explanations being compared. A training dose sets each model's reliance, reliance is measured on held-out conflicting images and corrected for chance, and fixed oracle maps are scored, so that the test does not depend on any attribution method. We lead with the natural-image settings, Oxford-IIIT Pet with real segmentation masks and CIFAR-10 with two networks, and use MNIST and PneumoniaMNIST to study the mechanisms. The contributions are:
+A dose-response protocol for testing faithfulness metrics with 234 models, chance-corrected reliance, per-image behavioural labels from forward passes, and a two-level bootstrap over seeds and images.
+Evidence of responsiveness without calibration. Preference rises with reliance in 27 of 28 cells, but black and blur deletion over-detect the shortcut on natural images (over-detection rate 0.75–1.00), the metrics' switch points lie well below the reliance at which the models follow the shortcut on half of the images, and within a single model the metrics separate followed from non-followed images only weakly.
+Size and form dependence. Matching the object map's size to the shortcut moves the switch points towards 0%, and on CIFAR-10 black and blur deletion prefer a random pixel ordering over a centred object map. Real masks on Pet reduce this form bias but do not remove the over-detection.
+A pre-registered test and a pre-registered amendment. The Pet predictions P1–P4 were committed before training; 42 models that fill reliance gaps were added under a dated amendment, and both model sets are reported.
+Section 2 positions the work, Sections 3 and 4 describe the protocol and setup, Section 5 reports the results (natural images first), and Sections 6–8 discuss them, state the limitations and conclude. Appendix A holds a supporting study of the model-randomisation sanity check, Appendix B the legacy analysis of earlier drafts, and Appendix C the check on the original model set.
+2. Related work
+The literature audit behind this section searched 2019 to October 2026 (literature audit committed on 2026-11-13, docs/audit/02_literature_novelty.md); every cited page was re-opened on 2026-11-13, when a further search found no study of graded reliance as ground truth for faithfulness metrics. Table 1 summarises the positioning.
+2.1. Controlled reliance and ground-truth benchmarks
+Decoy MNIST [15] adds a class-coded patch so that the model's reason is known. Zhou et al. [23] induce ground-truth features, Lin et al. [24] and BackX [25] use backdoor triggers, Adebayo et al. [26] and Sun et al. [18] ask whether explanations reveal spurious correlations, and Bastings et al. [21] give a shortcut-injection protocol for salience methods on text. CLEVR-XAI [27], FunnyBirds [28], XAI-Units [29], AttributionLab [30] and a recent synthetic intervention-based framework [31] build data or models whose important inputs are known by design. Closest to our design, BAM trains models with known relative feature importance [19], and SMERF controls the complexity of the model's reasoning [20]; OSCAR derives shortcut scores that are sensitive to the strength of the shortcut association [22]. All of these evaluate attribution methods or detect shortcuts. We evaluate the metrics, against reliance that is varied in steps and measured.
+2.2. Meta-evaluation of faithfulness metrics
+Tomsett et al. [8] found saliency metrics statistically unreliable. MetaQuantus [9] rates metrics by their resilience to noise and reactivity to randomness without ground truth, and Quantus [32] collects many metrics in one toolkit. LATEC [10] evaluates 17 methods with 20 metrics and finds conflicting rankings; M4 [33] benchmarks faithfulness across modalities and networks. Gevaert et al. [11] report that metrics measure different properties and that results on one dataset need not hold on another. Miró-Nicolau et al. [34] check fidelity metrics against a decision tree on 52,000 synthetic 128×128 images, and Hesse et al. [35] propose a protocol that avoids the out-of-domain problem of incremental deletion. The model-randomisation sanity check [36] has been criticised [37] and revised [38, 39]. None of these varies the model's reliance and reads the metrics' response to it.
+2.3. Known confounds of perturbation metrics
+ROAD [12] shows that pixel-perturbation results are driven by information leaking through the shape of the removed region; ROAR [40] retrains after removal, and a later analysis traces ROAR's and ROAD's rankings to a bias towards spatially blurry masks [41]. Blücher et al. [13] show that the occlusion strategy decides pixel-flipping rankings, and “Back to the Baseline” [14] that the replacement baseline favours some methods. Gomez et al. [42] note that deletion and insertion use only the ranking of the map and present out-of-distribution images. SaCo [43] reports that common metrics struggle to separate methods from random attribution, and Bilodeau et al. [44] argue that a concrete end task with repeated model evaluations is the proper reference. Section 6 links each of our findings to one of these mechanisms.
+2.4. Shortcuts in practice
+Clever-Hans behaviour has been found in standard vision models [16], and radiograph classifiers have been shown to use acquisition shortcuts [17]. Which feature a network uses depends on its predictivity and on its availability [45]; our dose varies predictivity only. Architectures differ in how readily they pick up positional and intensity shortcuts [46].
+Table 1. Positioning. What prior work already provides and what this study adds (after the audit's positioning table, docs/audit/02_literature_novelty.md §2)
+[TABLE]
+Ingredient | Prior work that already has it | What this study adds
+Inject a shortcut so the evidence is known | Decoy MNIST [15]; Zhou et al. [23]; Lin et al. [24]; BackX [25]; Adebayo et al. [26]; Sun et al. [18]; Bastings et al. (text) [21] | The object of evaluation is the metric, not the attribution method
+Graded or controlled model reliance | BAM: models trained with known relative feature importance [19]; SMERF: controlled model reasoning [20]; OSCAR: shortcut scores that react to the strength of the shortcut association [22] | A continuous signed dose, with reliance measured behaviourally from about 0% to 100% and chance-corrected
+Meta-evaluation of faithfulness metrics | Tomsett et al. [8]; MetaQuantus (no ground truth) [9]; fidelity metrics vs a decision tree [34]; synthetic intervention-based ground truth [31]; Gevaert et al. [11]; LATEC [10]; M4 [33] | A ground truth that changes with the model, read out as responsiveness, over-detection, a switch point and per-image AUROC
+Shape, size and fill confounds | ROAD [12]; ROAR pitfalls [41]; Blücher et al. [13]; Back to the Baseline [14]; Gomez et al. [42] | Size-matched, placebo and random oracle maps that show the confounds as reliance varies; real masks on Pet
+Pre-registration | In our searches we did not find an XAI-evaluation benchmark that pre-registers its predictions | Pre-registered Pet predictions and a dated amendment, with commit hashes
+[/TABLE]
+The protocol is new as a combination; its individual pieces are not. BAM and SMERF already controlled what a model relies on, to evaluate attribution methods.
+3. Method
+3.1. Shortcuts
+A patch shortcut is a white square (3×3 pixels on the 28×28 and 32×32 images, 12×12 on the 128×128 Pet images) whose position encodes the class: along the top and bottom borders for ten classes, and in the two top corners for two classes, like markers burned into radiographs. A texture shortcut gives each class a fixed random set of about 10% of the pixels, brightened by 0.3 (clipped at 1); it is used on the two 28×28 datasets.
+3.2. Controlling reliance with a signed dose
+A signed dose d combines two mechanisms. For d > 0, a share d of training images is replaced by an image of another class while the label and the shortcut are kept, so the image becomes less reliable. For d < 0, the shortcut of a share |d| of training images points to a randomly chosen wrong class, so the shortcut becomes less reliable. On MNIST and PneumoniaMNIST |d| ≤ 0.4. CIFAR-10 doses reach −0.8, and the Pet doses include −0.5, where half of the training shortcuts point to the wrong class and the shortcut carries no label information. The doses are −0.4, −0.25, −0.1, −0.05, 0, 0.005, 0.0075, 0.01, 0.015, 0.02, 0.03, 0.05, 0.1, 0.25, 0.4 (MNIST); −0.4, −0.25, −0.1, −0.075, −0.05, −0.025, 0, 0.005, 0.01, 0.02, 0.05, 0.1, 0.25, 0.4 (PneumoniaMNIST); −0.8, −0.6, −0.4, −0.25, −0.1, 0 (CIFAR-10); and −0.5, −0.4, −0.3, −0.2, −0.1, 0 (Pet).
+3.3. Measuring reliance and correcting it for chance
+Every test image receives the shortcut of a different, randomly chosen class, and raw reliance R is the percentage of these conflicting images on which the prediction follows the shortcut. R has a floor: a model that ignores the shortcut still lands on the shortcut's class whenever it errs, always on a binary task and, if errors spread evenly, with probability 1/(C − 1) on a task with C classes. We therefore use the chance floor f = (100 − accuracy without the shortcut)/(C − 1) and the chance-corrected reliance rᴄ = 100 (R − f)/(100 − f), in percent and not clipped. The correction is an approximation, because images without the shortcut are out of distribution for a model trained with it. All primary analyses use rᴄ; raw reliance is reported where labelled.
+3.4. Oracle explanations
+Five fixed maps are scored on the same 100 aligned test images per model (shortcut and image agree), explaining the true label:
+Shortcut map: 1 on the shortcut pixels, 0 elsewhere.
+Full object map: on Pet, the real segmentation mask (pet and border band) without the shortcut pixels. On the grayscale datasets, the image's own intensities without the shortcut pixels; on PneumoniaMNIST, where 97.5% of the pixels exceed 0.1, this is an intensity ranking of the whole radiograph rather than an object segmentation. On CIFAR-10, a centred Gaussian prior (σ = image size/4), because the images have no masks. Pet is therefore the primary natural-image evidence.
+Size-matched object map: k object pixels, where k is the number of shortcut pixels. On the intensity-based maps they are the first k pixels of a stable descending sort; on MNIST many saturated pixels tie, so the topmost saturated pixels in row-major order are taken. On Pet they are the k mask pixels nearest the mask centroid.
+Placebo map: the shortcut's shape at the position (or texture pattern) of a wrong class.
+Random map: an independent uniform score per pixel, i.e. a random pixel ordering.
+3.5. Metrics under test
+Each metric runs in 20 steps; step i changes the top i/20 of the pixels in the map's ranking (ties broken at random), and the score is the area under the model's probability for the explained class. Deletion replaces pixels (lower area is better) with black, with a blurred copy of the image (Gaussian kernel 25 and σ = 4 at 28 and 32 px, scaled to 97 and 16 on Pet), or by inpainting: the per-channel mean of the remaining pixels refined by repeated averaging of four neighbours (100 iterations, 1600 on Pet) plus Gaussian noise (standard deviation 0.05). The inpainting is inspired by ROAD [12] but is not the ROAD procedure. Insertion starts from the blurred image and restores pixels (higher area is better). Two properties matter for interpretation: blur fill leaves about 20% (28 and 32 px) to 25% (Pet) of the patch's intensity in place, so blur deletion does not fully remove a patch shortcut; and at the last inpainting step every pixel is masked, so the curve ends on noise around black.
+3.6. Preference and per-image behavioural labels
+For maps A and B, a metric's preference for A is the share of images on which it rates A better; area differences of at most 10⁻⁴ count as ties (one half). The per-image AUC gap is the signed difference of the two areas, positive when A is rated better. For the shortcut versus the object map an ideal metric gives a preference near 0 at low reliance and near 1 at high reliance.
+Preference is scored on aligned images, while reliance is measured on conflicting images, so the assumption that a metric should switch at 50% reliance is not derived. We therefore label each scored image from forward passes only. The primary label (after the audit's reviewer 05) is 1 if the model predicts the shortcut's class when the same image's shortcut is moved to a wrong class's position and does not predict that class when the shortcut is removed; it is 0 if the moved shortcut does not win; images that the model already assigns to the shortcut's class without any shortcut are left undetermined, which removes the same error floor as the chance correction. A check label (reviewer 03) marks an image as shortcut-dominant when removing the shortcut lowers the true-class probability more than replacing the image by one of another class that carries the same shortcut. Each metric's AUC gap is then scored against the label by an AUROC computed within each true class and averaged (class-stratified), because on the binary tasks the label and the gap both depend on the class. The behavioural switch is the reliance at which the models' follow rate crosses 0.5; it replaces the assumed 50% ideal.
+3.7. Statistics
+Responsiveness: Spearman ρ between rᴄ and preference over the models of a setting.
+Decisions: a model counts as relying on the shortcut when rᴄ > 50, and the metric “says shortcut” when its preference exceeds 0.5. We report the over-detection rate (the false-positive rate among models with rᴄ ≤ 50) and balanced accuracy.
+Switch point: the first rᴄ at which an increasing isotonic fit of preference reaches 0.5; a four-parameter logistic with free asymptotes is the sensitivity check. A switch is “identified” only if a model lies within ±10 points of it; it is reported only for the comparisons whose ideal curve crosses 0.5 (shortcut vs full or size-matched object).
+Uncertainty: a two-level bootstrap with 2000 replicates that resamples models within each dose and the 100 images within each model [47], following the advice to account for both sources of variance in machine-learning comparisons [48, 49]. The same resamples are reused for every metric, so metric-versus-metric differences are paired.
+Multiplicity: Benjamini–Hochberg within each family (each comparison, the methods, the metric pairs, each behavioural label), and Holm over the union of the headline tests. Correlation p-values use Spearman's t approximation; p-values below 0.001 are printed as p < 0.001.
+Effect size: the median per-image AUC gap at the lowest and the highest dose.
+3.8. Explanation methods
+Five methods are run on every model with Captum [50]: Saliency (absolute gradient), SmoothGrad (25 samples, noise 0.15), Integrated Gradients (50 steps, black baseline), Grad-CAM on the last convolutional feature maps (6×6 for the 28×28 CNN, 16×16 for the CIFAR CNN, 4×4 for the CIFAR ResNet-18 and 16×16 for the Pet ResNet-18, upsampled bilinearly), and Occlusion (window and stride 4 and 2 at 28 and 32 px, 16 and 8 on Pet). For each method we compute the share of positive attribution on the shortcut pixels (relevance mass accuracy [27]).
+4. Experimental setup
+Datasets. Oxford-IIIT Pet [51] as a cat-versus-dog task at 128×128 with the dataset's trimap masks; CIFAR-10 (10 classes, 32×32 colour); MNIST (10 classes, 28×28); and PneumoniaMNIST [52] (normal vs pneumonia, 28×28, derived from [53]).
+Networks and training. A small CNN with four convolutional layers on the 28×28 data; on CIFAR-10 a CNN with batch normalisation (0.77M parameters) and a ResNet-18 [54] (11.2M parameters) with a 3×3 stride-1 first convolution and no initial max-pooling; on Pet the same ResNet-18, also with this CIFAR-style stem. All networks are trained from scratch with Adam (learning rate 10⁻³, batch size 128) for 3 (MNIST), 20 (PneumoniaMNIST), 10 (CIFAR CNN), 15 (CIFAR ResNet-18) and 30 epochs (Pet), keeping the best validation checkpoint, without augmentation. The ResNet-18 models were trained on a free Kaggle T4 GPU (about 11 minutes per CIFAR model and 25 per Pet model); all others on a laptop CPU.
+Models. 234 models in total (Oxford-IIIT Pet (ResNet-18) 18; CIFAR-10 (ResNet-18) 18; CIFAR-10 (small CNN) 12; MNIST 102; PneumoniaMNIST 84). Seeds: Oxford-IIIT Pet (ResNet-18) 1, 2, 42; CIFAR-10 (ResNet-18) 1, 2, 42; CIFAR-10 (small CNN) 1, 42; MNIST 1, 2, 3, 4, 5, 42; PneumoniaMNIST 1, 2, 42. 192 models existed before amendment A1 (docs/PREDICTIONS_amendments.md, commit 8738b32, committed before any of its models was trained); A1 added 42 MNIST and PneumoniaMNIST models at new doses near the steep part of the dose-response curve, with six seeds at the two steepest MNIST doses, to fill reliance gaps. A1 made no predictions about the metrics, and both model sets are reported (Appendix C).
+Evaluation. Every model is scored on 100 aligned test images, the same images for every model of a setting. Reliance and accuracy use the full test set. Re-evaluating a cached model reproduces its stored scores exactly.
+5. Results
+5.1. The dose controls reliance
+Table 2 shows that the dose moves reliance across most of the range in every setting. On Pet the lowest raw reliance of a model is 15.5%, but its chance floor is about as large, so its rᴄ is −0.1% (the lowest rᴄ of any Pet model is −0.8%). The same holds on PneumoniaMNIST: the lowest per-dose mean raw reliance is 14.8% (patch) and 18.4% (texture), which is rᴄ = 0.6% and 3.9%. Earlier drafts reported “about 15%, not 0” here; that 15% is the error floor. Near d = 0 reliance varies strongly between seeds, so every analysis uses measured reliance, not the dose.
+Table 2. Reliance reached per setting. Ranges are over single models. Accuracy without the shortcut is the per-dose mean at the dose with the lowest and the highest mean reliance
+[TABLE]
+Setting | Network | Models | Dose range | Raw reliance R (%) | rᴄ (%) | Accuracy without shortcut (%), low → high reliance
+Oxford-IIIT Pet, patch (ResNet-18) | ResNet-18 (11.2M) | 18 (6 doses) | −0.50 to 0.00 | 15.5–99.5 | −0.8–99.2 | 82.4 → 65.2
+CIFAR-10, patch (ResNet-18) | ResNet-18 (11.2M) | 18 (6 doses) | −0.80 to 0.00 | 2.7–97.2 | 0.8–97.0 | 81.9 → 25.7
+CIFAR-10, patch (small CNN) | CIFAR CNN (0.77M) | 12 (6 doses) | −0.80 to 0.00 | 3.7–96.6 | 0.8–96.3 | 71.3 → 29.6
+MNIST, patch | Small CNN | 51 (15 doses), incl. 15 A1 | −0.40 to 0.40 | 0.1–99.8 | 0.0–99.8 | 98.8 → 13.3
+MNIST, texture | Small CNN | 51 (15 doses), incl. 15 A1 | −0.40 to 0.40 | 0.1–100.0 | 0.0–100.0 | 98.7 → 17.4
+PneumoniaMNIST, patch | Small CNN | 42 (14 doses), incl. 6 A1 | −0.40 to 0.40 | 12.8–100.0 | −0.2–100.0 | 85.7 → 37.6
+PneumoniaMNIST, texture | Small CNN | 42 (14 doses), incl. 6 A1 | −0.40 to 0.40 | 16.4–100.0 | 3.0–100.0 | 84.9 → 51.6
+[/TABLE]
+Source: results/dose_response/models.csv (234 models: 192 original and 42 from amendment A1). R: percentage of conflicting test images whose prediction follows the shortcut. rᴄ = 100 (R − f)/(100 − f) with chance floor f = (100 − accuracy without shortcut)/(C − 1); it is not clipped and can be slightly negative.
+5.2. Natural images: the metrics respond but over-detect
+Fig. 1 and Table 3 give the main comparison, the shortcut map against the full object map. Over all settings, preference rises with rᴄ in 27 of 28 cells (ρ = 0.27–0.99); the exception is Insertion (blur) on PneumoniaMNIST, texture (ρ = 0.27, p_bh = 0.085). On the natural images ρ = 0.88–0.99.
+Responsiveness is not calibration. Among the models with rᴄ ≤ 50, black and blur deletion still prefer the shortcut map for 75–92% of the Pet models and 100% of the CIFAR-10 models; inpainting deletion and insertion do so for 40–70%. Across all settings the true-positive rate is 1.00 in 23 of 28 cells and the over-detection rate is above 0 in 26 of 28: the metrics rarely miss a shortcut the model uses, but they often report one the model does not use. On Pet, the isotonic switch lies at 1.3–5.4% rᴄ for Deletion (black), Deletion (inpaint), Insertion (blur) (Deletion (black) at the lowest-reliance edge), and Deletion (blur) prefers the shortcut map already at the lowest reliance. The Pet models themselves follow the shortcut on half of the images only at rᴄ = 54.5% (Section 5.4). The effect sizes temper this: at the lowest Pet dose the median per-image AUC gap is −0.060 to 0.000, so the low-reliance preferences there are close to ties.
+Fig. 1. Preference for the shortcut map over the full object map against chance-corrected reliance rᴄ, for the four metrics in the seven settings (natural images first). Dots are single models; lines are the increasing isotonic fits used for the switch points. Dotted line: the assumed 50% ideal; dashed line: the behavioural switch, where the models' per-image follow rate crosses 0.5. Data: results/dose_response/preference.csv and behaviour_summary.csv
+Table 3. Metric responsiveness on rᴄ, shortcut map vs full object map
+[TABLE]
+Setting | Metric | ρ with rᴄ [95% CI] | Preference, lowest dose [CI] → highest | Median AUC gap, lowest dose | Over-detection FPR (n models) | Balanced accuracy | Switch, rᴄ % [CI]
+Pet | Deletion (black) | 0.88 [0.61, 0.94] | 0.46 [0.39, 0.52] → 0.87 | −0.01 | 0.75 (12) | 0.62 | 1.3 [−0.3, 4.2] (e)
+ | Deletion (blur) | 0.93 [0.82, 0.96] | 0.50 [0.44, 0.56] → 0.94 | 0.00 | 0.92 (12) | 0.54 | none (> 0.5 at lowest)
+ | Deletion (inpaint) | 0.95 [0.85, 0.98] | 0.40 [0.35, 0.46] → 0.99 | −0.05 | 0.58 (12) | 0.71 | 4.6 [2.1, 10.6]
+ | Insertion (blur) | 0.94 [0.88, 0.97] | 0.35 [0.30, 0.40] → 0.96 | −0.06 | 0.58 (12) | 0.71 | 5.4 [4.0, 9.0]
+CIFAR ResNet-18 | Deletion (black) | 0.96 [0.84, 0.97] | 0.70 [0.63, 0.77] → 1.00 | 0.05 | 1.00 (15) | 0.50 | none (> 0.5 at lowest)
+ | Deletion (blur) | 0.97 [0.91, 0.98] | 0.61 [0.54, 0.68] → 1.00 | 0.06 | 1.00 (15) | 0.50 | none (> 0.5 at lowest)
+ | Deletion (inpaint) | 0.98 [0.92, 0.99] | 0.15 [0.11, 0.19] → 0.99 | −0.17 | 0.40 (15) | 0.80 | 8.7 [4.4, 16.3]
+ | Insertion (blur) | 0.98 [0.95, 0.99] | 0.24 [0.18, 0.31] → 1.00 | −0.23 | 0.47 (15) | 0.77 | 8.6 [6.9, 11.2]
+CIFAR CNN | Deletion (black) | 0.91 [0.59, 0.96] | 0.81 [0.76, 0.87] → 0.99 | 0.10 | 1.00 (10) | 0.50 | none (> 0.5 at lowest)
+ | Deletion (blur) | 0.90 [0.66, 0.96] | 0.73 [0.68, 0.80] → 0.97 | 0.13 | 1.00 (10) | 0.50 | none (> 0.5 at lowest)
+ | Deletion (inpaint) | 0.99 [0.94, 1.00] | 0.27 [0.20, 0.33] → 0.98 | −0.08 | 0.70 (10) | 0.65 | 4.3 [3.5, 7.3] (e)
+ | Insertion (blur) | 0.95 [0.91, 0.99] | 0.23 [0.17, 0.29] → 0.98 | −0.18 | 0.40 (10) | 0.80 | 17.7 [13.4, 21.3]
+MNIST patch | Deletion (black) | 0.96 [0.93, 0.97] | 0.02 [0.00, 0.04] → 0.89 | −0.48 | 0.12 (32) | 0.94 | 38.7 [26.9, 46.5]
+ | Deletion (blur) | 0.97 [0.94, 0.97] | 0.02 [0.00, 0.03] → 0.89 | −0.19 | 0.09 (32) | 0.95 | 38.8 [27.6, 45.6]
+ | Deletion (inpaint) | 0.97 [0.94, 0.98] | 0.01 [0.00, 0.02] → 0.90 | −0.68 | 0.06 (32) | 0.94 | 39.2 [34.7, 52.5]
+ | Insertion (blur) | 0.97 [0.93, 0.97] | 0.01 [0.00, 0.03] → 0.89 | −0.19 | 0.03 (32) | 0.98 | 39.3 [33.9, 51.9]
+MNIST texture | Deletion (black) | 0.91 [0.85, 0.94] | 0.03 [0.01, 0.07] → 0.96 | −0.44 | 0.15 (20) | 0.93 | 17.3 [11.4, 22.0] (nb)
+ | Deletion (blur) | 0.96 [0.92, 0.97] | 0.04 [0.01, 0.06] → 0.88 | −0.16 | 0.00 (20) | 0.95 | 66.5 [49.6, 75.4]
+ | Deletion (inpaint) | 0.95 [0.88, 0.96] | 0.02 [0.00, 0.04] → 0.97 | −0.33 | 0.15 (20) | 0.93 | 18.8 [12.4, 25.9]
+ | Insertion (blur) | 0.96 [0.92, 0.97] | 0.01 [0.00, 0.03] → 0.60 | −0.18 | 0.00 (20) | 0.68 | 99.7 [94.0, 99.9]
+Pneumonia patch | Deletion (black) | 0.64 [0.39, 0.75] | 0.38 [0.26, 0.52] → 0.61 | −0.07 | 0.68 (22) | 0.66 | 5.9 [3.0, 16.2]
+ | Deletion (blur) | 0.51 [0.34, 0.66] | 0.45 [0.39, 0.52] → 0.58 | 0.00 | 0.73 (22) | 0.64 | 2.5 [0.4, 4.4] (e)
+ | Deletion (inpaint) | 0.66 [0.46, 0.79] | 0.15 [0.10, 0.20] → 0.56 | −0.05 | 0.23 (22) | 0.81 | 30.0 [7.6, 42.7]
+ | Insertion (blur) | 0.49 [0.32, 0.63] | 0.50 [0.40, 0.60] → 0.71 | 0.00 | 0.82 (22) | 0.59 | 0.1 [0.0, 1.2] (e)
+Pneumonia texture | Deletion (black) | 0.85 [0.77, 0.92] | 0.33 [0.23, 0.43] → 0.94 | −0.03 | 0.67 (18) | 0.67 | 12.6 [5.9, 22.9]
+ | Deletion (blur) | 0.58 [0.40, 0.73] | 0.57 [0.52, 0.63] → 1.00 | 0.00 | 1.00 (18) | 0.50 | none (> 0.5 at lowest)
+ | Deletion (inpaint) | 0.56 [0.32, 0.69] | 0.45 [0.34, 0.60] → 0.93 | 0.00 | 0.89 (18) | 0.53 | 4.4 [3.9, 6.8] (e)
+ | Insertion (blur) | 0.27† [0.06, 0.49] | 0.64 [0.56, 0.72] → 0.95 | 0.00 | 1.00 (18) | 0.50 | none (> 0.5 at lowest)
+[/TABLE]
+Source: results/dose_response/responsiveness_corrected.csv, comparison “shortcut vs full object”. CI: two-level bootstrap (2000 replicates; models resampled within dose, images within model). †: not significant after Benjamini–Hochberg within the comparison family (p_bh ≥ 0.05). Over-detection FPR: share of models with rᴄ ≤ 50 for which the preference exceeds 0.5 (n = number of such models). Median AUC gap: positive means the shortcut map is rated better. Switch: first crossing of 0.5 by the increasing isotonic fit; (e) identified at the lowest-reliance edge (within 5 points of the lowest model); (nb) not bracketed by models within ±10 points on both sides; “none (> 0.5 at lowest)”: the metric already prefers the shortcut map at the lowest reliance reached.
+Where does the over-detection come from? Table 4 and Fig. 2 compare the object map with a random pixel ordering at the lowest dose, where the model barely uses the shortcut. On CIFAR-10 black and blur deletion prefer the random ordering over the centred object map 75–81% of the time with the small CNN and 56–72% with ResNet-18, against 13–23% for inpainting deletion and insertion. With the real Pet masks the bias is smaller (49–53% against 35–38%), which supports the earlier hypothesis that the Gaussian object map inflated it on CIFAR-10, but black and blur deletion still treat the object mask about like a random ordering.
+Table 4. Natural images: preference at the lowest dose for the comparisons of the main maps and the controls. Each entry is the share of images on which the metric rates the first map above the second
+[TABLE]
+Setting (lowest model rᴄ) | Metric | S–O | R–O | P–O | S–R | P–R
+Pet (−0.8%) | Deletion (black) | 0.46 | 0.53 [0.46, 0.60] | 0.48 | 0.45 | 0.41
+ | Deletion (blur) | 0.50 | 0.49 [0.43, 0.55] | 0.46 | 0.53 | 0.47
+ | Deletion (inpaint) | 0.40 | 0.38 [0.33, 0.44] | 0.38 | 0.53 | 0.44
+ | Insertion (blur) | 0.35 | 0.35 [0.30, 0.40] | 0.34 | 0.53 | 0.49
+CIFAR ResNet-18 (0.8%) | Deletion (black) | 0.70 | 0.72 [0.63, 0.80] | 0.72 | 0.49 | 0.44
+ | Deletion (blur) | 0.61 | 0.56 [0.48, 0.64] | 0.61 | 0.52 | 0.52
+ | Deletion (inpaint) | 0.15 | 0.13 [0.09, 0.17] | 0.11 | 0.58 | 0.48
+ | Insertion (blur) | 0.24 | 0.21 [0.17, 0.26] | 0.20 | 0.55 | 0.49
+CIFAR CNN (0.8%) | Deletion (black) | 0.81 | 0.81 [0.76, 0.87] | 0.81 | 0.48 | 0.52
+ | Deletion (blur) | 0.73 | 0.75 [0.69, 0.81] | 0.71 | 0.56 | 0.49
+ | Deletion (inpaint) | 0.27 | 0.23 [0.17, 0.28] | 0.22 | 0.62 | 0.45
+ | Insertion (blur) | 0.23 | 0.18 [0.13, 0.23] | 0.18 | 0.59 | 0.46
+[/TABLE]
+S = shortcut map, O = full object map (Pet: the real segmentation mask; CIFAR-10: a centred Gaussian prior), R = random ordering, P = placebo (the shortcut's shape at a wrong class's position). At this reliance the models barely use the shortcut, so the ideal values are S–O, R–O and P–O low, S–R and P–R ≈ 0.5. Source: results/dose_response/responsiveness_corrected.csv, column pref_low (R–O with its two-level CI).
+Fig. 2. Preference for a random ordering over the full object map against rᴄ. Ideal: low at low reliance; a rise at high reliance is correct, because the object map then explains the model worse than random. Data: results/dose_response/preference.csv
+5.3. Pre-registered test on Oxford-IIIT Pet
+The Pet predictions were committed before any Pet model was trained (commit a962b6c), followed by the Pet code (20694f2), a documented dose change after the first model and before any metric result (d823737), and the results with the recorded verdicts (1e29918). P1 predicted ρ > 0.8 between reliance and the shortcut-vs-object preference for all four metrics; P2 a larger random-over-object preference for black and blur deletion than for inpainting and insertion at the lowest dose; P3 starting values within 0.5 ± 0.15 and ρ > 0.8 in the form-matched comparisons; P4 ρ > 0.8 for the shortcut mass of Integrated Gradients and Occlusion. Table 5 lists the outcomes. P1, P2 and P4 hold and P3 fails for black deletion (ρ = 0.75 against the random map and 0.73 against the placebo). Verdicts were judged on point estimates, as pre-registered; the intervals are added information. They qualify P1 for black deletion, whose estimate 0.85 has a two-level interval of [0.58, 0.93] that reaches below the 0.8 threshold. The P2 contrast, 0.142 [0.086, 0.202], excludes zero.
+Table 5. Pre-registered Pet predictions P1–P4 with their original verdicts. The intervals and the ρ on rᴄ were computed later and are additional information
+[TABLE]
+Pred. | Comparison | Metric or method | Statistic | Estimate [two-level 95% CI] | ρ on rᴄ | Threshold | Original verdict
+P1 | shortcut vs full object | Deletion (black) | spearman rho (raw reliance) | 0.850 [0.582, 0.934] | 0.877 | > 0.8 | Holds
+P1 | shortcut vs full object | Deletion (blur) | spearman rho (raw reliance) | 0.960 [0.842, 0.973] | 0.933 | > 0.8 | Holds
+P1 | shortcut vs full object | Deletion (inpaint) | spearman rho (raw reliance) | 0.950 [0.854, 0.979] | 0.951 | > 0.8 | Holds
+P1 | shortcut vs full object | Insertion (blur) | spearman rho (raw reliance) | 0.934 [0.877, 0.969] | 0.935 | > 0.8 | Holds
+P2 | random vs full object | Deletion (black) | preference at lowest dose (-0.5) | 0.528 [0.460, 0.597] | – | black, blur > inpaint, insertion | Holds
+P2 | random vs full object | Deletion (blur) | preference at lowest dose (-0.5) | 0.490 [0.430, 0.553] | – | black, blur > inpaint, insertion | Holds
+P2 | random vs full object | Deletion (inpaint) | preference at lowest dose (-0.5) | 0.383 [0.327, 0.443] | – | black, blur > inpaint, insertion | Holds
+P2 | random vs full object | Insertion (blur) | preference at lowest dose (-0.5) | 0.350 [0.297, 0.403] | – | black, blur > inpaint, insertion | Holds
+P2 | random vs full object | mean(black, blur) - mean(inpaint, insertion) | preference contrast at lowest dose | 0.142 [0.086, 0.202] | – | > 0 | Holds
+P3 | shortcut vs random | Deletion (black) | preference at lowest dose (-0.5) | 0.450 [0.378, 0.525] | – | 0.5 ± 0.15 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs random | Deletion (blur) | preference at lowest dose (-0.5) | 0.527 [0.462, 0.593] | – | 0.5 ± 0.15 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs random | Deletion (inpaint) | preference at lowest dose (-0.5) | 0.528 [0.467, 0.592] | – | 0.5 ± 0.15 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs random | Insertion (blur) | preference at lowest dose (-0.5) | 0.533 [0.467, 0.593] | – | 0.5 ± 0.15 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs random | Deletion (black) | spearman rho (raw reliance) | 0.750 [0.459, 0.902] | 0.772 | > 0.8 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs random | Deletion (blur) | spearman rho (raw reliance) | 0.884 [0.774, 0.945] | 0.889 | > 0.8 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs random | Deletion (inpaint) | spearman rho (raw reliance) | 0.960 [0.858, 0.983] | 0.966 | > 0.8 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs random | Insertion (blur) | spearman rho (raw reliance) | 0.948 [0.817, 0.970] | 0.955 | > 0.8 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs placebo | Deletion (black) | preference at lowest dose (-0.5) | 0.552 [0.487, 0.620] | – | 0.5 ± 0.15 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs placebo | Deletion (blur) | preference at lowest dose (-0.5) | 0.572 [0.513, 0.630] | – | 0.5 ± 0.15 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs placebo | Deletion (inpaint) | preference at lowest dose (-0.5) | 0.523 [0.437, 0.620] | – | 0.5 ± 0.15 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs placebo | Insertion (blur) | preference at lowest dose (-0.5) | 0.520 [0.457, 0.583] | – | 0.5 ± 0.15 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs placebo | Deletion (black) | spearman rho (raw reliance) | 0.727 [0.381, 0.879] | 0.730 | > 0.8 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs placebo | Deletion (blur) | spearman rho (raw reliance) | 0.889 [0.785, 0.957] | 0.912 | > 0.8 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs placebo | Deletion (inpaint) | spearman rho (raw reliance) | 0.952 [0.877, 0.979] | 0.968 | > 0.8 | Fails for Deletion (black); holds for the other three metrics
+P3 | shortcut vs placebo | Insertion (blur) | spearman rho (raw reliance) | 0.930 [0.825, 0.970] | 0.942 | > 0.8 | Fails for Deletion (black); holds for the other three metrics
+P4 | shortcut mass | Integrated Gradients | spearman rho (raw reliance) | 0.936 [0.897, 0.975] | 0.946 | > 0.8 | Holds
+P4 | shortcut mass | Occlusion | spearman rho (raw reliance) | 0.979 [0.958, 0.991] | 0.969 | > 0.8 | Holds
+[/TABLE]
+Source: results/dose_response/pet_preregistered.csv; the verdict strings are copied from the Outcome table of docs/PREDICTIONS_pet.md. Verdicts were judged on point estimates, as pre-registered; the pre-registration did not say whether a point estimate or an interval decides.
+5.4. Per-image behavioural ground truth
+Table 6 and Fig. 3 score the per-image AUC gap against the behavioural label. Pooled over all images of a setting, the class-stratified AUROC is 0.75–0.90 on the natural images and 0.41–0.92 on the mechanism settings; PneumoniaMNIST patch is the weak case (0.41–0.65; black deletion 0.46 [0.39, 0.54], Holm-adjusted p = 1.000). The pooled AUROC mixes models of different reliance. Within a single model the median AUROC is 0.43–0.80 on the natural images and 0.45–0.66 on MNIST, so most of the pooled signal separates high- from low-reliance models rather than followed from non-followed images of one model. Within rᴄ bands (Fig. 3) the PneumoniaMNIST patch AUROC falls to 0.00–0.08 above rᴄ = 60%, where the metrics rank the images the wrong way round (with only 18–89 non-followed images per band).
+The behavioural labels also locate the ideal switch. The models follow the shortcut on half of the images at rᴄ = 54.5% (Pet), rᴄ = 52.9% (CIFAR ResNet-18), rᴄ = 55.0% (CIFAR CNN), rᴄ = 53.9% (MNIST patch), rᴄ = 45.7% (MNIST texture), rᴄ = 36.9% (Pneumonia patch), rᴄ = 41.9% (Pneumonia texture). The assumed 50% is therefore about right for Pet, CIFAR-10 and MNIST patch and too high for PneumoniaMNIST. Measured against this derived ideal the over-detection remains: on the natural images the calibration gap (preference minus follow rate) is positive in every cell (0.27–0.63).
+Table 6. Per-image behavioural test (shortcut vs full object). Each scored image is labelled by forward passes as followed or not followed; the score is the per-image AUC gap
+[TABLE]
+Setting | Metric | Pooled AUROC [CI] | Within-model median AUROC [CI] | Calibration gap | Metric switch on follow rate (%) | Behavioural switch, rᴄ (%)
+Pet | Deletion (black) | 0.75 [0.71, 0.79] | 0.65 [0.58, 0.75] | 0.34 | 2.2 (e) | 54.5
+ | Deletion (blur) | 0.81 [0.75, 0.85] | 0.70 [0.57, 0.84] | 0.37 | none (> 0.5 at lowest) | 
+ | Deletion (inpaint) | 0.90 [0.87, 0.92] | 0.78 [0.71, 0.87] | 0.32 | 6.1 | 
+ | Insertion (blur) | 0.82 [0.78, 0.86] | 0.80 [0.69, 0.87] | 0.33 | 7.5 | 
+CIFAR ResNet-18 | Deletion (black) | 0.86 [0.84, 0.89] | 0.60 [0.49, 0.70] | 0.61 | none (> 0.5 at lowest) | 52.9
+ | Deletion (blur) | 0.82 [0.79, 0.85] | 0.56 [0.49, 0.71] | 0.59 | none (> 0.5 at lowest) | 
+ | Deletion (inpaint) | 0.88 [0.86, 0.91] | 0.68 [0.55, 0.79] | 0.33 | 8.0 | 
+ | Insertion (blur) | 0.87 [0.84, 0.89] | 0.56 [0.50, 0.70] | 0.36 | 8.2 | 
+CIFAR CNN | Deletion (black) | 0.84 [0.80, 0.88] | 0.43 [0.34, 0.55] | 0.63 | none (> 0.5 at lowest) | 55.0
+ | Deletion (blur) | 0.84 [0.81, 0.87] | 0.57 [0.50, 0.71] | 0.58 | none (> 0.5 at lowest) | 
+ | Deletion (inpaint) | 0.89 [0.86, 0.91] | 0.62 [0.55, 0.74] | 0.40 | 5.5 | 
+ | Insertion (blur) | 0.89 [0.86, 0.91] | 0.68 [0.58, 0.78] | 0.27 | 16.2 | 
+MNIST patch | Deletion (black) | 0.83 [0.80, 0.85] | 0.53 [0.48, 0.58] | 0.08 | 35.4 | 53.9
+ | Deletion (blur) | 0.79 [0.77, 0.82] | 0.52 [0.46, 0.59] | 0.08 | 35.6 | 
+ | Deletion (inpaint) | 0.87 [0.85, 0.89] | 0.53 [0.48, 0.58] | 0.05 | 37.5 | 
+ | Insertion (blur) | 0.81 [0.78, 0.83] | 0.52 [0.46, 0.56] | 0.06 | 37.8 | 
+MNIST texture | Deletion (black) | 0.91 [0.89, 0.93] | 0.56 [0.47, 0.66] | 0.04 | 18.7 (nb) | 45.7
+ | Deletion (blur) | 0.89 [0.87, 0.90] | 0.53 [0.43, 0.60] | −0.10 | 71.8 | 
+ | Deletion (inpaint) | 0.92 [0.90, 0.93] | 0.45 [0.40, 0.58] | 0.04 | 21.0 (nb) | 
+ | Insertion (blur) | 0.88 [0.86, 0.90] | 0.66 [0.57, 0.71] | −0.32 | 96.3 | 
+Pneumonia patch | Deletion (black) | 0.46 [0.39, 0.54] | 0.70 [0.54, 0.76] | 0.03 | 6.2 | 36.9
+ | Deletion (blur) | 0.50 [0.41, 0.60] | 0.56 [0.34, 0.72] | 0.16 | 3.0 (e) | 
+ | Deletion (inpaint) | 0.65 [0.59, 0.73] | 0.67 [0.44, 0.80] | −0.03 | 19.5 | 
+ | Insertion (blur) | 0.41 [0.33, 0.50] | 0.61 [0.46, 0.74] | 0.26 | 0.3 (e) | 
+Pneumonia texture | Deletion (black) | 0.85 [0.81, 0.88] | 0.73 [0.62, 0.78] | 0.14 | 13.5 | 41.9
+ | Deletion (blur) | 0.72 [0.66, 0.79] | 0.86 [0.79, 0.89] | 0.28 | none (> 0.5 at lowest) | 
+ | Deletion (inpaint) | 0.72 [0.65, 0.79] | 0.83 [0.77, 0.88] | 0.06 | 5.9 (e) | 
+ | Insertion (blur) | 0.68 [0.62, 0.75] | 0.79 [0.73, 0.86] | 0.25 | none (> 0.5 at lowest) | 
+[/TABLE]
+Source: results/dose_response/behaviour_summary.csv, label follows_shortcut_causal. AUROCs are class-stratified (computed within each true class and averaged) and tested one-sided against 0.5. Pooled: the images of all models together, which mixes between- and within-model signal. Within-model: AUROC inside each model, median over models. Calibration gap: mean of (preference − follow rate) over models; positive values mean over-detection. Metric switch on follow rate: where the isotonic fit of preference against 100 × follow rate crosses 0.5 (ideal 50 by construction). Behavioural switch: the rᴄ at which the models' follow rate crosses 0.5, the derived ideal that replaces the assumed 50%.
+Fig. 3. Class-stratified AUROC of each metric's per-image AUC gap against the behavioural label, within rᴄ bands (shortcut vs full object). Panels rearranged from results/dose_response/behaviour_auroc.png (alphabetical setting order)
+5.5. Mechanism settings: size and switch identification
+The full object map marks far more pixels than the shortcut map. Replacing it by a size-matched object map (Fig. 4, Table 7) raises the MNIST patch preference for the shortcut at the lowest dose from 0.007–0.022 to 0.275–0.373, moves the switch from 38.7–39.3% to 0.9–8.6% rᴄ, and raises the over-detection rate from 0.03–0.12 to 0.34–0.50. The metrics still respond (ρ = 0.97), but much of what looked like “the metric recognises the object” is the object map being larger. On PneumoniaMNIST texture, black deletion barely responds under this control (ρ = 0.02, p_bh = 0.891).
+Before amendment A1, the original MNIST patch models left a gap in raw reliance from 23.0% to 45.2%, and the switches against the full object map (32.0–48.7% rᴄ) lay inside it, so earlier drafts' statement that black and blur deletion switch “clearly before 50%” was not supported. With the A1 models the widest gap between 5% and 95% raw reliance is 53.1% to 62.2%, every switch has a model within 1.0 points, and the switches are 38.7–39.3% rᴄ (4-parameter logistic 35.4–41.6%), against a behavioural switch of 53.9%. The added models moved the switches up and closer together, and raised the over-detection rate; Appendix C lists both model sets.
+Fig. 4. Preference for the shortcut map over the size-matched object map against rᴄ. Layout as in Fig. 1. Data: results/dose_response/preference.csv
+Table 7. Metric responsiveness on rᴄ, shortcut map vs size-matched object map
+[TABLE]
+Setting | Metric | ρ with rᴄ [95% CI] | Preference, lowest dose [CI] → highest | Median AUC gap, lowest dose | Over-detection FPR (n models) | Balanced accuracy | Switch, rᴄ % [CI]
+Pet | Deletion (black) | 0.82 [0.52, 0.92] | 0.46 [0.39, 0.53] → 0.75 | 0.00 | 0.83 (12) | 0.58 | 0.2 [−0.4, 3.6] (e)
+ | Deletion (blur) | 0.86 [0.74, 0.94] | 0.54 [0.46, 0.62] → 0.91 | 0.00 | 0.92 (12) | 0.54 | none (> 0.5 at lowest)
+ | Deletion (inpaint) | 0.97 [0.88, 0.98] | 0.55 [0.49, 0.60] → 0.99 | 0.00 | 1.00 (12) | 0.50 | none (> 0.5 at lowest)
+ | Insertion (blur) | 0.95 [0.85, 0.97] | 0.50 [0.43, 0.57] → 0.97 | 0.00 | 0.83 (12) | 0.58 | −0.4 [−0.7, 2.1] (e)
+CIFAR ResNet-18 | Deletion (black) | 0.95 [0.88, 0.98] | 0.51 [0.45, 0.57] → 0.97 | 0.00 | 0.93 (15) | 0.53 | 0.9 [0.8, 1.8] (e)
+ | Deletion (blur) | 0.94 [0.80, 0.97] | 0.54 [0.47, 0.60] → 0.98 | 0.01 | 1.00 (15) | 0.50 | none (> 0.5 at lowest)
+ | Deletion (inpaint) | 0.91 [0.78, 0.96] | 0.62 [0.56, 0.68] → 0.97 | 0.02 | 1.00 (15) | 0.50 | none (> 0.5 at lowest)
+ | Insertion (blur) | 0.96 [0.91, 0.98] | 0.53 [0.45, 0.60] → 1.00 | 0.01 | 0.93 (15) | 0.53 | none (> 0.5 at lowest)
+CIFAR CNN | Deletion (black) | 0.99 [0.86, 0.99] | 0.48 [0.40, 0.56] → 0.96 | 0.00 | 0.90 (10) | 0.55 | 1.2 [0.8, 2.6] (e)
+ | Deletion (blur) | 0.89 [0.78, 0.97] | 0.59 [0.51, 0.67] → 0.97 | 0.01 | 1.00 (10) | 0.50 | none (> 0.5 at lowest)
+ | Deletion (inpaint) | 0.89 [0.65, 0.98] | 0.60 [0.53, 0.67] → 0.97 | 0.01 | 1.00 (10) | 0.50 | none (> 0.5 at lowest)
+ | Insertion (blur) | 0.85 [0.69, 0.93] | 0.58 [0.50, 0.66] → 0.90 | 0.01 | 1.00 (10) | 0.50 | none (> 0.5 at lowest)
+MNIST patch | Deletion (black) | 0.97 [0.92, 0.97] | 0.37 [0.31, 0.43] → 0.93 | −0.03 | 0.50 (32) | 0.75 | 0.9 [0.1, 4.6] (e)
+ | Deletion (blur) | 0.97 [0.93, 0.97] | 0.28 [0.23, 0.33] → 0.94 | −0.03 | 0.34 (32) | 0.83 | 8.6 [5.5, 16.0]
+ | Deletion (inpaint) | 0.97 [0.93, 0.97] | 0.33 [0.28, 0.39] → 0.94 | −0.02 | 0.50 (32) | 0.75 | 1.1 [0.6, 6.2] (e)
+ | Insertion (blur) | 0.97 [0.92, 0.97] | 0.30 [0.25, 0.36] → 0.92 | −0.03 | 0.41 (32) | 0.80 | 4.1 [0.3, 8.2] (e)
+MNIST texture | Deletion (black) | 0.92 [0.85, 0.94] | 0.02 [0.00, 0.03] → 0.94 | −0.39 | 0.25 (20) | 0.88 | 11.5 [9.8, 19.2]
+ | Deletion (blur) | 0.94 [0.90, 0.95] | 0.03 [0.01, 0.06] → 0.71 | −0.15 | 0.00 (20) | 0.84 | 84.9 [76.2, 92.8]
+ | Deletion (inpaint) | 0.95 [0.89, 0.96] | 0.07 [0.03, 0.11] → 0.98 | −0.20 | 0.20 (20) | 0.90 | 18.1 [11.6, 27.0] (nb)
+ | Insertion (blur) | 0.95 [0.91, 0.96] | 0.01 [0.00, 0.03] → 0.60 | −0.18 | 0.00 (20) | 0.66 | 99.7 [94.2, 100.0]
+Pneumonia patch | Deletion (black) | 0.83 [0.60, 0.85] | 0.50 [0.43, 0.58] → 0.79 | 0.00 | 0.82 (22) | 0.59 | 0.9 [0.0, 2.6] (e)
+ | Deletion (blur) | 0.54 [0.32, 0.72] | 0.51 [0.45, 0.57] → 0.72 | 0.00 | 0.86 (22) | 0.57 | 0.0 [−0.1, 1.2] (e)
+ | Deletion (inpaint) | 0.58 [0.36, 0.72] | 0.50 [0.41, 0.58] → 0.73 | 0.00 | 0.91 (22) | 0.55 | 0.2 [−0.1, 1.7] (e)
+ | Insertion (blur) | 0.73 [0.53, 0.80] | 0.50 [0.45, 0.56] → 0.71 | 0.00 | 0.82 (22) | 0.59 | 0.0 [−0.1, 3.4] (e)
+Pneumonia texture | Deletion (black) | 0.02† [−0.22, 0.29] | 0.55 [0.47, 0.62] → 0.52 | 0.00 | 0.83 (18) | 0.56 | 3.1 [–] (e)
+ | Deletion (blur) | 0.38 [0.18, 0.56] | 0.55 [0.49, 0.61] → 0.90 | 0.00 | 1.00 (18) | 0.50 | none (> 0.5 at lowest)
+ | Deletion (inpaint) | 0.61 [0.42, 0.73] | 0.48 [0.42, 0.53] → 0.93 | 0.00 | 0.83 (18) | 0.58 | 5.2 [3.3, 6.0] (e)
+ | Insertion (blur) | 0.48 [0.30, 0.63] | 0.54 [0.47, 0.62] → 0.92 | 0.00 | 1.00 (18) | 0.50 | none (> 0.5 at lowest)
+[/TABLE]
+Source: results/dose_response/responsiveness_corrected.csv, comparison “shortcut vs size-matched object”. CI: two-level bootstrap (2000 replicates; models resampled within dose, images within model). †: not significant after Benjamini–Hochberg within the comparison family (p_bh ≥ 0.05). Over-detection FPR: share of models with rᴄ ≤ 50 for which the preference exceeds 0.5 (n = number of such models). Median AUC gap: positive means the shortcut map is rated better. Switch: first crossing of 0.5 by the increasing isotonic fit; (e) identified at the lowest-reliance edge (within 5 points of the lowest model); (nb) not bracketed by models within ±10 points on both sides; “none (> 0.5 at lowest)”: the metric already prefers the shortcut map at the lowest reliance reached.
+The diffuse texture shows the form dependence from the other side. On MNIST texture, insertion switches only at 99.7% rᴄ and reaches a preference of only 0.60 at the highest dose. Against a random ordering, which has the same scattered form, blur deletion does not respond (ρ = 0.09, p_bh = 0.520) and insertion moves the wrong way (ρ = −0.54; against the placebo −0.77). On PneumoniaMNIST texture black deletion also moves the wrong way in these form-matched comparisons (ρ = −0.48 against random and −0.58 against the placebo).
+5.6. Same-form controls
+When the compared maps have the same form, the metrics mostly behave correctly (Fig. 5). On the patch shortcut, the preference for the shortcut map over a random ordering or a placebo starts at 0.39–0.62 at the lowest dose and rises to 0.76–1.00 (Pet); 0.96–1.00 (CIFAR ResNet-18); 0.91–0.99 (CIFAR CNN); 0.93–0.96 (MNIST patch); 0.73–0.79 (Pneumonia patch) at the highest dose. The rise is smallest on PneumoniaMNIST patch and for black deletion on Pet, so “rises to 0.93–0.99 for every metric” in earlier drafts was too general. The placebo behaves like a random ordering for the deletion variants (Fig. 6): placebo vs random stays at 0.36–0.52 at the lowest and highest dose in every setting. Insertion is the exception: its placebo-over-random preference rises with reliance on MNIST (ρ = 0.82–0.90) and falls on Pet (ρ = −0.69).
+Fig. 5. Same-form control: preference for the shortcut map over a random ordering against rᴄ. Ideal: about 0.5 at 0% reliance, rising to 1. Data: results/dose_response/preference.csv
+Fig. 6. Placebo control: preference for the placebo map over the random ordering against rᴄ. Ideal: about 0.5 at every reliance. Data: results/dose_response/preference.csv
+5.7. Comparing the metrics
+Across the 7 settings and the 4 comparisons of the shortcut map with another map (full object, size-matched object, placebo, random), Deletion (inpaint) had a positive, BH-significant ρ in all 28 cases (lowest ρ = 0.50). The other variants missed in 3 of 28 cases (Deletion (black)), 2 of 28 cases (Deletion (blur)), 3 of 28 cases (Insertion (blur)). Against the full object map alone, black, blur and inpainting deletion are positive and significant in all 7 settings. A paired test does not make inpainting the best variant (Table 8): 18 of 126 metric pairs differ at p_bh < 0.05, and on PneumoniaMNIST texture black deletion has the higher ρ against the full object map (black − inpaint Δρ = 0.293 [0.162, 0.530], Holm-adjusted p = 0.021). The supported claims are narrower: inpainting deletion responds in every comparison we ran, and black and blur deletion carry the largest form bias on natural images.
+Table 8. Paired metric-vs-metric differences that are significant after Benjamini–Hochberg (18 of 126 pairs tested)
+[TABLE]
+Comparison | Setting | Metric A | Metric B | Δρ on rᴄ (A − B) [CI] | p_bh | p_holm | Δ preference, lowest dose [CI]
+random vs full object | CIFAR ResNet-18 | Deletion (black) | Deletion (blur) | −0.159 [−0.374, −0.024] | 0.049 | 0.416 | 0.162 [0.100, 0.223]
+random vs full object | CIFAR CNN | Deletion (black) | Deletion (inpaint) | −0.433 [−0.806, −0.087] | 0.038 | 0.297 | 0.590 [0.515, 0.670]
+random vs full object | CIFAR CNN | Deletion (black) | Insertion (blur) | −0.397 [−0.805, −0.069] | 0.037 | 0.272 | 0.630 [0.545, 0.720]
+random vs full object | CIFAR CNN | Deletion (blur) | Deletion (inpaint) | −0.291 [−0.708, −0.080] | 0.030 | 0.185 | 0.525 [0.445, 0.610]
+random vs full object | CIFAR CNN | Deletion (blur) | Insertion (blur) | −0.254 [−0.704, −0.062] | 0.032 | 0.210 | 0.565 [0.470, 0.665]
+random vs full object | MNIST texture | Deletion (black) | Insertion (blur) | −0.069 [−0.142, −0.020] | 0.030 | 0.185 | 0.017 [−0.003, 0.043]
+random vs full object | Pneumonia patch | Deletion (blur) | Deletion (inpaint) | −0.174 [−0.292, −0.040] | 0.049 | 0.434 | 0.280 [0.185, 0.372]
+random vs full object | Pneumonia patch | Deletion (inpaint) | Insertion (blur) | 0.225 [0.091, 0.342] | 0.004 | 0.021 | −0.333 [−0.467, −0.205]
+random vs full object | Pneumonia texture | Deletion (black) | Deletion (inpaint) | 0.585 [0.373, 0.881] | 0.004 | 0.021 | −0.157 [−0.248, −0.058]
+random vs full object | Pneumonia texture | Deletion (black) | Insertion (blur) | 0.765 [0.500, 1.047] | 0.004 | 0.021 | −0.308 [−0.462, −0.112]
+random vs full object | Pneumonia texture | Deletion (blur) | Deletion (inpaint) | 0.464 [0.232, 0.786] | 0.004 | 0.021 | 0.137 [−0.028, 0.305]
+random vs full object | Pneumonia texture | Deletion (blur) | Insertion (blur) | 0.644 [0.422, 0.869] | 0.004 | 0.021 | −0.015 [−0.095, 0.077]
+shortcut vs full object | Pneumonia texture | Deletion (black) | Deletion (blur) | 0.266 [0.093, 0.458] | 0.021 | 0.078 | −0.243 [−0.365, −0.108]
+shortcut vs full object | Pneumonia texture | Deletion (black) | Deletion (inpaint) | 0.293 [0.162, 0.530] | 0.007 | 0.021 | −0.122 [−0.217, −0.020]
+shortcut vs full object | Pneumonia texture | Deletion (black) | Insertion (blur) | 0.579 [0.335, 0.806] | 0.007 | 0.021 | −0.312 [−0.427, −0.165]
+shortcut vs full object | Pneumonia texture | Deletion (blur) | Insertion (blur) | 0.313 [0.144, 0.461] | 0.007 | 0.021 | −0.068 [−0.153, 0.008]
+shortcut vs size-matched object | Pneumonia texture | Deletion (black) | Deletion (inpaint) | −0.593 [−0.819, −0.272] | 0.021 | 0.021 | 0.067 [−0.032, 0.165]
+shortcut vs size-matched object | Pneumonia texture | Deletion (black) | Insertion (blur) | −0.456 [−0.683, −0.166] | 0.021 | 0.041 | 0.002 [−0.068, 0.067]
+[/TABLE]
+Source: results/dose_response/metric_pairs.csv. Paired two-level bootstrap (the same resamples for both metrics); two-sided bootstrap p, adjusted within each comparison family (BH and Holm).
+5.8. Explanation methods
+Fig. 7 and Table 9 show how much positive attribution each method places on the shortcut. Integrated Gradients follows the shortcut in every setting (ρ = 0.86–1.00). On MNIST texture, Saliency and SmoothGrad move away from the shortcut as reliance grows (ρ = −0.75 and −0.68); Grad-CAM's trend is also negative (ρ = −0.32, Holm-adjusted p = 0.025), but its shortcut mass changes only from 0.100 to 0.098, which is negligible. This pattern is specific to MNIST texture: on PneumoniaMNIST texture Saliency and SmoothGrad move towards the shortcut (ρ = 0.89 and 0.78) and only Grad-CAM moves away (ρ = −0.38). Grad-CAM places the least attribution on the patch at the highest dose in 4 of the 5 patch settings.
+Fig. 7. Share of positive attribution that each explanation method places on the shortcut pixels, against raw reliance. Panels rearranged from results/dose_response/method_dose_response.png (alphabetical setting order)
+Table 9. Explanation methods: Spearman ρ between rᴄ and the share of positive attribution on the shortcut pixels [two-level 95% CI], and that share at the lowest → highest dose
+[TABLE]
+Method | Pet | CIFAR ResNet-18 | CIFAR CNN | MNIST patch | MNIST texture | Pneumonia patch | Pneumonia texture
+Saliency | 0.98
+[0.95, 0.99]
+0.001 → 0.304 | 0.95
+[0.88, 0.98]
+0.002 → 0.088 | 0.99
+[0.98, 1.00]
+0.003 → 0.115 | 0.93
+[0.88, 0.95]
+0.002 → 0.094 | −0.75
+[−0.85, −0.62]
+0.118 → 0.057 | 0.92
+[0.87, 0.96]
+0.001 → 0.174 | 0.89
+[0.84, 0.93]
+0.097 → 0.176
+SmoothGrad | 0.92
+[0.83, 0.98]
+0.002 → 0.140 | 0.95
+[0.93, 0.99]
+0.004 → 0.130 | 0.99
+[0.98, 1.00]
+0.004 → 0.103 | 0.95
+[0.91, 0.97]
+0.002 → 0.104 | −0.68
+[−0.82, −0.49]
+0.110 → 0.082 | 0.90
+[0.84, 0.94]
+0.001 → 0.132 | 0.78
+[0.69, 0.87]
+0.091 → 0.136
+Integrated Gradients | 0.95
+[0.90, 0.98]
+0.006 → 0.220 | 0.86
+[0.67, 0.93]
+0.017 → 0.084 | 1.00
+[0.98, 1.00]
+0.013 → 0.320 | 0.99
+[0.97, 0.99]
+0.002 → 0.696 | 0.90
+[0.85, 0.93]
+0.147 → 0.530 | 0.93
+[0.89, 0.95]
+0.003 → 0.391 | 0.90
+[0.82, 0.94]
+0.142 → 0.397
+Grad-CAM | 0.89
+[0.77, 0.95]
+0.006 → 0.085 | 0.78
+[0.48, 0.93]
+0.012 → 0.022 | 0.78
+[0.27, 0.88]
+0.012 → 0.080 | 0.86
+[0.77, 0.90]
+0.013 → 0.038 | −0.32
+[−0.46, −0.01]
+0.100 → 0.098 | 0.76
+[0.61, 0.88]
+0.022 → 0.166 | −0.38
+[−0.58, −0.09]
+0.098 → 0.093
+Occlusion | 0.97
+[0.95, 0.99]
+0.004 → 0.598 | 0.95
+[0.92, 0.98]
+0.005 → 0.338 | 0.99
+[0.97, 1.00]
+0.008 → 0.467 | 0.98
+[0.96, 0.98]
+0.000 → 0.531 | 0.93
+[0.85, 0.95]
+0.104 → 0.218 | 0.91
+[0.83, 0.95]
+0.000 → 0.362 | 0.66
+[0.47, 0.79]
+0.106 → 0.126
+[/TABLE]
+Source: results/dose_response/method_responsiveness_corrected.csv. †: not significant after BH over the methods family. The shortcut covers 144 of 16,384 pixels on Pet, 9 of 1,024 on CIFAR-10, 9 of 784 on the 28×28 patch settings and about 10% of the pixels for the texture.
+5.9. Reliance and object competence
+A model that relies more on the shortcut is also worse at the object, so a metric that responds to reliance may be responding to object competence. Table 10 separates the two. Reliance and accuracy without the shortcut are least collinear for the CIFAR small CNN (ρ = −0.72), where the partial ρ of preference with reliance given competence stays at 0.78–0.98. In 4 of 7 settings the two are collinear (ρ ≤ −0.95), and there the partial correlations are smaller and in places not significant (MNIST texture −0.26 to 0.53). Outside the CIFAR small CNN our design cannot fully separate reliance from object competence.
+Table 10. Reliance and object competence. ρ(R, acc): Spearman correlation between reliance and accuracy without the shortcut. Per metric (shortcut vs full object): ρ with reliance / partial ρ with reliance controlling for accuracy without the shortcut (p)
+[TABLE]
+Setting | Models | ρ(R, acc) | Deletion (black) | Deletion (blur) | Deletion (inpaint) | Insertion (blur)
+CIFAR CNN | 12 | −0.72 | 0.93 / 0.88 (< 0.001) | 0.90 / 0.78 (0.005) | 0.99 / 0.98 (< 0.001) | 0.98 / 0.96 (< 0.001)
+Pneumonia texture | 42 | −0.80 | 0.86 / 0.61 (< 0.001) | 0.58 / 0.60 (< 0.001) | 0.56 / 0.49 (0.001) | 0.27 / 0.26 (0.106)
+Pneumonia patch | 42 | −0.86 | 0.69 / 0.40 (0.010) | 0.55 / 0.42 (0.006) | 0.71 / 0.33 (0.034) | 0.46 / 0.49 (0.001)
+Pet | 18 | −0.96 | 0.85 / 0.57 (0.017) | 0.96 / 0.68 (0.003) | 0.95 / 0.64 (0.006) | 0.93 / 0.70 (0.002)
+MNIST texture | 51 | −0.98 | 0.91 / −0.26 (0.066) | 0.97 / 0.38 (0.007) | 0.95 / 0.23 (0.115) | 0.97 / 0.53 (< 0.001)
+CIFAR ResNet-18 | 18 | −0.98 | 0.96 / 0.46 (0.062) | 0.97 / 0.54 (0.024) | 0.98 / 0.78 (< 0.001) | 0.98 / 0.52 (0.033)
+MNIST patch | 51 | −0.99 | 0.97 / 0.48 (< 0.001) | 0.97 / 0.62 (< 0.001) | 0.98 / 0.45 (0.001) | 0.97 / 0.53 (< 0.001)
+[/TABLE]
+Source: results/dose_response/confound.csv, sorted from the least collinear setting. Partial Spearman: Pearson correlation of rank residuals after a linear fit on the accuracy rank; p from a t distribution with n − 3 degrees of freedom.
+6. Discussion
+Responsive but not calibrated. Every metric ranks models by reliance, but a ranking is not a verdict. A practitioner who reads “the metric prefers the shortcut explanation” as “the model uses the shortcut” would be wrong for most of the low-reliance Pet and CIFAR-10 models under black and blur deletion. Bilodeau et al. [44] argue that the end task must be defined; our behavioural labels give one such definition, and against it the metrics over-detect.
+Size and form. The size-matched control removes much of the preference for the object map at low reliance, and the random control shows black and blur deletion preferring scattered removal over compact removal on natural images. Both fit known mechanisms: removal shape leaks class information [12], removal-based benchmarks favour spatially blurry masks [41], the fill strategy decides rankings [13], deletion and insertion read only the ranking of a map [42], and common metrics struggle to separate methods from random attribution [43]. The real Pet masks reduce the CIFAR-10 form bias, so part of it was the Gaussian prior; the rest is a property of the metrics. Any mask-based evaluation that compares a small marker with a large object region inherits the size confound.
+Why the radiograph setting is harder. On PneumoniaMNIST the “object” map is an intensity ranking of the whole radiograph, there are two classes, and the model's probability saturates often: the share of tied comparisons reaches 14% against at most 0.3% on MNIST. Results that hold on MNIST should not be transferred to medical images without checking [11].
+Why insertion fails on a diffuse shortcut. Restoring scattered pixels into a blurred image changes it little, because the blur has already spread the texture's brightness over neighbouring pixels. This explanation was not tested separately.
+Why some methods move away from the texture. On MNIST texture, Saliency and SmoothGrad put less weight on the shortcut as reliance grows, possibly from gradient saturation once the model is confident or because the texture adds to bright digit pixels. The opposite trend on PneumoniaMNIST texture shows that this is not a general property of these methods.
+Recommendations. (1) Test a metric at several measured, chance-corrected reliance levels before using it to rank explanation methods, and report its over-detection rate, not only a correlation. (2) Derive the ideal switch from behaviour rather than assuming 50%. (3) Compare maps of matched size and form, or report size-matched and random controls. (4) Do not use insertion for diffuse evidence. (5) Report paired tests before calling one metric variant better than another.
+7. Limitations
+All metrics come from one family (ordered pixel removal or insertion with three fills). Other families such as faithfulness correlation or region perturbation were not tested, and the inpainting variant is inspired by ROAD but is not ROAD.
+All networks are trained from scratch; the Pet ResNet-18 uses a CIFAR-style stem at 128×128, and no pretrained or transformer backbone was tested.
+The shortcut is synthetic (a white patch or a brightened texture). The dose varies the shortcut's predictivity, not its availability [45].
+The oracle maps have limits: on PneumoniaMNIST the object map is an intensity ranking of the whole radiograph; on CIFAR-10 it is a centred Gaussian prior, so Pet is the primary natural-image evidence; the size-matched map on MNIST takes the topmost tied saturated pixels; blur deletion leaves about 20–25% of the patch intensity in place; and the inpainting curve ends on noise around black.
+Reliance and object competence are collinear in 4 of 7 settings (Section 5.9).
+The chance correction assumes that errors spread evenly over the wrong classes.
+Reliance gaps remain on CIFAR-10 and Pet, where no models were added; each model is scored on 100 images, and the low-reliance preferences on Pet are near ties.
+The switch-identification window (±10 points), the causal behavioural label and the class-stratified AUROC were chosen after the audit and after the original-set results had been inspected. The amendment-A1 models had been trained by then, but they entered no analysis until these choices were committed.
+8. Conclusion
+Across 234 models with controlled and measured shortcut reliance, deletion and insertion metrics respond to reliance but are not calibrated to it, and their verdicts depend on the size and form of the explanations they compare. On natural images black and blur deletion report a shortcut for most models that barely use it, the metrics switch far below the reliance at which the models follow the shortcut on half of the images, and within a model they separate followed from non-followed images only weakly. The pre-registered Pet test confirmed three of four predictions and showed black deletion failing a form-matched control. Metrics should be validated at several measured reliance levels, against behavioural ground truth and with size- and form-matched controls, before they are used to rank explanation methods. Future work should test other metric families, pretrained backbones and realistic shortcuts.
+CRediT authorship contribution statement
+Md Junaid Faizan Shaikh: Conceptualization, Methodology, Software, Investigation, Formal analysis, Visualization, Writing – original draft, Writing – review & editing. [Guide Name]: Supervision [to be confirmed].
+Declaration of competing interest
+The author declares no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+Data availability
+[Placeholder: link to the public code repository with result files and checkpoints.] MNIST, CIFAR-10, PneumoniaMNIST and Oxford-IIIT Pet are publicly available.
+Declaration of generative AI and AI-assisted technologies in the writing process
+During the preparation of this work the author used AI assistants for code development and for drafting the text. After using these tools, the author reviewed and edited the content as needed and takes full responsibility for the content of the publication.
+Funding
+This research did not receive any specific grant from funding agencies in the public, commercial, or not-for-profit sectors.
+Acknowledgements
+The author thanks [Guide Name] for guidance and feedback on this work.
+Appendix A. Supporting study: the sanity check against ground truth
+A separate fixed-shortcut study trained three seeds on each of five datasets, including two decoy datasets with a class-coded patch [15]. The models follow the patch 96% (Decoy MNIST) and 99% (Decoy Pneumonia) of the time, so on test images whose patch points to a wrong class the patch is the ground-truth evidence. On Decoy MNIST Integrated Gradients puts 71% of its positive attribution on the patch and Occlusion 54%, against at most 10% for the other methods. Table 11 and Fig. 8 compare each metric's ranking of the five methods with the ground-truth ranking. The model-randomisation sanity check [36] is not shown to agree with the ground truth: its mean Kendall τ is −0.20 on Decoy MNIST (exact one-sided p = 0.836) and 0.07 on Decoy Pneumonia (p = 0.445). With five methods, a single seed reaches one-sided p < 0.05 only at τ ≥ 0.8, so the study cannot show disagreement either. The perturbation metrics agree with the ground truth on Decoy MNIST (mean τ = 0.60–0.87) but not on Decoy Pneumonia (−0.33 to 0.33); per image, deletion scores correlate with correct localisation (Spearman ρ = 0.65–0.76) and insertion less so (0.36–0.39).
+Table 11. Supporting study: Kendall τ between each metric's ranking of the five methods and the ground-truth ranking, with exact p-values
+[TABLE]
+Dataset | Metric | Mean τ (3 seeds) | Exact one-sided p of the mean | τ per seed (42, 1, 2)
+Decoy MNIST | Deletion (black) | 0.80 | < 0.001 | 0.80, 0.80, 0.80
+Decoy MNIST | Deletion (blur) | 0.87 | < 0.001 | 1.00, 0.60, 1.00
+Decoy MNIST | Deletion (inpaint) | 0.67 | 0.003 | 0.80, 0.40, 0.80
+Decoy MNIST | Insertion (blur) | 0.60 | 0.007 | 0.80, 0.20, 0.80
+Decoy MNIST | Sanity (object px) | −0.20 | 0.836 | −0.20, −0.40, 0.00
+Decoy Pneumonia | Deletion (black) | −0.33 | 0.940 | 0.40, −0.80, −0.60
+Decoy Pneumonia | Deletion (blur) | −0.33 | 0.940 | 0.00, −0.60, −0.40
+Decoy Pneumonia | Deletion (inpaint) | 0.33 | 0.103 | 0.60, 0.20, 0.20
+Decoy Pneumonia | Insertion (blur) | 0.00 | 0.555 | 0.60, −0.40, −0.20
+Decoy Pneumonia | Sanity (object px) | 0.07 | 0.445 | −0.20, 0.20, 0.20
+[/TABLE]
+Source: results/analysis/kendall_exact.csv. With five methods τ moves in steps of 0.2, and a single seed reaches one-sided p < 0.05 only at τ ≥ 0.8 (exact null over all 120 orderings, results/analysis/kendall_null_n5.csv). The p of the mean uses the exact null of the mean of three independent τ.
+Fig. 8. Supporting study. Left: Kendall τ between each metric's ranking of the five methods and the ground-truth ranking (mean ± standard deviation over three seeds). Right: per-image Spearman ρ between metric scores and ground-truth localisation. Source: results/analysis/gt_agreement.png
+Appendix B. Legacy analysis
+Earlier drafts used raw reliance, a bootstrap over seeds only, an unbalanced decision accuracy and a first-crossing switch rule. These values are kept for comparison and are superseded by Section 5.
+Table 12. Legacy analysis (shortcut vs full object): raw reliance, seed-only bootstrap, unbalanced decision accuracy and the first-crossing switch rule, kept for comparison with earlier drafts
+[TABLE]
+Setting | Metric | ρ with raw R [seed-only CI] | p (unadjusted) | Decision accuracy (unbalanced) | Switch, raw R % [CI]
+Pet | Deletion (black) | 0.85 [0.71, 0.95] | < 0.001 | 0.56 | 18.9 [17.4, 20.4]
+ | Deletion (blur) | 0.96 [0.92, 0.99] | < 0.001 | 0.44 | none [–]
+ | Deletion (inpaint) | 0.95 [0.87, 0.99] | < 0.001 | 0.67 | 22.1 [20.8, 26.1]
+ | Insertion (blur) | 0.93 [0.89, 0.98] | < 0.001 | 0.67 | 24.7 [23.1, 26.2]
+CIFAR ResNet-18 | Deletion (black) | 0.96 [0.92, 0.99] | < 0.001 | 0.17 | none [–]
+ | Deletion (blur) | 0.97 [0.96, 0.99] | < 0.001 | 0.17 | none [–]
+ | Deletion (inpaint) | 0.98 [0.95, 1.00] | < 0.001 | 0.67 | 11.6 [9.6, 14.9]
+ | Insertion (blur) | 0.98 [0.97, 1.00] | < 0.001 | 0.61 | 11.0 [9.3, 12.7]
+CIFAR CNN | Deletion (black) | 0.94 [0.82, 1.00] | < 0.001 | 0.17 | none [–]
+ | Deletion (blur) | 0.90 [0.83, 0.99] | < 0.001 | 0.17 | none [–]
+ | Deletion (inpaint) | 0.99 [0.99, 1.00] | < 0.001 | 0.42 | 8.4 [7.1, 10.3]
+ | Insertion (blur) | 0.98 [0.94, 1.00] | < 0.001 | 0.67 | 19.7 [18.3, 21.6]
+MNIST patch | Deletion (black) | 0.97 [0.95, 0.98] | < 0.001 | 0.92 | 38.1 [25.8, 46.3]
+ | Deletion (blur) | 0.97 [0.95, 0.98] | < 0.001 | 0.94 | 38.6 [27.0, 46.0]
+ | Deletion (inpaint) | 0.98 [0.96, 0.98] | < 0.001 | 0.94 | 43.8 [32.4, 52.9]
+ | Insertion (blur) | 0.97 [0.96, 0.98] | < 0.001 | 0.98 | 45.1 [29.8, 51.3]
+MNIST texture | Deletion (black) | 0.91 [0.87, 0.95] | < 0.001 | 0.94 | 30.5 [19.4, 35.3]
+ | Deletion (blur) | 0.97 [0.95, 0.98] | < 0.001 | 0.94 | 61.2 [54.7, 72.2]
+ | Deletion (inpaint) | 0.95 [0.92, 0.97] | < 0.001 | 0.94 | 33.8 [22.8, 38.7]
+ | Insertion (blur) | 0.96 [0.94, 0.98] | < 0.001 | 0.61 | 96.8 [93.0, 99.8]
+Pneumonia patch | Deletion (black) | 0.69 [0.58, 0.81] | < 0.001 | 0.74 | 24.2 [13.9, 26.5]
+ | Deletion (blur) | 0.56 [0.42, 0.66] | < 0.001 | 0.71 | 19.0 [17.7, 20.6]
+ | Deletion (inpaint) | 0.71 [0.57, 0.82] | < 0.001 | 0.86 | 31.8 [28.8, 50.7]
+ | Insertion (blur) | 0.46 [0.31, 0.62] | = 0.002 | 0.67 | 16.8 [14.7, 19.4]
+Pneumonia texture | Deletion (black) | 0.86 [0.79, 0.93] | < 0.001 | 0.74 | 28.4 [21.6, 32.3]
+ | Deletion (blur) | 0.58 [0.41, 0.73] | < 0.001 | 0.59 | none [–]
+ | Deletion (inpaint) | 0.56 [0.36, 0.71] | < 0.001 | 0.62 | 19.2 [18.6, 20.1]
+ | Insertion (blur) | 0.27 [0.06, 0.47] | = 0.087 | 0.59 | none [–]
+[/TABLE]
+Source: results/dose_response/responsiveness.csv (legacy). These intervals resample only the 2–6 seeds per dose with the images fixed, so they are too narrow; the decision accuracy is unbalanced; the switch is the first crossing of the per-dose means. Superseded by Tables in Section 5.
+Appendix C. Original and amended model sets
+Amendment A1 committed to reporting both the 192 original models and all 234 models. The added models strengthen the rank correlations slightly and weaken the decision-level results: over-detection rises and the switch points move.
+Table 13. Model-set check promised by amendment A1 (shortcut vs full object): the 192 original models → all 234 models
+[TABLE]
+Setting | Metric | ρ on rᴄ | Over-detection FPR | Balanced accuracy | Switch, rᴄ %
+MNIST patch | Deletion (black) | 0.927 → 0.959 | 0.048 → 0.125 | 0.976 → 0.938 | 32.0 (nb) → 38.7
+ | Deletion (blur) | 0.965 → 0.973 | 0.048 → 0.094 | 0.976 → 0.953 | 34.9 (nb) → 38.8
+ | Deletion (inpaint) | 0.941 → 0.967 | 0.048 → 0.062 | 0.943 → 0.942 | 38.1 (nb) → 39.2
+ | Insertion (blur) | 0.939 → 0.965 | 0.000 → 0.031 | 1.000 → 0.984 | 48.7 → 39.3
+MNIST texture | Deletion (black) | 0.937 → 0.909 | 0.059 → 0.150 | 0.971 → 0.925 | 17.3 (nb) → 17.3 (nb)
+ | Deletion (blur) | 0.956 → 0.964 | 0.000 → 0.000 | 0.974 → 0.952 | 71.8 (nb) → 66.5
+ | Deletion (inpaint) | 0.948 → 0.948 | 0.059 → 0.150 | 0.971 → 0.925 | 20.1 (nb) → 18.8
+ | Insertion (blur) | 0.951 → 0.965 | 0.000 → 0.000 | 0.763 → 0.677 | 99.7 → 99.7
+Pneumonia patch | Deletion (black) | 0.670 → 0.645 | 0.562 → 0.682 | 0.719 → 0.659 | 6.2 → 5.9
+ | Deletion (blur) | 0.567 → 0.506 | 0.625 → 0.727 | 0.688 → 0.636 | 2.5 (e) → 2.5 (e)
+ | Deletion (inpaint) | 0.624 → 0.658 | 0.250 → 0.227 | 0.800 → 0.811 | 30.0 → 30.0
+ | Insertion (blur) | 0.492 → 0.488 | 0.750 → 0.818 | 0.625 → 0.591 | 0.1 (e) → 0.1 (e)
+Pneumonia texture | Deletion (black) | 0.790 → 0.848 | 0.500 → 0.667 | 0.750 → 0.667 | 13.4 → 12.6
+ | Deletion (blur) | 0.569 → 0.583 | 1.000 → 1.000 | 0.500 → 0.500 | none (> 0.5 at lowest) → none (> 0.5 at lowest)
+ | Deletion (inpaint) | 0.598 → 0.555 | 0.833 → 0.889 | 0.562 → 0.535 | 4.4 (e) → 4.4 (e)
+ | Insertion (blur) | 0.253 → 0.269 | 1.000 → 1.000 | 0.500 → 0.500 | none (> 0.5 at lowest) → none (> 0.5 at lowest)
+[/TABLE]
+Sources: results/dose_response/original_models/responsiveness_corrected.csv and results/dose_response/responsiveness_corrected.csv. Pet and CIFAR-10 received no new models, so their rows are identical in both sets and are omitted.
+References
+[Note for the guide: each entry was checked against the paper's own page (arXiv, proceedings, journal or PubMed Central) on 2026-11-13; entries without authors are cited by title. Page numbers and final venues must be checked before submission.]
+[1] Simonyan K, Vedaldi A, Zisserman A (2014) Deep inside convolutional networks: visualising image classification models and saliency maps. In: ICLR Workshop
+[2] Smilkov D, et al. (2017) SmoothGrad: removing noise by adding noise. arXiv:1706.03825
+[3] Sundararajan M, Taly A, Yan Q (2017) Axiomatic attribution for deep networks. In: Proceedings of the International Conference on Machine Learning (ICML)
+[4] Selvaraju RR, et al. (2017) Grad-CAM: visual explanations from deep networks via gradient-based localization. In: Proceedings of the IEEE International Conference on Computer Vision (ICCV)
+[5] Zeiler MD, Fergus R (2014) Visualizing and understanding convolutional networks. In: Proceedings of the European Conference on Computer Vision (ECCV)
+[6] Samek W, et al. (2017) Evaluating the visualization of what a deep neural network has learned. IEEE Transactions on Neural Networks and Learning Systems
+[7] Petsiuk V, Das A, Saenko K (2018) RISE: randomized input sampling for explanation of black-box models. In: Proceedings of the British Machine Vision Conference (BMVC)
+[8] Tomsett R, et al. (2020) Sanity checks for saliency metrics. In: Proceedings of the AAAI Conference on Artificial Intelligence. arXiv:1912.01451
+[9] Hedström A, Bommer P, Wickstrøm KK, Samek W, Lapuschkin S, Höhne MMC (2023) The meta-evaluation problem in explainable AI: identifying reliable estimators with MetaQuantus. Transactions on Machine Learning Research. arXiv:2302.07265
+[10] Klein L, Lüth CT, Schlegel U, Bungert TJ, El-Assady M, Jäger PF (2024) Navigating the maze of explainable AI: a systematic approach to evaluating methods and metrics. In: Advances in Neural Information Processing Systems (NeurIPS). arXiv:2409.16756
+[11] Gevaert A, Rousseau A-J, Becker T, Valkenborg D, De Bie T, Saeys Y (2022) Evaluating feature attribution methods in the image domain. arXiv:2202.12270
+[12] Rong Y, Leemann T, Borisov V, Kasneci G, Kasneci E (2022) A consistent and efficient evaluation strategy for attribution methods (ROAD). In: Proceedings of the International Conference on Machine Learning (ICML). arXiv:2202.00449
+[13] Blücher S, Vielhaben J, Strodthoff N (2024) Decoupling pixel flipping and occlusion strategy for consistent XAI benchmarks. Transactions on Machine Learning Research. arXiv:2401.06654
+[14] Back to the baseline: examining baseline effects on explainability metrics (2025). arXiv:2512.11433
+[15] Ross AS, Hughes MC, Doshi-Velez F (2017) Right for the right reasons: training differentiable models by constraining their explanations. In: Proceedings of the International Joint Conference on Artificial Intelligence (IJCAI)
+[16] Lapuschkin S, Wäldchen S, Binder A, Montavon G, Samek W, Müller K-R (2019) Unmasking Clever Hans predictors and assessing what machines really learn. Nature Communications. arXiv:1902.10178
+[17] DeGrave AJ, et al. (2021) AI for radiographic COVID-19 detection selects shortcuts over signal. Author manuscript, PubMed Central PMC7523163 [final venue to be confirmed from the published version]
+[18] Sun S, et al. (2023) Right for the wrong reason: can interpretable ML techniques detect spurious correlations? In: Medical Image Computing and Computer Assisted Intervention (MICCAI). arXiv:2307.12344
+[19] Yang M, Kim B (2019) Benchmarking attribution methods with relative feature importance. arXiv:1907.09701
+[20] Kim JS, Plumb G, Talwalkar A (2022) Sanity simulations for saliency methods. In: Proceedings of the 39th International Conference on Machine Learning (ICML), PMLR 162:11173–11200
+[21] Bastings J, Ebert S, Zablotskaia P, Sandholm A, Filippova K (2022) “Will you find these shortcuts?” A protocol for evaluating the faithfulness of input salience methods for text classification. In: Proceedings of EMNLP 2022, pp 976–991
+[22] Achara A, Triantafillou P, Puyol-Antón E, Hammers A, King AP (2025) Localising shortcut learning in pixel space via ordinal scoring correlations for attribution representations (OSCAR). arXiv:2512.18888
+[23] Zhou Y, et al. (2022) Do feature attribution methods correctly attribute features? In: Proceedings of the AAAI Conference on Artificial Intelligence. arXiv:2104.14403
+[24] Lin Y-S, Lee W-C, Celik ZB (2021) What do you see? Evaluation of explainable artificial intelligence (XAI) interpretability through neural backdoors. In: Proceedings of KDD 2021. arXiv:2009.10639
+[25] A backdoor-based explainable AI benchmark for high fidelity evaluation of attributions (BackX). arXiv:2405.02344
+[26] Adebayo J, et al. (2022) Post hoc explanations may be ineffective for detecting unknown spurious correlation. In: International Conference on Learning Representations (ICLR)
+[27] Arras L, Osman A, Samek W (2022) CLEVR-XAI: a benchmark dataset for the ground truth evaluation of neural network explanations. Information Fusion
+[28] Hesse R, Schaub-Meyer S, Roth S (2023) FunnyBirds: a synthetic vision dataset for a part-based analysis of explainable AI methods. In: Proceedings of ICCV 2023. arXiv:2308.06248
+[29] Lee JR, Emami S, Hollins MD, Wong TCH, Villalobos Sánchez CI, Toni F, Zhang D, Dejl A (2025) XAI-Units: benchmarking explainability methods with unit tests. In: Proceedings of ACM FAccT 2025. arXiv:2506.01059
+[30] AttributionLab: faithfulness of feature attribution under controllable environments (2023). NeurIPS XAI in Action Workshop. arXiv:2310.06514
+[31] Miró-Nicolau M, Spinnato F, Guidotti R (2026) A synthetic ground-truth framework for the evaluation of explainable AI methods. arXiv:2609.30397
+[32] Hedström A, Weber L, Krakowczyk D, Bareeva D, Motzkus F, Samek W, Lapuschkin S, Höhne MMC (2023) Quantus: an explainable AI toolkit for responsible evaluation of neural network explanations and beyond. Journal of Machine Learning Research 24(34):1–11
+[33] M4: a unified XAI benchmark for faithfulness evaluation of feature attribution methods across metrics, modalities and models (2023). In: NeurIPS 2023 Datasets and Benchmarks Track
+[34] Miró-Nicolau M, Jaume-i-Capó A, Moyà-Alcover G (2024) A comprehensive study on fidelity metrics for XAI. arXiv:2401.10640
+[35] Hesse R, Schaub-Meyer S, Roth S (2024) Benchmarking the attribution quality of vision models. In: NeurIPS 2024 Datasets and Benchmarks Track. arXiv:2407.11910
+[36] Adebayo J, et al. (2018) Sanity checks for saliency maps. In: Advances in Neural Information Processing Systems (NeurIPS)
+[37] Binder A, et al. (2023) Shortcomings of top-down randomization-based sanity checks for evaluations of deep neural network explanations. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)
+[38] Hedström A, Weber L, Lapuschkin S, Höhne MMC (2023) Sanity checks revisited: an exploration to repair the model parameter randomisation test. NeurIPS 2023 Workshop XAI in Action (XAIA). arXiv:2401.06465
+[39] Hedström A, Weber L, Lapuschkin S, Höhne M (2024) A fresh look at sanity checks for saliency maps. arXiv:2405.02383 (text overlaps with arXiv:2401.06465)
+[40] Hooker S, Erhan D, Kindermans P-J, Kim B (2019) A benchmark for interpretability methods in deep neural networks. In: Advances in Neural Information Processing Systems (NeurIPS). arXiv:1806.10758
+[41] Song J, Cha K, Seo J (2026) On pitfalls of RemOve-And-Retrain: data processing inequality perspective. ICML 2026 Workshop on Mechanistic Interpretability. arXiv:2304.13836
+[42] Gomez T, Fréour T, Mouchère H (2022) Metrics for saliency map evaluation of deep learning explanation methods. arXiv:2201.13291
+[43] Wu J, Kang W, Tang H, Hong Y, Yan Y (2024) On the faithfulness of vision transformer explanations. In: Proceedings of CVPR 2024. arXiv:2404.01415
+[44] Bilodeau B, Jaques N, Koh PW, Kim B (2024) Impossibility theorems for feature attribution. Proceedings of the National Academy of Sciences 121(2). arXiv:2212.11870
+[45] Hermann KL, Mobahi H, Fel T, Mozer MC (2024) On the foundations of shortcut learning. In: International Conference on Learning Representations (ICLR). arXiv:2310.16228
+[46] Suhail P, Goel V, Sethi A (2025) Shortcut learning susceptibility in vision classifiers. arXiv:2502.09150
+[47] Saravanan V, Berman GJ, Sober SJ (2020) Application of the hierarchical bootstrap to multi-level data in neuroscience. Neurons, Behavior, Data analysis, and Theory 3(5). arXiv:2007.07797
+[48] Bouthillier X, et al. (2021) Accounting for variance in machine learning benchmarks. In: MLSys 2021. arXiv:2103.03098
+[49] Agarwal R, Schwarzer M, Castro PS, Courville A, Bellemare MG (2021) Deep reinforcement learning at the edge of the statistical precipice. In: Advances in Neural Information Processing Systems (NeurIPS). arXiv:2108.13264
+[50] Kokhlikyan N, et al. (2020) Captum: a unified and generic model interpretability library for PyTorch. arXiv:2009.07896
+[51] Parkhi OM, Vedaldi A, Zisserman A, Jawahar CV (2012) Cats and dogs. In: IEEE Conference on Computer Vision and Pattern Recognition (CVPR). Dataset: https://www.robots.ox.ac.uk/~vgg/data/pets/
+[52] Yang J, et al. (2023) MedMNIST v2: a large-scale lightweight benchmark for 2D and 3D biomedical image classification. Scientific Data
+[53] Kermany DS, et al. (2018) Identifying medical diagnoses and treatable diseases by image-based deep learning. Cell
+[54] He K, et al. (2015) Deep residual learning for image recognition. arXiv:1512.03385

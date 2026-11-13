@@ -1,0 +1,205 @@
+C:\Users\Md Junaid Faizan\Desktop\Mtech Final project\Handwritten-Digit-Recognition-CNN-Flask-App-\.venv\Lib\site-packages\numpy\lib\_nanfunctions_impl.py:1573: RuntimeWarning: All-NaN slice encountered
+  return _nanquantile_unchecked(
+C:\Users\Md Junaid Faizan\Desktop\Mtech Final project\Handwritten-Digit-Recognition-CNN-Flask-App-\.venv\Lib\site-packages\numpy\lib\_nanfunctions_impl.py:1573: RuntimeWarning: All-NaN slice encountered
+  return _nanquantile_unchecked(
+============================== 1. follow rate (primary label) vs r_c, per setting
+cifar10            patch    n= 12 rho(rc, follow)=0.944  MAE|rc-100*follow|=  2.3 pts  rho(rc, dominant)=0.902  mean undetermined=0.022 max=0.080
+cifar10_resnet18   patch    n= 18 rho(rc, follow)=0.966  MAE|rc-100*follow|=  2.5 pts  rho(rc, dominant)=0.944  mean undetermined=0.018 max=0.100
+mnist              patch    n= 51 rho(rc, follow)=0.986  MAE|rc-100*follow|=  1.7 pts  rho(rc, dominant)=0.982  mean undetermined=0.034 max=0.130
+mnist              texture  n= 51 rho(rc, follow)=0.988  MAE|rc-100*follow|=  2.0 pts  rho(rc, dominant)=0.983  mean undetermined=0.074 max=0.150
+pet_resnet18       patch    n= 18 rho(rc, follow)=0.983  MAE|rc-100*follow|=  2.4 pts  rho(rc, dominant)=0.986  mean undetermined=0.327 max=0.490
+pneumonia_mnist    patch    n= 42 rho(rc, follow)=0.989  MAE|rc-100*follow|=  4.4 pts  rho(rc, dominant)=0.863  mean undetermined=0.327 max=0.530
+pneumonia_mnist    texture  n= 42 rho(rc, follow)=0.991  MAE|rc-100*follow|=  2.0 pts  rho(rc, dominant)=0.920  mean undetermined=0.250 max=0.530
+
+ ============================== 2. agreement of primary label with shortcut_dominant (determined images)
+cifar10            patch    agreement=0.836  P(dom=1|causal=1)=0.676  P(dom=1|causal=0)=0.103
+cifar10_resnet18   patch    agreement=0.872  P(dom=1|causal=1)=0.707  P(dom=1|causal=0)=0.076
+mnist              patch    agreement=0.797  P(dom=1|causal=1)=0.684  P(dom=1|causal=0)=0.147
+mnist              texture  agreement=0.861  P(dom=1|causal=1)=0.837  P(dom=1|causal=0)=0.107
+pet_resnet18       patch    agreement=0.860  P(dom=1|causal=1)=0.748  P(dom=1|causal=0)=0.087
+pneumonia_mnist    patch    agreement=0.503  P(dom=1|causal=1)=0.146  P(dom=1|causal=0)=0.200
+pneumonia_mnist    texture  agreement=0.720  P(dom=1|causal=1)=0.625  P(dom=1|causal=0)=0.130
+
+ ============================== 3. behavioural switch on dominant label (isotonic of dominant rate on r_c) vs primary
+cifar10            patch    switch(follow)=55.0 crossed  switch(dominant)=53.1 crossed
+cifar10_resnet18   patch    switch(follow)=52.9 crossed  switch(dominant)=56.3 crossed
+mnist              patch    switch(follow)=53.9 crossed  switch(dominant)=56.0 crossed
+mnist              texture  switch(follow)=45.7 crossed  switch(dominant)=53.2 crossed
+pet_resnet18       patch    switch(follow)=54.5 crossed  switch(dominant)=49.6 crossed
+pneumonia_mnist    patch    switch(follow)=36.9 crossed  switch(dominant)=41.7 crossed
+pneumonia_mnist    texture  switch(follow)=41.9 crossed  switch(dominant)=62.3 crossed
+
+ ============================== 4. binary tasks: class composition of determined images within high-reliance models
+pet_resnet18
+                    models  undetermined  share_determined_in_majority_class
+shortcut band                                                               
+patch    (-5, 20]      9.0         0.267                               0.646
+         (20, 50]      3.0         0.303                               0.715
+         (50, 80]      2.0         0.425                               0.818
+         (80, 101]     4.0         0.430                               0.790
+pneumonia_mnist
+                    models  undetermined  share_determined_in_majority_class
+shortcut band                                                               
+patch    (-5, 20]     15.0         0.194                               0.629
+         (20, 50]      7.0         0.254                               0.620
+         (50, 80]      7.0         0.383                               0.747
+         (80, 101]    13.0         0.491                               0.950
+texture  (-5, 20]      8.0         0.174                               0.609
+         (20, 50]     10.0         0.158                               0.568
+         (50, 80]      1.0         0.240                               0.684
+         (80, 101]    23.0         0.318                               0.714
+
+ ============================== 5. Pet: models with r_c <= 50, preference (shortcut vs full object) and near-tie share
+ dose  seed   rc  deletion_zero deletion_zero_ci  deletion_zero_|gap|<.01  deletion_blur deletion_blur_ci  deletion_blur_|gap|<.01  deletion_inpaint deletion_inpaint_ci  deletion_inpaint_|gap|<.01  insertion_blur insertion_blur_ci  insertion_blur_|gap|<.01
+ -0.5     1 -0.8           0.43      [0.34,0.53]                     0.11           0.52      [0.42,0.61]                     0.02              0.39         [0.30,0.48]                        0.05            0.34       [0.25,0.43]                      0.04
+ -0.5    42 -0.1           0.45      [0.35,0.55]                     0.03           0.48      [0.38,0.58]                     0.08              0.40         [0.31,0.50]                        0.05            0.36       [0.27,0.45]                      0.06
+ -0.5     2  0.2           0.50      [0.40,0.59]                     0.10           0.51      [0.41,0.61]                     0.15              0.42         [0.33,0.53]                        0.10            0.36       [0.26,0.45]                      0.14
+ -0.4     2  3.5           0.51      [0.41,0.60]                     0.05           0.61      [0.51,0.70]                     0.06              0.47         [0.38,0.57]                        0.11            0.41       [0.32,0.50]                      0.07
+ -0.4     1  3.9           0.54      [0.45,0.63]                     0.52           0.56      [0.46,0.66]                     0.05              0.45         [0.36,0.55]                        0.08            0.38       [0.29,0.48]                      0.08
+ -0.4    42  6.1           0.75      [0.66,0.83]                     0.08           0.64      [0.54,0.73]                     0.04              0.59         [0.49,0.69]                        0.05            0.55       [0.45,0.64]                      0.03
+ -0.3     1 14.6           0.69      [0.60,0.78]                     0.19           0.71      [0.62,0.80]                     0.03              0.57         [0.47,0.67]                        0.17            0.72       [0.63,0.80]                      0.04
+ -0.3     2 15.1           0.79      [0.71,0.86]                     0.11           0.62      [0.52,0.71]                     0.04              0.67         [0.58,0.76]                        0.06            0.67       [0.57,0.76]                      0.08
+ -0.3    42 15.4           0.75      [0.67,0.83]                     0.07           0.55      [0.45,0.65]                     0.02              0.55         [0.45,0.64]                        0.03            0.68       [0.59,0.77]                      0.06
+ -0.2    42 22.9           0.56      [0.46,0.65]                     0.12           0.70      [0.61,0.79]                     0.04              0.60         [0.51,0.70]                        0.11            0.66       [0.57,0.76]                      0.08
+ -0.2     2 23.0           0.71      [0.62,0.79]                     0.04           0.74      [0.65,0.82]                     0.07              0.56         [0.46,0.66]                        0.06            0.69       [0.60,0.78]                      0.08
+ -0.2     1 41.1           0.77      [0.68,0.85]                     0.03           0.88      [0.82,0.94]                     0.04              0.79         [0.71,0.86]                        0.05            0.84       [0.76,0.91]                      0.06
+ -0.1     1 60.1           0.83      [0.75,0.90]                     0.00           0.92      [0.86,0.97]                     0.07              0.89         [0.83,0.95]                        0.04            0.97       [0.93,1.00]                      0.01
+ -0.1     2 76.8           0.93      [0.88,0.97]                     0.02           0.93      [0.88,0.98]                     0.01              0.89         [0.83,0.95]                        0.06            0.98       [0.95,1.00]                      0.02
+ -0.1    42 82.7           0.77      [0.69,0.85]                     0.00           0.91      [0.85,0.96]                     0.03              0.95         [0.90,0.99]                        0.03            0.93       [0.88,0.98]                      0.00
+  0.0     1 98.2           0.89      [0.83,0.95]                     0.01           0.93      [0.88,0.98]                     0.09              0.99         [0.97,1.00]                        0.06            0.96       [0.92,0.99]                      0.05
+  0.0    42 98.2           0.76      [0.67,0.84]                     0.16           0.92      [0.86,0.97]                     0.03              0.98         [0.95,1.00]                        0.00            0.93       [0.88,0.97]                      0.03
+  0.0     2 99.2           0.95      [0.90,0.99]                     0.03           0.97      [0.93,1.00]                     0.01              0.99         [0.97,1.00]                        0.00            0.98       [0.95,1.00]                      0.00
+deletion_zero      FPR(pref>0.5)=0.75  FPR(image-CI lower bound >0.5)=0.50  n=12
+deletion_blur      FPR(pref>0.5)=0.92  FPR(image-CI lower bound >0.5)=0.58  n=12
+deletion_inpaint   FPR(pref>0.5)=0.58  FPR(image-CI lower bound >0.5)=0.25  n=12
+insertion_blur     FPR(pref>0.5)=0.58  FPR(image-CI lower bound >0.5)=0.50  n=12
+
+ ============================== 6. nested (per-model images) vs crossed (shared images) bootstrap, shortcut vs full object
+pet_resnet18     deletion_zero    rho nested [0.622,0.939] w=0.318 crossed [0.570,0.958] w=0.388 | switch nested [-0.246,4.213] w=4.459 crossed [-0.361,4.948] w=5.309 | pref@lowdose nested [0.393,0.523] w=0.130 crossed [0.377,0.543] w=0.167
+pet_resnet18     deletion_inpaint rho nested [0.856,0.981] w=0.126 crossed [0.858,0.992] w=0.134 | switch nested [1.872,11.493] w=9.620 crossed [0.230,15.684] w=15.454 | pref@lowdose nested [0.347,0.463] w=0.117 crossed [0.317,0.490] w=0.173
+cifar10          deletion_zero    rho nested [0.593,0.961] w=0.369 crossed [0.651,0.989] w=0.338 | switch nested [nan,nan] w=nan crossed [nan,nan] w=nan | pref@lowdose nested [0.755,0.865] w=0.110 crossed [0.740,0.885] w=0.145
+cifar10          deletion_inpaint rho nested [0.944,0.995] w=0.051 crossed [0.951,1.000] w=0.049 | switch nested [3.503,7.511] w=4.008 crossed [3.302,8.157] w=4.855 | pref@lowdose nested [0.205,0.325] w=0.120 crossed [0.190,0.340] w=0.150
+cifar10_resnet18 deletion_zero    rho nested [0.847,0.975] w=0.128 crossed [0.869,0.986] w=0.117 | switch nested [nan,nan] w=nan crossed [nan,nan] w=nan | pref@lowdose nested [0.637,0.767] w=0.130 crossed [0.610,0.790] w=0.180
+cifar10_resnet18 deletion_inpaint rho nested [0.918,0.991] w=0.073 crossed [0.919,0.998] w=0.079 | switch nested [4.432,16.291] w=11.858 crossed [4.301,16.522] w=12.221 | pref@lowdose nested [0.113,0.193] w=0.080 crossed [0.100,0.217] w=0.117
+mnist            deletion_zero    rho nested [0.926,0.967] w=0.041 crossed [0.932,0.977] w=0.046 | switch nested [26.901,47.030] w=20.129 crossed [24.905,48.281] w=23.376 | pref@lowdose nested [0.007,0.045] w=0.038 crossed [0.000,0.052] w=0.052
+mnist            deletion_inpaint rho nested [0.940,0.975] w=0.034 crossed [0.944,0.981] w=0.037 | switch nested [34.520,52.650] w=18.130 crossed [34.122,53.448] w=19.326 | pref@lowdose nested [0.000,0.023] w=0.023 crossed [0.000,0.027] w=0.027
+pneumonia_mnist  deletion_zero    rho nested [0.398,0.759] w=0.361 crossed [0.441,0.807] w=0.366 | switch nested [3.086,16.577] w=13.491 crossed [3.046,64.954] w=61.908 | pref@lowdose nested [0.263,0.513] w=0.250 crossed [0.250,0.530] w=0.280
+pneumonia_mnist  deletion_inpaint rho nested [0.461,0.788] w=0.327 crossed [0.466,0.823] w=0.357 | switch nested [7.580,42.798] w=35.218 crossed [7.353,65.368] w=58.016 | pref@lowdose nested [0.100,0.197] w=0.097 crossed [0.080,0.220] w=0.140
+
+ ============================== 7. within-model AUROC: which models contribute (Pet, CIFAR, MNIST patch), deletion_zero full
+pet_resnet18     models with defined within-AUROC: 15/18; their r_c range 3.5-99.2; follow-rate range 0.03-0.96; min(#pos,#neg) median = 11
+cifar10          models with defined within-AUROC: 11/12; their r_c range 0.8-96.3; follow-rate range 0.02-0.97; min(#pos,#neg) median = 10
+cifar10_resnet18 models with defined within-AUROC: 17/18; their r_c range 0.8-97.0; follow-rate range 0.01-0.97; min(#pos,#neg) median = 6
+mnist            models with defined within-AUROC: 32/51; their r_c range 0.6-87.8; follow-rate range 0.01-0.89; min(#pos,#neg) median = 25
+
+ ============================== 8. spot-check of paper numbers against CSVs
+            base shortcut             metric  rho_rc  p_bh   fpr  n_below  balanced_accuracy  switch_iso_rc                      switch_status  pref_low  median_gap_low
+         cifar10    patch   Deletion (black)   0.907 0.000 1.000       10              0.500            NaN       above 0.5 at lowest reliance     0.815           0.096
+         cifar10    patch    Deletion (blur)   0.900 0.000 1.000       10              0.500            NaN       above 0.5 at lowest reliance     0.735           0.126
+         cifar10    patch Deletion (inpaint)   0.986 0.000 0.700       10              0.650          4.315 identified at lowest-reliance edge     0.265          -0.079
+         cifar10    patch   Insertion (blur)   0.953 0.000 0.400       10              0.800         17.671                         identified     0.227          -0.179
+cifar10_resnet18    patch   Deletion (black)   0.959 0.000 1.000       15              0.500            NaN       above 0.5 at lowest reliance     0.703           0.051
+cifar10_resnet18    patch    Deletion (blur)   0.968 0.000 1.000       15              0.500            NaN       above 0.5 at lowest reliance     0.610           0.057
+cifar10_resnet18    patch Deletion (inpaint)   0.980 0.000 0.400       15              0.800          8.663                         identified     0.153          -0.165
+cifar10_resnet18    patch   Insertion (blur)   0.983 0.000 0.467       15              0.767          8.633                         identified     0.240          -0.232
+           mnist    patch   Deletion (black)   0.959 0.000 0.125       32              0.938         38.673                         identified     0.022          -0.482
+           mnist    patch    Deletion (blur)   0.973 0.000 0.094       32              0.953         38.786                         identified     0.017          -0.191
+           mnist    patch Deletion (inpaint)   0.967 0.000 0.062       32              0.942         39.193                         identified     0.007          -0.677
+           mnist    patch   Insertion (blur)   0.965 0.000 0.031       32              0.984         39.297                         identified     0.013          -0.193
+           mnist  texture   Deletion (black)   0.909 0.000 0.150       20              0.925         17.260                         identified     0.033          -0.442
+           mnist  texture    Deletion (blur)   0.964 0.000 0.000       20              0.952         66.452                         identified     0.037          -0.161
+           mnist  texture Deletion (inpaint)   0.948 0.000 0.150       20              0.925         18.759                         identified     0.017          -0.330
+           mnist  texture   Insertion (blur)   0.965 0.000 0.000       20              0.677         99.706                         identified     0.013          -0.185
+    pet_resnet18    patch   Deletion (black)   0.877 0.000 0.750       12              0.625          1.325 identified at lowest-reliance edge     0.458          -0.009
+    pet_resnet18    patch    Deletion (blur)   0.933 0.000 0.917       12              0.542            NaN       above 0.5 at lowest reliance     0.503           0.000
+    pet_resnet18    patch Deletion (inpaint)   0.951 0.000 0.583       12              0.708          4.647                         identified     0.405          -0.049
+    pet_resnet18    patch   Insertion (blur)   0.935 0.000 0.583       12              0.708          5.402                         identified     0.350          -0.060
+ pneumonia_mnist    patch   Deletion (black)   0.645 0.000 0.682       22              0.659          5.886                         identified     0.377          -0.071
+ pneumonia_mnist    patch    Deletion (blur)   0.506 0.001 0.727       22              0.636          2.522 identified at lowest-reliance edge     0.453          -0.000
+ pneumonia_mnist    patch Deletion (inpaint)   0.658 0.000 0.227       22              0.811         29.975                         identified     0.147          -0.047
+ pneumonia_mnist    patch   Insertion (blur)   0.488 0.001 0.818       22              0.591          0.084 identified at lowest-reliance edge     0.497           0.000
+ pneumonia_mnist  texture   Deletion (black)   0.848 0.000 0.667       18              0.667         12.575                         identified     0.328          -0.032
+ pneumonia_mnist  texture    Deletion (blur)   0.583 0.000 1.000       18              0.500            NaN       above 0.5 at lowest reliance     0.572           0.000
+ pneumonia_mnist  texture Deletion (inpaint)   0.555 0.000 0.889       18              0.535          4.437 identified at lowest-reliance edge     0.450          -0.000
+ pneumonia_mnist  texture   Insertion (blur)   0.269 0.085 1.000       18              0.500            NaN       above 0.5 at lowest reliance     0.640           0.000
+ base shortcut             metric  rho_rc   fpr  switch_iso_rc  pref_low
+mnist    patch   Deletion (black)   0.970 0.500          0.882     0.373
+mnist    patch    Deletion (blur)   0.973 0.344          8.582     0.275
+mnist    patch Deletion (inpaint)   0.974 0.500          1.120     0.333
+mnist    patch   Insertion (blur)   0.970 0.406          4.136     0.305
+mnist  texture   Deletion (black)   0.916 0.250         11.532     0.017
+mnist  texture    Deletion (blur)   0.942 0.000         84.934     0.033
+mnist  texture Deletion (inpaint)   0.946 0.200         18.078     0.070
+mnist  texture   Insertion (blur)   0.953 0.000         99.709     0.013
+            base             metric  pref_low  pref_low_ci_low  pref_low_ci_high
+         cifar10   Deletion (black)     0.815            0.765             0.870
+         cifar10    Deletion (blur)     0.750            0.690             0.810
+         cifar10 Deletion (inpaint)     0.225            0.165             0.285
+         cifar10   Insertion (blur)     0.185            0.130             0.235
+cifar10_resnet18   Deletion (black)     0.723            0.627             0.803
+cifar10_resnet18    Deletion (blur)     0.562            0.477             0.638
+cifar10_resnet18 Deletion (inpaint)     0.127            0.085             0.170
+cifar10_resnet18   Insertion (blur)     0.212            0.167             0.260
+    pet_resnet18   Deletion (black)     0.528            0.460             0.597
+    pet_resnet18    Deletion (blur)     0.490            0.430             0.553
+    pet_resnet18 Deletion (inpaint)     0.383            0.327             0.443
+    pet_resnet18   Insertion (blur)     0.350            0.297             0.403
+            base shortcut             metric  calibration_gap  observed_switch_rc observed_switch_rc_status
+         cifar10    patch   Deletion (black)            0.628              54.953                   crossed
+         cifar10    patch    Deletion (blur)            0.579              54.953                   crossed
+         cifar10    patch Deletion (inpaint)            0.398              54.953                   crossed
+         cifar10    patch   Insertion (blur)            0.272              54.953                   crossed
+cifar10_resnet18    patch   Deletion (black)            0.613              52.908                   crossed
+cifar10_resnet18    patch    Deletion (blur)            0.589              52.908                   crossed
+cifar10_resnet18    patch Deletion (inpaint)            0.325              52.908                   crossed
+cifar10_resnet18    patch   Insertion (blur)            0.356              52.908                   crossed
+           mnist    patch   Deletion (black)            0.078              53.882                   crossed
+           mnist    patch    Deletion (blur)            0.080              53.882                   crossed
+           mnist    patch Deletion (inpaint)            0.052              53.882                   crossed
+           mnist    patch   Insertion (blur)            0.063              53.882                   crossed
+           mnist  texture   Deletion (black)            0.044              45.655                   crossed
+           mnist  texture    Deletion (blur)           -0.098              45.655                   crossed
+           mnist  texture Deletion (inpaint)            0.041              45.655                   crossed
+           mnist  texture   Insertion (blur)           -0.319              45.655                   crossed
+    pet_resnet18    patch   Deletion (black)            0.340              54.479                   crossed
+    pet_resnet18    patch    Deletion (blur)            0.369              54.479                   crossed
+    pet_resnet18    patch Deletion (inpaint)            0.317              54.479                   crossed
+    pet_resnet18    patch   Insertion (blur)            0.330              54.479                   crossed
+ pneumonia_mnist    patch   Deletion (black)            0.033              36.938                   crossed
+ pneumonia_mnist    patch    Deletion (blur)            0.156              36.938                   crossed
+ pneumonia_mnist    patch Deletion (inpaint)           -0.028              36.938                   crossed
+ pneumonia_mnist    patch   Insertion (blur)            0.264              36.938                   crossed
+ pneumonia_mnist  texture   Deletion (black)            0.145              41.895                   crossed
+ pneumonia_mnist  texture    Deletion (blur)            0.282              41.895                   crossed
+ pneumonia_mnist  texture Deletion (inpaint)            0.064              41.895                   crossed
+ pneumonia_mnist  texture   Insertion (blur)            0.251              41.895                   crossed
+            base shortcut             metric  rho_reliance_competence  partial_rel_given_acc  p_partial_rel_given_acc  partial_rc_given_acc
+         cifar10    patch   Deletion (black)                   -0.720                  0.879                    0.000                 0.839
+         cifar10    patch    Deletion (blur)                   -0.720                  0.776                    0.005                 0.829
+         cifar10    patch Deletion (inpaint)                   -0.720                  0.979                    0.000                 0.977
+         cifar10    patch   Insertion (blur)                   -0.720                  0.960                    0.000                 0.926
+ pneumonia_mnist  texture   Deletion (black)                   -0.804                  0.609                    0.000                 0.611
+ pneumonia_mnist  texture    Deletion (blur)                   -0.804                  0.602                    0.000                 0.584
+ pneumonia_mnist  texture Deletion (inpaint)                   -0.804                  0.492                    0.001                 0.474
+ pneumonia_mnist  texture   Insertion (blur)                   -0.804                  0.256                    0.106                 0.250
+ pneumonia_mnist    patch   Deletion (black)                   -0.863                  0.400                    0.010                 0.314
+ pneumonia_mnist    patch    Deletion (blur)                   -0.863                  0.418                    0.006                 0.309
+ pneumonia_mnist    patch Deletion (inpaint)                   -0.863                  0.333                    0.034                 0.244
+ pneumonia_mnist    patch   Insertion (blur)                   -0.863                  0.495                    0.001                 0.504
+    pet_resnet18    patch   Deletion (black)                   -0.963                  0.568                    0.017                 0.643
+    pet_resnet18    patch    Deletion (blur)                   -0.963                  0.675                    0.003                 0.540
+    pet_resnet18    patch Deletion (inpaint)                   -0.963                  0.636                    0.006                 0.687
+    pet_resnet18    patch   Insertion (blur)                   -0.963                  0.701                    0.002                 0.685
+           mnist  texture   Deletion (black)                   -0.977                 -0.262                    0.066                -0.246
+           mnist  texture    Deletion (blur)                   -0.977                  0.376                    0.007                 0.357
+           mnist  texture Deletion (inpaint)                   -0.977                  0.226                    0.115                 0.222
+           mnist  texture   Insertion (blur)                   -0.977                  0.530                    0.000                 0.533
+cifar10_resnet18    patch   Deletion (black)                   -0.981                  0.462                    0.062                 0.462
+cifar10_resnet18    patch    Deletion (blur)                   -0.981                  0.545                    0.024                 0.545
+cifar10_resnet18    patch Deletion (inpaint)                   -0.981                  0.785                    0.000                 0.785
+cifar10_resnet18    patch   Insertion (blur)                   -0.981                  0.517                    0.033                 0.517
+           mnist    patch   Deletion (black)                   -0.990                  0.475                    0.000                 0.340
+           mnist    patch    Deletion (blur)                   -0.990                  0.618                    0.000                 0.628
+           mnist    patch Deletion (inpaint)                   -0.990                  0.451                    0.001                 0.344
+           mnist    patch   Insertion (blur)                   -0.990                  0.533                    0.000                 0.429
+n significant cells (full object, p_bh<0.05 & rho>0): 27 of 28  rho range sig: 0.488 0.986
