@@ -1,3 +1,5 @@
+# A Dose-Response Evaluation of Explanation Metrics under Controlled Shortcut Reliance in CNN Image Classifiers
+
 # The Project Explained Simply
 
 This guide assumes you know nothing about neural networks, CNNs or explainable AI. Read it from top to bottom. Each part builds on the one before it, and the story goes like this:

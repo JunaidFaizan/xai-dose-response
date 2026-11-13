@@ -1,6 +1,6 @@
-# Seminar Guide: Do Explanation Metrics Catch Shortcuts?
+# A Dose-Response Evaluation of Explanation Metrics under Controlled Shortcut Reliance in CNN Image Classifiers
 
-A Ground-Truth Evaluation of XAI Metrics for CNN Image Classifiers
+Seminar guide
 
 M.Tech Final Year Project, Explainable AI. This guide covers the whole project: the idea, how every part works, why each design choice was made, the key code, the results, and material for slides, a live demo and questions.
 
