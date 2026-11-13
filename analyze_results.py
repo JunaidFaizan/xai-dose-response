@@ -313,10 +313,60 @@ def markdown(frame, floatfmt=3):
     return "\n".join([header, rule, *body])
 
 
+def kendall_exact_table(ranking, n=5):
+    """Exact Kendall tau null (n methods, no ties) for gt_agreement.csv.
+
+    Per seed: one-sided P(T >= tau) and two-sided P(|T| >= |tau|) over all n!
+    orderings. Mean over k seeds: the exact null of the mean of k independent
+    taus. A tau off the tie-free grid {-1, -1 + 4/(n(n-1)), ..., 1} means the
+    ranking had ties, so the exact null is only approximate (ties_present).
+    """
+    from xai.stats import kendall_exact_p, kendall_null, mean_tau_null
+
+    null = kendall_null(n)
+    grid = null.tau.to_numpy()
+    tail = null.sort_values("tau", ascending=False).assign(p=lambda f: f.prob.cumsum())
+    critical = float(tail[tail.p < 0.05].tau.min()) if (tail.p < 0.05).any() else float("nan")
+    rows = []
+    for (dataset, metric), group in ranking.groupby(["dataset", "metric"], sort=False):
+        taus = group.sort_values("seed").tau_with_ground_truth.to_numpy(dtype=float)
+        ties = bool(np.any(np.min(np.abs(taus[:, None] - grid[None, :]), axis=1) > 1e-6))
+        mean = float(taus.mean())
+        mean_null = mean_tau_null(n, len(taus))
+        row = {"dataset": dataset, "metric": metric, "seeds": len(taus), "mean_tau": mean,
+               "p_mean_one_sided": float(mean_null.prob[mean_null.tau_mean >= mean - 1e-9].sum()),
+               "p_mean_two_sided": float(mean_null.prob[mean_null.tau_mean.abs() >= abs(mean) - 1e-9].sum())}
+        for seed, tau in zip(group.sort_values("seed").seed, taus):
+            one, two = kendall_exact_p(tau, n)
+            row[f"tau_seed{seed}"] = tau
+            row[f"p_one_sided_seed{seed}"] = one
+            row[f"p_two_sided_seed{seed}"] = two
+        row["min_tau_one_sided_p_below_0.05"] = critical
+        row["ties_present"] = ties
+        row["note"] = ("exact null is approximate (ties in a ranking)" if ties
+                       else f"exact null over all {int(null['count'].sum())} orderings of {n} methods")
+        rows.append(row)
+    return pd.DataFrame(rows), null
+
+
+def kendall_only():
+    """Write kendall_exact.csv and kendall_null_n5.csv from the existing
+    gt_agreement.csv, without regenerating any other output."""
+    ranking = pd.read_csv(OUT / "gt_agreement.csv")
+    table, null = kendall_exact_table(ranking)
+    table.to_csv(OUT / "kendall_exact.csv", index=False)
+    null.to_csv(OUT / "kendall_null_n5.csv", index=False)
+    print(table.round(4).to_string(index=False))
+
+
 def main():
     import argparse
-    argparse.ArgumentParser(description=__doc__,
-                            formatter_class=argparse.RawDescriptionHelpFormatter).parse_args()
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--kendall-only", action="store_true",
+                        help="only write kendall_exact.csv and kendall_null_n5.csv from gt_agreement.csv")
+    if parser.parse_args().kendall_only:
+        kendall_only()
+        return
     OUT.mkdir(parents=True, exist_ok=True)
     faith, sanity = load_results()
     datasets = [d for d in DATASETS if d in faith.dataset.unique()]
