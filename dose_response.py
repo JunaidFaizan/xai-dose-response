@@ -16,8 +16,11 @@ Design
         d < 0   a share |d| of training shortcuts points to a wrong class:
                 the shortcut becomes less reliable, so the model relies on it LESS
     Both are needed because the shortcut is easier to learn than the image,
-    so with d = 0 models already rely on it heavily. |d| is capped at 0.4 so
-    neither cue ever points away from the label on the binary task.
+    so with d = 0 models already rely on it heavily. For MNIST and
+    PneumoniaMNIST (DOSES) |d| is capped at 0.4 so neither cue ever points
+    away from the label on the binary task. CIFAR_DOSES reach -0.8 (with 10
+    classes the shortcut still points to the true class most often), and
+    PET_DOSES include -0.5, where the shortcut carries no label information.
 
     Reliance is measured behaviourally: on test images whose shortcut points
     to a wrong class, the share of predictions that follow the shortcut.
@@ -29,12 +32,22 @@ Design
     Preference = share of images where the metric rates the shortcut map as
     the better explanation. A metric that responds to the model's reasoning
     should prefer the object map when reliance is low and the shortcut map
-    when reliance is high, switching near 50% reliance.
+    when reliance is high. The legacy analysis assumed the switch at 50%
+    reliance; the per-image behaviour labels (`behaviour` step,
+    behaviour_summary.csv) test this directly instead.
 
-    Scores per metric (over all models of one base and shortcut type):
+    Legacy scores per metric (responsiveness.csv, kept for continuity):
         responsiveness   Spearman correlation between reliance and preference
         decision acc.    share of models where (preference > 0.5) equals (reliance > 50%)
-        switch point     reliance at which preference crosses 0.5 (ideal: 50%)
+                         (unbalanced: superseded by balanced accuracy and the
+                         over-detection rate)
+        switch point     first reliance at which the dose means cross 0.5
+
+    Corrected scores (PRIMARY: responsiveness_corrected.csv,
+    method_responsiveness_corrected.csv; see xai/dose_analysis.py): chance-
+    corrected reliance r_c, two-level bootstrap intervals, BH/Holm-adjusted
+    p-values, balanced accuracy and over-detection rate, effect sizes, and
+    isotonic switch points marked "not identified" without a model nearby.
 
     The five attribution methods are also run, and the share of their positive
     attribution on the shortcut is correlated with reliance.
@@ -55,8 +68,17 @@ Oxford-IIIT Pet (pet_resnet18, run on a Kaggle GPU via kaggle/dose_response_pet.
 Output
     checkpoint/dose/<base>_<shortcut>_dose<+NNN>_seed<N>.pt (+ _metrics.json)
     results/dose_response/scores_oracle.csv, scores_methods.csv  per-image scores
+    results/dose_response/per_model/<name>_behaviour.csv  per-image behaviour labels
+        (python dose_response.py behaviour; not part of "all")
     results/dose_response/models.csv, preference.csv, responsiveness.csv,
-        method_responsiveness.csv, summary.md, *.png
+        method_responsiveness.csv, summary.md, *.png   (legacy tables)
+    results/dose_response/responsiveness_corrected.csv,
+        method_responsiveness_corrected.csv (PRIMARY), effect_sizes.csv,
+        metric_pairs.csv, pet_preregistered.csv, confound.csv,
+        behaviour_models.csv, behaviour_summary.csv, behaviour_by_reliance.csv,
+        behaviour_auroc.png
+    analyze --model-set original writes the same files for the 192 models
+    from before amendment A1 to results/dose_response/original_models/.
 """
 
 import argparse
@@ -83,6 +105,8 @@ from xai.metrics import (BLUR_KERNEL, BLUR_SIGMA, FAITHFULNESS_METRICS, INPAINT_
                          area_under_curve, perturbation_curve, relevance_mass_accuracy)
 from xai.models import build_model
 from xai.paths import CHECKPOINT_DIR, RESULTS_DIR
+from xai import dose_analysis
+from xai.stats import chance_floor, corrected_reliance, format_p
 
 # Base dataset: training epochs. cifar10 is opt-in (--bases cifar10): its models
 # take 20-40 min each on a CPU, so it is not part of the default run.
@@ -237,9 +261,12 @@ def load(base, shortcut, dose, seed):
 
 
 def size_matched(object_values, k):
-    """Control oracle: a binary map of the k brightest object pixels, where k is
-    the number of shortcut pixels. It has the same size and form as the shortcut
-    map, so a preference between them cannot come from size alone."""
+    """Control oracle: a binary map of k object pixels, where k is the number of
+    shortcut pixels: the first k of a stable descending sort of the object
+    values. It has the same size as the shortcut map, so a preference between
+    them cannot come from size alone. On MNIST many saturated pixels tie
+    (median 29.5 tied pixels at the top value), and the stable sort then picks
+    the topmost saturated pixels in row-major order, not the k "brightest"."""
     flat = object_values.reshape(-1)
     top = np.argsort(-flat, kind="stable")[:k]
     matched = np.zeros_like(flat)
@@ -389,6 +416,92 @@ def placebo(args):
     combine(args)
 
 
+BEHAVIOUR_BATCH = 25
+SWAP_SEED = 20_000
+
+
+def behaviour_sets(base, shortcut):
+    """(aligned, conflicting, none) test sets; the conflicting shift uses seed 0,
+    as in the reliance measurement of train_one."""
+    return tuple(shortcut_split(base, shortcut, "test", mode=mode) for mode in ("aligned", "conflicting", "none"))
+
+
+def swap_partner(labels, i):
+    """Index of a different-class test image for item i (fixed per item)."""
+    for j in np.random.default_rng(SWAP_SEED + i).permutation(len(labels)):
+        if labels[j] != labels[i]:
+            return int(j)
+    raise ValueError("no image of another class")
+
+
+def behaviour_one(base, shortcut, dose, seed, samples, sets=None):
+    """Per-image behavioural labels on the scored aligned images (forward passes only).
+
+    follows_shortcut (primary, reviewer 05): the model predicts the shortcut's
+        class when the shortcut of the same image is moved to a wrong class's
+        position (the conflicting test image).
+    shortcut_dominant (check, reviewer 03): delta_s > delta_o, where
+        delta_s = p_y(aligned) - p_y(same image without shortcut) and
+        delta_o = p_y(aligned) - p_y(image of another class with the label-y shortcut).
+    """
+    model = load(base, shortcut, dose, seed)
+    aligned, conflicting, none = sets or behaviour_sets(base, shortcut)
+    generator = torch.Generator().manual_seed(IMAGE_SEED)
+    indices = torch.randperm(len(aligned), generator=generator)[:samples].tolist()
+    rows = []
+    for start in range(0, len(indices), BEHAVIOUR_BATCH):
+        batch = indices[start:start + BEHAVIOUR_BATCH]
+        labels = [int(aligned.labels[i]) for i in batch]
+        partners = [swap_partner(aligned.labels, i) for i in batch]
+        images = {
+            "aligned": torch.stack([aligned[i][0] for i in batch]),
+            "conflicting": torch.stack([conflicting[i][0] for i in batch]),
+            "none": torch.stack([none[i][0] for i in batch]),
+            "swapped": torch.stack([aligned.with_shortcut(none[j][0], y) for j, y in zip(partners, labels)]),
+        }
+        with torch.no_grad():
+            probs = {k: torch.exp(model(v.to(DEVICE))).cpu().numpy() for k, v in images.items()}
+        for k, (i, y, j) in enumerate(zip(batch, labels, partners)):
+            conflict = int(conflicting.patch_class[i])
+            p_aligned, p_none, p_swapped = probs["aligned"][k, y], probs["none"][k, y], probs["swapped"][k, y]
+            pred_conflicting = int(probs["conflicting"][k].argmax())
+            delta_s, delta_o = float(p_aligned - p_none), float(p_aligned - p_swapped)
+            rows.append({"base": base, "shortcut": shortcut, "dose": dose, "seed": seed, "index": i,
+                         "label": y, "conflict_class": conflict,
+                         "pred_aligned": int(probs["aligned"][k].argmax()), "p_label_aligned": float(p_aligned),
+                         "pred_conflicting": pred_conflicting,
+                         "p_conflict_class": float(probs["conflicting"][k, conflict]),
+                         "p_label_conflicting": float(probs["conflicting"][k, y]),
+                         "pred_none": int(probs["none"][k].argmax()), "p_label_none": float(p_none),
+                         "swap_index": j, "p_label_swapped": float(p_swapped),
+                         "follows_shortcut": int(pred_conflicting == conflict),
+                         "delta_s": delta_s, "delta_o": delta_o, "shortcut_dominant": int(delta_s > delta_o)})
+    return rows
+
+
+def behaviour(args):
+    """MD4: per-image behaviour labels for every cached model (or only the
+    selected configurations with --selection-only), cached per model in
+    per_model/<name>_behaviour.csv. Existing files are skipped (--force redoes them)."""
+    cache = OUT / "per_model"
+    configs = all_cached_models()
+    if getattr(args, "selection_only", False):
+        selected = {model_name(*c) for c in configurations(args)}
+        configs = [c for c in configs if model_name(*c) in selected]
+    sets = {}
+    for config in configs:
+        name = model_name(*config)
+        path = cache / f"{name}_behaviour.csv"
+        if path.exists() and not args.force:
+            continue
+        key = config[:2]
+        if key not in sets:
+            sets = {key: behaviour_sets(*key)}  # keep one dataset in memory at a time
+        start = time.perf_counter()
+        pd.DataFrame(behaviour_one(*config, args.samples, sets[key])).to_csv(path, index=False)
+        print(f"behaviour {name} ({time.perf_counter() - start:.1f} s)", flush=True)
+
+
 def combine(args):
     """Check the selected configurations are evaluated, then merge EVERY cached
     model (so evaluating cifar10 separately keeps the MNIST/PneumoniaMNIST results)."""
@@ -402,14 +515,51 @@ def combine(args):
     stale = [n for n in names if "deletion_zero_object_matched" not in pd.read_csv(cache / f"{n}_oracle.csv", nrows=0)]
     if stale:
         raise SystemExit(f"{len(stale)} cached results predate the size-matched control. Run: evaluate --force")
+    oracle, methods = _merge_scores(names)
+    oracle.to_csv(OUT / "scores_oracle.csv", index=False)
+    methods.to_csv(OUT / "scores_methods.csv", index=False)
+
+
+def _merge_scores(names):
+    """(oracle, methods) per-image scores of the named models. Control scores
+    are added when every model has them (dose_response.py placebo)."""
+    cache = OUT / "per_model"
     oracle = pd.concat([pd.read_csv(cache / f"{n}_oracle.csv") for n in names])
-    # Control scores are added when every model has them (dose_response.py placebo).
     for control in CONTROL_MAPS:
         if all((cache / f"{n}_{control}.csv").exists() for n in names):
             scores = pd.concat([pd.read_csv(cache / f"{n}_{control}.csv") for n in names])
             oracle = oracle.merge(scores, on=["base", "shortcut", "dose", "seed", "index"], how="left")
-    oracle.to_csv(OUT / "scores_oracle.csv", index=False)
-    pd.concat([pd.read_csv(cache / f"{n}_methods.csv") for n in names]).to_csv(OUT / "scores_methods.csv", index=False)
+    methods = pd.concat([pd.read_csv(cache / f"{n}_methods.csv") for n in names])
+    return oracle, methods
+
+
+# Pre-registered amendment A1 (docs/PREDICTIONS_amendments.md): the 42 models
+# added to fill reliance gaps. Every other model belongs to the "original" set.
+AMENDMENT_A1 = {"mnist": {"doses": (0.0075, 0.015, 0.03), "seeds": (3, 4, 5)},
+                "pneumonia_mnist": {"doses": (-0.075, -0.025), "seeds": ()}}
+
+
+def model_set_of(row):
+    """'A1' for a model added by amendment A1, otherwise 'original'."""
+    rule = AMENDMENT_A1.get(row["base"])
+    if rule and (np.isclose(row["dose"], rule["doses"]).any() or int(row["seed"]) in rule["seeds"]):
+        return "A1"
+    return "original"
+
+
+def complete_model_names(model_set="all"):
+    """Names of models with a metrics JSON, a .pt and all four per-model score
+    files (oracle, methods, placebo, random), restricted to a model set."""
+    cache = OUT / "per_model"
+    names = []
+    for path in sorted(MODEL_DIR.glob("*_metrics.json")):
+        run = json.loads(path.read_text())
+        name = model_name(run["base"], run["shortcut"], run["dose"], run["seed"])
+        files = [MODEL_DIR / f"{name}.pt"] + [cache / f"{name}_{kind}.csv"
+                                             for kind in ("oracle", "methods", *CONTROL_MAPS)]
+        if all(f.exists() for f in files) and model_set in ("all", model_set_of(run)):
+            names.append(name)
+    return sorted(names)
 
 
 # ---------------------------------------------------------------- analysis
@@ -417,6 +567,22 @@ def combine(args):
 def load_models():
     runs = [json.loads(p.read_text()) for p in sorted(MODEL_DIR.glob("*_metrics.json"))]
     return pd.DataFrame(runs)
+
+
+def add_corrected_reliance(models):
+    """Append classes, chance_floor, reliance_corrected and model_set.
+
+    chance_floor = (100 - test_accuracy_no_shortcut) / (C - 1): the reliance
+    expected from errors alone (on a binary task every error on a conflicting
+    image lands on the shortcut's class). reliance_corrected =
+    100 (reliance - floor) / (100 - floor), in percent and not clipped.
+    """
+    models = models.copy()
+    models["classes"] = [num_classes(b) for b in models.base]
+    models["chance_floor"] = chance_floor(models.test_accuracy_no_shortcut, models.classes)
+    models["reliance_corrected"] = corrected_reliance(models.reliance, models.chance_floor)
+    models["model_set"] = [model_set_of(row) for _, row in models.iterrows()]
+    return models
 
 
 TIE_TOLERANCE = 1e-4  # AUC difference treated as a tie
@@ -590,14 +756,250 @@ def markdown(frame):
     return "\n".join(lines)
 
 
-def analyze(_args=None):
-    # Rebuild the combined score files from every cached model first, so models
-    # added from elsewhere (e.g. the Kaggle ResNet-18 results) are included.
-    combine(None)
-    models = load_models()
-    oracle = pd.read_csv(OUT / "scores_oracle.csv")
-    methods = pd.read_csv(OUT / "scores_methods.csv")
+def _ci_text(frame, column, low=None, high=None, digits=3):
+    """'v [low, high]' strings for a value column and its interval columns."""
+    low, high = low or f"{column}_ci_low", high or f"{column}_ci_high"
+
+    def fmt(v):
+        return "–" if pd.isna(v) else f"{v:.{digits}f}"
+    return [f"{fmt(v)} [{fmt(a)}, {fmt(b)}]" for v, a, b in zip(frame[column], frame[low], frame[high])]
+
+
+def _p_text(frame, columns):
+    frame = frame.copy()
+    for column in columns:
+        frame[column] = [format_p(v) for v in frame[column]]
+    return frame
+
+
+def load_behaviour(oracle):
+    """Per-image behaviour labels of every scored model, or (None, missing names)."""
     keys = ["base", "shortcut", "dose", "seed"]
+    names = [model_name(*k) for k in oracle[keys].drop_duplicates().itertuples(index=False)]
+    paths = [OUT / "per_model" / f"{n}_behaviour.csv" for n in names]
+    missing = [n for n, p in zip(names, paths) if not p.exists()]
+    if missing:
+        return None, missing
+    return pd.concat([pd.read_csv(p) for p in paths], ignore_index=True), []
+
+
+def plot_behaviour_auroc(bands, path):
+    data = bands[(bands.comparison == "shortcut vs full object") & (bands.label == dose_analysis.PRIMARY_LABEL)]
+    groups = list(data.groupby(["base", "shortcut"]))
+    fig, axes = plt.subplots(1, len(groups), figsize=(4.3 * len(groups), 3.9), squeeze=False, sharey=True)
+    for ax, ((base, shortcut), group) in zip(axes[0], groups):
+        for metric, rows in group.groupby("metric", sort=False):
+            ax.plot(rows.band_centre, rows.auroc, marker="o", label=metric)
+        ax.axhline(0.5, color="gray", linewidth=0.8)
+        ax.set_title(f"{base}, {shortcut} shortcut", fontsize=10)
+        ax.set_xlabel("Chance-corrected reliance band (%)")
+        ax.set_xlim(-2, 102)
+        ax.set_ylim(0, 1)
+        ax.grid(alpha=0.3)
+    axes[0, 0].set_ylabel("AUROC vs per-image label (follows shortcut)")
+    axes[0, 0].legend(fontsize=7)
+    fig.suptitle("Shortcut vs full object: does the per-image AUC gap detect images where the model follows the shortcut?")
+    fig.tight_layout()
+    fig.savefig(path, dpi=130)
+    plt.close(fig)
+
+
+def corrected_analysis(oracle, methods, models, reps, out):
+    """MD2/MD3/MD4/MD7 outputs (written to `out`); returns the summary.md lines."""
+    settings = dose_analysis.build_settings(oracle, methods, models, reps, BOOTSTRAP_SEED, TIE_TOLERANCE)
+    resp = dose_analysis.responsiveness_corrected(settings, COMPARISONS, METRIC_TITLES)
+    effects = dose_analysis.effect_sizes(settings, COMPARISONS, METRIC_TITLES)
+    pairs = dose_analysis.metric_pairs(settings, COMPARISONS, METRIC_TITLES)
+    method_resp = dose_analysis.method_responsiveness_corrected(settings, METHOD_TITLES)
+    pet = dose_analysis.pet_preregistered(settings, COMPARISONS, METRIC_TITLES, METHOD_TITLES)
+    confound = dose_analysis.confound_table(settings, COMPARISONS, METRIC_TITLES)
+    behaviour, missing = load_behaviour(oracle)
+    beh_models = beh_summary = beh_bands = None
+    if behaviour is not None:
+        beh_models, beh_summary, beh_bands = dose_analysis.behaviour_tables(
+            settings, behaviour, COMPARISONS, METRIC_TITLES)
+    else:
+        print(f"warning: {len(missing)} models have no behaviour labels (e.g. {missing[0]}); "
+              "run `dose_response.py behaviour`. MD4 tables skipped.")
+    resp, beh_summary = dose_analysis.headline_holm(resp, beh_summary)
+
+    resp.to_csv(out / "responsiveness_corrected.csv", index=False)
+    effects.to_csv(out / "effect_sizes.csv", index=False)
+    pairs.to_csv(out / "metric_pairs.csv", index=False)
+    method_resp.to_csv(out / "method_responsiveness_corrected.csv", index=False)
+    pet.to_csv(out / "pet_preregistered.csv", index=False)
+    confound.to_csv(out / "confound.csv", index=False)
+    if beh_summary is not None:
+        beh_models.to_csv(out / "behaviour_models.csv", index=False)
+        beh_summary.to_csv(out / "behaviour_summary.csv", index=False)
+        beh_bands.to_csv(out / "behaviour_by_reliance.csv", index=False)
+        plot_behaviour_auroc(beh_bands, out / "behaviour_auroc.png")
+
+    setting = lambda f: f.base + " / " + f.shortcut  # noqa: E731
+    lines = [
+        "## Corrected analysis (primary)", "",
+        "Primary outputs: `responsiveness_corrected.csv` (metrics) and `method_responsiveness_corrected.csv` "
+        "(attribution methods), with `behaviour_summary.csv` as the per-image behavioural test (MD4). "
+        "Supporting outputs: `effect_sizes.csv`, `metric_pairs.csv`, `pet_preregistered.csv`, `confound.csv`, "
+        "`behaviour_models.csv`, `behaviour_by_reliance.csv`, `behaviour_auroc.png`; `models.csv` and "
+        "`preference.csv` gain the columns below. The legacy tables follow after this section.", "",
+        "### Definitions", "",
+        "- Chance floor f = (100 − accuracy without shortcut) / (C − 1), C = number of classes: the reliance "
+        "expected from errors alone (on a binary task every error on a conflicting image lands on the shortcut's "
+        "class; with C classes 1/(C − 1) of errors if they spread uniformly). An approximation, since images "
+        "without the shortcut are out of distribution.",
+        "- Chance-corrected reliance r_c = 100 (R − f) / (100 − f), in percent, not clipped (it can be slightly "
+        "negative). Columns `classes`, `chance_floor`, `reliance_corrected` and `model_set` in `models.csv`.",
+        "- Decisions on r_c: positive class r_c > 50, 'metric says shortcut' = preference > 0.5. "
+        "TPR = P(says shortcut | r_c > 50), TNR = P(says object | r_c ≤ 50), balanced accuracy = (TPR + TNR)/2, "
+        "**over-detection rate** fpr = 1 − TNR. `_raw` columns: the same on raw reliance.",
+        f"- Two-level bootstrap ({reps} replicates, seed {BOOTSTRAP_SEED}): models resampled within each dose, "
+        "and each picked model's 100 images resampled independently; the same picks are reused for every "
+        "comparison, metric and method (paired). 95% percentile intervals.",
+        "- Switch point (only for comparisons whose ideal crosses 0.5 at 50%: shortcut vs full / size-matched "
+        "object): increasing isotonic fit (PAVA) of model preference on r_c, first r_c where the fit reaches 0.5 "
+        f"(linear interpolation). 'not identified' when no model lies within ±{dose_analysis.IDENTIFY_WINDOW} "
+        "points. Sensitivity: 4-parameter logistic with free asymptotes (`switch_4pl_rc`). `switch_interp_rc`: "
+        "the legacy first-crossing rule applied to r_c dose means.",
+        "- Effect size: per-image AUC gap g (positive = shortcut map rated better; AUC_B − AUC_A for deletion, "
+        "AUC_A − AUC_B for insertion); medians at the lowest and highest dose in `effect_sizes.csv`.",
+        "- p-values: Spearman (models) for correlations; two-sided bootstrap for paired differences and AUROC vs "
+        "0.5 (floored at 1/(reps + 1)). BH and Holm within families: responsiveness:<comparison>, methods, "
+        "metric_pairs:<comparison>, behaviour:<label>. `p_holm_headline`: Holm over the union of the headline "
+        "rows (shortcut vs full object and shortcut vs random responsiveness, and the primary behaviour AUROC "
+        "for shortcut vs full object). p < 0.001 is printed as '< 0.001'.", ""]
+
+    main = resp[resp.comparison.isin(dose_analysis.SWITCH_COMPARISONS)].copy()
+    main["setting"] = setting(main)
+    full = main[main.comparison == "shortcut vs full object"]
+    lines += ["### Over-detection at low reliance (decisions on r_c)", "",
+              f"TPR = 1.00 in {int((full.tpr == 1).sum())} of {int(full.tpr.notna().sum())} cells "
+              "(shortcut vs full object, r_c axis); over-detection rate fpr > 0 in "
+              f"{int((full.fpr > 0).sum())} of {int(full.fpr.notna().sum())} cells.", "",
+              markdown(main[["comparison", "setting", "metric", "fpr", "balanced_accuracy", "tpr",
+                             "n_below", "n_above", "fpr_raw", "balanced_accuracy_raw"]]), ""]
+
+    shown = resp[resp.comparison.isin(["shortcut vs full object", "shortcut vs size-matched object",
+                                       "shortcut vs random", "shortcut vs placebo"])].copy()
+    shown["setting"] = setting(shown)
+    shown["rho_rc [95% CI]"] = _ci_text(shown, "rho_rc")
+    shown["pref_low [CI]"] = _ci_text(shown, "pref_low")
+    shown["pref_high [CI]"] = _ci_text(shown, "pref_high")
+    shown = _p_text(shown, ["p_rho_rc", "p_bh", "p_holm_headline"])
+    significant = resp[(resp.p_bh < 0.05) & (resp.rho_rc > 0)].groupby("comparison").size()
+    lines += ["### Responsiveness on r_c (two-level intervals)", "",
+              "Positive and BH-significant (p_bh < 0.05) rows per comparison: "
+              + ", ".join(f"{k}: {v} of {int((resp.comparison == k).sum())}" for k, v in significant.items()) + ".", "",
+              markdown(shown[["comparison", "setting", "metric", "rho_rc [95% CI]", "p_rho_rc", "p_bh",
+                              "p_holm_headline", "pref_low [CI]", "pref_high [CI]", "median_gap_low",
+                              "median_gap_high"]]), ""]
+
+    main["switch_iso_rc [CI]"] = _ci_text(main, "switch_iso_rc", "switch_iso_rc_ci_low", "switch_iso_rc_ci_high", 1)
+    lines += ["### Switch points on r_c (isotonic primary, 4PL sensitivity)", "",
+              markdown(main[["comparison", "setting", "metric", "switch_iso_rc [CI]", "switch_found_share",
+                             "switch_status", "nearest_model_distance", "switch_4pl_rc", "fit_4pl_ok",
+                             "switch_iso_raw", "switch_interp_rc"]]), ""]
+
+    sig_pairs = pairs[pairs.p_bh < 0.05].copy()
+    sig_pairs["setting"] = setting(sig_pairs)
+    sig_pairs["delta_rho_rc [CI]"] = _ci_text(sig_pairs, "delta_rho_rc")
+    sig_pairs["delta_pref_low [CI]"] = _ci_text(sig_pairs, "delta_pref_low")
+    lines += ["### Paired metric-vs-metric differences (BH-significant rows; all rows in metric_pairs.csv)", "",
+              f"{len(sig_pairs)} of {len(pairs)} metric pairs differ in rho_rc at p_bh < 0.05.", "",
+              markdown(_p_text(sig_pairs, ["p", "p_bh", "p_holm"])[
+                  ["comparison", "setting", "metric_a", "metric_b", "delta_rho_rc [CI]", "p", "p_bh", "p_holm",
+                   "delta_pref_low [CI]"]]) if len(sig_pairs) else "(none)", ""]
+
+    shown = method_resp.copy()
+    shown["setting"] = setting(shown)
+    shown["rho_rc [95% CI]"] = _ci_text(shown, "rho_rc")
+    shown["mass_low [CI]"] = _ci_text(shown, "mass_low")
+    shown["mass_high [CI]"] = _ci_text(shown, "mass_high")
+    lines += ["### Method responsiveness on r_c (two-level intervals)", "",
+              markdown(_p_text(shown, ["p", "p_bh", "p_holm"])[
+                  ["setting", "method", "rho_rc [95% CI]", "p", "p_bh", "p_holm", "mass_low [CI]",
+                   "mass_high [CI]"]]), ""]
+
+    if len(pet):
+        shown = pet.copy()
+        shown["estimate [95% CI]"] = _ci_text(shown, "estimate", "ci_low", "ci_high")
+        lines += ["### Pre-registered Pet predictions (original verdicts kept; intervals added)", "",
+                  dose_analysis.PET_NOTE, "",
+                  markdown(shown[["prediction", "comparison", "metric_or_method", "statistic", "estimate [95% CI]",
+                                  "rho_rc", "threshold", "original_verdict"]]), ""]
+
+    shown = confound.copy()
+    shown["setting"] = setting(shown)
+    lines += ["### Reliance vs object competence (MD7)", "",
+              "rho_reliance_competence: Spearman(reliance, accuracy without shortcut) over the models of a setting. "
+              "partial_rel_given_acc: partial Spearman of reliance and preference (shortcut vs full object) "
+              "controlling for accuracy without shortcut (rank residuals, t test with n − 3 df). Sorted from the "
+              "least collinear setting.", "",
+              markdown(_p_text(shown, ["p_partial_rel_given_acc", "p_partial_acc_given_rel"])[
+                  ["setting", "models", "rho_reliance_competence", "rho_rc_competence", "metric", "rho_rel",
+                   "partial_rel_given_acc", "p_partial_rel_given_acc", "partial_acc_given_rel",
+                   "p_partial_acc_given_rel"]]), "",
+              "Validity limits (not fixable by new runs):",
+              "- PneumoniaMNIST: the 'object' map is the image's own intensities, and 97.5% of pixels exceed 0.1, "
+              "so it is an intensity ranking of the whole radiograph, not an object segmentation.",
+              "- CIFAR-10 (both architectures): the 'object' map is a centred Gaussian prior, so Pet (real "
+              "segmentation masks) is the primary natural-image evidence.",
+              "- Blur fill leaves about 20% (28 and 32 px) to 25% (Pet) of the patch intensity in place, so blur "
+              "deletion does not fully remove a patch shortcut.",
+              "- `size_matched` takes the first k pixels of a stable descending sort of the object values; on MNIST "
+              "many saturated pixels tie, so it picks the topmost saturated pixels in row-major order.", ""]
+
+    lines += ["### MD4 per-image behavioural ground truth", ""]
+    if beh_summary is None:
+        lines += [f"Skipped: {len(missing)} models have no behaviour labels. Run `dose_response.py behaviour`.", ""]
+    else:
+        lines += [
+            "Each scored aligned image gets a label from forward passes only. Primary (`follows_shortcut`, "
+            "reviewer 05): the model predicts the shortcut's class when the same image's shortcut is moved to a "
+            "wrong class's position. Check (`shortcut_dominant`, reviewer 03): Δ_S > Δ_O, with Δ_S = p_y(aligned) "
+            "− p_y(no shortcut) and Δ_O = p_y(aligned) − p_y(another-class image with the label-y shortcut). "
+            "auroc_pooled: AUROC of the per-image AUC gap (shortcut vs object) against the label, images of all "
+            "models pooled. accuracy = mean(1 − |w − y|). calibration_gap = mean(preference − follow rate) "
+            "(positive = over-detection). observed_switch_rc: r_c where the follow rate crosses 0.5 (isotonic), "
+            "the derived ideal replacing the assumed 50%. **The per-image test is now primary; the aligned-image "
+            "preference curves are secondary.**", ""]
+        for name in dose_analysis.BEHAVIOUR_LABELS:
+            shown = beh_summary[beh_summary.label == name].copy()
+            shown["setting"] = setting(shown)
+            shown["auroc [95% CI]"] = _ci_text(shown, "auroc_pooled", "auroc_ci_low", "auroc_ci_high")
+            lines += [f"Label `{name}`" + (" (primary)" if name == dose_analysis.PRIMARY_LABEL else " (check)") + ":", "",
+                      markdown(_p_text(shown, ["p_auroc", "p_bh", "p_holm_headline"])[
+                          ["comparison", "setting", "metric", "label_rate", "auroc [95% CI]", "p_bh",
+                           "p_holm_headline", "median_model_auroc", "accuracy", "balanced_accuracy",
+                           "calibration_gap", "rho_pref_follow", "observed_switch_rc"]]), ""]
+    return lines
+
+
+def analyze(args=None):
+    """Legacy tables (unchanged computation) plus the corrected analysis.
+
+    --model-set all (default, PRIMARY): every cached model; the combined score
+    files are rebuilt first, so models added from elsewhere (e.g. the Kaggle
+    ResNet-18 results) are included; outputs go to results/dose_response/.
+    --model-set original: the 192 models from before amendment A1, merged in
+    memory (scores_*.csv are not rewritten); outputs go to original_models/.
+    """
+    model_set = getattr(args, "model_set", "all")
+    reps = getattr(args, "reps", BOOTSTRAP_REPS)
+    keys = ["base", "shortcut", "dose", "seed"]
+    models = add_corrected_reliance(load_models())
+    if model_set == "all":
+        combine(None)
+        out = OUT
+        oracle = pd.read_csv(OUT / "scores_oracle.csv")
+        methods = pd.read_csv(OUT / "scores_methods.csv")
+    else:
+        names = set(complete_model_names(model_set))
+        oracle, methods = _merge_scores(sorted(names))
+        out = OUT / f"{model_set}_models"
+        out.mkdir(parents=True, exist_ok=True)
+        models = models[[model_name(*k) in names for k in models[keys].itertuples(index=False)]]
+        models = models.reset_index(drop=True)
 
     prefs, resps = [], []
     for first, second, label, suffix, ideal in COMPARISONS:
@@ -608,32 +1010,39 @@ def analyze(_args=None):
         prefs.append(pref.assign(comparison=label))
         resps.append(resp.assign(comparison=label))
         plot_panels(pref, list(FAITHFULNESS_METRICS), METRIC_TITLES,
-                    f"Preference for {first} map", OUT / f"metric_dose_response{suffix}.png",
+                    f"Preference for {first} map", out / f"metric_dose_response{suffix}.png",
                     f"{label}: preference as reliance grows (ideal: {ideal})")
     pref, resp = pd.concat(prefs), pd.concat(resps)
     method_resp, mass = method_responsiveness(methods, models[keys + ["reliance"]])
 
-    models.to_csv(OUT / "models.csv", index=False)
-    pref.round(4).to_csv(OUT / "preference.csv", index=False)
-    resp.to_csv(OUT / "responsiveness.csv", index=False)
-    method_resp.to_csv(OUT / "method_responsiveness.csv", index=False)
+    models.to_csv(out / "models.csv", index=False)
+    pref = pref.merge(models[keys + ["reliance_corrected"]], on=keys, how="left").round(4)
+    pref.to_csv(out / "preference.csv", index=False)
+    resp.to_csv(out / "responsiveness.csv", index=False)
+    method_resp.to_csv(out / "method_responsiveness.csv", index=False)
     mass = mass.pivot_table(index=keys + ["reliance"], columns="method", values="shortcut_mass").reset_index()
     plot_panels(mass, list(METHODS), METHOD_TITLES, "Share of positive attribution on shortcut",
-                OUT / "method_dose_response.png", "Do explanation methods follow the shortcut as reliance grows?",
+                out / "method_dose_response.png", "Do explanation methods follow the shortcut as reliance grows?",
                 line=None)
+    corrected = corrected_analysis(oracle, methods, models, reps, out)
 
     level = models.groupby(["base", "shortcut", "dose"])[
         ["reliance", "test_accuracy", "test_accuracy_no_shortcut"]].agg(["mean", "std"]).round(2)
     level.columns = [f"{a}_{b}" for a, b in level.columns]
-    lines = ["# Dose-response results", "", "Generated by `dose_response.py analyze`.", "",
-             "## Reliance per dose (mean and std over seeds, %)", "", markdown(level.reset_index()), "",
-             "## Metric responsiveness to reliance (oracle maps)", "",
+    lines = ["## Legacy analysis (raw reliance, seed-only bootstrap; kept for continuity)", "",
+             "These tables are computed exactly as before amendment A1 and the audit corrections "
+             "(responsiveness.csv, method_responsiveness.csv, preference.csv). The corrected analysis above "
+             "is primary.", "",
+             "### Reliance per dose (mean and std over seeds, %)", "", markdown(level.reset_index()), "",
+             "### Metric responsiveness to reliance (oracle maps)", "",
              "responsiveness_rho: Spearman correlation between reliance and preference for the shortcut map "
              "(ideal: close to 1). decision_accuracy: share of models where the preferred map matches whether "
              "reliance is above 50%. switch_point_reliance: reliance where preference crosses 0.5 (ideal: 50). "
              "comparison: which two oracle maps are compared (preference = share of images where the metric "
-             "rates the first above the second). Size-matched object: a binary map of the object's brightest "
-             "pixels, as many as the shortcut. Placebo: the shortcut's shape at a wrong class's position, which "
+             "rates the first above the second). Size-matched object: a binary map of as many object pixels "
+             "as the shortcut has, the first k of a stable descending sort of the object values (on MNIST many "
+             "saturated pixels tie, so it takes the topmost saturated pixels in row-major order; on Pet, the k "
+             "mask pixels nearest the mask centroid). Placebo: the shortcut's shape at a wrong class's position, which "
              "never carries evidence. Random: independent uniform scores per pixel (a fully random ordering). "
              "The placebo's non-patch pixels are tied and ordered randomly, so it behaves almost like the random "
              "map ('placebo vs random' stays near 0.5). 'Placebo vs full object' and 'random vs full object' "
@@ -642,9 +1051,17 @@ def analyze(_args=None):
              f"switch_ci_low/high and rho_ci_low/high: 95% bootstrap intervals ({BOOTSTRAP_REPS} resamples of "
              "the seeds within each dose). switch_found_share: share of resamples in which preference crosses "
              "0.5 at all (the switch interval is left empty below 0.5).", "",
-             markdown(resp[["comparison"] + [c for c in resp.columns if c != "comparison"]]), "", "## Method responsiveness (share of attribution on the shortcut vs reliance)", "",
+             markdown(resp[["comparison"] + [c for c in resp.columns if c != "comparison"]]), "", "### Method responsiveness (share of attribution on the shortcut vs reliance)", "",
              markdown(method_resp), ""]
-    (OUT / "summary.md").write_text("\n".join(lines), encoding="utf-8")
+    header = ["# Dose-response results", "", "Generated by `dose_response.py analyze"
+              + ("`." if model_set == "all" else f" --model-set {model_set}`."), "",
+              f"Model set: **{model_set}** ({len(oracle[keys].drop_duplicates())} scored models"
+              + (", primary)." if model_set == "all" else "; the pre-amendment check promised in "
+                 "docs/PREDICTIONS_amendments.md)."), ""]
+    lines = header + corrected + lines
+    (out / "summary.md").write_text("\n".join(lines), encoding="utf-8")
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(errors="replace")  # e.g. a cp1252 Windows console
     print("\n".join(lines))
 
 
@@ -660,13 +1077,20 @@ def keep_awake():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("step", choices=["train", "evaluate", "placebo", "analyze", "all"])
+    parser.add_argument("step", choices=["train", "evaluate", "placebo", "behaviour", "analyze", "all"])
     parser.add_argument("--bases", nargs="+", default=DEFAULT_BASES, choices=list(BASES))
     parser.add_argument("--shortcuts", nargs="+", default=list(SHORTCUT_TYPES), choices=list(SHORTCUT_TYPES))
     parser.add_argument("--doses", nargs="+", type=float, default=DOSES)
     parser.add_argument("--seeds", nargs="+", type=int, default=SEEDS)
     parser.add_argument("--samples", type=int, default=100, help="test images per model")
     parser.add_argument("--force", action="store_true", help="retrain existing models")
+    parser.add_argument("--model-set", choices=["all", "original"], default="all",
+                        help="analyze: all models (primary, results/dose_response/) or the 192 models "
+                             "from before amendment A1 (results/dose_response/original_models/)")
+    parser.add_argument("--reps", type=int, default=BOOTSTRAP_REPS,
+                        help="analyze: two-level bootstrap replicates of the corrected analysis")
+    parser.add_argument("--selection-only", action="store_true",
+                        help="behaviour: only the models selected by --bases/--shortcuts/--doses/--seeds")
     args = parser.parse_args()
     for base in args.bases:
         info(base)  # validates the name
@@ -677,6 +1101,8 @@ def main():
         evaluate(args)
     if args.step in ("placebo", "all"):
         placebo(args)
+    if args.step == "behaviour":  # not part of "all"
+        behaviour(args)
     if args.step in ("analyze", "all"):
         analyze(args)
 

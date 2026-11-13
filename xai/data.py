@@ -331,6 +331,19 @@ class DecoyDataset(Dataset):
                 image = torch.where(pattern, (image + TEXTURE_VALUE).clamp(max=1.0), image)
         return image, _to_int(label)
 
+    def with_shortcut(self, image, cls):
+        """A copy of `image` with class cls's patch or texture added (the same
+        two branches as __getitem__). Used by the per-image behaviour labels."""
+        image = image.clone()
+        if self.shortcut == "patch":
+            y, x = self.positions[int(cls)]
+            p = self.patch_size
+            image[:, y:y + p, x:x + p] = PATCH_VALUE
+        else:
+            pattern = torch.from_numpy(self.patterns[int(cls)])
+            image = torch.where(pattern, (image + TEXTURE_VALUE).clamp(max=1.0), image)
+        return image
+
     def mask(self, i) -> np.ndarray:
         """Boolean HxW map of the shortcut pixels (the ground-truth evidence)."""
         if self.mode == "none":
@@ -350,7 +363,10 @@ class DecoyDataset(Dataset):
     def object_map(self, i) -> np.ndarray:
         """Oracle map of the object, with shortcut pixels set to 0.
 
-        Grayscale datasets (dark background): the image's own pixel values.
+        Grayscale datasets: the image's own pixel values. On MNIST the
+        background is black, so this is the digit. PneumoniaMNIST has no dark
+        background (97.5% of pixels exceed 0.1), so there the map is an
+        intensity ranking of the whole radiograph, not an object region.
         Colour natural images (CIFAR-10) have no clean background, so the map
         is a centred Gaussian (sigma = size/4), since CIFAR-10 objects are
         mostly centred. This is a modelling choice and is stated as such.

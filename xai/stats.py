@@ -132,7 +132,8 @@ def switch_identification(switch, x, window=10):
 
 
 def _logistic4(r, a, b, c, s):
-    return a + (b - a) / (1 + np.exp(-(r - c) / s))
+    with np.errstate(over="ignore"):
+        return a + (b - a) / (1 + np.exp(-(r - c) / s))
 
 
 def logistic4_switch(x, y, level=0.5):
@@ -237,6 +238,17 @@ def partial_spearman(x, y, z):
         return rho, 0.0 if abs(rho) >= 1 else float("nan")
     stat = rho * np.sqrt((n - 3) / (1 - rho ** 2))
     return rho, float(2 * t_dist.sf(abs(stat), n - 3))
+
+
+def auroc_rows(scores, labels):
+    """Row-wise AUROC of two (reps, n) matrices (midrank); NaN where a row has one class."""
+    scores, labels = np.atleast_2d(scores), np.atleast_2d(labels).astype(bool)
+    ranks = rankdata(scores, axis=1)
+    pos = labels.sum(axis=1).astype(float)
+    neg = labels.shape[1] - pos
+    u = (ranks * labels).sum(axis=1) - pos * (pos + 1) / 2
+    with np.errstate(invalid="ignore", divide="ignore"):
+        return np.where((pos > 0) & (neg > 0), u / (pos * neg), np.nan)
 
 
 def spearman_rows(x, y):

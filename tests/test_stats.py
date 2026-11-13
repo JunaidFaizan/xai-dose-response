@@ -71,6 +71,10 @@ class StatsTests(unittest.TestCase):
         self.assertEqual(stats.auroc([0.5, 0.5, 0.5, 0.5], labels), 0.5)
         self.assertEqual(stats.auroc([0.9, 0.8, 0.2, 0.1], labels), 0.0)
         self.assertTrue(np.isnan(stats.auroc([0.1, 0.2], [1, 1])))
+        rows = stats.auroc_rows([[0.1, 0.2, 0.8, 0.9], [0.9, 0.8, 0.2, 0.1], [1, 2, 3, 4]],
+                                [labels, labels, [1, 1, 1, 1]])
+        np.testing.assert_array_equal(rows[:2], [1.0, 0.0])
+        self.assertTrue(np.isnan(rows[2]))
 
     def test_decision_rates(self):
         '''CIFAR-like: 5 models below 50% all say shortcut, 1 above'''
