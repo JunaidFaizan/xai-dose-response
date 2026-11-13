@@ -60,3 +60,33 @@ PET_DOSES = [-0.5, -0.4, -0.3, -0.2, -0.1, 0.0]
 Dose -0.05 was dropped and -0.5 added. At -0.5 half the training shortcuts
 point to the wrong class, so the shortcut carries no information about the
 label. The predictions P1–P4 above are unchanged.
+
+## Outcome (all 18 models)
+
+Recorded after the full analysis (`dose_response.py analyze`, 18 Pet models,
+seeds 42, 1 and 2). Reliance ranged from 17% to 99%; accuracy without the
+shortcut was 65–82%. Values are from `responsiveness.csv` and
+`method_responsiveness.csv`.
+
+| Prediction | Result | Verdict |
+|---|---|---|
+| P1: shortcut vs full object, rho > 0.8 for all four metrics | black 0.85, blur 0.96, inpaint 0.95, insertion 0.93 | **Holds** (black's 95% bootstrap interval reaches down to 0.71) |
+| P2: at the lowest dose, random-vs-object preference higher for black and blur than for inpaint and insertion | black 0.53, blur 0.49 vs inpaint 0.38, insertion 0.35 | **Holds**, with a smaller gap than on CIFAR-10 (black/blur 0.56–0.82 there) |
+| P3: form-matched comparisons start within 0.5 ± 0.15 and have rho > 0.8 | Starting values 0.45–0.57 for every metric (pass). rho vs random: 0.75, 0.88, 0.96, 0.95; vs placebo: 0.73, 0.89, 0.95, 0.93 | **Fails for Deletion (black)** (rho 0.75 and 0.73); holds for the other three metrics |
+| P4: IG and Occlusion shortcut mass rises, rho > 0.8 | IG 0.94 (0.6% → 22%), Occlusion 0.98 (0.4% → 60%) | **Holds** |
+
+Summary: three of four predictions hold; P3 fails for black-fill deletion,
+which separates the real shortcut from form-matched controls less reliably than
+the other metrics on 128x128 photos.
+
+Exploratory observations (not pre-registered):
+
+- With the real pet mask, the bias of black and blur deletion towards compact or
+  random maps at low reliance is much smaller than with the centred-Gaussian
+  CIFAR-10 object map (about 0.49–0.53 here vs 0.56–0.82 on CIFAR-10), which
+  supports the earlier hypothesis that the Gaussian object map inflated it.
+- All metrics still switch their verdict early against the full object map
+  (about 19–25% reliance where a switch is found).
+- Against the compact size-matched object map, most metrics start near 0.5 at
+  the lowest reliance (0.46–0.55), so a size-matched object region is nearly
+  indistinguishable from the shortcut when the model barely uses it.
