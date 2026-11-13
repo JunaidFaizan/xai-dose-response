@@ -1312,9 +1312,12 @@ def build():
     heading("5. Results")
     heading("5.1. The dose controls reliance", 2)
     t_rel = COUNTERS["table"] + 1
+    pet_g = group("pet_resnet18", "patch")
+    pet_min = pet_g.loc[pet_g.reliance.idxmin()]
     para(f"Table {t_rel} shows that the dose moves reliance across most of the range in every setting. On Pet "
-         f"the lowest raw reliance is {f1(group('pet_resnet18', 'patch').reliance.min())}%, but its chance floor "
-         f"is as large, so {RC} starts at {f1(group('pet_resnet18', 'patch').reliance_corrected.min())}%. The same "
+         f"the lowest raw reliance of a model is {f1(pet_min.reliance)}%, but its chance floor is about as large, "
+         f"so its {RC} is {f1(pet_min.reliance_corrected)}% (the lowest {RC} of any Pet model is "
+         f"{f1(pet_g.reliance_corrected.min())}%). The same "
          f"holds on PneumoniaMNIST: the lowest per-dose mean raw reliance is {f1(pneu_low['patch'].reliance)}% "
          f"(patch) and {f1(pneu_low['texture'].reliance)}% (texture), which is {RC} = "
          f"{f1(pneu_low['patch'].reliance_corrected)}% and {f1(pneu_low['texture'].reliance_corrected)}%. Earlier "

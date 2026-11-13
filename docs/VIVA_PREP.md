@@ -81,7 +81,7 @@ Answer honestly, following your university's policy. For example: you defined th
 ## Questions on the dose-response study
 
 **Why correct reliance for chance?**
-A model that ignores the shortcut still lands on the shortcut's class whenever it makes an error. On a binary task every error does. So raw reliance has a floor equal to the error rate. On PneumoniaMNIST the lowest per-dose mean is 14.8% raw, which is 0.6% after correction. On Pet the lowest model is 15.5% raw and −0.8% corrected. The correction assumes errors spread evenly over the wrong classes. That is an approximation, because images without the shortcut are out of distribution.
+A model that ignores the shortcut still lands on the shortcut's class whenever it makes an error. On a binary task every error does. So raw reliance has a floor equal to the error rate. On PneumoniaMNIST the lowest per-dose mean is 14.8% raw, which is 0.6% after correction. On Pet the lowest model is 15.5% raw and −0.1% corrected. The correction assumes errors spread evenly over the wrong classes. That is an approximation, because images without the shortcut are out of distribution.
 
 **Why not just say the metric should switch at 50%?**
 Preference is scored on aligned images, while reliance is measured on conflicting images, so 50% is an assumption. The per-image forward passes give a derived ideal: the reliance at which the models follow the shortcut on half of the scored images. It is 52.9–55.0% r_c on Pet, CIFAR-10 and MNIST patch, but 36.9% and 41.9% on PneumoniaMNIST.
