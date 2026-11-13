@@ -70,3 +70,141 @@ This section records what happened; it does not change the design above.
   0.0075 and 0.015 are the ones listed above. That is the maximum of six seeds
   per dose allowed by the plan, so no further seeds or doses were added and no
   further amendment was needed.
+
+## Amendment A2 (2026-11-13): extra natural-image doses (SD2) and the pretrained Pet setting (SD1)
+
+Written and committed on 2026-11-13, before any of the models below was
+trained. No model listed here existed when this was written. The predictions
+for these models (P5–P9) are in `docs/PREDICTIONS_pretrained.md`, committed
+together with this amendment.
+
+**Third-party timestamp:** `[PLACEHOLDER: OSF or Zenodo DOI/URL and upload
+timestamp, to be added by the author after uploading this file and
+docs/PREDICTIONS_pretrained.md. The upload must happen before the first
+Kaggle session that trains an SD1 or SD2 model.]`
+
+### Purpose
+
+The second audit (`docs/audit2/00_combined_audit2.md`, N1, M6, SD1, SD2)
+found two problems that need new models:
+
+- **Reliance gaps on natural images (SD2).** Corrected reliance r_c jumps
+  across dose ranges with no models in between (`results/dose_response/models.csv`):
+  - CIFAR-10 ResNet-18: r_c 31.8–36.5 at dose −0.1, 95.8–97.0 at dose 0.
+  - CIFAR-10 small CNN: r_c 41.1–42.7 at dose −0.1, 96.0–96.3 at dose 0.
+  - Pet (from scratch): r_c 22.9–41.1 at dose −0.2, 60.1–82.7 at dose −0.1.
+
+  The behavioural switch lies inside these gaps. It is not identified on
+  CIFAR-10 and not bracketed on Pet.
+- **All models are trained from scratch (SD1).** The setting in which
+  practitioners use these metrics is a pretrained network. SD1 repeats the
+  Pet design with ImageNet-pretrained weights as a confirmatory test.
+
+### SD2: added doses for existing settings
+
+Same pipeline, architecture, epochs, data, shortcut and evaluation as the
+existing models of each setting (`dose_response.py`, 100 test images per
+model, oracle, method, placebo, random-control and behaviour scores).
+
+**CIFAR-10 ResNet-18 (`cifar10_resnet18`, Kaggle GPU).**
+
+1. Pilot: dose −0.05, seed 42. After training, only its reliance and
+   accuracies are read. No metric, oracle, method or behaviour scores are
+   computed for it until the final dose set is recorded (step 3).
+2. Dose rule, applied to the pilot's r_c:
+
+   | Pilot r_c at dose −0.05 | Final doses |
+   |---|---|
+   | below 50 | −0.05, −0.03, −0.02, −0.01 |
+   | 50 to 85 | −0.08, −0.05, −0.03, −0.01 |
+   | above 85 | −0.09, −0.075, −0.06, −0.05 |
+
+3. The pilot's r_c and the resulting dose set are recorded in a dated
+   completion note under this amendment, and committed, before any other SD2
+   CIFAR-10 model is trained.
+4. Seeds 42, 1, 2 at each of the 4 final doses: 12 models. The pilot is one
+   of them and is kept, as with the first Pet model.
+
+**CIFAR-10 small CNN (`cifar10`, laptop CPU).** The same 4 final doses as
+ResNet-18, seeds 42 and 1 (the existing small-CNN seeds): 8 models.
+
+**Pet from scratch (`pet_resnet18`, Kaggle GPU).** Dose −0.15, seeds 42, 1,
+2: 3 models. This dose sits between −0.2 and −0.1, where the gap is. No pilot.
+Dose −0.05 is not part of this amendment. Adding it would need a new dated
+amendment before it is trained.
+
+SD2 total: 23 models. Model names follow `model_name()`, for example
+`cifar10_resnet18_patch_dose-005_seed42`, `cifar10_patch_dose-7p5_seed1` and
+`pet_resnet18_patch_dose-015_seed2`.
+
+### SD1: ImageNet-pretrained ResNet-18 on Pet
+
+New base `pet_resnet18_pretrained`. It differs from `pet_resnet18` only in
+the network and its training:
+
+- torchvision ResNet-18 with `IMAGENET1K_V1` weights and the standard
+  ImageNet stem (7×7 stride-2 convolution and max-pool), with the final layer
+  replaced by a 2-class layer. All layers are fine-tuned.
+- ImageNet mean/std normalisation inside the model's forward pass. Images,
+  perturbation fills (black, blur, inpaint), oracle maps and the shortcut
+  therefore stay exactly as for `pet_resnet18`.
+- 15 training epochs. The optimiser, learning rate and schedule are set in
+  the code and committed before the pilot. They are not changed after it.
+- Same data, 128×128 resolution, splits, 12×12 white-patch shortcut (top-left
+  for cats, top-right for dogs), dose definition, object oracle (pet mask
+  with the shortcut pixels removed), compact size-matched object map,
+  metrics, controls and 100 test images per model.
+
+**Pilot (Kaggle GPU).** Doses 0 and −0.5, seed 7. Seed 7 is not one of the
+confirmatory seeds, so the pilot models are separate from the confirmatory
+set. They are reported as pilots and excluded from the tests of P5–P9. Only
+their reliance and accuracies are read before the final doses are recorded.
+
+**Rule: the SD1 doses are finalised after the pilot.** After the pilot, the
+author records the pilot's r_c and accuracies and the final SD1 doses in a
+dated completion note under this amendment. The note is committed, and added
+to the timestamped record, before any confirmatory SD1 model is trained. The
+final doses follow this rule unless the note gives a reason to deviate:
+
+| Pilot r_c at dose 0 | Final SD1 doses |
+|---|---|
+| 60 or above | −0.5, −0.4, −0.3, −0.2, −0.1, 0 (as `pet_resnet18`) |
+| below 60 | −0.5, −0.2, 0, +0.1, +0.25, +0.4 (positive doses swap that share of training images for the other class, as on MNIST) |
+
+**Confirmatory set.** The 6 final doses × seeds 42, 1, 2: 18 models. If the
+confirmatory set does not reach r_c above 50 on at least two models,
+predictions that need models above 50 are reported as "not testable", and
+SD1 is reported as a negative result. No doses or seeds are added except by a
+new dated amendment written before those models are trained.
+
+### Primary behavioural label for all new models
+
+For every SD1 and SD2 model, the primary per-image behavioural label is
+`follows_shortcut_causal`: the model follows the moved shortcut on the
+conflicting image, with undetermined images dropped. This is the label
+already marked primary in `xai/dose_analysis.py`. The check labels
+`follows_shortcut` (moved shortcut followed, no undetermined filter) and
+`shortcut_dominant` are always reported next to it, with the undetermined
+share. The labels answer different questions. The primary label measures
+whether the shortcut is sufficient under conflict. `shortcut_dominant` is
+closer to whether it is necessary on aligned images, which is what deletion
+measures. No label is treated as ground truth for every metric.
+
+### Commitments
+
+- Every model listed above is reported and included in its analyses,
+  whatever its reliance. No model is dropped or re-run with another seed
+  after its result is seen. The SD1 pilot models are reported separately as
+  pilots, as stated above.
+- The only design choices left open are the CIFAR-10 SD2 doses and the SD1
+  doses. Each is fixed by the rules above before the models it affects are
+  trained.
+- Analyses are reported both without the A2 models (the 234 models of the
+  original set and A1, as before) and with them, labelled clearly. The Pet
+  predictions P1–P4 are judged only on the original 18 Pet models, as
+  recorded in `docs/PREDICTIONS_pet.md`.
+- SD1 results are reported as a separate setting. They are not pooled with
+  `pet_resnet18`.
+- SD3 (exact ROAD) and SD4 (watermark shortcut) are not covered by this
+  amendment. Their predictions will be written in a new dated amendment
+  before any of their runs.
