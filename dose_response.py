@@ -65,6 +65,17 @@ Oxford-IIIT Pet (pet_resnet18, run on a Kaggle GPU via kaggle/dose_response_pet.
         python dose_response.py all --bases pet_resnet18 --shortcuts patch \\
             --doses -0.5 -0.4 -0.3 -0.2 -0.1 0 --seeds 42 1 2
 
+ImageNet-pretrained Pet (pet_resnet18_pretrained, amendment A2 SD1; Kaggle GPU via
+kaggle/dose_response_a2_session1.ipynb and _session2.ipynb)
+    The pet_resnet18 data, patch, fills and oracles with torchvision's
+    ImageNet-pretrained ResNet-18 (IMAGENET1K_V1, standard 7x7 stride-2 stem
+    and max-pool, new 2-class final layer, all layers fine-tuned). ImageNet
+    mean/std normalisation is inside the model, so inputs stay in [0,1].
+    Optimiser fixed before the pilot: Adam, lr 1e-4, no schedule, batch 128,
+    15 epochs. Pilot: doses 0 and -0.5, seed 7 (model set "A2_pilot", never
+    pooled with the confirmatory models); the final doses follow
+    a2_dose_set() applied to the pilot's r_c at dose 0.
+
 Output
     checkpoint/dose/<base>_<shortcut>_dose<+NNN>_seed<N>.pt (+ _metrics.json)
     results/dose_response/scores_oracle.csv, scores_methods.csv  per-image scores
@@ -78,7 +89,9 @@ Output
         behaviour_models.csv, behaviour_summary.csv, behaviour_by_reliance.csv,
         behaviour_auroc.png
     analyze --model-set original writes the same files for the 192 models
-    from before amendment A1 to results/dose_response/original_models/.
+    from before amendment A1 to results/dose_response/original_models/, and
+    analyze --model-set pre_a2 the 234 models from before amendment A2 to
+    results/dose_response/pre_a2_models/.
 """
 
 import argparse
@@ -111,7 +124,7 @@ from xai.stats import chance_floor, corrected_reliance, format_p
 # Base dataset: training epochs. cifar10 is opt-in (--bases cifar10): its models
 # take 20-40 min each on a CPU, so it is not part of the default run.
 BASES = {"mnist": 3, "pneumonia_mnist": 20, "cifar10": 10, "cifar10_resnet18": 15,
-         "pet_resnet18": 30}
+         "pet_resnet18": 30, "pet_resnet18_pretrained": 15}
 # CIFAR-10 learns the patch almost at once (96.7% validation accuracy after one
 # epoch at d = 0), so its range reaches further down. With 10 classes a
 # shortcut noise of 0.8 still points to the true class most often (20% vs
@@ -206,7 +219,7 @@ def train_one(base, shortcut, dose, seed, force):
     loader = DataLoader(train_set, batch_size=128, shuffle=True,
                         generator=torch.Generator().manual_seed(seed), **workers)
     model = build_model(base).to(DEVICE)
-    optimizer = optim.Adam(model.parameters(), lr=1e-3)
+    optimizer = optim.Adam(model.parameters(), lr=info(base).get("lr", 1e-3))
     loss_fn = nn.NLLLoss()
 
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
@@ -252,7 +265,7 @@ def train(args):
 # -------------------------------------------------------------- evaluation
 
 def load(base, shortcut, dose, seed):
-    model = build_model(base)
+    model = build_model(base, pretrained=False)  # weights come from the checkpoint
     model.load_state_dict(torch.load(MODEL_DIR / f"{model_name(base, shortcut, dose, seed)}.pt",
                                      map_location=DEVICE))
     model.to(DEVICE)
@@ -542,17 +555,63 @@ AMENDMENT_A1 = {"mnist": {"doses": (0.0075, 0.015, 0.03), "seeds": (3, 4, 5)},
                 "pneumonia_mnist": {"doses": (-0.075, -0.025), "seeds": ()}}
 
 
+# Pre-registered amendment A2 (docs/PREDICTIONS_amendments.md) dose rules,
+# keyed by the pilot's corrected reliance r_c (%) as worded in A2.
+# CIFAR-10 (SD2): pilot cifar10_resnet18 dose -0.05 seed 42; the small CNN
+# (cifar10) uses the same 4 final doses.
+A2_CIFAR_DOSE_SETS = {"below 50": [-0.05, -0.03, -0.02, -0.01],
+                      "50 to 85": [-0.08, -0.05, -0.03, -0.01],
+                      "above 85": [-0.09, -0.075, -0.06, -0.05]}
+# Pretrained Pet (SD1): pilot pet_resnet18_pretrained dose 0 seed 7.
+A2_SD1_DOSE_SETS = {"60 or above": [-0.5, -0.4, -0.3, -0.2, -0.1, 0.0],
+                    "below 60": [-0.5, -0.2, 0.0, 0.1, 0.25, 0.4]}
+
+
+def a2_dose_set(base, pilot_rc):
+    """Final A2 doses for a base given its pilot's r_c (%). "50 to 85"
+    includes both ends; "above 85" and "below 50" exclude them."""
+    if base in ("cifar10", "cifar10_resnet18"):
+        key = "below 50" if pilot_rc < 50 else "50 to 85" if pilot_rc <= 85 else "above 85"
+        return list(A2_CIFAR_DOSE_SETS[key])
+    if base == "pet_resnet18_pretrained":
+        return list(A2_SD1_DOSE_SETS["60 or above" if pilot_rc >= 60 else "below 60"])
+    raise ValueError(f"amendment A2 has no dose rule for {base}")
+
+
 def model_set_of(row):
-    """'A1' for a model added by amendment A1, otherwise 'original'."""
-    rule = AMENDMENT_A1.get(row["base"])
+    """'A2_pilot' for the SD1 pilot models (pet_resnet18_pretrained, seed 7),
+    'A2' for the other models added by amendment A2 (SD1; CIFAR-10 doses
+    strictly between -0.1 and 0; Pet dose -0.15), 'A1' for a model added by
+    amendment A1, otherwise 'original'."""
+    base, dose = row["base"], float(row["dose"])
+    if base == "pet_resnet18_pretrained":
+        return "A2_pilot" if int(row["seed"]) == 7 else "A2"
+    if base in ("cifar10", "cifar10_resnet18") and -0.1 + 1e-9 < dose < -1e-9:
+        return "A2"
+    if base == "pet_resnet18" and np.isclose(dose, -0.15):
+        return "A2"
+    rule = AMENDMENT_A1.get(base)
     if rule and (np.isclose(row["dose"], rule["doses"]).any() or int(row["seed"]) in rule["seeds"]):
         return "A1"
     return "original"
 
 
+def in_model_set(run, model_set):
+    """Whether a model (metrics JSON or models.csv row) belongs to a model set:
+    'all' = every model except the SD1 pilots, 'pre_a2' = original + A1 (the
+    234 models before amendment A2), otherwise the exact model_set_of value."""
+    kind = model_set_of(run)
+    if model_set == "all":
+        return kind != "A2_pilot"
+    if model_set == "pre_a2":
+        return kind in ("original", "A1")
+    return kind == model_set
+
+
 def complete_model_names(model_set="all"):
     """Names of models with a metrics JSON, a .pt and all four per-model score
-    files (oracle, methods, placebo, random), restricted to a model set."""
+    files (oracle, methods, placebo, random), restricted to a model set
+    (see in_model_set)."""
     cache = OUT / "per_model"
     names = []
     for path in sorted(MODEL_DIR.glob("*_metrics.json")):
@@ -560,7 +619,7 @@ def complete_model_names(model_set="all"):
         name = model_name(run["base"], run["shortcut"], run["dose"], run["seed"])
         files = [MODEL_DIR / f"{name}.pt"] + [cache / f"{name}_{kind}.csv"
                                              for kind in ("oracle", "methods", *CONTROL_MAPS)]
-        if all(f.exists() for f in files) and model_set in ("all", model_set_of(run)):
+        if all(f.exists() for f in files) and in_model_set(run, model_set):
             names.append(name)
     return sorted(names)
 
@@ -1039,6 +1098,8 @@ def analyze(args=None):
     keys = ["base", "shortcut", "dose", "seed"]
     models = add_corrected_reliance(load_models())
     if model_set == "all":
+        # The SD1 pilots (A2) are reported separately, never pooled (no-op before A2).
+        models = models[models.model_set != "A2_pilot"].reset_index(drop=True)
         combine(None)
         out = OUT
         oracle = pd.read_csv(OUT / "scores_oracle.csv")
@@ -1106,8 +1167,9 @@ def analyze(args=None):
     header = ["# Dose-response results", "", "Generated by `dose_response.py analyze"
               + ("`." if model_set == "all" else f" --model-set {model_set}`."), "",
               f"Model set: **{model_set}** ({len(oracle[keys].drop_duplicates())} scored models"
-              + (", primary)." if model_set == "all" else "; the pre-amendment check promised in "
-                 "docs/PREDICTIONS_amendments.md)."), ""]
+              + (", primary)." if model_set == "all" else
+                 "; the 234 models before amendment A2)." if model_set == "pre_a2" else
+                 "; the pre-amendment check promised in docs/PREDICTIONS_amendments.md)."), ""]
     lines = header + corrected + lines
     (out / "summary.md").write_text("\n".join(lines), encoding="utf-8")
     if hasattr(sys.stdout, "reconfigure"):
@@ -1134,9 +1196,10 @@ def main():
     parser.add_argument("--seeds", nargs="+", type=int, default=SEEDS)
     parser.add_argument("--samples", type=int, default=100, help="test images per model")
     parser.add_argument("--force", action="store_true", help="retrain existing models")
-    parser.add_argument("--model-set", choices=["all", "original"], default="all",
-                        help="analyze: all models (primary, results/dose_response/) or the 192 models "
-                             "from before amendment A1 (results/dose_response/original_models/)")
+    parser.add_argument("--model-set", choices=["all", "original", "pre_a2"], default="all",
+                        help="analyze: all models except the SD1 pilots (primary, results/dose_response/), "
+                             "the 192 models from before amendment A1 (results/dose_response/original_models/) "
+                             "or the 234 models before amendment A2 (results/dose_response/pre_a2_models/)")
     parser.add_argument("--reps", type=int, default=BOOTSTRAP_REPS,
                         help="analyze: two-level bootstrap replicates of the corrected analysis")
     parser.add_argument("--selection-only", action="store_true",

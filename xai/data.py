@@ -148,6 +148,13 @@ DATASETS = {
         "fit_size": 28, "epochs": 20,
     },
 }
+# Amendment A2, SD1 (docs/PREDICTIONS_amendments.md): the same data, patch,
+# fills and oracles as pet_resnet18, with an ImageNet-pretrained ResNet-18
+# fine-tuned for 15 epochs at Adam lr 1e-4. pet_resnet18 itself is unchanged.
+DATASETS["pet_resnet18_pretrained"] = dict(
+    DATASETS["pet_resnet18"],
+    title="Oxford-IIIT Pet (cat vs dog) with ImageNet-pretrained ResNet-18",
+    arch="resnet18_pretrained", epochs=15, lr=1e-4)
 
 
 def info(dataset: str) -> dict:

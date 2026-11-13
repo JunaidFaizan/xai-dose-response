@@ -117,13 +117,52 @@ class ResNet18Cifar(nn.Module):
         return nn.functional.log_softmax(n.fc(x), dim=1)
 
 
-ARCHITECTURES = {"cifar": CifarModel, "resnet18": ResNet18Cifar}
+class ResNet18Pretrained(nn.Module):
+    """ImageNet-pretrained ResNet-18 (torchvision IMAGENET1K_V1) with the
+    standard stem (7x7 stride-2 convolution and max-pool) and a new final
+    layer for `classes` outputs; all layers are fine-tuned (amendment A2, SD1).
+
+    Inputs stay in [0,1] pixel space, as for every other model: the ImageNet
+    mean/std normalisation is done inside forward, so images, perturbation
+    fills, oracle maps and the shortcut are unchanged. The mean/std buffers are
+    not saved in checkpoints (persistent=False). `pool2` is an identity after
+    the last residual stage, so Grad-CAM (input of `pool2`) uses layer4's maps.
+    pretrained=False builds the same network without downloading weights (used
+    when a trained checkpoint is loaded).
+    """
+
+    def __init__(self, classes: int = 2, pretrained: bool = True) -> None:
+        super().__init__()
+        from torchvision.models import ResNet18_Weights, resnet18
+        net = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1 if pretrained else None)
+        net.fc = nn.Linear(net.fc.in_features, classes)
+        self.classes = classes
+        self.net = net
+        self.pool2 = nn.Identity()
+        self.register_buffer("mean", torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1), persistent=False)
+        self.register_buffer("std", torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1), persistent=False)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        n = self.net
+        x = (x - self.mean) / self.std
+        x = n.maxpool(n.relu(n.bn1(n.conv1(x))))
+        x = n.layer4(n.layer3(n.layer2(n.layer1(x))))
+        x = torch.flatten(n.avgpool(self.pool2(x)), 1)
+        return nn.functional.log_softmax(n.fc(x), dim=1)
 
 
-def build_model(dataset: str) -> nn.Module:
-    """An untrained model of the right architecture for a dataset."""
+ARCHITECTURES = {"cifar": CifarModel, "resnet18": ResNet18Cifar,
+                 "resnet18_pretrained": ResNet18Pretrained}
+
+
+def build_model(dataset: str, pretrained: bool = True) -> nn.Module:
+    """An untrained model of the right architecture for a dataset.
+    `pretrained` only affects ResNet18Pretrained (whether to download the
+    ImageNet weights); every other architecture ignores it."""
     from .data import info
     cls = ARCHITECTURES.get(info(dataset).get("arch"), MnistModel)
+    if cls is ResNet18Pretrained:
+        return cls(classes=num_classes(dataset), pretrained=pretrained)
     return cls(classes=num_classes(dataset))
 
 
