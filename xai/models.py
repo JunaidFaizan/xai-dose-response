@@ -93,8 +93,10 @@ class ResNet18Cifar(nn.Module):
     parameters. Built from torchvision's implementation.
 
     `pool2` is an identity placed after the last residual stage, so Grad-CAM
-    (which hooks the input of `pool2`) uses the final 4x4 feature maps, as it
-    does for the smaller CNNs.
+    (which hooks the input of `pool2`) uses the last stage's feature maps, as it
+    does for the smaller CNNs. Measured with a forward hook: 512x4x4 for 32x32
+    CIFAR-10 images and 512x16x16 for 128x128 Pet images (the CIFAR stem has no
+    downsampling, so the maps are input size / 8).
     """
 
     def __init__(self, classes: int = 10) -> None:

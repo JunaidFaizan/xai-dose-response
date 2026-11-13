@@ -10,10 +10,14 @@
    How removed pixels are filled matters, so three variants are provided:
      zero     black pixels (the classic deletion test; also the Integrated
               Gradients baseline, which may favour that method)
-     blur     pixels from a Gaussian-blurred copy of the image
+     blur     pixels from a Gaussian-blurred copy of the image. A blurred
+              white patch keeps about 20% (28 and 32 px images, 3x3 patch) to
+              25% (128 px Pet, 12x12 patch) of its intensity, so blur deletion
+              does not fully remove a patch shortcut
      inpaint  pixels estimated from their neighbours plus a little noise,
               inspired by ROAD (Rong et al., 2022), which showed that the
-              shape of the removed region can leak class information
+              shape of the removed region can leak class information (this is
+              not the official ROAD noisy linear imputation)
 
 2. Sanity check: cascading model randomization (Adebayo et al., 2018)
    Layers are re-initialised from the output layer down. An explanation that
@@ -49,6 +53,9 @@ FAITHFULNESS_METRICS = {
 
 # sigma 4 was chosen so a fully blurred image gives near-chance confidence
 # (checked on MNIST and Fashion-MNIST); sigma 2 still kept ~63% on MNIST.
+# Blur fill leaves part of a patch shortcut in place: a 3x3 white patch keeps
+# a mean of 0.20 after this blur (0.25 for the 12x12 Pet patch with kernel 97,
+# sigma 16), so blur deletion only weakens the patch.
 BLUR_KERNEL, BLUR_SIGMA = 25, 4.0
 INPAINT_ITERATIONS, INPAINT_NOISE = 100, 0.05
 
@@ -75,7 +82,12 @@ def blur(x, kernel=BLUR_KERNEL, sigma=BLUR_SIGMA):
 
 
 def inpaint(images, masks, iterations=INPAINT_ITERATIONS, noise=INPAINT_NOISE, seed=0):
-    """Fill masked pixels by repeatedly averaging their 4 neighbours, then add noise."""
+    """Fill masked pixels by repeatedly averaging their 4 neighbours, then add noise.
+
+    At the last deletion step every pixel is masked: `count` clamps to 1, the
+    starting mean is 0 and averaging zeros stays 0, so the final image is
+    clamped noise around black (the curve ends like black deletion).
+    """
     channels = images.shape[1]
     kernel = torch.tensor([[0.0, 1.0, 0.0], [1.0, 0.0, 1.0], [0.0, 1.0, 0.0]]).view(1, 1, 3, 3) / 4
     kernel = kernel.repeat(channels, 1, 1, 1).to(images.device)  # one kernel per channel

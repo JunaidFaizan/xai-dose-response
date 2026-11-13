@@ -50,7 +50,9 @@ def integrated_gradients(model, x, target):
 
 def grad_cam(model, x, target):
     # Feature maps of the last conv layer weighted by their average gradient,
-    # then upsampled from 6x6 to the 28x28 input size. Grad-CAM needs the
+    # then upsampled to the input size. The input of pool2 is 6x6 for the 28x28
+    # CNN, 16x16 for the 32x32 CIFAR-10 CNN, 4x4 for ResNet-18 on 32x32 and
+    # 16x16 for ResNet-18 on 128x128 Pet images (measured). Grad-CAM needs the
     # activations after ReLU, which is the input of pool2 (the model reuses
     # one ReLU module, so it cannot be hooked directly).
     cam = LayerGradCam(model, model.pool2).attribute(
