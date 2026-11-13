@@ -1,6 +1,8 @@
 # Report Outline
 
-A chapter-by-chapter plan for the M.Tech report (about 55–65 pages). The thesis and the paper share the same experiments, so write the paper first (`PAPER_OUTLINE.md`) and expand it here. Take the exact numbers from `results/analysis/summary.md` after your final run.
+Project title: A Dose-Response Evaluation of Explanation Metrics under Controlled Shortcut Reliance in CNN Image Classifiers
+
+A chapter-by-chapter plan for the M.Tech report (about 55–65 pages). The thesis and the paper share the same experiments, so write the paper first (`PAPER_OUTLINE.md`) and expand it here. Take the exact numbers from `results/dose_response/summary.md` (section "Corrected analysis (primary)") and `results/analysis/summary.md` after your final run, or copy them from `paper/paper_draft.docx`, which is generated from those files.
 
 ## Writing schedule (1–2 hours a day)
 
@@ -23,15 +25,16 @@ A chapter-by-chapter plan for the M.Tech report (about 55–65 pages). The thesi
 
 - Why explanations matter: medicine, finance, and regulation such as the EU AI Act
 - Explanations are judged with metrics, but the metrics are rarely validated
-- Research question: *Do common explanation metrics identify the methods that point to the evidence a model really uses?*
+- Research question: *When a model's reliance on a shortcut increases in controlled steps, do faithfulness metrics shift their preference from object explanations to shortcut explanations, and at what reliance?*
+- Thesis: the metrics respond to reliance but are not calibrated to it, and their verdicts depend on explanation size and form
 - Objectives:
-  1. Build shortcut datasets with a known ground truth
-  2. Apply five explanation methods
-  3. Measure them with perturbation metrics and the sanity check
-  4. Test the metrics against the ground truth
-  5. Repeat on standard and medical data with several seeds
-  6. Build an interactive dashboard
-- Contributions (the 4 in the paper outline)
+  1. Build shortcut datasets (patch and texture) and control reliance with a signed training dose
+  2. Measure reliance on conflicting images and correct it for chance
+  3. Score fixed oracle maps (shortcut, object, size-matched, placebo, random) with four deletion/insertion metrics
+  4. Label each scored image by forward passes (does the model follow the shortcut here?) and test the metrics against these labels
+  5. Repeat on Oxford-IIIT Pet (real masks, pre-registered), CIFAR-10 (two networks), MNIST and PneumoniaMNIST; 234 models
+  6. Run five explanation methods on every model; supporting sanity-check study; interactive dashboard
+- Contributions (the 4 in `PAPER_OUTLINE.md`)
 - Where the project came from: it extends the B.Tech digit recognition app
 - Chapter overview
 
@@ -43,7 +46,10 @@ A chapter-by-chapter plan for the M.Tech report (about 55–65 pages). The thesi
 - Evaluating explanations:
   - Perturbation metrics and their confounds (Samek, Petsiuk, ROAD)
   - Sanity checks and their critiques (Adebayo 2018, Binder 2023, Hedström 2024)
-  - Ground-truth benchmarks (CLEVR-XAI, Decoy MNIST, Adebayo 2022)
+  - Ground-truth benchmarks (CLEVR-XAI, Decoy MNIST, Adebayo 2022, FunnyBirds, XAI-Units)
+  - Controlled reliance for methods: BAM, SMERF, Bastings et al., OSCAR; how this project differs (the metrics are tested, reliance is graded and measured)
+  - Meta-evaluation of metrics (Tomsett, MetaQuantus, Quantus, LATEC, M4, Gevaert, Miró-Nicolau) and confounds (ROAD, ROAR and its pitfalls, Blücher, Gomez, SaCo, Bilodeau)
+  - Use the positioning table in the paper (Section 2, Table 1) and the verified reference list in `docs/audit/00_combined_audit.md` §9
 - Shortcut learning, and why it matters in medical imaging
 - The research gap
 
@@ -54,7 +60,10 @@ A chapter-by-chapter plan for the M.Tech report (about 55–65 pages). The thesi
 - **3.3 Model and training:** the architecture table, Adam with learning rate 0.001, batch size 128, seeds 42, 1 and 2, and model selection on the validation set
 - **3.4 Explanation methods:** formulas and settings (see `VIVA_PREP.md`)
 - **3.5 Metrics:** deletion with black, blur (σ = 4, and why) or inpaint replacement; insertion; the sanity check; mass and rank accuracy
-- **3.6 Meta-evaluation and statistics:** Kendall τ, Spearman ρ, Wilcoxon tests with Holm correction, and seed stability
+- **3.6 Dose-response design:** the signed dose, measured reliance, chance correction r_c = 100 (R − f)/(100 − f) with f = (100 − accuracy without shortcut)/(C − 1), oracle maps and their limits (PneumoniaMNIST object map is an intensity ranking; CIFAR-10 uses a Gaussian prior; blur leaves 20–25% of the patch; size-matched tie order)
+- **3.7 Per-image behavioural labels:** the moved-shortcut and removed-shortcut forward passes (primary) and the Δ_S > Δ_O check; class-stratified AUROC
+- **3.8 Statistics:** two-level bootstrap (seeds within dose, images within model), Benjamini–Hochberg families and Holm for headline claims, isotonic switch with 4PL check and the ±10-point identification rule, over-detection rate and balanced accuracy, median AUC gap, paired metric tests, exact Kendall null for five methods; seed stability
+- **3.9 Pre-registration:** `docs/PREDICTIONS_pet.md` (P1–P4) and `docs/PREDICTIONS_amendments.md` (A1), with commit hashes
 
 ## Chapter 4: Implementation (6–8 pages)
 
@@ -65,7 +74,9 @@ A chapter-by-chapter plan for the M.Tech report (about 55–65 pages). The thesi
 
 ## Chapter 5: Results (12–15 pages)
 
-Use the tables and figures listed in `PAPER_OUTLINE.md`, plus these, which don't fit in the paper:
+Use the tables and figures of `paper/paper_draft.docx` (natural images first; the pre-registered Pet test; the behavioural test; mechanism settings; controls; paired metric tests; methods; reliance vs competence), plus these, which don't fit in the paper:
+- The full `responsiveness_corrected.csv` for all 7 comparisons, and `effect_sizes.csv`
+- The original-set check (`results/dose_response/original_models/`)
 - Per-dataset perturbation curves (`results/metrics/<dataset>/perturbation_curves.png`)
 - Per-dataset sanity curves and examples (`sanity_curve.png`, `sanity_examples.png`)
 - Explanation grids for all five datasets (`results/explanations/`)
@@ -74,7 +85,9 @@ Use the tables and figures listed in `PAPER_OUTLINE.md`, plus these, which don't
 ## Chapter 6: Discussion (5–6 pages)
 
 The discussion points from `PAPER_OUTLINE.md`, in more depth, plus:
-- The effect of dataset: standard, medical and shortcut data
+- The effect of dataset: natural images with real masks, colour images with a Gaussian prior, digits and radiographs
+- Why chance correction and behavioural labels change the conclusions (lowest PneumoniaMNIST reliance about 15% raw is about 0% chance-corrected; the ideal switch is 37–55% r_c, not always 50%)
+- The collinearity of reliance and object competence (`confound.csv`)
 - What the results mean for practitioners in medical imaging
 
 ## Chapter 7: Conclusion and Future Work (2–3 pages)

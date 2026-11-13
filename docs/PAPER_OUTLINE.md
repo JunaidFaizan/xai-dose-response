@@ -1,10 +1,20 @@
 # Paper Outline
 
-A plan for an 8–10 page paper in IEEE or Springer LNCS format. Take exact numbers from `results/dose_response/summary.md` (main study) and `results/analysis/summary.md` (supporting study). The numbers below are from the current runs.
+The plan behind `paper/paper_draft.docx`, which `paper/build_paper.py` builds from the result files. Do not copy numbers from this outline into the paper by hand: the builder reads them from `results/dose_response/*.csv`. The numbers quoted here are from the current 234-model run.
 
 ## Title
 
 "A Dose-Response Evaluation of Explanation Metrics under Controlled Shortcut Reliance in CNN Image Classifiers"
+
+## Target and format
+
+- Provisional target journal: **Neurocomputing** (Elsevier), Q1 in Artificial Intelligence, SJR 1.47 (SCImago widget, `docs/audit/00_combined_audit.md` §7).
+- The free subscription route (no article processing charge) is **unverified**. Confirm it in a normal browser before submitting.
+- Single-column Elsevier-style manuscript (A4, Times New Roman 12 pt, 1.5 spacing), numbered references in square brackets, highlights (≤ 85 characters each), abstract ≤ 250 words (confirm both limits in the Guide for Authors). The elsarticle LaTeX version is optional and not prepared.
+
+## Thesis
+
+The metrics respond to reliance but are not calibrated to it, and their verdicts depend on the size and form of the explanations being compared.
 
 ## Research question
 
@@ -12,71 +22,65 @@ When a model's reliance on a shortcut increases in controlled steps, do faithful
 
 ## Contributions
 
-1. **A dose-response protocol for meta-evaluating XAI metrics.** A signed training dose sets the model's reliance on an injected shortcut, from about 0% to 100%. Reliance is measured behaviourally, and fixed oracle explanations are scored, so the metrics are tested independently of any explanation method.
-2. **Evidence that metric responsiveness depends on the data and the shortcut type.** Metrics track reliance closely on MNIST (ρ = 0.91–0.98) but weakly or not at all on chest X-rays (ρ = 0.07–0.84). Insertion fails on a diffuse shortcut.
-3. **A size and shape confound in oracle-based evaluation.** Against a size-matched object map, the switch point on MNIST patch moves from 30–42% reliance to 6–15%, so metrics partly reward explanation size. Placebo and random-map controls separate genuine responses from form effects. When the shortcut map is compared with maps of the same form (a placebo patch, or a random ordering), every metric on the patch shortcut starts near 0.5 at low reliance and rises to 0.93–0.99, which is correct. The placebo behaves like a random ordering (placebo vs random stays near 0.5 for deletion), so its rise over the object map at high reliance is correct behaviour: the object map then explains the model worse than random. The errors come from comparing explanations of different form.
-4. **On natural images, black and blur deletion rate a random explanation above the object explanation (CIFAR-10).** On 32×32 colour images with a larger CNN, preference tracks reliance (ρ = 0.88–0.99), but at 4% reliance black and blur deletion prefer a fully random ordering over the object map 75–82% of the time, as often as they prefer the shortcut. So their apparent shortcut "detection" at low reliance is a bias against the compact object map, not a response to the model. Inpainting deletion and insertion are not affected (18–23%). Hypothesis: scattered removal damages natural images more than compact removal, the information-leakage effect ROAD describes. The CIFAR-10 object map is a centred Gaussian, so this needs confirming with real object masks. The finding replicates with a standard ResNet-18: black and blur deletion prefer a random ordering over the object map 56–72% of the time at 3% reliance, against 13–21% for inpainting and insertion, while all metrics track reliance (ρ = 0.96–0.98).
-5. **Practical guidance.** Inpainting deletion is the only variant that responds significantly in all eight settings, and some explanation methods (Saliency, SmoothGrad, Grad-CAM) move away from a diffuse shortcut as the model relies on it more.
-6. **Supporting fixed-shortcut study:** five methods, five datasets and three seeds, showing that the model-randomization sanity check does not rank methods in line with the ground truth (Kendall τ = −0.20 to 0.07). Use this as a secondary section, or leave it out if space is short.
+1. **A dose-response protocol for testing faithfulness metrics.** A signed training dose sets each model's reliance on an injected shortcut (234 models). Reliance is measured on conflicting test images and chance-corrected (r_c). Per-image behavioural labels come from forward passes. Fixed oracle maps keep the test independent of any attribution method.
+2. **Responsiveness without calibration.** Preference rises with r_c in 27 of 28 metric–setting cells. But black and blur deletion over-detect on natural images: they prefer the shortcut map for 75–92% of the low-reliance Pet models and 100% of the low-reliance CIFAR-10 models. On Pet the metrics switch at 1.3–5.4% r_c, against a behavioural switch of 54.5%. Within one model, the per-image AUROC is only 0.43–0.80.
+3. **Size and form dependence.** With a size-matched object map, the MNIST patch switch moves from 38.7–39.3% to 0.9–8.6% r_c. On CIFAR-10 black and blur deletion prefer a random ordering over a centred object map at low reliance (75–82% small CNN, 56–72% ResNet-18). Real Pet masks reduce this to 49–53%.
+4. **A pre-registered test and amendment.** On Pet, P1, P2 and P4 hold and P3 fails for black deletion (commits a962b6c → 20694f2 → d823737 → 1e29918). Amendment A1 (8738b32) added 42 models before they were trained. Both model sets are reported.
 
-## Related work (verified links; read each before citing)
+Claims that earlier outlines made and that are now corrected:
+- "Rises to 0.93–0.99 for every metric on the patch shortcut" was too general. The form-matched preference at the highest dose is 0.73–0.79 on PneumoniaMNIST patch and 0.76–1.00 on Pet (black deletion lowest).
+- The old claim that inpainting deletion alone is significant in "eight" settings is replaced. There are 7 settings. Inpainting is the only variant with a positive, BH-significant ρ in all 28 shortcut-map comparisons. Black, blur and inpainting deletion are all 7/7 against the full object map. A paired test shows black deletion *better* than inpainting on PneumoniaMNIST texture.
+- "Saliency, SmoothGrad and Grad-CAM move away from a diffuse shortcut" holds only on MNIST texture. On PneumoniaMNIST texture, Saliency and SmoothGrad move towards it. The Grad-CAM change on MNIST texture is negligible (0.100 → 0.098).
+- MNIST inpainting switch interval. The old outline said the interval "reaches about 51%". In the legacy `responsiveness.csv` (192 models) its upper end was 49.95. In the current primary table (`responsiveness_corrected.csv`, r_c axis, two-level bootstrap) the inpainting switch is 39.2 [34.7, 52.5], status "identified". The black and blur switches before A1 lay in the 23–45% reliance gap; they are now identified, with the nearest model about 1 point away.
+
+## Related work (positioning table in the paper, Section 2, Table 1)
 
 | Paper | What it does | How we differ |
 |---|---|---|
-| Zhou et al., AAAI 2022, [arXiv:2104.14403](https://arxiv.org/abs/2104.14403) | Induces ground-truth features to test attribution methods | We test the metrics, at graded reliance |
-| BackX, [arXiv:2405.02344](https://arxiv.org/abs/2405.02344) | Backdoor-based benchmark for attribution methods | Fixed trigger strength; methods, not metrics |
-| Sun et al., MICCAI 2023, [arXiv:2307.12344](https://arxiv.org/abs/2307.12344) | Can explanations detect spurious correlations in chest X-rays? | Methods, at a fixed strength |
-| Adebayo et al., ICLR 2022 | Post hoc explanations and unknown spurious correlations | Methods, plus a human study |
-| Tomsett et al., AAAI 2020, [arXiv:1912.01451](https://arxiv.org/abs/1912.01451) | Saliency metrics are statistically unreliable | No ground truth |
-| MetaQuantus, [arXiv:2302.07265](https://arxiv.org/abs/2302.07265) | Meta-evaluates metrics by noise resilience and reactivity to randomness | No ground truth, no graded reliance |
-| LATEC, NeurIPS 2024, [arXiv:2409.16756](https://arxiv.org/abs/2409.16756) | 20 metrics × 17 methods; the metrics conflict | Large benchmark, no controlled reliance |
-| AttributionLab, [arXiv:2310.06514](https://arxiv.org/abs/2310.06514) (NeurIPS 2023 XAIA workshop) | Hand-set weights give an exact ground truth | Designed, not learned, models; no dose |
-| [arXiv:2401.10640](https://arxiv.org/abs/2401.10640) | Fidelity metrics checked against a transparent model | Tabular/transparent models |
-| Back to the Baseline, [arXiv:2512.11433](https://arxiv.org/abs/2512.11433) | The deletion/insertion baseline favours some methods | Supports our supporting study's finding |
-| ROAD (Rong et al., ICML 2022); Binder et al. (CVPR 2023); Hedström et al. (2024) | Perturbation confounds; sanity check critiques | Background |
-| M4, NeurIPS 2023 Datasets & Benchmarks | Faithfulness benchmark across modalities | Read the PDF to confirm its synthetic ground-truth part before citing |
+| BAM, Yang & Kim 2019, [arXiv:1907.09701](https://arxiv.org/abs/1907.09701) | Models trained with known relative feature importance, to evaluate attribution methods | We evaluate the metrics, with continuous measured reliance |
+| SMERF, Kim, Plumb & Talwalkar, ICML 2022 ([PMLR](https://proceedings.mlr.press/v162/kim22h.html)) | Synthetic benchmark that controls the model's reasoning | Methods, not metrics |
+| Bastings et al., EMNLP 2022 ([ACL](https://aclanthology.org/2022.emnlp-main.64/)) | Shortcut-injection protocol for salience methods (text) | Images; metrics |
+| OSCAR, [arXiv:2512.18888](https://arxiv.org/abs/2512.18888) | Shortcut scores sensitive to association strength | Detection, not metric validation |
+| Zhou et al., AAAI 2022; Lin et al., KDD 2021; BackX; Sun et al., MICCAI 2023; Adebayo et al., ICLR 2022 | Injected features or backdoors as ground truth for methods | Fixed strength; methods |
+| Tomsett et al., AAAI 2020; MetaQuantus (TMLR 2023); Quantus (JMLR 2023); LATEC (Klein et al., NeurIPS 2024); M4 (NeurIPS 2023 D&B); Gevaert et al. | Meta-evaluation of metrics, mostly without ground truth | Ground truth that changes with the model |
+| Miró-Nicolau et al., [arXiv:2401.10640](https://arxiv.org/abs/2401.10640) | Fidelity metrics checked against a decision tree on 52,000 synthetic 128×128 images | Learned CNNs, graded reliance |
+| Miró-Nicolau, Spinnato & Guidotti 2026, [arXiv:2609.30397](https://arxiv.org/abs/2609.30397); FunnyBirds; XAI-Units; AttributionLab; Hesse et al. 2024 | Synthetic or designed ground truth; benchmarks for methods | Metrics, dose-response |
+| ROAD; ROAR; ROAR pitfalls; Blücher et al. (TMLR 2024); Back to the Baseline; Gomez et al.; SaCo; Bilodeau et al. | Removal-shape, fill and ranking confounds; end-task framing | We show these confounds as reliance varies |
+| Lapuschkin et al.; DeGrave et al.; Hermann et al. (ICLR 2024); Suhail et al. | Shortcuts in practice; predictivity vs availability | Motivation and limitation (we vary predictivity only) |
 
-Before submitting, run your own search, with your guide, for "graded spurious correlation", "dose-response" and "meta-evaluation of faithfulness metrics" from 2024 onwards. An earlier AI-generated literature summary contained invented citations, so cite only papers you've opened yourself.
+Citation rule: cite only papers whose page you have opened. Every reference in the draft was opened on 2026-11-13. When citing the sanity-check critique, give "Sanity Checks Revisited" (arXiv:2401.06465, NeurIPS XAIA 2023) and "A Fresh Look at Sanity Checks for Saliency Maps" (arXiv:2405.02383) as two separate entries.
 
-## Structure
+## Structure (as built)
 
-1. **Introduction** (1 page): problem, question, contributions
-2. **Related work** (1 page): the table above, written as prose
-3. **Method** (2 pages)
-   - Shortcuts: a 3×3 patch at class-coded positions; a texture of a class-specific random 10% of pixels, brightened by 0.3
-   - Signed dose: image swaps (d > 0) and shortcut noise (d < 0), capped at |d| = 0.4, and why both are needed (with d = 0 the shortcut is already easier to learn)
-   - Reliance: following a conflicting shortcut on the test set
-   - Oracle maps: shortcut, full object, size-matched object, placebo (the shortcut's shape at a wrong class's position), random (a fully random pixel ordering)
-   - Metrics: deletion (black, blur, inpaint), insertion (blur)
-   - Scores: preference, responsiveness ρ, decision accuracy, switch point
-4. **Setup** (0.5 page): MNIST and PneumoniaMNIST, the CNN, 12 doses × 3 seeds × 2 shortcuts × 2 datasets = 144 models; plus CIFAR-10 with the patch shortcut at 6 doses: a larger CNN (0.77M parameters, batch norm, 10 epochs, 2 seeds = 12 models) and a standard ResNet-18 (11.2M parameters, 15 epochs, 3 seeds = 18 models, Kaggle T4 GPU, about 11 min per model); 100 test images each, CPU only. For CIFAR-10 the object map is a centred Gaussian, because natural images have no clean background.
-5. **Results** (3 pages)
-   - Table 1: reliance per dose (`summary.md`, first table). It shows the dose controls reliance, and how much seeds vary near d = 0.
-   - Figure 1: preference vs reliance, full object map (`metric_dose_response.png`). The main result.
-   - Figure 2: the same with the size-matched control (`metric_dose_response_size_matched.png`)
-   - Figure 2b: the placebo and random controls (`metric_dose_response_shortcut_vs_random.png`, `metric_dose_response_random_vs_object.png`, `metric_dose_response_placebo_vs_random.png`). The shortcut-vs-random panel shows the metrics behave correctly when explanation form is matched.
-   - Table 2: responsiveness, decision accuracy and switch point per metric and setting (`responsiveness.csv`)
-   - Figure 3: explanation methods vs reliance (`method_dose_response.png`)
-   - Optional, from the supporting study: sanity check vs ground truth (`results/analysis/gt_agreement.png`)
-6. **Discussion** (1 page)
-   - Why the X-ray setting is harder: textured background, 2 classes, and the lowest reliance reached was 15%
-   - The size confound, and what it means for any oracle- or mask-based evaluation
-   - Why insertion fails on a diffuse shortcut: restoring scattered pixels into a blurred image barely changes it
-   - Why some methods move away from the texture shortcut. Possible reasons are gradient saturation, or the texture adding to bright digit pixels. State this as a hypothesis.
-   - Recommendation: report inpainting-based deletion, test metrics at several reliance levels, and control for explanation size
-7. **Limitations** (0.5 page): 28×28 images and a small CNN; synthetic shortcuts; reliance varies between seeds near d = 0; the 50% switch-point ideal is an assumption; one size-matching rule; ROAD-inspired, not exact ROAD
-8. **Conclusion**
-
-## Draft abstract (rewrite in your own words)
-
-> Faithfulness metrics such as deletion and insertion curves are widely used to compare explanation methods, yet whether they detect changes in what a model actually relies on has rarely been tested. We propose a dose-response protocol: CNNs are trained on MNIST and PneumoniaMNIST with an injected local patch or diffuse texture shortcut, and a signed training dose sets their measured reliance on it from about 0% to 100% (144 models). Scoring fixed oracle explanations, we test whether each metric shifts its preference from an object explanation to a shortcut explanation as reliance grows. On MNIST, all metrics track reliance closely (Spearman ρ = 0.91–0.98), but black and blur deletion switch preference too early, at 30–35% reliance (95% bootstrap intervals 30–42%), and every metric switches at 6–15% (intervals 1–20%) when the object explanation is matched in size to the shortcut. This reveals that the metrics partly reward explanation size. Placebo and random-map controls show that the metrics judge explanations of the same form correctly, but are biased when forms differ: on CIFAR-10, black and blur deletion prefer a random pixel ordering over a centred object explanation 75–82% of the time at 4% reliance. On chest X-rays, responsiveness falls to ρ = 0.07–0.84, and some variants do not respond significantly. Insertion fails on the diffuse shortcut, while inpainting-based deletion is the only variant that responds significantly in all settings. Among five attribution methods, Integrated Gradients follows the shortcut in every setting, whereas Saliency, SmoothGrad and Grad-CAM put less weight on a diffuse shortcut as the model relies on it more. We recommend validating metrics at several controlled reliance levels, and controlling for explanation size, before using them to compare explanation methods.
+1. Introduction: problem, question, thesis, contributions (natural images first)
+2. Related work: 2.1 controlled reliance and ground-truth benchmarks; 2.2 meta-evaluation; 2.3 known confounds of perturbation metrics; 2.4 shortcuts in practice; positioning table
+3. Method: shortcuts; signed dose; reliance and chance correction; oracle maps with their limits; metrics; preference and per-image behavioural labels; statistics (two-level bootstrap, BH/Holm, isotonic + 4PL switch with ±10-point identification, over-detection rate and balanced accuracy, effect sizes, paired tests); methods
+4. Setup: datasets, networks, model counts (from `models.csv`), amendment A1
+5. Results:
+   - 5.1 the dose controls reliance;
+   - 5.2 natural images: respond but over-detect;
+   - 5.3 pre-registered test;
+   - 5.4 per-image behavioural ground truth;
+   - 5.5 mechanism settings: size and switch identification;
+   - 5.6 same-form controls;
+   - 5.7 comparing the metrics (paired);
+   - 5.8 explanation methods;
+   - 5.9 reliance and object competence
+6. Discussion: findings linked to known mechanisms; recommendations
+7. Limitations
+8. Conclusion
+9. Declarations: CRediT, competing interest, data availability, generative-AI declaration, funding
+10. Appendices:
+    - A: sanity-check supporting study, with the exact Kendall null;
+    - B: legacy analysis;
+    - C: original vs amended model sets
 
 ## Before submitting
 
 - [ ] Get your guide's approval of the claims and the venue
-- [ ] Re-run `python dose_response.py analyze` and copy the final numbers
-- [ ] Report the switch points and ρ with their 95% bootstrap intervals (`switch_ci_*`, `rho_ci_*` in `responsiveness.csv`). On MNIST patch, the inpaint and insertion switch-point intervals reach about 51%, so only black and blur deletion are clearly early with the full object map
-- [ ] Confirm the venue is indexed (Scopus / Web of Science) and not predatory; check its deadline on its own website
+- [ ] Confirm the Neurocomputing no-fee route, the abstract and highlight limits, and the reference style in the Guide for Authors
+- [ ] Re-run `python dose_response.py analyze` and `python paper\build_paper.py`, then check `.agents/tasks/q1-must-do/docx_check.md`
+- [ ] Check every reference's authors, venue and pages against the published version, especially DeGrave et al. (cited from the PMC author manuscript) and M4 (cited by title)
 - [ ] Follow the venue's rules on AI assistance and disclose it
-- [ ] Put the code in a public repository and cite it
+- [ ] Put the code and result files in a public repository (Zenodo DOI recommended) and fill in the data-availability statement
 - [ ] Don't submit to two venues at once

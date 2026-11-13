@@ -28,15 +28,19 @@ Existing studies test explanation methods against a shortcut of one fixed streng
 
 > When a model's reliance on a shortcut increases in controlled steps, do XAI evaluation metrics shift their preference from object explanations to shortcut explanations, and at what level of reliance?
 
+**Thesis:** the metrics respond to reliance but are not calibrated to it, and their verdicts depend on the size and form of the explanations being compared.
+
+**Target:** provisional target journal Neurocomputing (Elsevier, Q1 in Artificial Intelligence). The free (subscription, no-fee) route must still be confirmed in a normal browser before submission.
+
 ## Novelty
 
-In two literature searches (September–October 2026) we did not find published work that:
+In our literature searches (an audit covering 2019 to October 2026, re-checked on 2026-11-13) we did not find published work that:
 
 1. **varies a model's reliance on a shortcut in controlled steps** (a "dose-response" design) to test the evaluation metrics, rather than the explanation methods;
 2. scores **fixed oracle explanations** (shortcut-only, object-only, size-matched, placebo and random maps), so that the metrics are tested independently of any explanation method;
 3. reports when metrics **switch their verdict** relative to the model's measured reliance, and separates genuine responses to the model from biases caused by the size and form of the explanation being scored.
 
-The closest related work covers parts of this: shortcut or backdoor ground truth for evaluating explanation methods at a fixed strength [16, 17, 18], meta-evaluation of metrics without ground truth [10, 13], hand-designed networks with known explanations [19], and baseline effects in deletion metrics [14]. This claim of novelty is based on our searches and will be confirmed by a full literature search with the guide before submission.
+The individual pieces are not new. BAM [22] and SMERF [23] already controlled what a model relies on, to evaluate *attribution methods*; shortcut or backdoor ground truth is used for methods at a fixed strength [16, 17, 18]; metrics are meta-evaluated without ground truth [10, 13]; hand-designed networks have known explanations [19]; and removal shape, fill and baseline confounds are documented [9, 14, 24]. What is new is the combination: graded, measured reliance as ground truth for the metrics, with size and form controls.
 
 ## Objectives
 
@@ -44,12 +48,13 @@ The closest related work covers parts of this: shortcut or backdoor ground truth
 2. Control and measure how much each trained model relies on the shortcut, from about 0% to about 100%.
 3. Test whether four faithfulness metrics follow this change, using fixed oracle explanations and controls for explanation size and shape.
 4. Measure how five explanation methods respond to the same change in reliance.
-5. Repeat on a handwriting dataset, a medical dataset and a colour natural-image dataset, including a standard ResNet-18, with several random seeds.
+5. Repeat on natural images with real object masks (Oxford-IIIT Pet), a colour natural-image dataset (CIFAR-10, including a standard ResNet-18), a handwriting dataset and a medical dataset, with several random seeds, and test pre-registered predictions on Pet.
 6. Provide an interactive dashboard for generating and evaluating explanations live.
 
 ## Methodology
 
 **Datasets**
+- Oxford-IIIT Pet: cat vs dog photos, 128×128 colour, with real segmentation masks
 - MNIST: handwritten digits, 10 classes, 28×28 grayscale
 - PneumoniaMNIST [20]: paediatric chest X-rays, normal vs pneumonia, 28×28 grayscale
 - CIFAR-10: natural images, 10 classes, 32×32 colour
@@ -62,12 +67,13 @@ The closest related work covers parts of this: shortcut or backdoor ground truth
 **Controlling reliance (the "dose")**
 - Positive dose: a share of training images is replaced by an image of another class while keeping the label and shortcut, so the model relies on the shortcut more.
 - Negative dose: a share of training shortcuts points to a wrong class, so the model relies on it less.
-- Reliance is measured, not assumed: the share of test predictions that follow a shortcut placed at a wrong class's position.
+- Reliance is measured, not assumed: the share of test predictions that follow a shortcut placed at a wrong class's position. It is chance-corrected, r_c = 100 (R − f)/(100 − f) with f = (100 − accuracy without shortcut)/(C − 1), because a model that ignores the shortcut still lands on its class when it errs.
+- Per-image behavioural labels from forward passes (shortcut moved and removed) say whether the model follows the shortcut on each scored image.
 
 **Models**
 - A custom CNN with four convolutional layers for 28×28 images; for CIFAR-10, a larger CNN with batch normalisation (0.77M parameters) and a standard ResNet-18 (11.2M parameters)
-- 174 trained models in total: 12 reliance levels × 3 seeds × 2 shortcuts × 2 datasets (144), plus on CIFAR-10 6 levels × 2 seeds with the larger CNN (12) and 6 levels × 3 seeds with ResNet-18 (18)
-- ResNet-18 was trained on a free Kaggle GPU (NVIDIA T4); everything else on a laptop CPU
+- 234 trained models in total: 192 original (MNIST and PneumoniaMNIST 144, CIFAR-10 small CNN 12, CIFAR-10 ResNet-18 18, Pet ResNet-18 18) and 42 from the pre-registered amendment A1 (extra MNIST and PneumoniaMNIST doses and seeds to fill reliance gaps)
+- The ResNet-18 models were trained on a free Kaggle GPU (NVIDIA T4); everything else on a laptop CPU
 
 **Oracle explanations** (scored by every metric)
 - Shortcut map: the shortcut pixels
@@ -82,9 +88,10 @@ The closest related work covers parts of this: shortcut or backdoor ground truth
 - Model-randomization sanity check [5] (in the supporting study)
 
 **Scores for each metric**
-- Responsiveness: correlation between the model's reliance and the metric's preference for the shortcut map
-- Decision accuracy: whether the metric's verdict matches whether the model actually relies on the shortcut
-- Switch point: the reliance at which the metric changes its verdict
+- Responsiveness: correlation between the model's chance-corrected reliance and the metric's preference for the shortcut map
+- Over-detection rate and balanced accuracy: how often the metric reports a shortcut the model does not use
+- Switch point: the reliance at which the metric changes its verdict (isotonic fit), compared with the behavioural switch
+- Per-image AUROC against the behavioural labels
 
 **Explanation methods**
 
@@ -97,20 +104,23 @@ The closest related work covers parts of this: shortcut or backdoor ground truth
 | Occlusion [4] | Perturbation-based | Hides image patches and measures the change in prediction |
 
 **Statistics**
-- Spearman and Kendall rank correlations, paired Wilcoxon tests with Holm correction, and results over several random seeds
+- Spearman and Kendall rank correlations with a two-level bootstrap (seeds within dose, images within model), Benjamini–Hochberg and Holm corrections, effect sizes, paired metric-vs-metric tests and an exact Kendall null for five methods
 
 ## Preliminary Findings
 
-All 174 models have been trained and evaluated, including the placebo and random-map controls:
+All 234 models have been trained and evaluated, including the placebo, random-map and per-image behavioural controls (numbers from `results/dose_response/*_corrected.csv` and `behaviour_summary.csv`):
 
-1. **Metric reliability depends on the data.** On MNIST, every metric tracks the model's reliance closely (ρ = 0.91–0.98). On chest X-rays, responsiveness falls to ρ = 0.07–0.84, and some metrics do not respond significantly.
-2. **Explanation size distorts the metrics.** When the object explanation is matched in size to the shortcut, the metrics switch their verdict at only 6–15% reliance, instead of 30–42%.
-3. **The metrics judge explanations of the same form well, but not explanations of different forms.** When the shortcut map is compared with a placebo or a random map, which have the same compact or scattered form, every metric on the patch shortcut starts near 0.5 at low reliance and rises to 0.93–0.99, which is the correct behaviour. The errors appear when maps of different form are compared, such as a small patch against a broad object map.
-4. **On natural images, black and blur deletion rate a random explanation above the object explanation.** On CIFAR-10, at only 4% reliance, they prefer a fully random pixel ordering over the object map 75–82% of the time, exactly as often as they prefer the real shortcut. This is why they appeared to "detect" a shortcut the model ignores. Inpainting deletion and insertion don't show this bias (18–23%). The same pattern holds with a standard ResNet-18 (56–72% for black and blur, against 13–21% for inpainting and insertion), so it isn't specific to small networks. A likely cause is that removing scattered pixels damages natural images more than removing a compact region; this is a hypothesis, since the CIFAR-10 object map is a centred Gaussian, not a real object mask.
-5. **Insertion fails on a diffuse shortcut,** switching only at about 98% reliance. On the MNIST texture shortcut, blur deletion and insertion can't distinguish the real shortcut from a random map at all (ρ = 0.09 and −0.59).
-6. **Inpainting-based deletion is the most robust variant tested.**
-7. **Explanation methods differ:** Integrated Gradients follows the shortcut in every setting, while Saliency, SmoothGrad and Grad-CAM move away from a diffuse shortcut as the model relies on it more.
-8. **Supporting study:** the model-randomization sanity check does not rank explanation methods in line with the ground truth (Kendall τ = −0.20 to 0.07).
+1. **The metrics respond to reliance.** Preference for the shortcut map rises with chance-corrected reliance in 27 of 28 metric–setting cells (ρ = 0.27–0.99; natural images 0.88–0.99).
+2. **They over-detect.** Among models that follow the shortcut on at most half of the conflicting images, black and blur deletion still prefer the shortcut map for 75–92% of Pet models and 100% of CIFAR-10 models.
+3. **The 50% ideal is replaced by behaviour.** The models follow the shortcut on half of the images at r_c = 52.9–55.0% on Pet, CIFAR-10 and MNIST patch, but at 36.9–41.9% on PneumoniaMNIST. On Pet the metrics switch already at 1.3–5.4%.
+4. **Within a model, per-image detection is weak** (median AUROC 0.43–0.80 on natural images, against 0.75–0.90 pooled over models).
+5. **Explanation size distorts the metrics.** With a size-matched object map, the MNIST patch switch moves from 38.7–39.3% to 0.9–8.6% r_c.
+6. **Explanation form distorts the metrics.** On CIFAR-10 at the lowest dose, black and blur deletion prefer a random pixel ordering over a centred object map 75–82% (small CNN) and 56–72% (ResNet-18) of the time, against 13–22% for inpainting and insertion. With real Pet masks this drops to 49–53%.
+7. **Same-form comparisons mostly behave correctly,** but the rise depends on the setting: the preference over a random or placebo map reaches 0.76–1.00 on Pet, 0.91–1.00 on CIFAR-10, 0.93–0.96 on MNIST patch and only 0.73–0.79 on PneumoniaMNIST patch. On diffuse textures, some metrics move the wrong way.
+8. **No variant is best everywhere.** Inpainting deletion responds in all 28 shortcut-map comparisons, but a paired test shows black deletion better than inpainting on PneumoniaMNIST texture.
+9. **Explanation methods differ:** Integrated Gradients follows the shortcut in every setting. Saliency and SmoothGrad move away from the diffuse shortcut on MNIST texture, but towards it on PneumoniaMNIST texture; Grad-CAM's change on MNIST texture is negligible (shortcut mass 0.100 → 0.098).
+10. **Pre-registered Pet test:** P1, P2 and P4 hold; P3 fails for black deletion.
+11. **Supporting study:** the model-randomization sanity check is not shown to agree with the ground truth (mean Kendall τ = −0.20, exact p = 0.84; 0.07, p = 0.44); with five methods only τ ≥ 0.8 is significant for a single seed.
 
 ## Tools and Technologies
 
@@ -131,15 +141,16 @@ All tools are free and open source. Experiments run on a laptop CPU, except the 
 - A dose-response protocol for testing XAI evaluation metrics against a controlled, measured change in model behaviour
 - Evidence of when common metrics can and cannot be trusted, on natural, medical and colour images
 - Controls for explanation size and shape that other evaluation studies can reuse
-- 174 trained models, result tables and figures, with code for full reproduction
+- 234 trained models, result tables and figures, with code for full reproduction
 - An interactive explainability dashboard
-- A research paper submitted to a peer-reviewed venue, and the M.Tech thesis
+- A research paper for a Q1 journal (provisional target: Neurocomputing), and the M.Tech thesis
 
 ## Limitations
 
-- Small images (up to 32×32); the largest network is ResNet-18
-- Synthetic shortcuts, which are simpler than real-world shortcuts
-- The 50% switch point and the size-matching rule are modelling choices
+- One metric family (deletion and insertion); models trained from scratch; the largest network is ResNet-18
+- Synthetic shortcuts, which are simpler than real-world shortcuts; the dose varies predictivity, not availability
+- The PneumoniaMNIST "object" map is an intensity ranking of the whole X-ray, and the CIFAR-10 object map is a Gaussian prior (Pet is the main natural-image evidence); blur fill leaves 20–25% of the patch intensity
+- Reliance and object competence are strongly collinear in most settings
 - The inpainting variant approximates ROAD rather than reproducing it exactly
 
 ## References
@@ -155,8 +166,8 @@ All tools are free and open source. Experiments run on a laptop CPU, except the 
 9. Rong, Y., et al. (2022). A Consistent and Efficient Evaluation Strategy for Attribution Methods (ROAD). ICML.
 10. Tomsett, R., et al. (2020). Sanity Checks for Saliency Metrics. AAAI.
 11. Binder, A., et al. (2023). Shortcomings of Top-Down Randomization-Based Sanity Checks for Evaluations of Deep Neural Network Explanations. CVPR.
-12. Hedström, A., et al. (2024). A Fresh Look at Sanity Checks for Saliency Maps. arXiv:2405.02383.
-13. Hedström, A., et al. (2023). The Meta-Evaluation Problem in Explainable AI: Identifying Reliable Estimators with MetaQuantus. arXiv:2302.07265.
+12. Hedström, A., Weber, L., Lapuschkin, S., and Höhne, M. (2024). A Fresh Look at Sanity Checks for Saliency Maps. arXiv:2405.02383 (overlaps with "Sanity Checks Revisited", NeurIPS XAIA 2023, arXiv:2401.06465).
+13. Hedström, A., et al. (2023). The Meta-Evaluation Problem in Explainable AI: Identifying Reliable Estimators with MetaQuantus. Transactions on Machine Learning Research.
 14. Back to the Baseline: Examining Baseline Effects on Explainability Metrics (2025). arXiv:2512.11433.
 15. Ross, A. S., Hughes, M. C., and Doshi-Velez, F. (2017). Right for the Right Reasons: Training Differentiable Models by Constraining their Explanations. IJCAI.
 16. Sun, S., et al. (2023). Right for the Wrong Reason: Can Interpretable ML Techniques Detect Spurious Correlations? MICCAI. arXiv:2307.12344.
@@ -165,3 +176,6 @@ All tools are free and open source. Experiments run on a laptop CPU, except the 
 19. AttributionLab: Faithfulness of Feature Attribution Under Controllable Environments (2023). NeurIPS XAIA Workshop. arXiv:2310.06514.
 20. Yang, J., et al. (2023). MedMNIST v2: A Large-Scale Lightweight Benchmark for 2D and 3D Biomedical Image Classification. Scientific Data.
 21. Smilkov, D., et al. (2017). SmoothGrad: Removing Noise by Adding Noise. arXiv:1706.03825.
+22. Yang, M., and Kim, B. (2019). Benchmarking Attribution Methods with Relative Feature Importance (BAM). arXiv:1907.09701.
+23. Kim, J. S., Plumb, G., and Talwalkar, A. (2022). Sanity Simulations for Saliency Methods (SMERF). ICML.
+24. Blücher, S., Vielhaben, J., and Strodthoff, N. (2024). Decoupling Pixel Flipping and Occlusion Strategy for Consistent XAI Benchmarks. TMLR.
