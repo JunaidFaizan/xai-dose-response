@@ -78,10 +78,21 @@ trained. No model listed here existed when this was written. The predictions
 for these models (P5–P9) are in `docs/PREDICTIONS_pretrained.md`, committed
 together with this amendment.
 
-**Third-party timestamp:** `[PLACEHOLDER: OSF or Zenodo DOI/URL and upload
-timestamp, to be added by the author after uploading this file and
-docs/PREDICTIONS_pretrained.md. The upload must happen before the first
-Kaggle session that trains an SD1 or SD2 model.]`
+**Third-party timestamp:** Zenodo, DOI
+[10.5281/zenodo.24285532](https://doi.org/10.5281/zenodo.24285532), published
+2026-11-16 16:41 UTC. The archived files are this file and
+`docs/PREDICTIONS_pretrained.md` exactly as committed in `f2bff81`
+(MD5 f1e3209f3c8b5f57f2508e9b6833ffab for this file).
+
+**Deviation, recorded 2026-11-16.** This amendment asked for the upload
+before the first Kaggle session that trains an SD1 or SD2 model. The two SD1
+pilot models (`pet_resnet18_pretrained_patch_dose+000_seed7` and
+`..._dose-050_seed7`) were trained in an interactive Kaggle run shortly
+before the upload. Only their reliance and accuracies were read, as the pilot
+rule allows. No confirmatory SD1 or SD2 model existed at upload time. The
+repository was private then, so the Zenodo record is the first public
+timestamp. The pilots are retrained in the committed session-1 run, and the
+SD1 completion note uses the values in that run's `a2_pilot_report.json`.
 
 ### Purpose
 

@@ -8,9 +8,13 @@ Date: 2026-11-13. Written and committed before any SD1 or SD2 model was
 trained. The design (models, doses, pilots and the primary behavioural label)
 is amendment A2 in `docs/PREDICTIONS_amendments.md`.
 
-**Third-party timestamp:** `[PLACEHOLDER: OSF or Zenodo DOI/URL and upload
-timestamp, to be added by the author after upload, before the first Kaggle
-session that trains an SD1 or SD2 model.]`
+**Third-party timestamp:** Zenodo, DOI
+[10.5281/zenodo.24285532](https://doi.org/10.5281/zenodo.24285532), published
+2026-11-16 16:41 UTC. The archived files are this file and
+`docs/PREDICTIONS_amendments.md` exactly as committed in `f2bff81`
+(MD5 3b7f5a019289c69b2f76f951c12423ff for this file). The two SD1 pilot models
+(seed 7, doses 0 and −0.5) were trained on Kaggle shortly before the upload;
+see the note under A2. No confirmatory model existed at upload time.
 
 ### Settings
 
