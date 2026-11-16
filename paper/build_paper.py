@@ -10,7 +10,13 @@ typed in by hand:
         behaviour_summary.csv (primary per-image test), effect_sizes.csv, metric_pairs.csv,
         pet_preregistered.csv, confound.csv,
         responsiveness.csv / method_responsiveness.csv (legacy, Appendix B),
-        original_models/responsiveness_corrected.csv (192-model check set, Appendix C)
+        original_models/responsiveness_corrected.csv (192-model check set, Appendix C),
+        audit-2 additions: intervals_crossed.csv (crossed and BCa intervals),
+        behaviour_switch.csv (behavioural switch status, three labels),
+        switch_differences.csv (paired behavioural - metric switch),
+        overdetection.csv and excess_preference_models.csv (S-O / R-O / S-R,
+        excess preference, Clopper-Pearson and margin FPR, r_c bands),
+        behaviour_calibration.csv, confound_rc.csv, correct_only.csv, behaviour_power.csv
     results/analysis/  gt_agreement.csv, gt_instance.csv, accuracy.csv,
         decoy_mnist_summary.csv, kendall_exact.csv (supporting study, Appendix A)
 Model counts are derived from models.csv. Nothing is retrained or re-evaluated.
@@ -67,6 +73,16 @@ PET = pd.read_csv(DR / "pet_preregistered.csv")
 BEH = pd.read_csv(DR / "behaviour_summary.csv")
 BAND = pd.read_csv(DR / "behaviour_by_reliance.csv")
 CONF = pd.read_csv(DR / "confound.csv")
+# audit-2 additions (new files; the tables above are unchanged)
+CROSSED = pd.read_csv(DR / "intervals_crossed.csv")
+BSWITCH = pd.read_csv(DR / "behaviour_switch.csv")
+SWDIFF = pd.read_csv(DR / "switch_differences.csv")
+OVER = pd.read_csv(DR / "overdetection.csv")
+EXCESS = pd.read_csv(DR / "excess_preference_models.csv")
+CALIB = pd.read_csv(DR / "behaviour_calibration.csv")
+CONF_RC = pd.read_csv(DR / "confound_rc.csv")
+CORRECT = pd.read_csv(DR / "correct_only.csv")
+POWER = pd.read_csv(DR / "behaviour_power.csv")
 KENDALL = pd.read_csv(AN / "kendall_exact.csv")
 GT_TAU = pd.read_csv(AN / "gt_agreement.csv")
 GT_INSTANCE = pd.read_csv(AN / "gt_instance.csv")
@@ -80,6 +96,9 @@ BB = METRICS[:2]
 II = METRICS[2:]
 METHODS = ["Saliency", "SmoothGrad", "Integrated Gradients", "Grad-CAM", "Occlusion"]
 PRIMARY_LABEL = "follows_shortcut_causal"
+BEHAVIOUR_LABELS = ["follows_shortcut_causal", "follows_shortcut", "shortcut_dominant"]  # primary first
+LABEL_NAMES = {"follows_shortcut_causal": "causal (primary)", "follows_shortcut": "moved-only (check)",
+               "shortcut_dominant": "shortcut dominance (check)"}
 # Natural-image settings first (Pet is the primary natural-image evidence), then the
 # mechanism settings.
 SETTINGS = [  # (base, shortcut, label, short label)
@@ -145,6 +164,44 @@ def brow(comparison, base, shortcut, metric, label=PRIMARY_LABEL):
 
 def crow(base, shortcut, metric):
     return _one(CONF, base=base, shortcut=shortcut, metric=metric)
+
+
+def xrow(comparison, base, shortcut, metric):
+    """One row of intervals_crossed.csv (crossed bootstrap, BCa intervals for rho)."""
+    return _one(CROSSED, comparison=comparison, base=base, shortcut=shortcut, metric=metric)
+
+
+def swrow(base, shortcut, label=PRIMARY_LABEL):
+    """One row of behaviour_switch.csv (behavioural switch with its status)."""
+    return _one(BSWITCH, base=base, shortcut=shortcut, label=label)
+
+
+def drow(comparison, base, shortcut, metric, label=PRIMARY_LABEL):
+    """One row of switch_differences.csv (paired behavioural - metric switch)."""
+    return _one(SWDIFF, comparison=comparison, base=base, shortcut=shortcut, metric=metric, label=label)
+
+
+def orow(base, shortcut, metric):
+    """One row of overdetection.csv (shortcut vs full object only)."""
+    return _one(OVER, base=base, shortcut=shortcut, metric=metric)
+
+
+def calrow(comparison, base, shortcut, metric, label=PRIMARY_LABEL):
+    return _one(CALIB, comparison=comparison, base=base, shortcut=shortcut, metric=metric, label=label)
+
+
+def ccrow(base, shortcut, metric):
+    """One row of confound_rc.csv (partial rho on r_c with BH)."""
+    return _one(CONF_RC, base=base, shortcut=shortcut, metric=metric)
+
+
+def korow(base, shortcut, metric):
+    """One row of correct_only.csv (correctly classified images only)."""
+    return _one(CORRECT, base=base, shortcut=shortcut, metric=metric)
+
+
+def powrow(base, shortcut, label=PRIMARY_LABEL):
+    return _one(POWER, base=base, shortcut=shortcut, label=label)
 
 
 def prow(comparison, base, shortcut, a, b):
@@ -236,6 +293,20 @@ def fmt_switch(r, column="switch_iso_rc", status="switch_status", lo="switch_iso
     return f"{f1(value)}{interval}{mark}"
 
 
+def switch_text(r, unit="%", note=None):
+    """behaviour_switch.csv report_text with the unit after the number:
+    '54.5% (not bracketed)', '> 42.7% (not identified; no model between ...)'.
+    An optional note is added inside the parentheses."""
+    head, sep, tail = str(r.report_text).partition(" (")
+    number = head.lstrip("> ")
+    expected = r.behavioural_switch_rc - (r.distance_below if head.startswith(">") else 0)
+    assert number == f"{expected:.1f}", (r.report_text, expected)
+    inner = tail[:-1] if sep else ""
+    if note:
+        inner = f"{inner}; {note}" if inner else note
+    return head.replace("-", MINUS) + unit + (f" ({inner})" if inner else "")
+
+
 def sig(r, p_col="p_bh"):
     return "" if r[p_col] < 0.05 else "\u2020"
 
@@ -271,8 +342,11 @@ def dose_list(base):
 
 
 def behavioural_switch(base, shortcut):
-    """r_c at which the per-image follow rate crosses 0.5 (same for every metric)."""
-    return brow(FULL, base, shortcut, METRICS[0]).observed_switch_rc
+    """r_c at which the per-image follow rate crosses 0.5 (same for every metric).
+    Its identification status is in behaviour_switch.csv (swrow)."""
+    value = brow(FULL, base, shortcut, METRICS[0]).observed_switch_rc
+    assert value == swrow(base, shortcut).behavioural_switch_rc, (base, shortcut)
+    return value
 
 
 # ------------------------------------------------------------------ references
@@ -682,11 +756,15 @@ def table_main(comparison, caption):
     body = []
     for base, shortcut, label, short in SETTINGS:
         for i, metric in enumerate(METRICS):
-            r = row(comparison, base, shortcut, metric)
+            r = row(comparison, base, shortcut, metric).copy()
+            x = xrow(comparison, base, shortcut, metric)
+            assert np.isclose(x.rho_rc, r.rho_rc) and np.isclose(x.pref_low, r.pref_low)
+            assert (pd.isna(x.switch_iso_rc) and pd.isna(r.switch_iso_rc)) or np.isclose(x.switch_iso_rc, r.switch_iso_rc)
+            r["switch_iso_rc_ci_low"], r["switch_iso_rc_ci_high"] = x.switch_crossed_ci_low, x.switch_crossed_ci_high
             body.append([
                 short if i == 0 else "", metric,
-                f"{f2(r.rho_rc)}{sig(r)} {ci(r.rho_rc_ci_low, r.rho_rc_ci_high)}",
-                f"{f2(r.pref_low)} {ci(r.pref_low_ci_low, r.pref_low_ci_high)} \u2192 {f2(r.pref_high)}",
+                f"{f2(r.rho_rc)}{sig(r)} {ci(x.rho_rc_bca_ci_low, x.rho_rc_bca_ci_high)}",
+                f"{f2(r.pref_low)} {ci(x.pref_low_crossed_ci_low, x.pref_low_crossed_ci_high)} \u2192 {f2(r.pref_high)}",
                 f2(r.median_gap_low),
                 f"{f2(r.fpr)} ({int(r.n_below)})",
                 f2(r.balanced_accuracy),
@@ -694,12 +772,16 @@ def table_main(comparison, caption):
             ])
     return table(
         caption,
-        ["Setting", "Metric", f"\u03c1 with {RC} [95% CI]", "Preference, lowest dose [CI] \u2192 highest",
+        ["Setting", "Metric", f"\u03c1 with {RC} [BCa 95% CI]", "Preference, lowest dose [crossed CI] \u2192 highest",
          "Median AUC gap, lowest dose", "Over-detection FPR (n models)", "Balanced accuracy",
-         f"Switch, {RC} % [CI]"],
+         f"Switch, {RC} % [crossed CI]"],
         body, widths=[2.0, 2.2, 2.4, 2.9, 1.5, 1.6, 1.4, 2.6], size=7.5,
-        note=f"Source: results/dose_response/responsiveness_corrected.csv, comparison \u201c{comparison}\u201d. "
-             "CI: two-level bootstrap (2000 replicates; models resampled within dose, images within model). "
+        note=f"Sources: results/dose_response/responsiveness_corrected.csv (estimates, p_bh, FPR, balanced "
+             f"accuracy) and intervals_crossed.csv (intervals), comparison \u201c{comparison}\u201d. Crossed CI: "
+             "2000 bootstrap replicates that resample models within dose and draw one set of images per replicate "
+             "shared by all models. BCa CI for \u03c1: bias-corrected and accelerated (leave-one-model-out "
+             "jackknife), on crossed replicates with tiny jitter to break ties between duplicated models. "
+             "Significance comes from the model-level Spearman test, not from the intervals. "
              "\u2020: not significant after Benjamini\u2013Hochberg within the comparison family (p_bh \u2265 0.05). "
              f"Over-detection FPR: share of models with {RC} \u2264 50 for which the preference exceeds 0.5 "
              "(n = number of such models). Median AUC gap: positive means the shortcut map is rated better. "
@@ -731,29 +813,96 @@ def table_behaviour():
     for base, shortcut, label, short in SETTINGS:
         for i, metric in enumerate(METRICS):
             b = brow(FULL, base, shortcut, metric)
+            cal = calrow(FULL, base, shortcut, metric)
+            assert np.isclose(cal.calibration_gap, b.calibration_gap)
             body.append([
                 short if i == 0 else "", metric,
                 f"{f2(b.auroc_pooled_strat)} {ci(b.auroc_strat_ci_low, b.auroc_strat_ci_high)}",
                 f"{f2(b.median_model_auroc_strat)} {ci(b.median_model_auroc_strat_ci_low, b.median_model_auroc_strat_ci_high)}",
-                f2(b.calibration_gap),
+                f"{f2(b.calibration_gap)} / {f2(cal.calibration_gap_determined)}",
                 fmt_switch(b, "switch_on_follow_rate", "switch_on_follow_rate_status", None, None,
                            "switch_on_follow_rate_bracketed"),
-                f1(b.observed_switch_rc) if i == 0 else "",
+                switch_text(swrow(base, shortcut)) if i == 0 else "",
             ])
     return table(
-        "Per-image behavioural test (shortcut vs full object). Each scored image is labelled by forward "
-        "passes as followed or not followed; the score is the per-image AUC gap",
+        "Per-image behavioural test (shortcut vs full object, primary label). Each scored image is labelled by "
+        "forward passes as followed or not followed; the score is the per-image AUC gap",
         ["Setting", "Metric", "Pooled AUROC [CI]", "Within-model median AUROC [CI]",
-         "Calibration gap", "Metric switch on follow rate (%)", f"Behavioural switch, {RC} (%)"],
-        body, widths=[2.0, 2.3, 2.6, 2.8, 1.6, 2.6, 2.2], size=7.5,
-        note=f"Source: results/dose_response/behaviour_summary.csv, label {PRIMARY_LABEL}. AUROCs are "
+         "Calibration gap, all / determined images", "Metric switch on follow rate (%)",
+         f"Behavioural switch, {RC} (status)"],
+        body, widths=[2.0, 2.2, 2.4, 2.6, 1.8, 2.3, 2.8], size=7.5,
+        note=f"Sources: results/dose_response/behaviour_summary.csv, behaviour_calibration.csv and "
+             f"behaviour_switch.csv, label {PRIMARY_LABEL}. AUROCs are "
              "class-stratified (computed within each true class and averaged) and tested one-sided against "
              "0.5. Pooled: the images of all models together, which mixes between- and within-model signal. "
-             "Within-model: AUROC inside each model, median over models. Calibration gap: mean of "
-             "(preference \u2212 follow rate) over models; positive values mean over-detection. Metric switch on "
+             "Within-model: AUROC inside each model, median over models. Calibration gap: mean over models of "
+             "(preference \u2212 follow rate), with the preference over all 100 images or over the images whose "
+             "label is determined (the follow rate always uses the determined images); positive values mean "
+             "over-detection. Metric switch on "
              "follow rate: where the isotonic fit of preference against 100 \u00d7 follow rate crosses 0.5 "
              "(ideal 50 by construction). Behavioural switch: the "
-             f"{RC} at which the models' follow rate crosses 0.5, the derived ideal that replaces the assumed 50%.")
+             f"{RC} at which the models' follow rate crosses 0.5, with the identification rule of the metric "
+             "switches: \u201cnot identified\u201d when no model lies within \u00b110 points (the crossing is then "
+             "only known to lie above the last model below the gap), \u201cnot bracketed\u201d when models within "
+             "\u00b110 points do not lie on both sides.")
+
+
+def table_labels():
+    body = []
+    for base, shortcut, label, short in SETTINGS:
+        for i, lab in enumerate(BEHAVIOUR_LABELS):
+            s = swrow(base, shortcut, lab)
+            b = BEH[(BEH.comparison == FULL) & (BEH.base == base) & (BEH.shortcut == shortcut) & (BEH.label == lab)]
+            assert len(b) == len(METRICS)
+            und = ("none" if s.undetermined_rate_max == 0 else
+                   f"{pct(s.undetermined_rate_mean)} (max {pct(s.undetermined_rate_max)}); \u03c1 = "
+                   f"{f2(s.rho_undetermined_rc)}")
+            body.append([short if i == 0 else "", LABEL_NAMES[lab], switch_text(s), und,
+                         span(b.auroc_pooled_strat), span(b.median_model_auroc_strat)])
+    return table(
+        "Behavioural results under the three labels (shortcut vs full object): behavioural switch with its "
+        "status, undetermined share and its Spearman \u03c1 with r\u1d04 over models, and the range over the four "
+        "metrics of the pooled and within-model class-stratified AUROC",
+        ["Setting", "Label", f"Behavioural switch, {RC} (status)", f"Undetermined share; \u03c1 with {RC}",
+         "Pooled AUROC (4 metrics)", "Within-model median AUROC (4 metrics)"],
+        body, widths=[2.0, 2.2, 4.4, 3.0, 2.2, 2.2], size=7,
+        note="Sources: results/dose_response/behaviour_switch.csv and behaviour_summary.csv. What each label "
+             "measures: " + "; ".join(f"{LABEL_NAMES[lab]}: {BSWITCH[BSWITCH.label == lab].measures.iloc[0]}"
+                                      for lab in BEHAVIOUR_LABELS)
+             + ". Only the primary label leaves images undetermined (those the model already assigns to the "
+               "shortcut's class without any shortcut).")
+
+
+def table_overdetection():
+    body = []
+    for base, shortcut, label, short in NATURAL:
+        for i, metric in enumerate(METRICS):
+            o = orow(base, shortcut, metric)
+            body.append([
+                short if i == 0 else "", metric, f2(o.pref_so_low), f2(o.pref_ro_low), f2(o.pref_sr_low),
+                f"{f2(o.excess_low)} {ci(o.excess_low_ci_low, o.excess_low_ci_high)}",
+                f"{f2(o.rho_excess_rc)} ({format_p(o.p_bh_excess_one_sided)})",
+                f"{f2(o.fpr)} {ci(o.fpr_cp_low, o.fpr_cp_high)} ({int(o.k_fpr)}/{int(o.n_below)})",
+                f"{f2(o.fpr_margin)} ({int(o.k_fpr_margin)}/{int(o.n_below)})",
+                f"{f2(o.fpr_rc_le10)} ({int(o.n_rc_le10)}) / {f2(o.fpr_rc_10_50)} ({int(o.n_rc_10_50)})",
+                f"{f2(o.tpr)} ({int(o.n_above)})",
+            ])
+    return table(
+        "Natural images: decomposition of the over-detection (shortcut vs full object). Lowest-dose "
+        "preferences for S\u2013O, R\u2013O and S\u2013R, the excess preference S\u2013O \u2212 R\u2013O, and the "
+        "decision rates with intervals, a margin and a split by reliance",
+        ["Setting", "Metric", "S\u2013O", "R\u2013O", "S\u2013R", "Excess, lowest dose [CI]",
+         f"\u03c1(excess, {RC}) (p_bh)", "FPR [CP 95% CI] (k/n)", "Margin FPR (k/n)",
+         f"FPR at {RC} \u2264 10 (n) / 10\u201350 (n)", "TPR (n above 50)"],
+        body, widths=[1.6, 1.9, 1.0, 1.0, 1.0, 2.0, 1.6, 2.2, 1.4, 2.0, 1.3], size=6.5,
+        note="Source: results/dose_response/overdetection.csv (per model: excess_preference_models.csv). S = "
+             "shortcut map, O = full object map (Pet: real mask; CIFAR-10: centred Gaussian prior), R = random "
+             "ordering. Excess: per-model S\u2013O minus R\u2013O, i.e. the shortcut preference beyond what a random "
+             "ordering already gets against the same object map; two-level CI. \u03c1(excess, "
+             f"{RC}): Spearman over models, one-sided (\u03c1 > 0), BH over all settings and metrics. FPR: share of "
+             f"models with {RC} \u2264 50 whose preference exceeds 0.5, with a Clopper\u2013Pearson interval. Margin "
+             "FPR: a model counts only if the lower end of its own 95% image-bootstrap interval of preference "
+             "exceeds 0.5. TPR: share of models with " + RC + " > 50 whose preference exceeds 0.5.")
 
 
 def table_controls():
@@ -820,22 +969,27 @@ def table_methods():
 
 def table_confound():
     body = []
-    for (base, shortcut), g in CONF.groupby(["base", "shortcut"], sort=False):
+    for (base, shortcut), g in CONF_RC.groupby(["base", "shortcut"], sort=False):
         first = g.iloc[0]
-        values = [SHORT[(base, shortcut)], str(int(first.models)), f2(first.rho_reliance_competence)]
+        values = [SHORT[(base, shortcut)], str(int(first.models)), f2(first.rho_rc_competence)]
         for metric in METRICS:
-            r = crow(base, shortcut, metric)
-            values.append(f"{f2(r.rho_rel)} / {f2(r.partial_rel_given_acc)} ({format_p(r.p_partial_rel_given_acc)})")
+            r = ccrow(base, shortcut, metric)
+            assert np.isclose(r.partial_rel_given_acc, crow(base, shortcut, metric).partial_rel_given_acc)
+            values.append(f"{f2(r.partial_rc_given_acc)} (p_bh {format_p(r.p_bh_rc)}) "
+                          f"[raw R: {f2(r.partial_rel_given_acc)}]")
         body.append(values)
     return table(
-        "Reliance and object competence. \u03c1(R, acc): Spearman correlation between reliance and accuracy "
-        "without the shortcut. Per metric (shortcut vs full object): \u03c1 with reliance / partial \u03c1 with "
-        "reliance controlling for accuracy without the shortcut (p)",
-        ["Setting", "Models", "\u03c1(R, acc)"] + METRICS,
+        f"Reliance and object competence. \u03c1({RC}, acc): Spearman correlation between chance-corrected "
+        "reliance and accuracy without the shortcut. Per metric (shortcut vs full object): partial \u03c1 of "
+        f"preference with {RC} controlling for accuracy without the shortcut (BH-adjusted p), with the partial "
+        "\u03c1 on raw reliance R in brackets",
+        ["Setting", "Models", f"\u03c1({RC}, acc)"] + METRICS,
         body, widths=[2.2, 1.2, 1.4, 2.8, 2.8, 2.8, 2.8], size=7.5,
-        note="Source: results/dose_response/confound.csv, sorted from the least collinear setting. Partial "
+        note="Source: results/dose_response/confound_rc.csv (raw-reliance values as in confound.csv), in the row "
+             "order of confound.csv (from the least collinear setting on raw reliance). Partial "
              "Spearman: Pearson correlation of rank residuals after a linear fit on the accuracy rank; p from "
-             "a t distribution with n \u2212 3 degrees of freedom.")
+             "a t distribution with n \u2212 3 degrees of freedom, adjusted by Benjamini\u2013Hochberg over the "
+             f"{len(CONF_RC)} tests of the table.")
 
 
 def table_kendall():
@@ -996,13 +1150,81 @@ def build():
     gc_lowest = sum(min(METHODS, key=lambda m: mrow(b, s, m).mass_high) == "Grad-CAM" for b, s, *_ in sf_patch_settings)
     conf_first = CONF.iloc[0]
     assert (conf_first.base, conf_first.shortcut) == ("cifar10", "patch"), "text leads with the CIFAR CNN"
-    conf_cifar = CONF[(CONF.base == "cifar10")]
-    conf_set = CONF.groupby(["base", "shortcut"]).rho_reliance_competence.first()
+    conf_cifar = CONF_RC[(CONF_RC.base == "cifar10")]
+    assert CONF_RC.iloc[0].base == "cifar10" and CONF_RC.rho_rc_competence.max() == conf_cifar.rho_rc_competence.max(), \
+        "text: the CIFAR small CNN is the least collinear setting on r_c"
+    conf_set = CONF_RC.groupby(["base", "shortcut"]).rho_rc_competence.first()
     collinear = conf_set[conf_set <= -0.95]
+    # ---- audit-2 numbers (M1-M4; from the new CSVs)
+    bsw = {(b, s): swrow(b, s) for b, s, *_ in SETTINGS}
+    pet_bsw = bsw[("pet_resnet18", "patch")]
+    cifar_bsw = [bsw[(b, s)] for b, s, *_ in NATURAL[1:]]
+    pet_label_sw = [swrow("pet_resnet18", "patch", lab).behavioural_switch_rc for lab in BEHAVIOUR_LABELS]
+    pt_label_sw = [swrow("pneumonia_mnist", "texture", lab).behavioural_switch_rc for lab in BEHAVIOUR_LABELS]
+    und_rho = BSWITCH[BSWITCH.primary & BSWITCH.undetermined_rate_max.gt(0.1)].rho_undetermined_rc
+    pp_dom_pooled = BEH[(BEH.comparison == FULL) & (BEH.base == "pneumonia_mnist") & (BEH.shortcut == "patch")
+                        & (BEH.label == "shortcut_dominant")].auroc_pooled_strat
+    mp_dom_black = brow(FULL, "mnist", "patch", "Deletion (black)", "shortcut_dominant")
+    gap_det_nat = [calrow(FULL, b, s, m).calibration_gap_determined for b, s, *_ in NATURAL for m in METRICS]
+    nat_power = [powrow(b, s) for b, s, *_ in NATURAL]
+    over = {(b, m): orow(b, "patch", m) for b, *_ in NATURAL for m in METRICS}
+    pet_bb_margin = [over[("pet_resnet18", m)].fpr_margin for m in BB]
+    pet_ii_margin = [over[("pet_resnet18", m)].fpr_margin for m in II]
+    cifar_bb_margin = [over[(b, m)].fpr_margin for b, *_ in NATURAL[1:] for m in BB]
+    pet_black_over = over[("pet_resnet18", "Deletion (black)")]
+    max_so_ro = (OVER.pref_so_low - OVER.pref_ro_low).abs().max()
+    nat_over = OVER[OVER.base.isin([b for b, *_ in NATURAL])]
+    nat_excess_sig = nat_over[nat_over.p_bh_excess_one_sided < 0.05]
+    nat_excess_ns = nat_over[nat_over.p_bh_excess_one_sided >= 0.05]
+    pet_over = OVER[OVER.base == "pet_resnet18"]
+    mp_over_le10 = OVER[(OVER.base == "mnist") & (OVER.shortcut == "patch")].fpr_rc_le10
+    pet_ro_bb, pet_ro_ii = ro_bb["pet_resnet18"], ro_ii["pet_resnet18"]
+    pet_correct = CORRECT[CORRECT.base == "pet_resnet18"]
+    pet_correct_bb = pet_correct[pet_correct.metric.isin(BB)]
+    mis_low = {(b, s): korow(b, s, METRICS[0]).misclassified_share_rc_le20 for b, s, *_ in SETTINGS}
+    p1_black_x = xrow(FULL, "pet_resnet18", "patch", "Deletion (black)")
+    full_x = CROSSED[CROSSED.comparison == FULL].merge(
+        RESP[RESP.comparison == FULL], on=["comparison", "base", "shortcut", "metric"], suffixes=("_x", ""))
+    pref_width_ratio = ((full_x.pref_low_crossed_ci_high - full_x.pref_low_crossed_ci_low)
+                        / (full_x.pref_low_ci_high - full_x.pref_low_ci_low))
+    pp_black_x = xrow(FULL, "pneumonia_mnist", "patch", "Deletion (black)")
+    pp_black_r = row(FULL, "pneumonia_mnist", "patch", "Deletion (black)")
+    mp_x = CROSSED[(CROSSED.comparison == FULL) & (CROSSED.base == "mnist") & (CROSSED.shortcut == "patch")]
+    sd = SWDIFF[(SWDIFF.comparison == FULL) & SWDIFF.primary]
+    sd_order = {(b, s): i for i, (b, s, *_) in enumerate(SETTINGS)}
+    sd = sd.assign(o=[sd_order[(b, s)] for b, s in zip(sd.base, sd.shortcut)]).sort_values(["o", "metric"])
+    sd_mp = {m: drow(FULL, "mnist", "patch", m) for m in METRICS}
+    sd_nat = sd[sd.base.isin([b for b, *_ in NATURAL])]
+    sd_nat_test = sd_nat[~sd_nat.verdict.str.startswith("not testable")]
+    sd_nd = sd[sd.verdict == "not distinguishable"]
+    sd_later = sd[sd.verdict == "metric later"]
+    sd_crossed_lost = sd[(sd.verdict == "metric earlier") & (sd.diff_crossed_ci_low <= 0)]
+    conf_rc_sig = int((CONF_RC.p_bh_rc < 0.05).sum())
+    # The per-model table agrees with the summary: margin FPR = share of low-r_c models that say shortcut
+    # with a margin (natural images, every metric).
+    for (b, m), o in over.items():
+        sel = EXCESS[(EXCESS.base == b) & (EXCESS.metric == m) & (EXCESS.reliance_corrected <= 50)]
+        assert len(sel) == o.n_below and np.isclose(sel.says_shortcut_margin.mean(), o.fpr_margin), (b, m)
     # Guards for the qualitative statements in the text.
-    assert all(45 <= beh_switch[k] <= 60 for k in [("pet_resnet18", "patch"), ("cifar10", "patch"),
-                                                     ("cifar10_resnet18", "patch"), ("mnist", "patch")])
-    assert all(beh_switch[("pneumonia_mnist", s)] < 45 for s in ("patch", "texture"))
+    assert pet_bsw.status == "identified" and not pet_bsw.bracketed, "Pet switch: identified, not bracketed"
+    assert all(r.status.startswith("not identified") for r in cifar_bsw), "CIFAR-10 switch not identified"
+    mp_bsw = bsw[("mnist", "patch")]
+    assert mp_bsw.status == "identified" and mp_bsw.bracketed and 45 <= mp_bsw.behavioural_switch_rc <= 60, \
+        "text: the assumed 50% is close to the bracketed MNIST patch switch"
+    assert all(bsw[("pneumonia_mnist", s)].status == "identified" and bsw[("pneumonia_mnist", s)].bracketed
+               and beh_switch[("pneumonia_mnist", s)] < 45 for s in ("patch", "texture")), "50% too high there"
+    assert min(gap_det_nat) > 0, "text: calibration gap on determined images positive on natural images"
+    assert max(abs(v - 0.5) for v in pet_ro_bb) < 0.05, "text: Pet black/blur rank the mask like random pixels"
+    assert max(pet_ro_ii) < 0.45, "text: inpainting and insertion rank the mask above random, weakly"
+    assert min(pet_bb_margin) >= 0.5 and min(cifar_bb_margin) >= 0.9, "text: at least half / nearly all"
+    assert set(nat_excess_sig.base) >= {"pet_resnet18"} and len(pet_over[pet_over.p_bh_excess_one_sided < 0.05]) == 4
+    assert (mp_over_le10 == 0).all(), "text: no MNIST patch over-detection at r_c <= 10"
+    assert (sd_nat_test.verdict == "metric earlier").all() and (sd_nat_test.diff_crossed_ci_low > 0).all(), \
+        "text: every testable natural-image cell is 'metric earlier', also crossed"
+    assert sd_nat[sd_nat.verdict.str.startswith("not testable")].metric_switch_status.eq(
+        "above 0.5 at lowest reliance").all()
+    assert (pref_width_ratio >= 1).all(), "text: crossed level intervals are wider"
+    assert mp_x.switch_crossed_ci_high.max() < mp_bsw.behavioural_switch_rc
     assert pet_pr_ins.rho_rc < 0 and (pr_ins_mnist.rho_rc > 0).all()
     assert all(robust_full == N_SETTINGS for robust_full in
                [sig_positive(rows([FULL], SETTINGS, [m])) for m in METRICS[:3]])
@@ -1019,6 +1241,8 @@ def build():
     p2_contrast = pet_row("P2", R_OBJECT, "mean(black, blur) - mean(inpaint, insertion)", "preference contrast")
     p3_black_sr = pet_row("P3", S_RANDOM, "Deletion (black)", "spearman")
     p3_black_sp = pet_row("P3", S_PLACEBO, "Deletion (black)", "spearman")
+    assert np.isclose(p1_black_x.rho_raw, p1_black.estimate), "P1 black estimate is the raw-reliance rho"
+    assert p1_black.ci_low < 0.8, "text: the two-level interval reaches below 0.8"
     kmn = KENDALL.set_index(["dataset", "metric"])
     sanity = [kmn.loc[(d, "Sanity (object px)")] for d in ("decoy_mnist", "decoy_pneumonia")]
     tau_threshold = KENDALL["min_tau_one_sided_p_below_0.05"].iloc[0]
@@ -1049,23 +1273,26 @@ def build():
     para("E-mail: [email]", align=WD_ALIGN_PARAGRAPH.CENTER, size=10)
 
     abstract = (
-        "Deletion and insertion curves are used to decide which explanation of an image classifier is faithful, "
-        "but whether their verdicts follow what a model relies on is rarely tested. We trained "
+        "Deletion and insertion curves decide which explanation of an image classifier counts as faithful, "
+        "but whether they track what a model relies on is rarely tested. We trained "
         f"{N_MODELS} CNNs in which a signed training dose sets the measured reliance on an injected class-coded "
-        "shortcut, on Oxford-IIIT Pet with real object masks, CIFAR-10, MNIST and "
-        "PneumoniaMNIST, and scored fixed oracle explanations with four metric variants. The metrics respond to "
-        "reliance: the preference for the shortcut map over the object map rises with chance-corrected reliance "
-        f"in {n_full_sig} of {n_full} metric\u2013setting cells (Spearman \u03c1 = {span(full_sig.rho_rc)} in "
+        "shortcut, on Oxford-IIIT Pet with object masks, CIFAR-10, MNIST and "
+        "PneumoniaMNIST, and scored fixed oracle explanations with four metrics. The metrics respond to "
+        "reliance: preference for the shortcut map over the object map rises with chance-corrected reliance "
+        f"in {n_full_sig} of {n_full} cells (Spearman \u03c1 = {span(full_sig.rho_rc)} in "
         "those cells). They are not calibrated to it. Among models with chance-corrected reliance at most 50%, "
-        f"black and blur deletion still prefer the shortcut map for {pct_span(pet_bb_fpr)} of Pet models and "
-        f"{pct_span(cifar_bb_fpr)} of CIFAR-10 models, and on Pet the metrics switch at "
+        f"black and blur deletion prefer the shortcut map for {pct_span(pet_bb_fpr)} of Pet models "
+        f"({pct_span(pet_bb_margin)} with a per-model margin) and, against a centred "
+        f"Gaussian object prior, {pct_span(cifar_bb_fpr)} of CIFAR-10 models. On Pet the metrics switch at "
         f"{span(pet_switch, f1)}% chance-corrected reliance, while the models follow the "
-        f"shortcut on half of the images only at {f1(beh_switch[('pet_resnet18', 'patch')])}%. Against per-image "
-        f"behavioural labels, the metrics reach a class-stratified AUROC of {span(pooled_nat)} "
+        "shortcut on half the images only at "
+        f"{switch_text(pet_bsw, note=f'{span(pet_label_sw, f1)}% across behavioural labels')}. Against per-image "
+        f"behavioural labels the class-stratified AUROC is {span(pooled_nat)} "
         f"on natural images, but within a model only {span(within_nat)}. Their verdicts depend on "
         "explanation size and form: a size-matched object map moves the MNIST switch points from "
         f"{span(mp_full.switch_iso_rc, f1)}% to {span(mp_matched.switch_iso_rc, f1)}%, and on CIFAR-10 black "
-        f"deletion prefers a random ordering over a centred object map {pct(ro[('cifar10', 'Deletion (black)')].pref_low)} "
+        "deletion prefers a random ordering over a centred object map "
+        f"{pct_span([ro[(b, 'Deletion (black)')].pref_low for b, *_ in NATURAL[1:]])} "
         "of the time at low reliance. A pre-registered test on Pet confirmed three of four "
         "predictions; black deletion failed the form-matched control.")
     assert word_count(abstract) <= 250, word_count(abstract)
@@ -1073,7 +1300,7 @@ def build():
     add_runs(p, "**Abstract** " + abstract)
     highlights = [
         f"{N_MODELS} CNNs with measured, chance-corrected shortcut reliance test four metrics",
-        "Deletion and insertion track reliance but over-detect shortcuts models barely use",
+        "Black and blur deletion over-detect shortcuts on natural images",
         "Per-image behavioural labels replace the assumed 50% switch point",
         "Explanation size and form change which map the metrics prefer",
         "Pre-registered Pet test: three of four predictions held; black deletion failed",
@@ -1119,8 +1346,9 @@ def build():
         "images.",
         f"**Evidence of responsiveness without calibration.** Preference rises with reliance in {n_full_sig} of "
         f"{n_full} cells, but black and blur deletion over-detect the shortcut on natural images "
-        f"(over-detection rate {span(nat_bb_fpr)}), the metrics' switch points lie well below the reliance at "
-        "which the models follow the shortcut on half of the images, and within a single model the metrics "
+        f"(over-detection rate {span(nat_bb_fpr)}, {span(pet_bb_margin + cifar_bb_margin)} with a per-model "
+        "margin), in every testable natural-image cell the metrics switch earlier than the models follow the "
+        "shortcut on half of the images (paired bootstrap), and within a single model the metrics "
         "separate followed from non-followed images only weakly.",
         "**Size and form dependence.** Matching the object map's size to the shortcut moves the switch points "
         "towards 0%, and on CIFAR-10 black and blur deletion prefer a random pixel ordering over a centred "
@@ -1269,21 +1497,38 @@ def build():
          "Each metric's AUC gap is then scored against the label by an AUROC computed within each true class "
          "and averaged (class-stratified), because on the binary tasks the label and the gap both depend on "
          "the class. The **behavioural switch** is the reliance at which the models' follow rate crosses 0.5; "
-         "it replaces the assumed 50% ideal.")
+         "where the models identify it (Section 3.7), it replaces the assumed 50% ideal.")
     heading("3.7. Statistics", 2)
     bullets([
         f"**Responsiveness**: Spearman \u03c1 between {RC} and preference over the models of a setting.",
         f"**Decisions**: a model counts as relying on the shortcut when {RC} > 50, and the metric \u201csays "
         "shortcut\u201d when its preference exceeds 0.5. We report the **over-detection rate** (the false-positive "
-        f"rate among models with {RC} \u2264 50) and balanced accuracy.",
+        f"rate among models with {RC} \u2264 50) and balanced accuracy. The over-detection rate is given with a "
+        "Clopper\u2013Pearson interval, with a margin (a model counts only if the lower end of its own 95% "
+        f"image-bootstrap interval of preference exceeds 0.5), and split into {RC} \u2264 10 and 10\u201350; the "
+        f"true-positive rate is given with the number of models above {RC} = 50.",
+        "**Excess preference**: per model, the shortcut-vs-object preference minus the random-vs-object "
+        "preference, i.e. what the shortcut map gains over a random ordering compared against the same object "
+        f"map; its Spearman \u03c1 with {RC} is tested one-sided.",
         f"**Switch point**: the first {RC} at which an increasing isotonic fit of preference reaches 0.5; a "
         "four-parameter logistic with free asymptotes is the sensitivity check. A switch is \u201cidentified\u201d "
-        "only if a model lies within \u00b110 points of it; it is reported only for the comparisons whose ideal "
-        "curve crosses 0.5 (shortcut vs full or size-matched object).",
+        "only if a model lies within \u00b110 points of it, and \u201cbracketed\u201d if such models lie on both "
+        "sides; it is reported only for the comparisons whose ideal curve crosses 0.5 (shortcut vs full or "
+        "size-matched object). The same rule is applied to the behavioural switch, and the difference "
+        "behavioural \u2212 metric switch is bootstrapped on the same resamples; a metric is called earlier "
+        "than behaviour only if that 95% interval excludes 0.",
         "**Uncertainty**: a two-level bootstrap with 2000 replicates that resamples models within each dose and "
         "the 100 images within each model " + cite("saravanan") + ", following the advice to account for "
         "both sources of variance in machine-learning comparisons " + cite("bouthillier", "agarwal") + ". The "
-        "same resamples are reused for every metric, so metric-versus-metric differences are paired.",
+        "same resamples are reused for every metric, so metric-versus-metric differences are paired. Because "
+        "every model of a setting is scored on the same 100 images, images are a crossed factor; for "
+        "preference levels and switch points we therefore also use a **crossed bootstrap** that resamples "
+        "models within dose and draws one set of images per replicate for all models, which gives wider "
+        "intervals. Intervals for \u03c1 are **BCa** (bias-corrected and accelerated, with a leave-one-model-out "
+        "jackknife) computed on the crossed replicates after adding a tiny jitter that breaks the ties between "
+        "duplicated models. Significance of \u03c1 always comes from the model-level Spearman test; the "
+        "intervals describe uncertainty. The main responsiveness tables give crossed and BCa intervals; the "
+        "other tables give two-level intervals.",
         "**Multiplicity**: Benjamini\u2013Hochberg within each family (each comparison, the methods, the metric "
         "pairs, each behavioural label), and Holm over the union of the headline tests. Correlation p-values "
         "use Spearman's t approximation; p-values below 0.001 are printed as p < 0.001.",
@@ -1357,21 +1602,30 @@ def build():
          f"Pet models and {pct_span(cifar_bb_fpr)} of the CIFAR-10 models; inpainting deletion and insertion do "
          f"so for {pct_span(nat_ii_fpr)}. Across all settings the true-positive rate is 1.00 in {n_tpr1} of "
          f"{n_full} cells and the over-detection rate is above 0 in {n_fpr_pos} of {n_full}: the metrics rarely miss a "
-         "shortcut the model uses, but they often report one the model does not use. On Pet, the isotonic "
+         "shortcut the model uses, but they often report one the model barely uses. On the natural images the "
+         f"true-positive rate rests on few models (models with {RC} > 50: "
+         + ", ".join(f"{int(over[(b, METRICS[0])].n_above)} on {short}" for b, _, _, short in NATURAL)
+         + "). On Pet, the isotonic "
          f"switch lies at {span(pet_switch, f1)}% {RC} for "
          + ", ".join(m for m in METRICS if m not in pet_no_switch)
          + (f" ({', '.join(pet_edge)} at the lowest-reliance edge)" if pet_edge else "")
          + (f", and {', '.join(pet_no_switch)} prefers the shortcut map already at the lowest reliance" if pet_no_switch else "")
          + f". The Pet models themselves follow the shortcut on half of the images only at {RC} = "
-         f"{f1(beh_switch[('pet_resnet18', 'patch')])}% (Section 5.4). The effect sizes temper this: at the "
+         f"{switch_text(pet_bsw, note='Section 5.4')}. The effect sizes temper this: at the "
          f"lowest Pet dose the median per-image AUC gap is {signed_span(pet_gap_low, f3)}, so the low-reliance "
          "preferences there are close to ties.")
     figure(figs["full"],
            f"Preference for the shortcut map over the full object map against chance-corrected reliance {RC}, for "
            "the four metrics in the seven settings (natural images first). Dots are single models; lines are the "
            "increasing isotonic fits used for the switch points. Dotted line: the assumed 50% ideal; dashed line: "
-           "the behavioural switch, where the models' per-image follow rate crosses 0.5. Data: "
-           "results/dose_response/preference.csv and behaviour_summary.csv")
+           "the behavioural switch, where the models' per-image follow rate crosses 0.5 (primary label; not "
+           "identified on " + " and ".join(SHORT[(r.base, r.shortcut)] for r in bsw.values()
+                                           if r.status.startswith("not identified"))
+           + ", where the line only marks the isotonic crossing inside a reliance gap, and not bracketed on "
+           + " and ".join(SHORT[(r.base, r.shortcut)] for r in bsw.values()
+                          if r.status == "identified" and not r.bracketed)
+           + "; Section 5.4). Data: results/dose_response/preference.csv, behaviour_summary.csv and "
+           "behaviour_switch.csv")
     table_main(FULL, f"Metric responsiveness on {RC}, shortcut map vs full object map")
     t_ctrl = COUNTERS["table"] + 1
     f_ro = COUNTERS["fig"] + 1
@@ -1382,9 +1636,48 @@ def build():
          f"{pct_span(ro_ii['cifar10'] + ro_ii['cifar10_resnet18'])} for inpainting deletion and insertion. With "
          f"the real Pet masks the bias is smaller ({pct_span(ro_bb['pet_resnet18'])} against "
          f"{pct_span(ro_ii['pet_resnet18'])}), which supports the earlier hypothesis that the Gaussian object map "
-         "inflated it on CIFAR-10, but black and blur deletion still treat the object mask about like a random "
-         "ordering.")
+         "inflated it on CIFAR-10. On Pet, black and blur deletion do not rank the real object mask above random "
+         f"pixels (random-vs-object preference {span(pet_ro_bb)}); inpainting deletion and insertion do, but "
+         f"only weakly ({span(pet_ro_ii)}).")
     table_controls()
+    t_over = COUNTERS["table"] + 1
+    o_bb = [over[("pet_resnet18", m)] for m in BB]
+    para(f"Table {t_over} decomposes the over-detection. At the lowest dose the shortcut-vs-object preference "
+         "(S\u2013O) equals the random-vs-object preference (R\u2013O) within "
+         f"{f2(max_so_ro)} in all {len(OVER)} metric\u2013setting cells, and the shortcut-vs-random preference "
+         f"(S\u2013R) is {span(nat_over.pref_sr_low)} on the natural images. At low reliance the metrics thus rate "
+         "the shortcut pixels about like random pixels, which is correct, and the preference above 0.5 comes "
+         "from the object map not beating a random ordering. On CIFAR-10 that object map is a centred Gaussian "
+         "prior; on Pet it is the real mask. The excess preference (S\u2013O \u2212 R\u2013O) is what the shortcut "
+         f"itself adds. At the lowest dose it is {signed_span(nat_over.excess_low)} on the natural images, so the "
+         "over-detection at low reliance is the object map not beating random pixels. As reliance grows the "
+         f"excess rises (one-sided p_bh < 0.05) in {len(nat_excess_sig)} of {len(nat_over)} natural-image cells: "
+         f"all four Pet metrics (\u03c1 = {span(pet_over.rho_excess_rc)})"
+         + "".join(f"; {r.metric} on {SHORT[(r.base, r.shortcut)]} (\u03c1 = {f2(r.rho_excess_rc)})"
+                   for r in nat_excess_sig[nat_excess_sig.base != "pet_resnet18"].itertuples())
+         + ". It does not rise significantly for "
+         + ", ".join(f"{r.metric} on {SHORT[(r.base, r.shortcut)]} (\u03c1 = {f2(r.rho_excess_rc)})"
+                     for r in nat_excess_ns.itertuples())
+         + ".")
+    para("The over-detection rates are imprecise and depend on the threshold. With Clopper\u2013Pearson intervals, "
+         f"Pet black deletion over-detects for {int(pet_black_over.k_fpr)} of {int(pet_black_over.n_below)} models, "
+         f"{f2(pet_black_over.fpr)} {ci(pet_black_over.fpr_cp_low, pet_black_over.fpr_cp_high)}. If a model "
+         "counts only when the lower end of its own 95% image-bootstrap interval of preference exceeds 0.5, "
+         f"Pet black and blur deletion fall to {span(pet_bb_margin)} and inpainting deletion and insertion to "
+         f"{span(pet_ii_margin)}, while CIFAR-10 black and blur deletion stay at {span(cifar_bb_margin)}. Split by "
+         f"reliance, Pet black and blur deletion over-detect for {span([o.fpr_rc_le10 for o in o_bb])} of the "
+         f"{int(o_bb[0].n_rc_le10)} models with {RC} \u2264 10 and inpainting deletion and insertion for "
+         f"{span([over[('pet_resnet18', m)].fpr_rc_le10 for m in II])}; among the {int(o_bb[0].n_rc_10_50)} Pet "
+         f"models with 10 < {RC} \u2264 50 every metric gives {span(pet_over.fpr_rc_10_50)}. The Pet inpainting "
+         "and insertion over-detection therefore comes from models that already use the shortcut partly. On "
+         f"MNIST patch no metric over-detects at {RC} \u2264 10. Misclassified images do not explain the result: at "
+         f"{RC} \u2264 20, {pct(mis_low[('pet_resnet18', 'patch')])} of the aligned Pet images, "
+         f"{pct(mis_low[('cifar10', 'patch')])} (CIFAR CNN) and {pct(mis_low[('pneumonia_mnist', 'patch')])} "
+         "(PneumoniaMNIST patch) are misclassified, and scoring only "
+         f"the correctly classified images gives Pet \u03c1 = {span(pet_correct.rho_rc_correct)} (all images "
+         f"{span(pet_correct.rho_rc)}) and a Pet black and blur over-detection rate of "
+         f"{span(pet_correct_bb.fpr_correct)} (all images {span(pet_correct_bb.fpr)}).")
+    table_overdetection()
     figure(figs["r_object"],
            f"Preference for a random ordering over the full object map against {RC}. Ideal: low at low reliance; a "
            "rise at high reliance is correct, because the object map then explains the model worse than random. "
@@ -1402,8 +1695,13 @@ def build():
          "and P4 hold and P3 fails for black deletion (\u03c1 = "
          f"{f2(p3_black_sr.estimate)} against the random map and {f2(p3_black_sp.estimate)} against the placebo). "
          "Verdicts were judged on point estimates, as pre-registered; the intervals are added information. They "
-         f"qualify P1 for black deletion, whose estimate {f2(p1_black.estimate)} has a two-level interval of "
-         f"{ci(p1_black.ci_low, p1_black.ci_high)} that reaches below the 0.8 threshold. The P2 contrast, "
+         f"qualify P1 for black deletion, whose estimate {f2(p1_black.estimate)} has a two-level percentile "
+         f"interval of {ci(p1_black.ci_low, p1_black.ci_high)} and a BCa interval of "
+         f"{ci(p1_black_x.rho_raw_bca_ci_low, p1_black_x.rho_raw_bca_ci_high)}; "
+         + ("both reach below the 0.8 threshold, so the data do not establish \u03c1 > 0.8 for black deletion."
+            if p1_black_x.rho_raw_bca_ci_low < 0.8 else
+            "the bias-corrected interval stays above the 0.8 threshold.")
+         + " The P2 contrast, "
          f"{f3(p2_contrast.estimate)} {ci(p2_contrast.ci_low, p2_contrast.ci_high, f3)}, excludes zero.")
     table_prereg()
 
@@ -1412,21 +1710,58 @@ def build():
     f_beh = COUNTERS["fig"] + 1
     para(f"Table {t_beh} and Fig. {f_beh} score the per-image AUC gap against the behavioural label. Pooled over "
          f"all images of a setting, the class-stratified AUROC is {span(pooled_nat)} on the natural images and "
-         f"{span(pooled_mech)} on the mechanism settings; PneumoniaMNIST patch is the weak case "
+         f"{span(pooled_mech)} on the mechanism settings. Under this primary label PneumoniaMNIST patch is weak "
          f"({span(pp_pooled)}; black deletion {f2(pp_black.auroc_pooled_strat)} "
          f"{ci(pp_black.auroc_strat_ci_low, pp_black.auroc_strat_ci_high)}, Holm-adjusted "
-         f"{p_text(pp_black.p_holm_headline_strat)}). The pooled AUROC mixes models of different reliance. Within "
+         f"{p_text(pp_black.p_holm_headline_strat)}), but this depends on the label: under the "
+         f"shortcut-dominance label its pooled AUROC is {span(pp_dom_pooled)} (Table {t_beh + 1}). The pooled "
+         "AUROC mixes models of different reliance. Within "
          f"a single model the median AUROC is {span(within_nat)} on the natural images and {span(within_mnist)} on "
          "MNIST, so most of the pooled signal separates high- from low-reliance models rather than followed from "
-         f"non-followed images of one model. Within {RC} bands (Fig. {f_beh}) the PneumoniaMNIST patch AUROC "
+         "non-followed images of one model. These within-model values are imprecise: on the natural images the "
+         f"smaller label group of a model has a median of {span([p.median_minority_count for p in nat_power], lambda v: f'{v:g}')} "
+         "images, which gives a single model's AUROC a standard error of about "
+         f"{span([p.median_hanley_mcneil_se for p in nat_power])} under the null (Hanley\u2013McNeil). Within {RC} "
+         f"bands (Fig. {f_beh}) the PneumoniaMNIST patch AUROC "
          f"falls to {span(pp_band.auroc_strat)} above {RC} = 60%, where the metrics rank the images the "
          f"wrong way round (with only {span(pp_band.n_neg, lambda v: f'{v:.0f}')} non-followed images per band).")
-    para("The behavioural labels also locate the ideal switch. The models follow the shortcut on half of the "
-         "images at " + ", ".join(f"{RC} = {f1(beh_switch[(b, s)])}% ({short})" for b, s, _, short in SETTINGS)
-         + ". The assumed 50% is therefore about right for Pet, CIFAR-10 and MNIST patch and too high for "
-         "PneumoniaMNIST. Measured against this derived ideal the over-detection remains: on the natural images "
-         f"the calibration gap (preference minus follow rate) is positive in every cell ({span(gap_nat)}).")
+    assert all(swrow(b, s, lab).status.startswith("not identified") for b, s, *_ in NATURAL[1:]
+               for lab in BEHAVIOUR_LABELS), "text: on CIFAR-10 no label identifies the switch"
+    for b in ("mnist", "pneumonia_mnist"):
+        sel = BEH[(BEH.comparison == FULL) & (BEH.base == b) & (BEH.shortcut == "patch")]
+        assert sel[sel.label == "shortcut_dominant"].auroc_pooled_strat.min() > \
+            sel[sel.label != "shortcut_dominant"].auroc_pooled_strat.max(), "text: dominance gives highest AUROC"
+    para("The behavioural labels also give a derived ideal switch, judged by the same identification rule as "
+         "the metric switches. Under the primary label the models follow the shortcut on half of the images at "
+         f"the following {RC}: "
+         + "; ".join(f"{switch_text(bsw[(b, s)])} on {short}" for b, s, _, short in SETTINGS)
+         + ". On CIFAR-10 the crossing falls in a reliance gap without models, so it is only known to lie above "
+         "the last model below the gap; on Pet it is identified but not bracketed. The assumed 50% is close to "
+         f"the bracketed MNIST patch switch ({f1(mp_bsw.behavioural_switch_rc)}%) and too high for PneumoniaMNIST; "
+         "on CIFAR-10 it can be neither confirmed nor rejected. Measured against the behaviour the over-detection "
+         f"remains: on the natural images the calibration gap (preference minus follow rate) is positive in every "
+         f"cell ({span(gap_nat)}), and {span(gap_det_nat)} when the preference is computed on the same "
+         "determined images as the follow rate.")
+    t_lab = COUNTERS["table"] + 2
+    pet_und = bsw[("pet_resnet18", "patch")]
+    pp_und = bsw[("pneumonia_mnist", "patch")]
+    para(f"The behavioural results depend on the label (Table {t_lab}). The primary label asks whether the "
+         "shortcut is sufficient under conflict once errors are removed: the moved shortcut wins, and the image "
+         "without any shortcut is not already assigned to the shortcut's class. The moved-only check drops the "
+         "second condition, so it also counts errors; the shortcut-dominance check asks whether the shortcut is "
+         "more necessary than the object on the aligned image. The Pet switch is "
+         f"{span(pet_label_sw, f1)}% depending on the label, and the PneumoniaMNIST texture switch "
+         f"{span(pt_label_sw, f1)}%; on CIFAR-10 no label identifies it. Only the primary label leaves images "
+         f"undetermined, on average {pct(pet_und.undetermined_rate_mean)} on Pet (up to "
+         f"{pct(pet_und.undetermined_rate_max)} for one model) and {pct(pp_und.undetermined_rate_mean)} on "
+         "PneumoniaMNIST patch, and the share rises with reliance (Spearman \u03c1 with "
+         f"{RC} = {span(und_rho)} where it exceeds 10% for some model), so the label discards more images at high "
+         "reliance. The shortcut-dominance label gives the highest pooled AUROCs on the patch mechanism settings "
+         f"(MNIST patch black deletion {f2(mp_dom_black.auroc_pooled_strat)}), but for black deletion on MNIST "
+         "patch it is partly circular: the image without the patch, which defines the label, is on the black "
+         "MNIST background nearly the image that black deletion produces when it removes the shortcut pixels.")
     table_behaviour()
+    table_labels()
     figure(figs["behaviour"],
            f"Class-stratified AUROC of each metric's per-image AUC gap against the behavioural label, within {RC} "
            "bands (shortcut vs full object). Panels rearranged from results/dose_response/behaviour_auroc.png "
@@ -1453,6 +1788,39 @@ def build():
          f"{span(mp_full.switch_iso_rc, f1)}% {RC} (4-parameter logistic {span(mp_full.switch_4pl_rc, f1)}%), "
          f"against a behavioural switch of {f1(beh_switch[('mnist', 'patch')])}%. The added models moved the "
          "switches up and closer together, and raised the over-detection rate; Appendix C lists both model sets.")
+
+    def cell(r):
+        return f"{r.metric} on {SHORT[(r.base, r.shortcut)]}"
+
+    mp_earlier = [m for m, r in sd_mp.items() if r.verdict == "metric earlier"]
+    mp_nd = [m for m, r in sd_mp.items() if r.verdict == "not distinguishable"]
+    para("Is the metric switch earlier than the behavioural switch? A paired bootstrap of the difference "
+         "(behavioural \u2212 metric switch, primary label) on the same resamples answers this per cell. On MNIST "
+         "patch it is "
+         + "; ".join(f"{f1(sd_mp[m].difference)} {ci(sd_mp[m].diff_ci_low, sd_mp[m].diff_ci_high, f1)} points "
+                     f"for {m}" for m in METRICS)
+         + f", so {' and '.join(mp_earlier)} switch earlier than behaviour"
+         + (f", while {' and '.join(mp_nd)} cannot be distinguished from it" if mp_nd else "")
+         + ". Over all settings the cells that are not distinguishable are "
+         + ", ".join(f"{cell(r)} ({f1(r.difference)} {ci(r.diff_ci_low, r.diff_ci_high, f1)})"
+                     for r in sd_nd.itertuples())
+         + "; the metric switches later than behaviour for "
+         + ", ".join(cell(r) for r in sd_later.itertuples())
+         + ". On the natural images all "
+         f"{len(sd_nat_test)} testable cells are earlier (also under the crossed bootstrap), and the other "
+         f"{len(sd_nat) - len(sd_nat_test)} cannot be tested because the metric already prefers the shortcut map "
+         "at the lowest reliance."
+         + (" Under the crossed bootstrap " + ", ".join(cell(r) for r in sd_crossed_lost.itertuples())
+            + " also becomes indistinguishable from behaviour." if len(sd_crossed_lost) else ""))
+    para("The crossed bootstrap, which respects that all models of a setting share the same images, widens the "
+         "level intervals: the interval of the lowest-dose preference against the full object map is "
+         f"{f2(pref_width_ratio.median())} times as wide as the two-level one in the median cell (range "
+         f"{f2(pref_width_ratio.min())}\u2013{f2(pref_width_ratio.max())}), and the PneumoniaMNIST patch "
+         f"black-deletion switch interval widens from {ci(pp_black_r.switch_iso_rc_ci_low, pp_black_r.switch_iso_rc_ci_high, f1)} "
+         f"to {ci(pp_black_x.switch_crossed_ci_low, pp_black_x.switch_crossed_ci_high, f1)}. The crossed upper "
+         f"bounds of the MNIST patch metric switches are {span(mp_x.switch_crossed_ci_high, f1)}%, against a "
+         f"behavioural switch of {f1(mp_bsw.behavioural_switch_rc)}%; the paired test above is the direct "
+         "comparison.")
     figure(figs["matched"],
            f"Preference for the shortcut map over the size-matched object map against {RC}. Layout as in Fig. "
            f"{f_full}. Data: results/dose_response/preference.csv")
@@ -1530,21 +1898,25 @@ def build():
     cnn = conf_cifar.iloc[0]
     para("A model that relies more on the shortcut is also worse at the object, so a metric that responds to "
          "reliance may be responding to object competence. Table "
-         f"{t_conf} separates the two. Reliance and accuracy without the shortcut are least collinear for the "
-         f"CIFAR small CNN (\u03c1 = {f2(cnn.rho_reliance_competence)}), where the partial \u03c1 of preference "
-         f"with reliance given competence stays at {span(conf_cifar.partial_rel_given_acc)}. In "
+         f"{t_conf} separates the two on {RC}. Reliance and accuracy without the shortcut are least collinear "
+         f"for the CIFAR small CNN (\u03c1 = {f2(cnn.rho_rc_competence)}), where the partial \u03c1 of preference "
+         f"with {RC} given competence stays at {span(conf_cifar.partial_rc_given_acc)}. In "
          f"{len(collinear)} of {len(conf_set)} settings the two are collinear (\u03c1 \u2264 \u22120.95), and there "
          "the partial correlations are smaller and in places not significant (MNIST texture "
-         f"{signed_span(CONF[(CONF.base == 'mnist') & (CONF.shortcut == 'texture')].partial_rel_given_acc)}). "
-         "Outside the CIFAR small CNN our design cannot fully separate reliance from object competence.")
+         f"{signed_span(CONF_RC[(CONF_RC.base == 'mnist') & (CONF_RC.shortcut == 'texture')].partial_rc_given_acc)}). "
+         f"After Benjamini\u2013Hochberg over the {len(CONF_RC)} tests, {conf_rc_sig} partial correlations remain "
+         "significant. Outside the CIFAR small CNN our design cannot fully separate reliance from object "
+         "competence.")
     table_confound()
 
     # ---- 6 Discussion
     heading("6. Discussion")
     para("**Responsive but not calibrated.** Every metric ranks models by reliance, but a ranking is not a "
          "verdict. A practitioner who reads \u201cthe metric prefers the shortcut explanation\u201d as \u201cthe "
-         "model uses the shortcut\u201d would be wrong for most of the low-reliance Pet and CIFAR-10 models under "
-         "black and blur deletion. Bilodeau et al. " + cite("bilodeau") + " argue that the end task must be "
+         "model uses the shortcut\u201d would be wrong, under black and blur deletion, for at least half of the "
+         "low-reliance Pet models and nearly all low-reliance CIFAR-10 models, even when a per-model margin is "
+         "required. At low reliance this error comes from the object map, which these metrics do not rank above "
+         "random pixels, rather than from the shortcut map itself. Bilodeau et al. " + cite("bilodeau") + " argue that the end task must be "
          "defined; our behavioural labels give one such definition, and against it the metrics over-detect. "
          "BAM " + cite("bam") + " and Adebayo et al. " + cite("adebayo2022") + " found false positives in "
          "attribution methods; our oracle maps show the same kind of error in the metrics used to evaluate "
@@ -1593,8 +1965,13 @@ def build():
         "20\u201325% of the patch intensity in place; and the inpainting curve ends on noise around black.",
         f"Reliance and object competence are collinear in {len(collinear)} of {len(conf_set)} settings (Section 5.9).",
         "The chance correction assumes that errors spread evenly over the wrong classes.",
-        "Reliance gaps remain on CIFAR-10 and Pet, where no models were added; each model is scored on 100 "
-        "images, and the low-reliance preferences on Pet are near ties.",
+        "Reliance gaps remain on CIFAR-10 and Pet, where no models were added, so the CIFAR-10 behavioural "
+        "switch is not identified and the Pet one is not bracketed; each model is scored on 100 "
+        "images, the within-model AUROCs on natural images have null standard errors of about "
+        f"{span([p.median_hanley_mcneil_se for p in nat_power])}, and the low-reliance preferences "
+        "on Pet are near ties.",
+        "The behavioural switch and the per-image AUROCs depend on which behavioural label is used; all three "
+        "labels are reported.",
         "The switch-identification window (\u00b110 points), the causal behavioural label and the class-stratified "
         "AUROC were chosen after the audit and after the original-set results had been inspected. The amendment-A1 "
         "models had been trained by then, but they entered no analysis until these choices were committed.",
@@ -1604,8 +1981,8 @@ def build():
     heading("8. Conclusion")
     para(f"Across {N_MODELS} models with controlled and measured shortcut reliance, deletion and insertion metrics "
          "respond to reliance but are not calibrated to it, and their verdicts depend on the size and form of "
-         "the explanations they compare. On natural images black and blur deletion report a shortcut for most "
-         "models that barely use it, the metrics switch far below the reliance at which the models follow the "
+         "the explanations they compare. On natural images black and blur deletion report a shortcut for at "
+         "least half of the Pet models and nearly all CIFAR-10 models that barely use it, the metrics switch far below the reliance at which the models follow the "
          "shortcut on half of the images, and within a model they separate followed from non-followed images "
          "only weakly. The pre-registered Pet test confirmed three of four predictions and showed black "
          "deletion failing a form-matched control. Metrics should be validated at several measured reliance "
