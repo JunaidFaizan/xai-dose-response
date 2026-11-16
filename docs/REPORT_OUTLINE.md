@@ -86,7 +86,7 @@ Use the tables and figures of `paper/paper_draft.docx` (natural images first; th
 
 The discussion points from `PAPER_OUTLINE.md`, in more depth, plus:
 - The effect of dataset: natural images with real masks, colour images with a Gaussian prior, digits and radiographs
-- Why chance correction and behavioural labels change the conclusions (lowest PneumoniaMNIST reliance about 15% raw is about 0% chance-corrected; the ideal switch is 37–55% r_c, not always 50%)
+- Why chance correction and behavioural labels change the conclusions (lowest PneumoniaMNIST reliance about 15% raw is about 0% chance-corrected; the behavioural switch is 37–54% r_c where it is identified and bracketed, depends on the label, is not bracketed on Pet and is not identified on CIFAR-10)
 - The collinearity of reliance and object competence (`confound.csv`)
 - What the results mean for practitioners in medical imaging
 

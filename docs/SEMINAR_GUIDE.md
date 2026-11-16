@@ -42,7 +42,7 @@ This project builds cases where the truth is known. Models are trained on "decoy
 
 Headline findings:
 
-- The popular sanity check rewards the wrong methods. Grad-CAM passes it best but localizes the true evidence worst. Integrated Gradients localizes best but changes least under randomization.
+- The popular sanity check's method ranking is not shown to match the ground truth. Grad-CAM passes it best but localizes the true evidence worst. Integrated Gradients localizes best but changes least under randomization.
 - Deletion metrics track the ground truth better, but which method "wins" depends on how deleted pixels are filled.
 - On chest X-rays, the metrics barely separate real methods from a random map.
 
@@ -639,7 +639,7 @@ Integrated Gradients puts 71% of its positive attribution on a 9-pixel patch (1%
 
 Why: Saliency and SmoothGrad measure local sensitivity, which spreads over the digit's strokes. Grad-CAM's 6×6 resolution blurs a 3×3 border patch over a large area. IG and Occlusion measure the actual contribution relative to a black reference, and the patch is the brightest, most decisive region.
 
-### Finding 2: the sanity check rewards the wrong methods
+### Finding 2: the sanity check's ranking is not shown to match the ground truth
 
 Grad-CAM changes most under randomization ("passes" best) but localizes the shortcut worst. IG changes least ("fails") but localizes best.
 

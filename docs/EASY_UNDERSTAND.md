@@ -306,7 +306,7 @@ On Decoy digits, how much of each heatmap landed on the square:
 
 Grad-CAM, one of the most popular methods, did worst. Its map is very coarse (6×6), so a tiny square near the edge gets smeared out.
 
-### Finding 2: The famous sanity check rewards the wrong methods
+### Finding 2: The famous sanity check's ranking is not shown to match the ground truth
 
 This is the headline result.
 
