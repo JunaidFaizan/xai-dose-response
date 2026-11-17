@@ -219,3 +219,41 @@ measures. No label is treated as ground truth for every metric.
 - SD3 (exact ROAD) and SD4 (watermark shortcut) are not covered by this
   amendment. Their predictions will be written in a new dated amendment
   before any of their runs.
+
+### Completion notes (added 2026-11-17, after session 1, before session 2)
+
+These notes record the pilot results and the final doses fixed by the rules
+above. They do not change the design. All values are copied from
+`a2_pilot_report.json`, written by the committed Kaggle session-1 run.
+No metric, oracle, method or behaviour score of any pilot model had been
+computed when these notes were written, and no confirmatory SD1 model or
+further SD2 CIFAR-10 model had been trained.
+
+**Third-party timestamp of these notes:** the author will add them as a new
+version of Zenodo record
+[10.5281/zenodo.24285532](https://doi.org/10.5281/zenodo.24285532) (concept
+DOI [10.5281/zenodo.24285531](https://doi.org/10.5281/zenodo.24285531))
+before session 2.
+**TODO (author): replace this line with the new version's DOI and
+publication time once Zenodo has published it.**
+
+**Note A2-C1 (2026-11-17): SD2 CIFAR-10 doses.** Pilot
+`cifar10_resnet18_patch_dose-005_seed42`: reliance 50.61, test accuracy
+98.52, test accuracy without the shortcut 57.82, chance floor 4.69,
+corrected reliance r_c 48.18, training time 14.68 min. r_c 48.18 is below 50,
+so the rule gives the final SD2 CIFAR-10 doses −0.05, −0.03, −0.02, −0.01.
+`cifar10_resnet18` is trained at these 4 doses with seeds 42, 1, 2 (12
+models). The pilot is one of the 12 and is kept. The small CNN (`cifar10`,
+laptop CPU) uses the same 4 doses with seeds 42 and 1 (8 models), as stated
+in `kaggle/README.md`.
+
+**Note A2-C2 (2026-11-17): SD1 doses.** Pilot
+`pet_resnet18_pretrained_patch_dose+000_seed7`: reliance 36.06, test
+accuracy 99.81, test accuracy without the shortcut 93.98, chance floor 6.02,
+r_c 31.96, training time 1.38 min. Pilot
+`pet_resnet18_pretrained_patch_dose-050_seed7`: reliance 2.56, test accuracy
+97.19, test accuracy without the shortcut 97.22, chance floor 2.78, r_c
+−0.23. The r_c at dose 0 (31.96) is below 60, so the rule gives the final SD1
+doses −0.5, −0.2, 0, +0.1, +0.25, +0.4. With seeds 42, 1, 2 this is 18
+confirmatory models. There is no deviation from the rule. The two seed-7
+pilots stay outside the confirmatory set, as stated above.
