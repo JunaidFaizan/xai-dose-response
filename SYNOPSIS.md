@@ -72,7 +72,7 @@ The individual pieces are not new. BAM [22] and SMERF [23] already controlled wh
 
 **Models**
 - A custom CNN with four convolutional layers for 28×28 images; for CIFAR-10, a larger CNN with batch normalisation (0.77M parameters) and a standard ResNet-18 (11.2M parameters)
-- 234 trained models in total: 192 original (MNIST and PneumoniaMNIST 144, CIFAR-10 small CNN 12, CIFAR-10 ResNet-18 18, Pet ResNet-18 18) and 42 from the pre-registered amendment A1 (extra MNIST and PneumoniaMNIST doses and seeds to fill reliance gaps)
+- 237 trained models in total: 192 original (MNIST and PneumoniaMNIST 144, CIFAR-10 small CNN 12, CIFAR-10 ResNet-18 18, Pet ResNet-18 18), 42 from the pre-registered amendment A1 (extra MNIST and PneumoniaMNIST doses and seeds to fill reliance gaps) and 3 from amendment A2 (Pet ResNet-18 at dose −0.15). The A2 pilots are reported separately; the ImageNet-pretrained Pet models (SD1) and the extra CIFAR-10 doses (SD2) are pending
 - The ResNet-18 models were trained on a free Kaggle GPU (NVIDIA T4); everything else on a laptop CPU
 
 **Oracle explanations** (scored by every metric)
@@ -108,12 +108,12 @@ The individual pieces are not new. BAM [22] and SMERF [23] already controlled wh
 
 ## Preliminary Findings
 
-All 234 models have been trained and evaluated, including the placebo, random-map and per-image behavioural controls (numbers from `results/dose_response/*_corrected.csv` and `behaviour_summary.csv`):
+All 237 pooled models have been trained and evaluated, including the placebo, random-map and per-image behavioural controls (numbers from `results/dose_response/*_corrected.csv` and `behaviour_summary.csv`):
 
-1. **The metrics respond to reliance.** Preference for the shortcut map rises with chance-corrected reliance in 27 of 28 metric–setting cells (ρ = 0.49–0.99 in those cells; natural images 0.88–0.99).
-2. **Black and blur deletion over-detect on natural images.** Among models with chance-corrected reliance r_c ≤ 50%, black and blur deletion still prefer the shortcut map for 75–92% of Pet models (50–58% if each model's own 95% interval must exceed 0.5) and, against a centred Gaussian object prior, 100% of CIFAR-10 models (93–100% with that margin). Much of this comes from the object map: at the lowest dose the metrics prefer the shortcut map over the object map about as often as a random pixel ordering (within 0.07), and on Pet black and blur deletion do not rank the real object mask above random pixels. The shortcut's excess preference over random still rises with r_c for all four Pet metrics (ρ = 0.50–0.81).
-3. **The 50% ideal is replaced by behaviour where the models identify it.** Under the primary label the models follow the shortcut on half of the images at r_c = 53.9% on MNIST patch and 36.9–45.7% on MNIST texture and PneumoniaMNIST. On Pet the crossing (54.5%) is not bracketed and depends on the label (29.4–54.5%); on CIFAR-10 it is not identified (above 42.7% and 36.5%, in a reliance gap). On Pet the metrics switch already at 1.3–5.4%, earlier than behaviour in every testable natural-image cell (paired bootstrap).
-4. **Within a model, per-image detection is weak** (median AUROC 0.43–0.80 on natural images, against 0.75–0.90 pooled over models), and each within-model AUROC rests on only 5–8 minority-label images.
+1. **The metrics respond to reliance.** Preference for the shortcut map rises with chance-corrected reliance in 27 of 28 metric–setting cells (ρ = 0.49–0.99 in those cells; natural images 0.83–0.99).
+2. **Black and blur deletion over-detect on natural images.** Among models with chance-corrected reliance r_c ≤ 50%, black and blur deletion still prefer the shortcut map for 79–93% of Pet models (50–64% if each model's own 95% interval must exceed 0.5) and, against a centred Gaussian object prior, 100% of CIFAR-10 models (93–100% with that margin). Much of this comes from the object map: at the lowest dose the metrics prefer the shortcut map over the object map about as often as a random pixel ordering (within 0.07), and on Pet black and blur deletion do not rank the real object mask above random pixels. The shortcut's excess preference over random still rises with r_c for all four Pet metrics (ρ = 0.47–0.81).
+3. **The 50% ideal is replaced by behaviour where the models identify it.** Under the primary label the models follow the shortcut on half of the images at r_c = 53.9% on MNIST patch and 36.9–45.7% on MNIST texture and PneumoniaMNIST. On Pet the crossing (54.1%) is now bracketed by the A2 models at dose −0.15 (54.5% and not bracketed without them) and depends on the label (29.4–54.1%); on CIFAR-10 it is not identified (above 42.7% and 36.5%, in a reliance gap). On Pet the metrics switch already at 1.3–5.4%, earlier than behaviour in every testable natural-image cell (paired bootstrap).
+4. **Within a model, per-image detection is weak** (median AUROC 0.43–0.78 on natural images, against 0.74–0.89 pooled over models), and each within-model AUROC rests on only 5–11 minority-label images.
 5. **Explanation size distorts the metrics.** With a size-matched object map, the MNIST patch switch moves from 38.7–39.3% to 0.9–8.6% r_c.
 6. **Explanation form distorts the metrics.** On CIFAR-10 at the lowest dose, black and blur deletion prefer a random pixel ordering over a centred object map 75–81% (small CNN) and 56–72% (ResNet-18) of the time, against 13–23% for inpainting and insertion. With real Pet masks this drops to 49–53%.
 7. **Same-form comparisons mostly behave correctly,** but the rise depends on the setting: the preference over a random or placebo map reaches 0.76–1.00 on Pet, 0.91–1.00 on CIFAR-10, 0.93–0.96 on MNIST patch and only 0.73–0.79 on PneumoniaMNIST patch. On diffuse textures, some metrics move the wrong way.
@@ -141,7 +141,7 @@ All tools are free and open source. Experiments run on a laptop CPU, except the 
 - A dose-response protocol for testing XAI evaluation metrics against a controlled, measured change in model behaviour
 - Evidence of when common metrics can and cannot be trusted, on natural, medical and colour images
 - Controls for explanation size and shape that other evaluation studies can reuse
-- 234 trained models, result tables and figures, with code for full reproduction
+- 237 trained models, result tables and figures, with code for full reproduction
 - An interactive explainability dashboard
 - A research paper for a Q1 journal (provisional target: Neurocomputing), and the M.Tech thesis
 
