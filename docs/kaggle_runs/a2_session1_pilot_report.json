@@ -1,0 +1,43 @@
+[
+  {
+    "model": "pet_resnet18_pretrained_patch_dose+000_seed7",
+    "reliance": 36.06,
+    "test_accuracy": 99.81,
+    "test_accuracy_no_shortcut": 93.98,
+    "chance_floor": 6.02,
+    "reliance_corrected": 31.96,
+    "training_minutes": 1.38,
+    "a2_dose_set": [
+      -0.5,
+      -0.2,
+      0.0,
+      0.1,
+      0.25,
+      0.4
+    ]
+  },
+  {
+    "model": "pet_resnet18_pretrained_patch_dose-050_seed7",
+    "reliance": 2.56,
+    "test_accuracy": 97.19,
+    "test_accuracy_no_shortcut": 97.22,
+    "chance_floor": 2.78,
+    "reliance_corrected": -0.23,
+    "training_minutes": 1.38
+  },
+  {
+    "model": "cifar10_resnet18_patch_dose-005_seed42",
+    "reliance": 50.61,
+    "test_accuracy": 98.52,
+    "test_accuracy_no_shortcut": 57.82,
+    "chance_floor": 4.69,
+    "reliance_corrected": 48.18,
+    "training_minutes": 14.68,
+    "a2_dose_set": [
+      -0.05,
+      -0.03,
+      -0.02,
+      -0.01
+    ]
+  }
+]

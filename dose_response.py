@@ -94,6 +94,10 @@ Output
         behaviour_power.csv (audit-2 additions M1-M4, new files only; the
         behaviour-based ones need behaviour labels), and an appended
         "Audit-2 additions" section at the end of summary.md
+    results/dose_response/pilots.csv  A2 models that are not pooled (the SD1
+        pilots, and A2 models without scores yet), with a summary.md section;
+        models outside every pre-registered design are "unregistered" and
+        excluded from every model set (model_set_of)
     analyze --model-set original writes the same files for the 192 models
     from before amendment A1 to results/dose_response/original_models/, and
     analyze --model-set pre_a2 the 234 models from before amendment A2 to
@@ -584,31 +588,62 @@ def a2_dose_set(base, pilot_rc):
     raise ValueError(f"amendment A2 has no dose rule for {base}")
 
 
+# The pre-registered designs, per base: (shortcuts, doses, seeds). A model
+# outside every design is "unregistered" and excluded from every model set.
+ORIGINAL_DESIGN = {"mnist": (tuple(SHORTCUT_TYPES), DOSES, SEEDS),
+                   "pneumonia_mnist": (tuple(SHORTCUT_TYPES), DOSES, SEEDS),
+                   "cifar10": (("patch",), CIFAR_DOSES, CIFAR_SEEDS),
+                   "cifar10_resnet18": (("patch",), CIFAR_DOSES, SEEDS),
+                   "pet_resnet18": (("patch",), PET_DOSES, PET_SEEDS)}
+# Amendment A2, final doses fixed by the dated completion notes A2-C1 and A2-C2
+# (docs/PREDICTIONS_amendments.md): CIFAR pilot r_c 48.18 -> "below 50",
+# SD1 pilot r_c 31.96 -> "below 60". The CIFAR pilot (-0.05, seed 42) is one
+# of the cifar10_resnet18 models.
+A2_DESIGN = {"cifar10_resnet18": (("patch",), A2_CIFAR_DOSE_SETS["below 50"], (42, 1, 2)),
+             "cifar10": (("patch",), A2_CIFAR_DOSE_SETS["below 50"], (42, 1)),
+             "pet_resnet18": (("patch",), [-0.15], (42, 1, 2)),
+             "pet_resnet18_pretrained": (("patch",), A2_SD1_DOSE_SETS["below 60"], (42, 1, 2))}
+A2_PILOT_DESIGN = {"pet_resnet18_pretrained": (("patch",), [0.0, -0.5], (7,))}
+
+
+def _in_design(design, base, shortcut, dose, seed):
+    if base not in design:
+        return False
+    shortcuts, doses, seeds = design[base]
+    return shortcut in shortcuts and bool(np.isclose(dose, doses).any()) and seed in seeds
+
+
 def model_set_of(row):
-    """'A2_pilot' for the SD1 pilot models (pet_resnet18_pretrained, seed 7),
-    'A2' for the other models added by amendment A2 (SD1; CIFAR-10 doses
-    strictly between -0.1 and 0; Pet dose -0.15), 'A1' for a model added by
-    amendment A1, otherwise 'original'."""
-    base, dose = row["base"], float(row["dose"])
-    if base == "pet_resnet18_pretrained":
-        return "A2_pilot" if int(row["seed"]) == 7 else "A2"
-    if base in ("cifar10", "cifar10_resnet18") and -0.1 + 1e-9 < dose < -1e-9:
-        return "A2"
-    if base == "pet_resnet18" and np.isclose(dose, -0.15):
+    """'A2_pilot' for the SD1 pilot models (pet_resnet18_pretrained, doses 0 and
+    -0.5, seed 7), 'A2' for the models added by amendment A2 at the final doses
+    of its completion notes (A2_DESIGN), 'A1' for a model added by amendment A1,
+    'original' for the designs before A1 (ORIGINAL_DESIGN), and 'unregistered'
+    for anything else (e.g. Pet dose -0.05, which needs a new amendment)."""
+    base, shortcut, dose, seed = row["base"], row["shortcut"], float(row["dose"]), int(row["seed"])
+    if _in_design(A2_PILOT_DESIGN, base, shortcut, dose, seed):
+        return "A2_pilot"
+    if _in_design(A2_DESIGN, base, shortcut, dose, seed):
         return "A2"
     rule = AMENDMENT_A1.get(base)
-    if rule and (np.isclose(row["dose"], rule["doses"]).any() or int(row["seed"]) in rule["seeds"]):
-        return "A1"
-    return "original"
+    if rule:
+        shortcuts, doses, seeds = ORIGINAL_DESIGN[base]
+        known_dose = np.isclose(dose, list(doses) + list(rule["doses"])).any()
+        if shortcut in shortcuts and known_dose and seed in tuple(seeds) + rule["seeds"] and (
+                np.isclose(dose, rule["doses"]).any() or seed in rule["seeds"]):
+            return "A1"
+    if _in_design(ORIGINAL_DESIGN, base, shortcut, dose, seed):
+        return "original"
+    return "unregistered"
 
 
 def in_model_set(run, model_set):
     """Whether a model (metrics JSON or models.csv row) belongs to a model set:
-    'all' = every model except the SD1 pilots, 'pre_a2' = original + A1 (the
-    234 models before amendment A2), otherwise the exact model_set_of value."""
+    'all' = every registered model except the SD1 pilots, 'pre_a2' = original +
+    A1 (the 234 models before amendment A2), otherwise the exact model_set_of
+    value. Unregistered models belong to no set."""
     kind = model_set_of(run)
     if model_set == "all":
-        return kind != "A2_pilot"
+        return kind not in ("A2_pilot", "unregistered")
     if model_set == "pre_a2":
         return kind in ("original", "A1")
     return kind == model_set
@@ -1270,13 +1305,32 @@ def analyze(args=None):
     reps = getattr(args, "reps", BOOTSTRAP_REPS)
     keys = ["base", "shortcut", "dose", "seed"]
     models = add_corrected_reliance(load_models())
+    unregistered = models[models.model_set == "unregistered"]
+    if len(unregistered):
+        print(f"WARNING: {len(unregistered)} unregistered models are excluded from every model set, e.g. "
+              f"{model_name(*unregistered[keys].iloc[0])}", flush=True)
+    not_pooled = None
     if model_set == "all":
-        # The SD1 pilots (A2) are reported separately, never pooled (no-op before A2).
-        models = models[models.model_set != "A2_pilot"].reset_index(drop=True)
         combine(None)
         out = OUT
         oracle = pd.read_csv(OUT / "scores_oracle.csv")
         methods = pd.read_csv(OUT / "scores_methods.csv")
+        # Pooled: registered, not an SD1 pilot, and scored. The SD1 pilots and
+        # A2 models without scores yet (the CIFAR pilot before session 2) are
+        # listed in pilots.csv instead (no-op before A2).
+        scored = {model_name(*k) for k in oracle[keys].drop_duplicates().itertuples(index=False)}
+        names = [model_name(*k) for k in models[keys].itertuples(index=False)]
+        member = [in_model_set(row, "all") for _, row in models.iterrows()]
+        pooled = [m and n in scored for m, n in zip(member, names)]
+        not_pooled = models[[not p and s != "unregistered" for p, s in zip(pooled, models.model_set)]]
+        not_pooled = not_pooled.assign(status=["SD1 pilot (never pooled)" if s == "A2_pilot"
+                                               else "not scored yet" for s in not_pooled.model_set])
+        keep = {n for n, p in zip(names, pooled) if p}
+        if scored - keep:  # scored but unregistered (or a scored SD1 pilot): drop its scores
+            oracle = oracle[[model_name(*k) in keep for k in oracle[keys].itertuples(index=False)]]
+            methods = methods[[model_name(*k) in keep for k in methods[keys].itertuples(index=False)]]
+            oracle, methods = oracle.reset_index(drop=True), methods.reset_index(drop=True)
+        models = models[pooled].reset_index(drop=True)
     else:
         names = set(complete_model_names(model_set))
         oracle, methods = _merge_scores(sorted(names))
@@ -1300,6 +1354,8 @@ def analyze(args=None):
     method_resp, mass = method_responsiveness(methods, models[keys + ["reliance"]])
 
     models.to_csv(out / "models.csv", index=False)
+    if not_pooled is not None and len(not_pooled):
+        not_pooled.to_csv(out / "pilots.csv", index=False)
     pref = pref.merge(models[keys + ["reliance_corrected"]], on=keys, how="left").round(4)
     pref.to_csv(out / "preference.csv", index=False)
     resp.to_csv(out / "responsiveness.csv", index=False)
@@ -1346,6 +1402,14 @@ def analyze(args=None):
     lines = header + corrected + lines
     # The audit-2 section is appended, so the earlier content stays an exact prefix.
     text = "\n".join(lines) + "\n\n" + "\n".join(extra)
+    if not_pooled is not None and len(not_pooled):
+        columns = keys + ["model_set", "status", "reliance", "test_accuracy", "test_accuracy_no_shortcut",
+                          "chance_floor", "reliance_corrected", "training_minutes"]
+        text += "\n\n" + "\n".join([
+            "## Amendment A2 models not pooled (pilots.csv)", "",
+            "SD1 pilots are never pooled. A2 models without score files (the CIFAR-10 ResNet-18 pilot until "
+            "session 2) are not pooled until they are scored. Neither kind is in models.csv or any table above.",
+            "", markdown(not_pooled[columns].round(2)), ""])
     (out / "summary.md").write_text(text, encoding="utf-8")
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(errors="replace")  # e.g. a cp1252 Windows console

@@ -127,6 +127,11 @@ class ResNet18Pretrained(nn.Module):
     fills, oracle maps and the shortcut are unchanged. The mean/std buffers are
     not saved in checkpoints (persistent=False). `pool2` is an identity after
     the last residual stage, so Grad-CAM (input of `pool2`) uses layer4's maps.
+    With the standard stem these are 512x4x4 for 128x128 Pet images (input
+    size / 32), against 512x16x16 for pet_resnet18 (ResNet18Cifar, CIFAR stem).
+    Grad-CAM results of SD1 and pet_resnet18 therefore differ in map
+    resolution as well as in pretraining; the oracle-map metrics are not
+    affected (they do not use Grad-CAM).
     pretrained=False builds the same network without downloading weights (used
     when a trained checkpoint is loaded).
     """

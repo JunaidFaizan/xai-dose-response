@@ -5,9 +5,12 @@
 Runs the real dose_response step functions (train, evaluate, placebo,
 behaviour) in a temporary directory, with 1 epoch, a 512-image training
 subset, a 128-image validation subset and 2 scored test images, for:
-    (a) SD1: pet_resnet18_pretrained, dose 0, seed 7 (downloads the ImageNet
-        ResNet-18 weights once, about 45 MB);
-    (b) SD2: cifar10, dose -0.075, seed 42 (the fractional name dose-7p5).
+    (a) SD1 pilot: pet_resnet18_pretrained, dose 0, seed 7 (downloads the
+        ImageNet ResNet-18 weights once, about 45 MB);
+    (b) SD1 confirmatory, positive dose: pet_resnet18_pretrained, dose +0.1,
+        seed 42 (the swap-fraction path: swap 0.1, shortcut noise 0);
+    (c) SD2: cifar10, dose -0.03, seed 42 (a final A2 CIFAR-10 dose).
+It also checks the fractional name dose-7p5 for -0.075.
 The temporary directory is always removed, and the script checks that
 nothing was written under checkpoint/ or results/ of the repository.
 """
@@ -32,13 +35,16 @@ from xai.models import build_model  # noqa: E402
 
 SUBSETS = {"train": 512, "val": 128}
 SAMPLES = 2
-PARTS = [("SD1", "pet_resnet18_pretrained", 0.0, 7, "A2_pilot"),
-         ("SD2", "cifar10", -0.075, 42, "A2")]
+PARTS = [("SD1 pilot", "pet_resnet18_pretrained", 0.0, 7, "A2_pilot"),
+         ("SD1 +0.1", "pet_resnet18_pretrained", 0.1, 42, "A2"),
+         ("SD2", "cifar10", -0.03, 42, "A2")]
 REPO_DIRS = [ROOT / "checkpoint" / "dose", ROOT / "results"]
 
 
 def repo_files():
-    return {p for folder in REPO_DIRS for p in folder.rglob("*") if p.is_file()}
+    """{path: (size, mtime)} of every file under checkpoint/dose and results/."""
+    return {p: (p.stat().st_size, p.stat().st_mtime_ns)
+            for folder in REPO_DIRS for p in folder.rglob("*") if p.is_file()}
 
 
 def subset_split(original):
@@ -65,6 +71,8 @@ def run_part(label, base, dose, seed, expected_set):
     metrics = json.loads((dose_response.MODEL_DIR / f"{name}_metrics.json").read_text())
     for key in ("reliance", "test_accuracy_no_shortcut", "training_minutes"):
         assert key in metrics, f"{name}: metrics JSON lacks {key}"
+    swap, noise = dose_response.dose_params(dose)
+    assert (metrics["swap_fraction"], metrics["shortcut_noise"]) == (swap, noise), f"{name}: dose params"
     cache = dose_response.OUT / "per_model"
     for kind in ("oracle", "methods", "placebo", "random", "behaviour"):
         path = cache / f"{name}_{kind}.csv"
@@ -93,15 +101,22 @@ def main():
         dose_response.shortcut_split = subset_split(dose_response.shortcut_split)
         for part in PARTS:
             run_part(*part)
-        assert names[1] == "cifar10_patch_dose-7p5_seed42", names[1]
-        assert dose_response.model_set_of({"base": "cifar10", "dose": -0.075, "seed": 1}) == "A2"
+        assert names[1] == "pet_resnet18_pretrained_patch_dose+010_seed42", names[1]
+        fractional = dose_response.model_name("cifar10", "patch", -0.075, 42)
+        assert fractional == "cifar10_patch_dose-7p5_seed42", fractional
+        # -0.075 belongs to another A2 dose rule, not the final CIFAR-10 doses
+        assert dose_response.model_set_of({"base": "cifar10", "shortcut": "patch", "dose": -0.075,
+                                           "seed": 1}) == "unregistered"
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     assert not tmp.exists(), f"temporary directory left behind: {tmp}"
-    new = repo_files() - before
-    assert not new, f"files written into the repository: {sorted(map(str, new))[:5]}"
-    leaked = [p for p in before | repo_files() if "smoke" in p.name or any(n in p.name for n in names)]
-    assert not leaked, f"smoke files in the repository: {leaked[:5]}"
+    after = repo_files()
+    new = sorted(str(p) for p in after.keys() - before.keys())
+    assert not new, f"files written into the repository: {new[:5]}"
+    # The real Kaggle SD1 pilot shares a name with part (a), so check by content
+    # stamp rather than by name: no existing repository file may change.
+    changed = sorted(str(p) for p in before.keys() & after.keys() if before[p] != after[p])
+    assert not changed, f"repository files changed: {changed[:5]}"
     print("smoke_a2: OK")
 
 
