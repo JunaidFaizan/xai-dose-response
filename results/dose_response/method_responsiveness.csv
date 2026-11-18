@@ -19,11 +19,11 @@ mnist,texture,Integrated Gradients,0.897,0.0,0.147,0.53
 mnist,texture,Occlusion,0.929,0.0,0.104,0.218
 mnist,texture,Saliency,-0.753,0.0,0.118,0.057
 mnist,texture,SmoothGrad,-0.687,0.0,0.11,0.082
-pet_resnet18,patch,Grad-CAM,0.886,0.0,0.006,0.085
-pet_resnet18,patch,Integrated Gradients,0.936,0.0,0.006,0.22
-pet_resnet18,patch,Occlusion,0.979,0.0,0.004,0.598
-pet_resnet18,patch,Saliency,0.969,0.0,0.001,0.304
-pet_resnet18,patch,SmoothGrad,0.907,0.0,0.002,0.14
+pet_resnet18,patch,Grad-CAM,0.857,0.0,0.006,0.085
+pet_resnet18,patch,Integrated Gradients,0.944,0.0,0.006,0.22
+pet_resnet18,patch,Occlusion,0.966,0.0,0.004,0.598
+pet_resnet18,patch,Saliency,0.943,0.0,0.001,0.304
+pet_resnet18,patch,SmoothGrad,0.858,0.0,0.002,0.14
 pneumonia_mnist,patch,Grad-CAM,0.808,0.0,0.022,0.166
 pneumonia_mnist,patch,Integrated Gradients,0.945,0.0,0.003,0.391
 pneumonia_mnist,patch,Occlusion,0.928,0.0,0.0,0.362

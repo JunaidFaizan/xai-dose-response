@@ -1,0 +1,1639 @@
+base,shortcut,dose,seed,deletion_zero,deletion_zero_ties,deletion_blur,deletion_blur_ties,deletion_inpaint,deletion_inpaint_ties,insertion_blur,insertion_blur_ties,reliance,comparison,reliance_corrected
+cifar10,patch,-0.8,1,0.83,0.0,0.74,0.0,0.27,0.0,0.235,0.01,4.22,shortcut vs full object,0.8032
+cifar10,patch,-0.8,42,0.8,0.0,0.73,0.0,0.26,0.0,0.22,0.0,3.74,shortcut vs full object,0.8401
+cifar10,patch,-0.6,1,0.87,0.0,0.83,0.0,0.43,0.0,0.29,0.0,7.61,shortcut vs full object,3.7236
+cifar10,patch,-0.6,42,0.82,0.0,0.84,0.0,0.53,0.0,0.22,0.0,7.49,shortcut vs full object,4.5687
+cifar10,patch,-0.4,1,0.93,0.0,0.86,0.0,0.68,0.0,0.48,0.0,17.29,shortcut vs full object,14.5636
+cifar10,patch,-0.4,42,0.88,0.0,0.8,0.0,0.67,0.0,0.37,0.0,13.73,shortcut vs full object,11.0272
+cifar10,patch,-0.25,1,0.96,0.0,0.83,0.0,0.755,0.01,0.6,0.0,23.18,shortcut vs full object,20.6833
+cifar10,patch,-0.25,42,0.96,0.0,0.88,0.0,0.74,0.0,0.515,0.01,22.55,shortcut vs full object,20.0016
+cifar10,patch,-0.1,1,0.97,0.0,0.89,0.0,0.88,0.0,0.81,0.0,45.07,shortcut vs full object,42.6817
+cifar10,patch,-0.1,42,0.88,0.0,0.94,0.0,0.93,0.0,0.9,0.0,43.4,shortcut vs full object,41.0744
+cifar10,patch,0.0,1,0.99,0.0,0.98,0.0,1.0,0.0,0.99,0.0,96.62,shortcut vs full object,96.3297
+cifar10,patch,0.0,42,0.99,0.0,0.97,0.0,0.97,0.0,0.98,0.0,96.29,shortcut vs full object,95.9789
+cifar10_resnet18,patch,-0.8,1,0.65,0.0,0.56,0.0,0.15,0.0,0.3,0.0,3.31,shortcut vs full object,1.2427
+cifar10_resnet18,patch,-0.8,2,0.72,0.0,0.64,0.0,0.15,0.0,0.2,0.0,2.94,shortcut vs full object,0.9412
+cifar10_resnet18,patch,-0.8,42,0.74,0.0,0.63,0.0,0.16,0.0,0.22,0.0,2.71,shortcut vs full object,0.8077
+cifar10_resnet18,patch,-0.6,1,0.75,0.0,0.72,0.0,0.34,0.0,0.31,0.0,5.36,shortcut vs full object,3.4078
+cifar10_resnet18,patch,-0.6,2,0.83,0.0,0.7,0.0,0.34,0.0,0.425,0.01,6.35,shortcut vs full object,4.326
+cifar10_resnet18,patch,-0.6,42,0.76,0.0,0.7,0.0,0.48,0.0,0.38,0.0,6.58,shortcut vs full object,4.4503
+cifar10_resnet18,patch,-0.4,1,0.81,0.0,0.85,0.0,0.44,0.02,0.455,0.01,10.8,shortcut vs full object,8.5743
+cifar10_resnet18,patch,-0.4,2,0.8,0.0,0.79,0.0,0.54,0.0,0.56,0.0,10.83,shortcut vs full object,8.7163
+cifar10_resnet18,patch,-0.4,42,0.8,0.0,0.8,0.0,0.48,0.0,0.46,0.0,10.25,shortcut vs full object,7.9676
+cifar10_resnet18,patch,-0.25,1,0.89,0.0,0.94,0.0,0.67,0.0,0.615,0.01,19.72,shortcut vs full object,17.5017
+cifar10_resnet18,patch,-0.25,2,0.93,0.0,0.94,0.0,0.635,0.01,0.69,0.0,18.68,shortcut vs full object,16.3107
+cifar10_resnet18,patch,-0.25,42,0.85,0.0,0.9,0.02,0.5,0.0,0.69,0.0,18.4,shortcut vs full object,16.081
+cifar10_resnet18,patch,-0.1,1,0.98,0.0,0.98,0.0,0.77,0.0,0.78,0.0,35.67,shortcut vs full object,33.1752
+cifar10_resnet18,patch,-0.1,2,1.0,0.0,0.94,0.0,0.87,0.0,0.9,0.0,38.95,shortcut vs full object,36.5407
+cifar10_resnet18,patch,-0.1,42,0.96,0.0,0.955,0.01,0.8,0.0,0.86,0.0,34.32,shortcut vs full object,31.8452
+cifar10_resnet18,patch,0.0,1,1.0,0.0,1.0,0.0,0.99,0.0,1.0,0.0,97.25,shortcut vs full object,96.997
+cifar10_resnet18,patch,0.0,2,0.99,0.0,0.99,0.0,0.97,0.0,1.0,0.0,96.16,shortcut vs full object,95.8157
+cifar10_resnet18,patch,0.0,42,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0,97.02,shortcut vs full object,96.7566
+mnist,patch,-0.4,1,0.01,0.0,0.02,0.0,0.0,0.0,0.01,0.0,0.12,shortcut vs full object,0.0178
+mnist,patch,-0.4,2,0.035,0.01,0.01,0.0,0.0,0.0,0.01,0.0,0.12,shortcut vs full object,-0.0033
+mnist,patch,-0.4,42,0.02,0.0,0.02,0.0,0.02,0.0,0.02,0.0,0.18,shortcut vs full object,0.0078
+mnist,patch,-0.25,1,0.01,0.0,0.02,0.0,0.0,0.0,0.02,0.0,0.14,shortcut vs full object,0.0211
+mnist,patch,-0.25,2,0.01,0.0,0.02,0.0,0.0,0.0,0.0,0.0,0.17,shortcut vs full object,0.0278
+mnist,patch,-0.25,42,0.02,0.0,0.01,0.0,0.01,0.0,0.02,0.0,0.22,shortcut vs full object,0.0668
+mnist,patch,-0.1,1,0.01,0.0,0.02,0.0,0.0,0.0,0.0,0.0,0.13,shortcut vs full object,0.01
+mnist,patch,-0.1,2,0.01,0.0,0.07,0.0,0.0,0.0,0.01,0.0,0.2,shortcut vs full object,0.0701
+mnist,patch,-0.1,42,0.04,0.0,0.03,0.0,0.01,0.0,0.02,0.0,0.2,shortcut vs full object,0.0234
+mnist,patch,-0.05,1,0.01,0.0,0.02,0.0,0.0,0.0,0.01,0.0,0.15,shortcut vs full object,0.0145
+mnist,patch,-0.05,2,0.01,0.0,0.11,0.0,0.01,0.0,0.02,0.0,0.18,shortcut vs full object,0.0367
+mnist,patch,-0.05,42,0.03,0.0,0.03,0.0,0.0,0.0,0.01,0.0,0.22,shortcut vs full object,0.0712
+mnist,patch,0.0,1,0.0,0.0,0.02,0.0,0.0,0.0,0.01,0.0,0.17,shortcut vs full object,0.0389
+mnist,patch,0.0,2,0.01,0.0,0.05,0.0,0.01,0.0,0.0,0.0,0.17,shortcut vs full object,0.0289
+mnist,patch,0.0,42,0.42,0.0,0.27,0.0,0.27,0.0,0.28,0.0,8.87,shortcut vs full object,8.5438
+mnist,patch,0.005,1,0.02,0.0,0.03,0.0,0.01,0.0,0.02,0.0,0.81,shortcut vs full object,0.6345
+mnist,patch,0.005,2,0.21,0.0,0.23,0.0,0.15,0.0,0.23,0.0,1.59,shortcut vs full object,1.3785
+mnist,patch,0.005,42,0.42,0.0,0.4,0.0,0.39,0.0,0.37,0.0,22.98,shortcut vs full object,22.0551
+mnist,patch,0.0075,1,0.25,0.0,0.3,0.0,0.22,0.0,0.26,0.0,13.3,shortcut vs full object,12.8215
+mnist,patch,0.0075,2,0.27,0.0,0.33,0.0,0.22,0.0,0.26,0.0,5.77,shortcut vs full object,5.5149
+mnist,patch,0.0075,3,0.23,0.0,0.19,0.0,0.2,0.0,0.22,0.0,6.93,shortcut vs full object,6.6572
+mnist,patch,0.0075,4,0.05,0.0,0.1,0.0,0.02,0.0,0.04,0.0,0.53,shortcut vs full object,0.3806
+mnist,patch,0.0075,5,0.42,0.0,0.42,0.0,0.32,0.0,0.39,0.0,19.03,shortcut vs full object,17.7227
+mnist,patch,0.0075,42,0.65,0.0,0.62,0.0,0.6,0.0,0.66,0.0,40.85,shortcut vs full object,39.806
+mnist,patch,0.01,1,0.26,0.0,0.35,0.0,0.14,0.0,0.22,0.0,9.13,shortcut vs full object,8.7152
+mnist,patch,0.01,2,0.41,0.0,0.4,0.0,0.39,0.0,0.42,0.0,17.52,shortcut vs full object,16.6943
+mnist,patch,0.01,42,0.71,0.0,0.74,0.0,0.72,0.0,0.75,0.0,62.21,shortcut vs full object,61.264
+mnist,patch,0.015,1,0.34,0.0,0.36,0.0,0.31,0.0,0.31,0.0,39.33,shortcut vs full object,37.6443
+mnist,patch,0.015,2,0.52,0.0,0.51,0.0,0.37,0.0,0.42,0.0,30.18,shortcut vs full object,29.0383
+mnist,patch,0.015,3,0.26,0.0,0.26,0.0,0.26,0.0,0.26,0.0,31.49,shortcut vs full object,29.8764
+mnist,patch,0.015,4,0.54,0.0,0.5,0.0,0.45,0.0,0.41,0.0,10.64,shortcut vs full object,10.441
+mnist,patch,0.015,5,0.41,0.0,0.41,0.0,0.4,0.0,0.42,0.0,26.1,shortcut vs full object,24.2785
+mnist,patch,0.015,42,0.72,0.0,0.74,0.0,0.72,0.0,0.75,0.0,64.89,shortcut vs full object,63.8542
+mnist,patch,0.02,1,0.56,0.0,0.59,0.0,0.49,0.0,0.53,0.0,53.12,shortcut vs full object,50.7833
+mnist,patch,0.02,2,0.63,0.0,0.57,0.0,0.59,0.0,0.43,0.0,45.18,shortcut vs full object,43.9131
+mnist,patch,0.02,42,0.74,0.0,0.73,0.0,0.71,0.0,0.74,0.0,68.52,shortcut vs full object,67.6006
+mnist,patch,0.03,1,0.77,0.0,0.7,0.0,0.735,0.01,0.77,0.0,71.03,shortcut vs full object,69.1488
+mnist,patch,0.03,2,0.77,0.0,0.75,0.0,0.75,0.0,0.71,0.0,70.38,shortcut vs full object,68.4181
+mnist,patch,0.03,42,0.74,0.0,0.73,0.0,0.73,0.0,0.74,0.0,74.95,shortcut vs full object,73.1923
+mnist,patch,0.05,1,0.77,0.0,0.76,0.0,0.76,0.0,0.77,0.0,75.72,shortcut vs full object,73.7788
+mnist,patch,0.05,2,0.79,0.0,0.76,0.0,0.76,0.0,0.77,0.0,77.26,shortcut vs full object,75.5933
+mnist,patch,0.05,42,0.75,0.0,0.74,0.0,0.74,0.0,0.74,0.0,75.67,shortcut vs full object,73.7606
+mnist,patch,0.1,1,0.85,0.0,0.85,0.0,0.85,0.0,0.84,0.0,84.1,shortcut vs full object,82.7765
+mnist,patch,0.1,2,0.85,0.0,0.86,0.0,0.86,0.0,0.85,0.0,87.86,shortcut vs full object,86.7155
+mnist,patch,0.1,42,0.75,0.0,0.75,0.0,0.74,0.0,0.75,0.0,76.97,shortcut vs full object,75.1227
+mnist,patch,0.25,1,0.92,0.0,0.91,0.0,0.92,0.0,0.94,0.0,99.76,shortcut vs full object,99.7335
+mnist,patch,0.25,2,0.93,0.0,0.9,0.0,0.93,0.0,0.93,0.0,99.57,shortcut vs full object,99.5228
+mnist,patch,0.25,42,0.83,0.0,0.83,0.0,0.83,0.0,0.83,0.0,88.51,shortcut vs full object,87.3889
+mnist,patch,0.4,1,0.92,0.0,0.93,0.0,0.95,0.0,0.92,0.0,99.8,shortcut vs full object,99.7779
+mnist,patch,0.4,2,0.85,0.0,0.85,0.0,0.85,0.0,0.85,0.0,88.92,shortcut vs full object,87.8239
+mnist,patch,0.4,42,0.9,0.0,0.9,0.0,0.9,0.0,0.9,0.0,99.47,shortcut vs full object,99.4115
+mnist,texture,-0.4,1,0.01,0.0,0.02,0.0,0.01,0.0,0.0,0.0,0.17,shortcut vs full object,0.0478
+mnist,texture,-0.4,2,0.03,0.0,0.04,0.0,0.01,0.0,0.02,0.0,0.17,shortcut vs full object,0.0289
+mnist,texture,-0.4,42,0.06,0.0,0.05,0.0,0.03,0.0,0.02,0.0,0.18,shortcut vs full object,0.0089
+mnist,texture,-0.25,1,0.02,0.0,0.03,0.0,0.02,0.0,0.03,0.0,0.11,shortcut vs full object,-0.0044
+mnist,texture,-0.25,2,0.06,0.0,0.05,0.0,0.06,0.0,0.02,0.0,0.27,shortcut vs full object,0.108
+mnist,texture,-0.25,42,0.02,0.0,0.08,0.0,0.05,0.0,0.02,0.0,0.23,shortcut vs full object,0.0534
+mnist,texture,-0.1,1,0.02,0.0,0.01,0.0,0.02,0.0,0.01,0.0,0.14,shortcut vs full object,0.0278
+mnist,texture,-0.1,2,0.1,0.0,0.05,0.0,0.06,0.0,0.01,0.0,0.64,shortcut vs full object,0.4065
+mnist,texture,-0.1,42,0.1,0.0,0.04,0.0,0.06,0.0,0.04,0.0,0.51,shortcut vs full object,0.2695
+mnist,texture,-0.05,1,0.02,0.0,0.03,0.0,0.05,0.0,0.02,0.0,0.18,shortcut vs full object,0.0401
+mnist,texture,-0.05,2,0.18,0.0,0.07,0.0,0.07,0.0,0.02,0.0,1.3,shortcut vs full object,0.992
+mnist,texture,-0.05,42,0.2,0.0,0.06,0.0,0.11,0.0,0.03,0.0,2.43,shortcut vs full object,1.9441
+mnist,texture,0.0,1,0.02,0.0,0.05,0.0,0.02,0.0,0.03,0.0,0.21,shortcut vs full object,0.0645
+mnist,texture,0.0,2,0.37,0.0,0.08,0.0,0.19,0.0,0.05,0.0,8.88,shortcut vs full object,7.8065
+mnist,texture,0.0,42,0.49,0.0,0.22,0.0,0.47,0.0,0.07,0.0,18.24,shortcut vs full object,16.5752
+mnist,texture,0.005,1,0.46,0.0,0.19,0.0,0.44,0.0,0.03,0.0,14.24,shortcut vs full object,12.5423
+mnist,texture,0.005,2,0.72,0.0,0.36,0.0,0.7,0.0,0.19,0.0,55.64,shortcut vs full object,53.1985
+mnist,texture,0.005,42,0.85,0.0,0.52,0.0,0.86,0.0,0.25,0.0,76.75,shortcut vs full object,75.3287
+mnist,texture,0.0075,1,0.7,0.0,0.455,0.01,0.74,0.0,0.08,0.0,41.59,shortcut vs full object,38.569
+mnist,texture,0.0075,2,0.8,0.0,0.5,0.0,0.82,0.0,0.25,0.0,74.41,shortcut vs full object,72.7208
+mnist,texture,0.0075,3,0.81,0.0,0.38,0.0,0.76,0.0,0.32,0.0,60.93,shortcut vs full object,58.2233
+mnist,texture,0.0075,4,0.66,0.0,0.39,0.0,0.63,0.0,0.16,0.0,30.38,shortcut vs full object,28.2219
+mnist,texture,0.0075,5,0.385,0.01,0.17,0.0,0.24,0.0,0.05,0.0,7.48,shortcut vs full object,5.8108
+mnist,texture,0.0075,42,0.82,0.0,0.57,0.0,0.81,0.0,0.23,0.0,82.07,shortcut vs full object,80.9788
+mnist,texture,0.01,1,0.78,0.0,0.43,0.0,0.64,0.0,0.13,0.0,38.88,shortcut vs full object,36.4334
+mnist,texture,0.01,2,0.78,0.04,0.59,0.0,0.86,0.0,0.22,0.0,80.4,shortcut vs full object,78.998
+mnist,texture,0.01,42,0.9,0.0,0.69,0.0,0.95,0.0,0.37,0.0,92.03,shortcut vs full object,91.4836
+mnist,texture,0.015,1,0.84,0.0,0.6,0.0,0.84,0.0,0.26,0.0,73.2,shortcut vs full object,71.7621
+mnist,texture,0.015,2,0.75,0.0,0.76,0.0,0.885,0.01,0.38,0.0,92.06,shortcut vs full object,91.5041
+mnist,texture,0.015,3,0.93,0.0,0.75,0.0,0.94,0.0,0.31,0.0,89.3,shortcut vs full object,88.3025
+mnist,texture,0.015,4,0.93,0.0,0.64,0.0,0.9,0.0,0.24,0.0,78.36,shortcut vs full object,76.7072
+mnist,texture,0.015,5,0.91,0.0,0.62,0.0,0.88,0.0,0.16,0.0,73.63,shortcut vs full object,71.7192
+mnist,texture,0.015,42,0.81,0.0,0.63,0.0,0.85,0.0,0.36,0.0,92.57,shortcut vs full object,91.949
+mnist,texture,0.02,1,0.93,0.0,0.8,0.0,0.95,0.0,0.35,0.0,87.94,shortcut vs full object,86.9978
+mnist,texture,0.02,2,0.89,0.0,0.75,0.0,0.935,0.01,0.36,0.0,92.39,shortcut vs full object,91.7996
+mnist,texture,0.02,42,0.85,0.0,0.72,0.0,0.92,0.0,0.46,0.0,98.38,shortcut vs full object,98.2511
+mnist,texture,0.03,1,0.97,0.0,0.88,0.0,0.98,0.0,0.66,0.0,95.45,shortcut vs full object,95.0242
+mnist,texture,0.03,2,0.89,0.0,0.8,0.0,0.92,0.0,0.37,0.0,97.01,shortcut vs full object,96.7652
+mnist,texture,0.03,42,0.96,0.0,0.79,0.0,0.95,0.0,0.49,0.0,98.65,shortcut vs full object,98.5241
+mnist,texture,0.05,1,0.98,0.0,0.83,0.0,0.95,0.0,0.52,0.0,98.51,shortcut vs full object,98.3656
+mnist,texture,0.05,2,0.81,0.0,0.78,0.0,0.95,0.0,0.52,0.0,99.35,shortcut vs full object,99.293
+mnist,texture,0.05,42,0.93,0.0,0.79,0.0,0.96,0.0,0.48,0.0,99.64,shortcut vs full object,99.6075
+mnist,texture,0.1,1,0.93,0.0,0.9,0.0,0.96,0.0,0.58,0.0,99.74,shortcut vs full object,99.7148
+mnist,texture,0.1,2,0.93,0.0,0.82,0.0,0.96,0.0,0.42,0.0,99.73,shortcut vs full object,99.7043
+mnist,texture,0.1,42,0.93,0.0,0.81,0.0,0.95,0.0,0.54,0.0,99.87,shortcut vs full object,99.8574
+mnist,texture,0.25,1,0.96,0.0,0.92,0.0,0.93,0.0,0.67,0.0,99.98,shortcut vs full object,99.978
+mnist,texture,0.25,2,1.0,0.0,0.81,0.0,0.96,0.0,0.59,0.0,100.0,shortcut vs full object,100.0
+mnist,texture,0.25,42,0.89,0.0,0.82,0.0,0.93,0.0,0.54,0.0,99.95,shortcut vs full object,99.9455
+mnist,texture,0.4,1,0.97,0.0,0.93,0.0,0.97,0.0,0.7,0.0,100.0,shortcut vs full object,100.0
+mnist,texture,0.4,2,0.92,0.0,0.83,0.0,0.97,0.0,0.58,0.0,100.0,shortcut vs full object,100.0
+mnist,texture,0.4,42,0.98,0.0,0.89,0.0,0.97,0.0,0.525,0.01,99.96,shortcut vs full object,99.9557
+pet_resnet18,patch,-0.5,1,0.43,0.0,0.52,0.0,0.39,0.0,0.34,0.0,19.16,shortcut vs full object,-0.7854
+pet_resnet18,patch,-0.5,2,0.495,0.01,0.51,0.0,0.425,0.01,0.355,0.01,17.72,shortcut vs full object,0.2304
+pet_resnet18,patch,-0.5,42,0.45,0.0,0.48,0.0,0.4,0.0,0.355,0.01,15.48,shortcut vs full object,-0.1303
+pet_resnet18,patch,-0.4,1,0.54,0.12,0.56,0.0,0.45,0.0,0.38,0.0,21.83,shortcut vs full object,3.9445
+pet_resnet18,patch,-0.4,2,0.51,0.0,0.61,0.0,0.47,0.0,0.41,0.0,20.11,shortcut vs full object,3.5145
+pet_resnet18,patch,-0.4,42,0.75,0.0,0.64,0.0,0.59,0.0,0.55,0.0,24.83,shortcut vs full object,6.0962
+pet_resnet18,patch,-0.3,1,0.69,0.0,0.71,0.0,0.575,0.01,0.72,0.0,34.53,shortcut vs full object,14.5746
+pet_resnet18,patch,-0.3,2,0.79,0.0,0.62,0.0,0.67,0.0,0.67,0.0,33.2,shortcut vs full object,15.1099
+pet_resnet18,patch,-0.3,42,0.75,0.0,0.55,0.0,0.55,0.0,0.68,0.0,31.86,shortcut vs full object,15.3646
+pet_resnet18,patch,-0.2,1,0.77,0.0,0.88,0.0,0.79,0.0,0.84,0.0,57.13,shortcut vs full object,41.0641
+pet_resnet18,patch,-0.2,2,0.71,0.0,0.74,0.0,0.56,0.0,0.69,0.0,43.28,shortcut vs full object,22.9766
+pet_resnet18,patch,-0.2,42,0.555,0.01,0.7,0.0,0.6,0.0,0.665,0.01,39.38,shortcut vs full object,22.9047
+pet_resnet18,patch,-0.1,1,0.83,0.0,0.92,0.0,0.89,0.0,0.97,0.0,72.28,shortcut vs full object,60.1323
+pet_resnet18,patch,-0.1,2,0.93,0.0,0.93,0.0,0.89,0.0,0.98,0.0,83.7,shortcut vs full object,76.7674
+pet_resnet18,patch,-0.1,42,0.77,0.0,0.91,0.0,0.95,0.0,0.93,0.0,88.55,shortcut vs full object,82.683
+pet_resnet18,patch,0.0,1,0.89,0.0,0.93,0.0,0.99,0.0,0.96,0.0,98.83,shortcut vs full object,98.2211
+pet_resnet18,patch,0.0,2,0.95,0.0,0.97,0.0,0.99,0.0,0.98,0.0,99.45,shortcut vs full object,99.1857
+pet_resnet18,patch,0.0,42,0.76,0.0,0.92,0.0,0.98,0.0,0.93,0.0,98.86,shortcut vs full object,98.1678
+pneumonia_mnist,patch,-0.4,1,0.3,0.0,0.425,0.09,0.18,0.0,0.46,0.14,12.82,shortcut vs full object,0.0
+pneumonia_mnist,patch,-0.4,2,0.53,0.0,0.495,0.05,0.12,0.0,0.425,0.05,13.3,shortcut vs full object,-0.1849
+pneumonia_mnist,patch,-0.4,42,0.3,0.0,0.44,0.3,0.14,0.0,0.605,0.33,18.43,shortcut vs full object,2.1121
+pneumonia_mnist,patch,-0.25,1,0.26,0.0,0.325,0.17,0.11,0.0,0.445,0.09,14.58,shortcut vs full object,0.0
+pneumonia_mnist,patch,-0.25,2,0.43,0.0,0.525,0.09,0.115,0.01,0.5,0.12,19.39,shortcut vs full object,3.2641
+pneumonia_mnist,patch,-0.25,42,0.41,0.0,0.43,0.14,0.11,0.0,0.535,0.15,15.87,shortcut vs full object,0.3907
+pneumonia_mnist,patch,-0.1,1,0.46,0.0,0.685,0.33,0.32,0.0,0.66,0.34,23.24,shortcut vs full object,3.2396
+pneumonia_mnist,patch,-0.1,2,0.51,0.0,0.575,0.09,0.44,0.02,0.77,0.12,24.84,shortcut vs full object,15.1884
+pneumonia_mnist,patch,-0.1,42,0.4,0.0,0.45,0.18,0.17,0.0,0.565,0.23,15.87,shortcut vs full object,0.1898
+pneumonia_mnist,patch,-0.075,1,0.59,0.0,0.79,0.18,0.41,0.0,0.79,0.16,26.6,shortcut vs full object,10.7165
+pneumonia_mnist,patch,-0.075,2,0.53,0.0,0.585,0.01,0.46,0.0,0.865,0.03,25.16,shortcut vs full object,16.7519
+pneumonia_mnist,patch,-0.075,42,0.53,0.0,0.65,0.08,0.43,0.0,0.88,0.12,30.93,shortcut vs full object,19.4425
+pneumonia_mnist,patch,-0.05,1,0.57,0.0,0.88,0.16,0.585,0.01,0.8,0.16,36.22,shortcut vs full object,8.0847
+pneumonia_mnist,patch,-0.05,2,0.525,0.01,0.565,0.05,0.485,0.01,0.84,0.06,26.12,shortcut vs full object,17.5262
+pneumonia_mnist,patch,-0.05,42,0.55,0.0,0.665,0.01,0.46,0.0,0.955,0.03,34.94,shortcut vs full object,25.0979
+pneumonia_mnist,patch,-0.025,1,0.57,0.0,0.785,0.37,0.675,0.09,0.685,0.39,43.27,shortcut vs full object,14.9093
+pneumonia_mnist,patch,-0.025,2,0.54,0.0,0.755,0.01,0.5,0.0,0.89,0.0,37.02,shortcut vs full object,29.1882
+pneumonia_mnist,patch,-0.025,42,0.57,0.0,0.665,0.17,0.43,0.02,0.875,0.19,38.94,shortcut vs full object,29.961
+pneumonia_mnist,patch,0.0,1,0.63,0.0,0.785,0.43,0.52,0.04,0.72,0.44,80.13,shortcut vs full object,68.5303
+pneumonia_mnist,patch,0.0,2,0.55,0.0,0.64,0.0,0.52,0.0,0.93,0.0,52.08,shortcut vs full object,41.7103
+pneumonia_mnist,patch,0.0,42,0.57,0.0,0.59,0.0,0.58,0.0,0.89,0.0,62.5,shortcut vs full object,48.233
+pneumonia_mnist,patch,0.005,1,0.6,0.0,0.84,0.2,0.5,0.0,0.72,0.24,54.33,shortcut vs full object,29.9755
+pneumonia_mnist,patch,0.005,2,0.54,0.0,0.66,0.0,0.53,0.0,0.805,0.01,79.97,shortcut vs full object,64.6924
+pneumonia_mnist,patch,0.005,42,0.53,0.0,0.69,0.0,0.66,0.0,0.98,0.0,70.51,shortcut vs full object,54.7838
+pneumonia_mnist,patch,0.01,1,0.52,0.0,0.87,0.16,0.48,0.0,0.77,0.22,98.4,shortcut vs full object,97.4914
+pneumonia_mnist,patch,0.01,2,0.56,0.0,0.63,0.0,0.53,0.0,0.87,0.0,79.97,shortcut vs full object,64.4921
+pneumonia_mnist,patch,0.01,42,0.55,0.0,0.7,0.0,0.57,0.0,0.94,0.0,78.53,shortcut vs full object,62.3663
+pneumonia_mnist,patch,0.02,1,0.65,0.0,0.7,0.0,0.65,0.0,0.83,0.0,57.05,shortcut vs full object,42.6109
+pneumonia_mnist,patch,0.02,2,0.64,0.0,0.81,0.0,0.53,0.0,0.945,0.01,71.15,shortcut vs full object,55.2158
+pneumonia_mnist,patch,0.02,42,0.53,0.0,0.64,0.0,0.63,0.0,0.99,0.0,77.56,shortcut vs full object,60.7761
+pneumonia_mnist,patch,0.05,1,0.53,0.0,0.865,0.21,0.47,0.0,0.795,0.23,99.36,shortcut vs full object,98.9864
+pneumonia_mnist,patch,0.05,2,0.675,0.01,0.95,0.0,0.98,0.0,0.99,0.0,92.31,shortcut vs full object,82.6763
+pneumonia_mnist,patch,0.05,42,0.54,0.0,0.72,0.0,0.55,0.0,0.81,0.0,92.79,shortcut vs full object,83.3372
+pneumonia_mnist,patch,0.1,1,0.56,0.02,0.695,0.13,0.47,0.0,0.82,0.18,99.84,shortcut vs full object,99.7447
+pneumonia_mnist,patch,0.1,2,0.88,0.0,1.0,0.0,1.0,0.0,1.0,0.0,98.4,shortcut vs full object,97.1311
+pneumonia_mnist,patch,0.1,42,0.62,0.0,0.77,0.0,0.665,0.01,0.96,0.0,98.4,shortcut vs full object,95.8398
+pneumonia_mnist,patch,0.25,1,0.7,0.0,0.83,0.0,0.54,0.0,0.83,0.0,97.28,shortcut vs full object,93.2372
+pneumonia_mnist,patch,0.25,2,1.0,0.0,1.0,0.0,1.0,0.0,1.0,0.0,99.84,shortcut vs full object,99.744
+pneumonia_mnist,patch,0.25,42,0.61,0.0,0.775,0.03,0.625,0.03,0.83,0.02,99.68,shortcut vs full object,99.1503
+pneumonia_mnist,patch,0.4,1,0.66,0.0,0.56,0.0,0.53,0.0,0.69,0.0,99.68,shortcut vs full object,99.1503
+pneumonia_mnist,patch,0.4,2,0.61,0.08,0.625,0.01,0.625,0.03,0.87,0.02,100.0,shortcut vs full object,100.0
+pneumonia_mnist,patch,0.4,42,0.57,0.0,0.54,0.0,0.53,0.0,0.58,0.02,99.52,shortcut vs full object,98.7308
+pneumonia_mnist,texture,-0.4,1,0.23,0.0,0.585,0.13,0.385,0.11,0.605,0.09,17.95,shortcut vs full object,3.765
+pneumonia_mnist,texture,-0.4,2,0.42,0.0,0.55,0.08,0.595,0.11,0.595,0.07,20.83,shortcut vs full object,4.9922
+pneumonia_mnist,texture,-0.4,42,0.335,0.01,0.58,0.18,0.37,0.16,0.72,0.12,16.35,shortcut vs full object,2.9807
+pneumonia_mnist,texture,-0.25,1,0.37,0.0,0.96,0.04,0.73,0.04,0.935,0.03,21.15,shortcut vs full object,8.7173
+pneumonia_mnist,texture,-0.25,2,0.56,0.0,0.805,0.15,0.615,0.11,0.695,0.13,22.92,shortcut vs full object,6.6037
+pneumonia_mnist,texture,-0.25,42,0.42,0.0,0.64,0.02,0.52,0.06,0.705,0.01,20.03,shortcut vs full object,9.4337
+pneumonia_mnist,texture,-0.1,1,0.485,0.01,1.0,0.0,0.755,0.01,0.99,0.0,31.89,shortcut vs full object,22.16
+pneumonia_mnist,texture,-0.1,2,0.54,0.0,0.925,0.13,0.565,0.13,0.89,0.12,31.09,shortcut vs full object,14.8523
+pneumonia_mnist,texture,-0.1,42,0.53,0.0,0.765,0.03,0.575,0.07,0.715,0.01,29.81,shortcut vs full object,21.7852
+pneumonia_mnist,texture,-0.075,1,0.745,0.01,0.99,0.0,0.755,0.01,0.99,0.0,37.66,shortcut vs full object,28.2293
+pneumonia_mnist,texture,-0.075,2,0.59,0.0,0.885,0.23,0.71,0.22,0.875,0.21,35.42,shortcut vs full object,18.5932
+pneumonia_mnist,texture,-0.075,42,0.595,0.01,0.935,0.03,0.69,0.04,0.885,0.01,35.1,shortcut vs full object,27.68
+pneumonia_mnist,texture,-0.05,1,0.8,0.0,1.0,0.0,0.7,0.0,0.99,0.0,40.71,shortcut vs full object,32.8539
+pneumonia_mnist,texture,-0.05,2,0.72,0.0,1.0,0.0,0.8,0.0,0.95,0.0,36.86,shortcut vs full object,27.0395
+pneumonia_mnist,texture,-0.05,42,0.535,0.01,0.945,0.01,0.67,0.02,0.84,0.04,38.3,shortcut vs full object,28.7035
+pneumonia_mnist,texture,-0.025,1,0.72,0.0,1.0,0.0,0.78,0.0,1.0,0.0,48.4,shortcut vs full object,40.1531
+pneumonia_mnist,texture,-0.025,2,0.9,0.0,1.0,0.0,0.815,0.01,1.0,0.0,49.2,shortcut vs full object,34.9052
+pneumonia_mnist,texture,-0.025,42,0.845,0.01,0.97,0.0,0.64,0.0,0.785,0.07,54.17,shortcut vs full object,45.7376
+pneumonia_mnist,texture,0.0,1,0.84,0.0,1.0,0.0,0.77,0.0,1.0,0.0,84.62,shortcut vs full object,81.0334
+pneumonia_mnist,texture,0.0,2,1.0,0.0,0.95,0.1,0.535,0.09,0.95,0.08,94.39,shortcut vs full object,92.7369
+pneumonia_mnist,texture,0.0,42,1.0,0.0,1.0,0.0,0.79,0.0,0.88,0.14,99.04,shortcut vs full object,98.7118
+pneumonia_mnist,texture,0.005,1,0.89,0.0,1.0,0.0,0.81,0.0,1.0,0.0,98.4,shortcut vs full object,98.0688
+pneumonia_mnist,texture,0.005,2,1.0,0.0,0.98,0.04,0.55,0.0,0.98,0.04,97.28,shortcut vs full object,96.3964
+pneumonia_mnist,texture,0.005,42,0.975,0.01,0.99,0.02,0.805,0.01,0.86,0.26,100.0,shortcut vs full object,100.0
+pneumonia_mnist,texture,0.01,1,0.93,0.0,1.0,0.0,0.83,0.0,1.0,0.0,95.67,shortcut vs full object,94.6497
+pneumonia_mnist,texture,0.01,2,0.98,0.0,0.97,0.06,0.56,0.06,0.985,0.03,77.88,shortcut vs full object,71.5389
+pneumonia_mnist,texture,0.01,42,0.95,0.0,1.0,0.0,0.95,0.0,0.99,0.0,95.19,shortcut vs full object,94.0566
+pneumonia_mnist,texture,0.02,1,0.91,0.0,1.0,0.0,0.69,0.0,1.0,0.0,93.75,shortcut vs full object,92.3678
+pneumonia_mnist,texture,0.02,2,1.0,0.0,0.955,0.09,0.6,0.06,0.97,0.06,96.79,shortcut vs full object,95.5286
+pneumonia_mnist,texture,0.02,42,1.0,0.0,0.995,0.01,0.815,0.01,0.855,0.23,100.0,shortcut vs full object,100.0
+pneumonia_mnist,texture,0.05,1,0.96,0.0,1.0,0.0,0.72,0.0,1.0,0.0,98.88,shortcut vs full object,97.9446
+pneumonia_mnist,texture,0.05,2,1.0,0.0,1.0,0.0,0.97,0.0,1.0,0.0,98.08,shortcut vs full object,97.3727
+pneumonia_mnist,texture,0.05,42,1.0,0.0,1.0,0.0,0.86,0.0,0.88,0.18,100.0,shortcut vs full object,100.0
+pneumonia_mnist,texture,0.1,1,1.0,0.0,1.0,0.0,0.85,0.0,1.0,0.0,100.0,shortcut vs full object,100.0
+pneumonia_mnist,texture,0.1,2,1.0,0.0,0.835,0.33,0.5,0.0,0.86,0.28,99.84,shortcut vs full object,99.7535
+pneumonia_mnist,texture,0.1,42,0.995,0.01,0.99,0.02,0.755,0.01,0.83,0.3,100.0,shortcut vs full object,100.0
+pneumonia_mnist,texture,0.25,1,1.0,0.0,0.97,0.0,0.88,0.0,0.87,0.0,100.0,shortcut vs full object,100.0
+pneumonia_mnist,texture,0.25,2,1.0,0.0,1.0,0.0,0.6,0.0,0.96,0.0,100.0,shortcut vs full object,100.0
+pneumonia_mnist,texture,0.25,42,0.83,0.34,1.0,0.0,0.695,0.01,0.975,0.01,100.0,shortcut vs full object,100.0
+pneumonia_mnist,texture,0.4,1,1.0,0.0,1.0,0.0,0.98,0.0,0.95,0.0,100.0,shortcut vs full object,100.0
+pneumonia_mnist,texture,0.4,2,0.84,0.0,1.0,0.0,0.82,0.02,0.97,0.0,99.84,shortcut vs full object,99.8031
+pneumonia_mnist,texture,0.4,42,0.965,0.05,1.0,0.0,1.0,0.0,0.92,0.0,100.0,shortcut vs full object,100.0
+cifar10,patch,-0.8,1,0.52,0.0,0.56,0.0,0.59,0.0,0.615,0.01,4.22,shortcut vs size-matched object,0.8032
+cifar10,patch,-0.8,42,0.45,0.0,0.62,0.0,0.615,0.01,0.55,0.0,3.74,shortcut vs size-matched object,0.8401
+cifar10,patch,-0.6,1,0.615,0.01,0.76,0.0,0.805,0.01,0.69,0.0,7.61,shortcut vs size-matched object,3.7236
+cifar10,patch,-0.6,42,0.66,0.0,0.8,0.0,0.88,0.0,0.58,0.0,7.49,shortcut vs size-matched object,4.5687
+cifar10,patch,-0.4,1,0.77,0.0,0.86,0.0,0.93,0.0,0.87,0.0,17.29,shortcut vs size-matched object,14.5636
+cifar10,patch,-0.4,42,0.76,0.02,0.84,0.0,0.95,0.0,0.81,0.0,13.73,shortcut vs size-matched object,11.0272
+cifar10,patch,-0.25,1,0.93,0.0,0.98,0.0,0.96,0.0,0.9,0.0,23.18,shortcut vs size-matched object,20.6833
+cifar10,patch,-0.25,42,0.86,0.0,0.89,0.0,0.97,0.0,0.89,0.0,22.55,shortcut vs size-matched object,20.0016
+cifar10,patch,-0.1,1,0.95,0.0,0.95,0.0,0.98,0.0,0.95,0.0,45.07,shortcut vs size-matched object,42.6817
+cifar10,patch,-0.1,42,0.95,0.0,0.99,0.0,0.98,0.0,0.99,0.0,43.4,shortcut vs size-matched object,41.0744
+cifar10,patch,0.0,1,0.97,0.0,0.97,0.0,0.96,0.0,0.915,0.17,96.62,shortcut vs size-matched object,96.3297
+cifar10,patch,0.0,42,0.95,0.0,0.97,0.0,0.99,0.0,0.885,0.21,96.29,shortcut vs size-matched object,95.9789
+cifar10_resnet18,patch,-0.8,1,0.525,0.03,0.545,0.01,0.655,0.01,0.47,0.02,3.31,shortcut vs size-matched object,1.2427
+cifar10_resnet18,patch,-0.8,2,0.505,0.09,0.51,0.0,0.61,0.0,0.55,0.0,2.94,shortcut vs size-matched object,0.9412
+cifar10_resnet18,patch,-0.8,42,0.495,0.01,0.55,0.0,0.595,0.01,0.57,0.0,2.71,shortcut vs size-matched object,0.8077
+cifar10_resnet18,patch,-0.6,1,0.645,0.03,0.7,0.0,0.725,0.01,0.67,0.02,5.36,shortcut vs size-matched object,3.4078
+cifar10_resnet18,patch,-0.6,2,0.7,0.0,0.74,0.0,0.73,0.0,0.7,0.0,6.35,shortcut vs size-matched object,4.326
+cifar10_resnet18,patch,-0.6,42,0.74,0.02,0.76,0.0,0.8,0.02,0.67,0.0,6.58,shortcut vs size-matched object,4.4503
+cifar10_resnet18,patch,-0.4,1,0.7,0.04,0.755,0.01,0.925,0.01,0.725,0.01,10.8,shortcut vs size-matched object,8.5743
+cifar10_resnet18,patch,-0.4,2,0.755,0.01,0.735,0.01,0.75,0.0,0.81,0.0,10.83,shortcut vs size-matched object,8.7163
+cifar10_resnet18,patch,-0.4,42,0.83,0.0,0.74,0.0,0.86,0.0,0.84,0.0,10.25,shortcut vs size-matched object,7.9676
+cifar10_resnet18,patch,-0.25,1,0.89,0.0,0.78,0.0,0.865,0.01,0.84,0.0,19.72,shortcut vs size-matched object,17.5017
+cifar10_resnet18,patch,-0.25,2,0.91,0.0,0.8,0.0,0.855,0.01,0.89,0.02,18.68,shortcut vs size-matched object,16.3107
+cifar10_resnet18,patch,-0.25,42,0.82,0.0,0.75,0.0,0.87,0.0,0.9,0.0,18.4,shortcut vs size-matched object,16.081
+cifar10_resnet18,patch,-0.1,1,0.9,0.0,0.87,0.0,0.89,0.0,0.925,0.01,35.67,shortcut vs size-matched object,33.1752
+cifar10_resnet18,patch,-0.1,2,0.9,0.0,0.83,0.0,0.9,0.0,0.99,0.0,38.95,shortcut vs size-matched object,36.5407
+cifar10_resnet18,patch,-0.1,42,0.93,0.0,0.875,0.01,0.895,0.01,0.9,0.02,34.32,shortcut vs size-matched object,31.8452
+cifar10_resnet18,patch,0.0,1,0.95,0.0,0.98,0.0,0.98,0.0,1.0,0.0,97.25,shortcut vs size-matched object,96.997
+cifar10_resnet18,patch,0.0,2,0.98,0.0,0.98,0.0,0.96,0.0,1.0,0.0,96.16,shortcut vs size-matched object,95.8157
+cifar10_resnet18,patch,0.0,42,0.98,0.0,0.97,0.0,0.98,0.0,1.0,0.0,97.02,shortcut vs size-matched object,96.7566
+mnist,patch,-0.4,1,0.35,0.0,0.26,0.0,0.34,0.0,0.31,0.0,0.12,shortcut vs size-matched object,0.0178
+mnist,patch,-0.4,2,0.39,0.0,0.29,0.0,0.32,0.0,0.325,0.01,0.12,shortcut vs size-matched object,-0.0033
+mnist,patch,-0.4,42,0.38,0.0,0.275,0.01,0.34,0.0,0.28,0.0,0.18,shortcut vs size-matched object,0.0078
+mnist,patch,-0.25,1,0.39,0.0,0.27,0.0,0.29,0.0,0.28,0.0,0.14,shortcut vs size-matched object,0.0211
+mnist,patch,-0.25,2,0.36,0.0,0.385,0.01,0.35,0.0,0.32,0.0,0.17,shortcut vs size-matched object,0.0278
+mnist,patch,-0.25,42,0.4,0.0,0.36,0.0,0.37,0.0,0.335,0.01,0.22,shortcut vs size-matched object,0.0668
+mnist,patch,-0.1,1,0.36,0.0,0.26,0.0,0.31,0.0,0.31,0.0,0.13,shortcut vs size-matched object,0.01
+mnist,patch,-0.1,2,0.47,0.0,0.39,0.0,0.38,0.0,0.44,0.0,0.2,shortcut vs size-matched object,0.0701
+mnist,patch,-0.1,42,0.49,0.0,0.29,0.0,0.37,0.0,0.36,0.0,0.2,shortcut vs size-matched object,0.0234
+mnist,patch,-0.05,1,0.36,0.0,0.33,0.02,0.36,0.0,0.27,0.0,0.15,shortcut vs size-matched object,0.0145
+mnist,patch,-0.05,2,0.45,0.0,0.4,0.0,0.41,0.0,0.425,0.01,0.18,shortcut vs size-matched object,0.0367
+mnist,patch,-0.05,42,0.43,0.0,0.26,0.0,0.37,0.0,0.41,0.0,0.22,shortcut vs size-matched object,0.0712
+mnist,patch,0.0,1,0.37,0.0,0.32,0.0,0.365,0.01,0.27,0.0,0.17,shortcut vs size-matched object,0.0389
+mnist,patch,0.0,2,0.39,0.0,0.32,0.0,0.35,0.0,0.42,0.0,0.17,shortcut vs size-matched object,0.0289
+mnist,patch,0.0,42,0.63,0.0,0.485,0.01,0.53,0.0,0.57,0.0,8.87,shortcut vs size-matched object,8.5438
+mnist,patch,0.005,1,0.49,0.0,0.35,0.0,0.42,0.0,0.42,0.0,0.81,shortcut vs size-matched object,0.6345
+mnist,patch,0.005,2,0.52,0.0,0.4,0.0,0.54,0.0,0.49,0.0,1.59,shortcut vs size-matched object,1.3785
+mnist,patch,0.005,42,0.56,0.0,0.53,0.0,0.615,0.01,0.59,0.0,22.98,shortcut vs size-matched object,22.0551
+mnist,patch,0.0075,1,0.64,0.0,0.57,0.0,0.64,0.0,0.57,0.0,13.3,shortcut vs size-matched object,12.8215
+mnist,patch,0.0075,2,0.58,0.0,0.42,0.0,0.58,0.0,0.52,0.0,5.77,shortcut vs size-matched object,5.5149
+mnist,patch,0.0075,3,0.57,0.0,0.45,0.0,0.57,0.0,0.49,0.0,6.93,shortcut vs size-matched object,6.6572
+mnist,patch,0.0075,4,0.49,0.0,0.39,0.0,0.43,0.0,0.5,0.0,0.53,shortcut vs size-matched object,0.3806
+mnist,patch,0.0075,5,0.57,0.0,0.51,0.0,0.6,0.0,0.61,0.0,19.03,shortcut vs size-matched object,17.7227
+mnist,patch,0.0075,42,0.74,0.0,0.72,0.0,0.74,0.0,0.75,0.0,40.85,shortcut vs size-matched object,39.806
+mnist,patch,0.01,1,0.69,0.0,0.67,0.0,0.69,0.0,0.71,0.0,9.13,shortcut vs size-matched object,8.7152
+mnist,patch,0.01,2,0.66,0.0,0.56,0.0,0.64,0.0,0.56,0.0,17.52,shortcut vs size-matched object,16.6943
+mnist,patch,0.01,42,0.82,0.0,0.79,0.0,0.84,0.0,0.8,0.0,62.21,shortcut vs size-matched object,61.264
+mnist,patch,0.015,1,0.74,0.0,0.62,0.0,0.725,0.01,0.615,0.01,39.33,shortcut vs size-matched object,37.6443
+mnist,patch,0.015,2,0.75,0.0,0.59,0.0,0.75,0.0,0.63,0.0,30.18,shortcut vs size-matched object,29.0383
+mnist,patch,0.015,3,0.58,0.0,0.485,0.01,0.57,0.0,0.49,0.0,31.49,shortcut vs size-matched object,29.8764
+mnist,patch,0.015,4,0.68,0.0,0.55,0.0,0.65,0.0,0.71,0.0,10.64,shortcut vs size-matched object,10.441
+mnist,patch,0.015,5,0.65,0.0,0.51,0.0,0.56,0.0,0.61,0.0,26.1,shortcut vs size-matched object,24.2785
+mnist,patch,0.015,42,0.86,0.0,0.8,0.0,0.86,0.0,0.8,0.0,64.89,shortcut vs size-matched object,63.8542
+mnist,patch,0.02,1,0.83,0.0,0.775,0.01,0.82,0.0,0.805,0.01,53.12,shortcut vs size-matched object,50.7833
+mnist,patch,0.02,2,0.74,0.0,0.71,0.0,0.79,0.0,0.68,0.0,45.18,shortcut vs size-matched object,43.9131
+mnist,patch,0.02,42,0.84,0.0,0.79,0.0,0.82,0.0,0.81,0.0,68.52,shortcut vs size-matched object,67.6006
+mnist,patch,0.03,1,0.86,0.0,0.83,0.0,0.85,0.02,0.83,0.0,71.03,shortcut vs size-matched object,69.1488
+mnist,patch,0.03,2,0.82,0.0,0.81,0.0,0.86,0.0,0.83,0.0,70.38,shortcut vs size-matched object,68.4181
+mnist,patch,0.03,42,0.85,0.0,0.8,0.0,0.83,0.0,0.83,0.0,74.95,shortcut vs size-matched object,73.1923
+mnist,patch,0.05,1,0.83,0.0,0.875,0.01,0.84,0.0,0.84,0.0,75.72,shortcut vs size-matched object,73.7788
+mnist,patch,0.05,2,0.85,0.0,0.84,0.0,0.91,0.0,0.86,0.0,77.26,shortcut vs size-matched object,75.5933
+mnist,patch,0.05,42,0.85,0.0,0.81,0.0,0.82,0.0,0.82,0.0,75.67,shortcut vs size-matched object,73.7606
+mnist,patch,0.1,1,0.91,0.0,0.92,0.0,0.87,0.0,0.9,0.0,84.1,shortcut vs size-matched object,82.7765
+mnist,patch,0.1,2,0.9,0.0,0.9,0.0,0.92,0.0,0.9,0.0,87.86,shortcut vs size-matched object,86.7155
+mnist,patch,0.1,42,0.86,0.0,0.83,0.0,0.84,0.0,0.83,0.0,76.97,shortcut vs size-matched object,75.1227
+mnist,patch,0.25,1,0.98,0.0,0.96,0.0,0.94,0.0,0.95,0.0,99.76,shortcut vs size-matched object,99.7335
+mnist,patch,0.25,2,0.95,0.0,0.98,0.0,0.98,0.0,0.92,0.0,99.57,shortcut vs size-matched object,99.5228
+mnist,patch,0.25,42,0.92,0.0,0.89,0.0,0.89,0.0,0.87,0.0,88.51,shortcut vs size-matched object,87.3889
+mnist,patch,0.4,1,0.975,0.01,0.95,0.0,0.96,0.0,0.95,0.0,99.8,shortcut vs size-matched object,99.7779
+mnist,patch,0.4,2,0.89,0.0,0.93,0.0,0.89,0.0,0.89,0.0,88.92,shortcut vs size-matched object,87.8239
+mnist,patch,0.4,42,0.92,0.0,0.93,0.0,0.96,0.0,0.92,0.0,99.47,shortcut vs size-matched object,99.4115
+mnist,texture,-0.4,1,0.01,0.0,0.03,0.0,0.04,0.0,0.01,0.0,0.17,shortcut vs size-matched object,0.0478
+mnist,texture,-0.4,2,0.02,0.0,0.02,0.0,0.08,0.0,0.01,0.0,0.17,shortcut vs size-matched object,0.0289
+mnist,texture,-0.4,42,0.02,0.0,0.05,0.0,0.09,0.0,0.02,0.0,0.18,shortcut vs size-matched object,0.0089
+mnist,texture,-0.25,1,0.01,0.0,0.05,0.0,0.05,0.0,0.02,0.0,0.11,shortcut vs size-matched object,-0.0044
+mnist,texture,-0.25,2,0.04,0.0,0.03,0.0,0.06,0.0,0.0,0.0,0.27,shortcut vs size-matched object,0.108
+mnist,texture,-0.25,42,0.02,0.0,0.06,0.0,0.06,0.0,0.02,0.0,0.23,shortcut vs size-matched object,0.0534
+mnist,texture,-0.1,1,0.02,0.0,0.03,0.0,0.06,0.0,0.02,0.0,0.14,shortcut vs size-matched object,0.0278
+mnist,texture,-0.1,2,0.07,0.0,0.02,0.0,0.08,0.0,0.0,0.0,0.64,shortcut vs size-matched object,0.4065
+mnist,texture,-0.1,42,0.09,0.0,0.05,0.0,0.07,0.0,0.03,0.0,0.51,shortcut vs size-matched object,0.2695
+mnist,texture,-0.05,1,0.02,0.0,0.035,0.01,0.07,0.0,0.02,0.0,0.18,shortcut vs size-matched object,0.0401
+mnist,texture,-0.05,2,0.21,0.0,0.04,0.0,0.1,0.0,0.01,0.0,1.3,shortcut vs size-matched object,0.992
+mnist,texture,-0.05,42,0.2,0.0,0.03,0.0,0.14,0.0,0.01,0.0,2.43,shortcut vs size-matched object,1.9441
+mnist,texture,0.0,1,0.03,0.0,0.05,0.0,0.075,0.01,0.03,0.0,0.21,shortcut vs size-matched object,0.0645
+mnist,texture,0.0,2,0.34,0.0,0.05,0.0,0.19,0.0,0.02,0.0,8.88,shortcut vs size-matched object,7.8065
+mnist,texture,0.0,42,0.58,0.0,0.18,0.0,0.45,0.0,0.05,0.0,18.24,shortcut vs size-matched object,16.5752
+mnist,texture,0.005,1,0.54,0.0,0.14,0.0,0.51,0.0,0.04,0.0,14.24,shortcut vs size-matched object,12.5423
+mnist,texture,0.005,2,0.79,0.0,0.24,0.0,0.64,0.0,0.14,0.0,55.64,shortcut vs size-matched object,53.1985
+mnist,texture,0.005,42,0.79,0.0,0.34,0.0,0.77,0.0,0.285,0.01,76.75,shortcut vs size-matched object,75.3287
+mnist,texture,0.0075,1,0.76,0.0,0.295,0.01,0.7,0.0,0.1,0.0,41.59,shortcut vs size-matched object,38.569
+mnist,texture,0.0075,2,0.81,0.0,0.38,0.0,0.85,0.0,0.28,0.0,74.41,shortcut vs size-matched object,72.7208
+mnist,texture,0.0075,3,0.81,0.0,0.23,0.0,0.65,0.0,0.24,0.0,60.93,shortcut vs size-matched object,58.2233
+mnist,texture,0.0075,4,0.65,0.0,0.3,0.0,0.64,0.0,0.12,0.0,30.38,shortcut vs size-matched object,28.2219
+mnist,texture,0.0075,5,0.365,0.01,0.14,0.0,0.27,0.0,0.07,0.0,7.48,shortcut vs size-matched object,5.8108
+mnist,texture,0.0075,42,0.84,0.0,0.38,0.0,0.79,0.0,0.26,0.0,82.07,shortcut vs size-matched object,80.9788
+mnist,texture,0.01,1,0.85,0.0,0.3,0.0,0.63,0.0,0.13,0.0,38.88,shortcut vs size-matched object,36.4334
+mnist,texture,0.01,2,0.835,0.03,0.37,0.0,0.88,0.0,0.285,0.01,80.4,shortcut vs size-matched object,78.998
+mnist,texture,0.01,42,0.89,0.0,0.5,0.0,0.92,0.0,0.37,0.0,92.03,shortcut vs size-matched object,91.4836
+mnist,texture,0.015,1,0.85,0.0,0.46,0.0,0.86,0.0,0.26,0.0,73.2,shortcut vs size-matched object,71.7621
+mnist,texture,0.015,2,0.795,0.01,0.53,0.0,0.86,0.0,0.41,0.0,92.06,shortcut vs size-matched object,91.5041
+mnist,texture,0.015,3,0.91,0.0,0.55,0.0,0.91,0.0,0.35,0.0,89.3,shortcut vs size-matched object,88.3025
+mnist,texture,0.015,4,0.91,0.0,0.52,0.0,0.93,0.0,0.3,0.0,78.36,shortcut vs size-matched object,76.7072
+mnist,texture,0.015,5,0.9,0.0,0.5,0.0,0.86,0.0,0.27,0.0,73.63,shortcut vs size-matched object,71.7192
+mnist,texture,0.015,42,0.81,0.0,0.41,0.0,0.86,0.0,0.38,0.0,92.57,shortcut vs size-matched object,91.949
+mnist,texture,0.02,1,0.93,0.0,0.67,0.0,0.97,0.0,0.405,0.01,87.94,shortcut vs size-matched object,86.9978
+mnist,texture,0.02,2,0.9,0.0,0.58,0.0,0.94,0.0,0.37,0.0,92.39,shortcut vs size-matched object,91.7996
+mnist,texture,0.02,42,0.88,0.0,0.51,0.0,0.94,0.0,0.44,0.0,98.38,shortcut vs size-matched object,98.2511
+mnist,texture,0.03,1,0.96,0.0,0.71,0.0,0.98,0.0,0.6,0.0,95.45,shortcut vs size-matched object,95.0242
+mnist,texture,0.03,2,0.91,0.0,0.62,0.0,0.9,0.0,0.42,0.0,97.01,shortcut vs size-matched object,96.7652
+mnist,texture,0.03,42,0.95,0.0,0.545,0.01,0.97,0.0,0.45,0.0,98.65,shortcut vs size-matched object,98.5241
+mnist,texture,0.05,1,0.96,0.0,0.645,0.01,0.96,0.0,0.52,0.0,98.51,shortcut vs size-matched object,98.3656
+mnist,texture,0.05,2,0.85,0.0,0.6,0.0,0.94,0.0,0.53,0.0,99.35,shortcut vs size-matched object,99.293
+mnist,texture,0.05,42,0.95,0.0,0.61,0.0,0.96,0.0,0.51,0.0,99.64,shortcut vs size-matched object,99.6075
+mnist,texture,0.1,1,0.93,0.0,0.77,0.0,0.96,0.0,0.59,0.0,99.74,shortcut vs size-matched object,99.7148
+mnist,texture,0.1,2,0.96,0.0,0.59,0.0,0.95,0.0,0.39,0.0,99.73,shortcut vs size-matched object,99.7043
+mnist,texture,0.1,42,0.96,0.0,0.66,0.0,0.96,0.0,0.48,0.0,99.87,shortcut vs size-matched object,99.8574
+mnist,texture,0.25,1,0.92,0.0,0.76,0.0,0.97,0.0,0.66,0.0,99.98,shortcut vs size-matched object,99.978
+mnist,texture,0.25,2,0.96,0.0,0.69,0.0,0.975,0.01,0.58,0.0,100.0,shortcut vs size-matched object,100.0
+mnist,texture,0.25,42,0.89,0.0,0.68,0.0,0.92,0.0,0.49,0.0,99.95,shortcut vs size-matched object,99.9455
+mnist,texture,0.4,1,0.94,0.0,0.73,0.0,0.97,0.0,0.65,0.0,100.0,shortcut vs size-matched object,100.0
+mnist,texture,0.4,2,0.91,0.0,0.69,0.0,0.98,0.0,0.525,0.01,100.0,shortcut vs size-matched object,100.0
+mnist,texture,0.4,42,0.96,0.0,0.71,0.0,0.98,0.0,0.62,0.0,99.96,shortcut vs size-matched object,99.9557
+pet_resnet18,patch,-0.5,1,0.43,0.0,0.53,0.0,0.54,0.0,0.47,0.0,19.16,shortcut vs size-matched object,-0.7854
+pet_resnet18,patch,-0.5,2,0.52,0.08,0.48,0.02,0.57,0.0,0.485,0.01,17.72,shortcut vs size-matched object,0.2304
+pet_resnet18,patch,-0.5,42,0.43,0.0,0.61,0.0,0.53,0.04,0.55,0.0,15.48,shortcut vs size-matched object,-0.1303
+pet_resnet18,patch,-0.4,1,0.6,0.14,0.63,0.0,0.665,0.01,0.57,0.0,21.83,shortcut vs size-matched object,3.9445
+pet_resnet18,patch,-0.4,2,0.56,0.0,0.7,0.0,0.61,0.0,0.64,0.0,20.11,shortcut vs size-matched object,3.5145
+pet_resnet18,patch,-0.4,42,0.67,0.0,0.745,0.01,0.78,0.0,0.74,0.0,24.83,shortcut vs size-matched object,6.0962
+pet_resnet18,patch,-0.3,1,0.585,0.01,0.75,0.0,0.78,0.08,0.71,0.0,34.53,shortcut vs size-matched object,14.5746
+pet_resnet18,patch,-0.3,2,0.715,0.01,0.74,0.0,0.81,0.0,0.75,0.0,33.2,shortcut vs size-matched object,15.1099
+pet_resnet18,patch,-0.3,42,0.61,0.0,0.74,0.0,0.8,0.0,0.85,0.0,31.86,shortcut vs size-matched object,15.3646
+pet_resnet18,patch,-0.2,1,0.78,0.0,0.87,0.0,0.905,0.01,0.9,0.0,57.13,shortcut vs size-matched object,41.0641
+pet_resnet18,patch,-0.2,2,0.73,0.0,0.68,0.0,0.795,0.01,0.805,0.01,43.28,shortcut vs size-matched object,22.9766
+pet_resnet18,patch,-0.2,42,0.615,0.15,0.655,0.01,0.82,0.0,0.695,0.01,39.38,shortcut vs size-matched object,22.9047
+pet_resnet18,patch,-0.1,1,0.725,0.01,0.9,0.0,0.98,0.0,0.93,0.0,72.28,shortcut vs size-matched object,60.1323
+pet_resnet18,patch,-0.1,2,0.88,0.0,0.93,0.0,0.99,0.0,1.0,0.0,83.7,shortcut vs size-matched object,76.7674
+pet_resnet18,patch,-0.1,42,0.73,0.0,0.91,0.0,1.0,0.0,0.94,0.0,88.55,shortcut vs size-matched object,82.683
+pet_resnet18,patch,0.0,1,0.65,0.0,0.89,0.0,0.99,0.0,0.96,0.0,98.83,shortcut vs size-matched object,98.2211
+pet_resnet18,patch,0.0,2,0.9,0.0,0.97,0.0,1.0,0.0,0.98,0.0,99.45,shortcut vs size-matched object,99.1857
+pet_resnet18,patch,0.0,42,0.7,0.0,0.87,0.0,0.99,0.0,0.97,0.0,98.86,shortcut vs size-matched object,98.1678
+pneumonia_mnist,patch,-0.4,1,0.51,0.0,0.5,0.14,0.42,0.1,0.52,0.12,12.82,shortcut vs size-matched object,0.0
+pneumonia_mnist,patch,-0.4,2,0.45,0.0,0.48,0.12,0.515,0.01,0.49,0.08,13.3,shortcut vs size-matched object,-0.1849
+pneumonia_mnist,patch,-0.4,42,0.55,0.0,0.555,0.29,0.56,0.3,0.495,0.37,18.43,shortcut vs size-matched object,2.1121
+pneumonia_mnist,patch,-0.25,1,0.5,0.0,0.465,0.13,0.505,0.15,0.495,0.11,14.58,shortcut vs size-matched object,0.0
+pneumonia_mnist,patch,-0.25,2,0.55,0.0,0.51,0.16,0.57,0.02,0.485,0.17,19.39,shortcut vs size-matched object,3.2641
+pneumonia_mnist,patch,-0.25,42,0.48,0.0,0.55,0.2,0.525,0.07,0.575,0.19,15.87,shortcut vs size-matched object,0.3907
+pneumonia_mnist,patch,-0.1,1,0.695,0.01,0.715,0.37,0.755,0.31,0.595,0.33,23.24,shortcut vs size-matched object,3.2396
+pneumonia_mnist,patch,-0.1,2,0.64,0.0,0.64,0.14,0.695,0.01,0.565,0.19,24.84,shortcut vs size-matched object,15.1884
+pneumonia_mnist,patch,-0.1,42,0.36,0.0,0.54,0.24,0.495,0.15,0.57,0.22,15.87,shortcut vs size-matched object,0.1898
+pneumonia_mnist,patch,-0.075,1,0.71,0.0,0.75,0.2,0.77,0.18,0.71,0.22,26.6,shortcut vs size-matched object,10.7165
+pneumonia_mnist,patch,-0.075,2,0.635,0.01,0.67,0.02,0.74,0.0,0.67,0.02,25.16,shortcut vs size-matched object,16.7519
+pneumonia_mnist,patch,-0.075,42,0.725,0.01,0.725,0.09,0.69,0.02,0.7,0.18,30.93,shortcut vs size-matched object,19.4425
+pneumonia_mnist,patch,-0.05,1,0.665,0.01,0.795,0.23,0.78,0.16,0.72,0.24,36.22,shortcut vs size-matched object,8.0847
+pneumonia_mnist,patch,-0.05,2,0.64,0.0,0.665,0.07,0.74,0.0,0.67,0.1,26.12,shortcut vs size-matched object,17.5262
+pneumonia_mnist,patch,-0.05,42,0.74,0.0,0.685,0.03,0.735,0.01,0.685,0.07,34.94,shortcut vs size-matched object,25.0979
+pneumonia_mnist,patch,-0.025,1,0.695,0.01,0.75,0.4,0.775,0.39,0.665,0.41,43.27,shortcut vs size-matched object,14.9093
+pneumonia_mnist,patch,-0.025,2,0.715,0.01,0.705,0.03,0.785,0.01,0.75,0.04,37.02,shortcut vs size-matched object,29.1882
+pneumonia_mnist,patch,-0.025,42,0.7,0.0,0.67,0.18,0.665,0.17,0.61,0.26,38.94,shortcut vs size-matched object,29.961
+pneumonia_mnist,patch,0.0,1,0.69,0.0,0.725,0.49,0.76,0.44,0.73,0.46,80.13,shortcut vs size-matched object,68.5303
+pneumonia_mnist,patch,0.0,2,0.74,0.02,0.7,0.0,0.7,0.0,0.63,0.0,52.08,shortcut vs size-matched object,41.7103
+pneumonia_mnist,patch,0.0,42,0.75,0.0,0.725,0.01,0.725,0.01,0.625,0.03,62.5,shortcut vs size-matched object,48.233
+pneumonia_mnist,patch,0.005,1,0.7,0.0,0.74,0.34,0.77,0.26,0.8,0.26,54.33,shortcut vs size-matched object,29.9755
+pneumonia_mnist,patch,0.005,2,0.79,0.18,0.72,0.0,0.77,0.02,0.71,0.0,79.97,shortcut vs size-matched object,64.6924
+pneumonia_mnist,patch,0.005,42,0.72,0.12,0.73,0.0,0.75,0.02,0.75,0.0,70.51,shortcut vs size-matched object,54.7838
+pneumonia_mnist,patch,0.01,1,0.77,0.04,0.745,0.37,0.765,0.31,0.79,0.3,98.4,shortcut vs size-matched object,97.4914
+pneumonia_mnist,patch,0.01,2,0.78,0.0,0.74,0.0,0.695,0.05,0.73,0.0,79.97,shortcut vs size-matched object,64.4921
+pneumonia_mnist,patch,0.01,42,0.695,0.05,0.745,0.01,0.765,0.01,0.76,0.0,78.53,shortcut vs size-matched object,62.3663
+pneumonia_mnist,patch,0.02,1,0.7,0.0,0.71,0.0,0.76,0.0,0.72,0.0,57.05,shortcut vs size-matched object,42.6109
+pneumonia_mnist,patch,0.02,2,0.77,0.0,0.77,0.0,0.78,0.0,0.685,0.03,71.15,shortcut vs size-matched object,55.2158
+pneumonia_mnist,patch,0.02,42,0.805,0.11,0.745,0.01,0.735,0.03,0.745,0.01,77.56,shortcut vs size-matched object,60.7761
+pneumonia_mnist,patch,0.05,1,0.71,0.02,0.74,0.34,0.765,0.29,0.78,0.3,99.36,shortcut vs size-matched object,98.9864
+pneumonia_mnist,patch,0.05,2,0.735,0.09,0.79,0.0,0.86,0.0,0.795,0.01,92.31,shortcut vs size-matched object,82.6763
+pneumonia_mnist,patch,0.05,42,0.745,0.01,0.715,0.01,0.775,0.01,0.745,0.01,92.79,shortcut vs size-matched object,83.3372
+pneumonia_mnist,patch,0.1,1,0.75,0.18,0.705,0.23,0.735,0.27,0.715,0.31,99.84,shortcut vs size-matched object,99.7447
+pneumonia_mnist,patch,0.1,2,0.815,0.01,0.935,0.01,0.96,0.0,0.98,0.0,98.4,shortcut vs size-matched object,97.1311
+pneumonia_mnist,patch,0.1,42,0.785,0.11,0.74,0.0,0.815,0.01,0.74,0.0,98.4,shortcut vs size-matched object,95.8398
+pneumonia_mnist,patch,0.25,1,0.79,0.0,0.675,0.01,0.78,0.0,0.77,0.0,97.28,shortcut vs size-matched object,93.2372
+pneumonia_mnist,patch,0.25,2,0.84,0.0,1.0,0.0,1.0,0.0,1.0,0.0,99.84,shortcut vs size-matched object,99.744
+pneumonia_mnist,patch,0.25,42,0.785,0.19,0.74,0.02,0.785,0.13,0.735,0.05,99.68,shortcut vs size-matched object,99.1503
+pneumonia_mnist,patch,0.4,1,0.785,0.01,0.72,0.06,0.725,0.03,0.71,0.0,99.68,shortcut vs size-matched object,99.1503
+pneumonia_mnist,patch,0.4,2,0.755,0.33,0.685,0.05,0.785,0.09,0.71,0.12,100.0,shortcut vs size-matched object,100.0
+pneumonia_mnist,patch,0.4,42,0.825,0.03,0.755,0.11,0.69,0.08,0.715,0.07,99.52,shortcut vs size-matched object,98.7308
+pneumonia_mnist,texture,-0.4,1,0.545,0.01,0.585,0.11,0.48,0.14,0.505,0.13,17.95,shortcut vs size-matched object,3.765
+pneumonia_mnist,texture,-0.4,2,0.6,0.0,0.555,0.11,0.475,0.01,0.62,0.1,20.83,shortcut vs size-matched object,4.9922
+pneumonia_mnist,texture,-0.4,42,0.49,0.02,0.52,0.22,0.48,0.16,0.505,0.15,16.35,shortcut vs size-matched object,2.9807
+pneumonia_mnist,texture,-0.25,1,0.63,0.0,0.87,0.06,0.675,0.11,0.835,0.05,21.15,shortcut vs size-matched object,8.7173
+pneumonia_mnist,texture,-0.25,2,0.62,0.0,0.7,0.18,0.635,0.17,0.67,0.18,22.92,shortcut vs size-matched object,6.6037
+pneumonia_mnist,texture,-0.25,42,0.46,0.0,0.535,0.05,0.665,0.07,0.535,0.01,20.03,shortcut vs size-matched object,9.4337
+pneumonia_mnist,texture,-0.1,1,0.66,0.0,0.935,0.01,0.78,0.04,0.935,0.01,31.89,shortcut vs size-matched object,22.16
+pneumonia_mnist,texture,-0.1,2,0.55,0.0,0.865,0.19,0.65,0.08,0.905,0.15,31.09,shortcut vs size-matched object,14.8523
+pneumonia_mnist,texture,-0.1,42,0.38,0.0,0.605,0.07,0.71,0.1,0.6,0.02,29.81,shortcut vs size-matched object,21.7852
+pneumonia_mnist,texture,-0.075,1,0.725,0.01,0.96,0.0,0.87,0.02,0.96,0.0,37.66,shortcut vs size-matched object,28.2293
+pneumonia_mnist,texture,-0.075,2,0.56,0.0,0.85,0.26,0.74,0.2,0.84,0.24,35.42,shortcut vs size-matched object,18.5932
+pneumonia_mnist,texture,-0.075,42,0.64,0.02,0.8,0.06,0.875,0.05,0.82,0.06,35.1,shortcut vs size-matched object,27.68
+pneumonia_mnist,texture,-0.05,1,0.76,0.0,0.98,0.0,0.835,0.03,0.96,0.0,40.71,shortcut vs size-matched object,32.8539
+pneumonia_mnist,texture,-0.05,2,0.56,0.0,0.945,0.01,0.805,0.03,0.935,0.01,36.86,shortcut vs size-matched object,27.0395
+pneumonia_mnist,texture,-0.05,42,0.625,0.03,0.82,0.02,0.845,0.05,0.82,0.04,38.3,shortcut vs size-matched object,28.7035
+pneumonia_mnist,texture,-0.025,1,0.77,0.0,0.98,0.0,0.88,0.02,0.99,0.0,48.4,shortcut vs size-matched object,40.1531
+pneumonia_mnist,texture,-0.025,2,0.59,0.0,0.985,0.01,0.8,0.0,1.0,0.0,49.2,shortcut vs size-matched object,34.9052
+pneumonia_mnist,texture,-0.025,42,0.57,0.0,0.84,0.0,0.795,0.01,0.845,0.07,54.17,shortcut vs size-matched object,45.7376
+pneumonia_mnist,texture,0.0,1,0.73,0.0,0.97,0.0,0.85,0.0,0.99,0.0,84.62,shortcut vs size-matched object,81.0334
+pneumonia_mnist,texture,0.0,2,0.63,0.0,0.855,0.19,0.575,0.05,0.925,0.11,94.39,shortcut vs size-matched object,92.7369
+pneumonia_mnist,texture,0.0,42,0.56,0.0,0.91,0.0,0.925,0.01,0.935,0.09,99.04,shortcut vs size-matched object,98.7118
+pneumonia_mnist,texture,0.005,1,0.67,0.0,0.965,0.01,0.85,0.04,1.0,0.0,98.4,shortcut vs size-matched object,98.0688
+pneumonia_mnist,texture,0.005,2,0.62,0.0,0.95,0.06,0.63,0.02,0.97,0.06,97.28,shortcut vs size-matched object,96.3964
+pneumonia_mnist,texture,0.005,42,0.59,0.0,0.89,0.0,0.87,0.0,0.885,0.21,100.0,shortcut vs size-matched object,100.0
+pneumonia_mnist,texture,0.01,1,0.55,0.0,0.96,0.0,0.885,0.01,1.0,0.0,95.67,shortcut vs size-matched object,94.6497
+pneumonia_mnist,texture,0.01,2,0.61,0.0,0.92,0.12,0.665,0.05,0.95,0.1,77.88,shortcut vs size-matched object,71.5389
+pneumonia_mnist,texture,0.01,42,0.58,0.0,0.97,0.0,0.93,0.0,1.0,0.0,95.19,shortcut vs size-matched object,94.0566
+pneumonia_mnist,texture,0.02,1,0.59,0.0,0.96,0.0,0.83,0.0,1.0,0.0,93.75,shortcut vs size-matched object,92.3678
+pneumonia_mnist,texture,0.02,2,0.585,0.01,0.865,0.17,0.535,0.03,0.95,0.08,96.79,shortcut vs size-matched object,95.5286
+pneumonia_mnist,texture,0.02,42,0.54,0.0,0.89,0.0,0.875,0.01,0.91,0.14,100.0,shortcut vs size-matched object,100.0
+pneumonia_mnist,texture,0.05,1,0.55,0.0,0.95,0.0,0.87,0.0,1.0,0.0,98.88,shortcut vs size-matched object,97.9446
+pneumonia_mnist,texture,0.05,2,0.59,0.0,0.98,0.0,0.95,0.0,1.0,0.0,98.08,shortcut vs size-matched object,97.3727
+pneumonia_mnist,texture,0.05,42,0.52,0.0,0.91,0.0,0.91,0.0,0.95,0.08,100.0,shortcut vs size-matched object,100.0
+pneumonia_mnist,texture,0.1,1,0.7,0.0,0.96,0.0,0.91,0.0,1.0,0.0,100.0,shortcut vs size-matched object,100.0
+pneumonia_mnist,texture,0.1,2,0.71,0.0,0.785,0.41,0.55,0.08,0.855,0.29,99.84,shortcut vs size-matched object,99.7535
+pneumonia_mnist,texture,0.1,42,0.61,0.0,0.905,0.01,0.81,0.0,0.915,0.17,100.0,shortcut vs size-matched object,100.0
+pneumonia_mnist,texture,0.25,1,0.62,0.0,0.86,0.0,0.925,0.01,0.87,0.0,100.0,shortcut vs size-matched object,100.0
+pneumonia_mnist,texture,0.25,2,0.56,0.0,0.97,0.0,0.78,0.0,0.98,0.0,100.0,shortcut vs size-matched object,100.0
+pneumonia_mnist,texture,0.25,42,0.695,0.33,0.94,0.0,0.9,0.0,1.0,0.0,100.0,shortcut vs size-matched object,100.0
+pneumonia_mnist,texture,0.4,1,0.57,0.0,0.87,0.0,1.0,0.0,0.92,0.0,100.0,shortcut vs size-matched object,100.0
+pneumonia_mnist,texture,0.4,2,0.49,0.0,0.915,0.01,0.82,0.0,0.945,0.01,99.84,shortcut vs size-matched object,99.8031
+pneumonia_mnist,texture,0.4,42,0.51,0.04,0.91,0.0,0.97,0.0,0.89,0.0,100.0,shortcut vs size-matched object,100.0
+cifar10,patch,-0.8,1,0.81,0.0,0.72,0.0,0.24,0.0,0.16,0.0,4.22,placebo vs full object,0.8032
+cifar10,patch,-0.8,42,0.82,0.0,0.71,0.0,0.2,0.0,0.2,0.0,3.74,placebo vs full object,0.8401
+cifar10,patch,-0.6,1,0.88,0.0,0.81,0.0,0.28,0.0,0.2,0.0,7.61,placebo vs full object,3.7236
+cifar10,patch,-0.6,42,0.82,0.0,0.81,0.0,0.255,0.01,0.18,0.0,7.49,placebo vs full object,4.5687
+cifar10,patch,-0.4,1,0.84,0.0,0.74,0.0,0.35,0.0,0.32,0.0,17.29,placebo vs full object,14.5636
+cifar10,patch,-0.4,42,0.87,0.0,0.74,0.0,0.31,0.0,0.225,0.01,13.73,placebo vs full object,11.0272
+cifar10,patch,-0.25,1,0.79,0.0,0.725,0.01,0.515,0.01,0.44,0.0,23.18,placebo vs full object,20.6833
+cifar10,patch,-0.25,42,0.96,0.0,0.84,0.0,0.39,0.0,0.3,0.0,22.55,placebo vs full object,20.0016
+cifar10,patch,-0.1,1,0.93,0.0,0.86,0.0,0.64,0.0,0.6,0.0,45.07,placebo vs full object,42.6817
+cifar10,patch,-0.1,42,0.8,0.0,0.82,0.0,0.65,0.0,0.65,0.0,43.4,placebo vs full object,41.0744
+cifar10,patch,0.0,1,0.955,0.03,0.935,0.09,0.93,0.08,0.96,0.0,96.62,placebo vs full object,96.3297
+cifar10,patch,0.0,42,0.94,0.08,0.925,0.11,0.95,0.02,0.95,0.0,96.29,placebo vs full object,95.9789
+cifar10_resnet18,patch,-0.8,1,0.68,0.0,0.55,0.0,0.105,0.01,0.22,0.0,3.31,placebo vs full object,1.2427
+cifar10_resnet18,patch,-0.8,2,0.72,0.0,0.63,0.0,0.08,0.0,0.2,0.0,2.94,placebo vs full object,0.9412
+cifar10_resnet18,patch,-0.8,42,0.75,0.0,0.65,0.0,0.16,0.0,0.18,0.0,2.71,placebo vs full object,0.8077
+cifar10_resnet18,patch,-0.6,1,0.7,0.0,0.67,0.0,0.18,0.0,0.19,0.0,5.36,placebo vs full object,3.4078
+cifar10_resnet18,patch,-0.6,2,0.75,0.0,0.64,0.0,0.21,0.0,0.29,0.0,6.35,placebo vs full object,4.326
+cifar10_resnet18,patch,-0.6,42,0.7,0.0,0.67,0.0,0.24,0.0,0.3,0.0,6.58,placebo vs full object,4.4503
+cifar10_resnet18,patch,-0.4,1,0.7,0.0,0.78,0.0,0.225,0.01,0.32,0.0,10.8,placebo vs full object,8.5743
+cifar10_resnet18,patch,-0.4,2,0.7,0.0,0.69,0.0,0.37,0.0,0.29,0.0,10.83,placebo vs full object,8.7163
+cifar10_resnet18,patch,-0.4,42,0.77,0.0,0.76,0.0,0.24,0.0,0.29,0.0,10.25,placebo vs full object,7.9676
+cifar10_resnet18,patch,-0.25,1,0.86,0.0,0.87,0.0,0.41,0.0,0.4,0.0,19.72,placebo vs full object,17.5017
+cifar10_resnet18,patch,-0.25,2,0.77,0.0,0.89,0.0,0.28,0.02,0.43,0.0,18.68,placebo vs full object,16.3107
+cifar10_resnet18,patch,-0.25,42,0.72,0.0,0.91,0.0,0.225,0.01,0.395,0.01,18.4,placebo vs full object,16.081
+cifar10_resnet18,patch,-0.1,1,0.86,0.0,0.935,0.01,0.52,0.02,0.485,0.01,35.67,placebo vs full object,33.1752
+cifar10_resnet18,patch,-0.1,2,0.92,0.0,0.865,0.01,0.595,0.01,0.61,0.0,38.95,placebo vs full object,36.5407
+cifar10_resnet18,patch,-0.1,42,0.86,0.0,0.835,0.01,0.56,0.04,0.52,0.0,34.32,placebo vs full object,31.8452
+cifar10_resnet18,patch,0.0,1,0.97,0.02,0.99,0.0,0.98,0.02,0.95,0.0,97.25,placebo vs full object,96.997
+cifar10_resnet18,patch,0.0,2,0.97,0.0,0.98,0.0,0.96,0.0,0.975,0.01,96.16,placebo vs full object,95.8157
+cifar10_resnet18,patch,0.0,42,0.99,0.0,0.99,0.0,0.96,0.0,0.96,0.0,97.02,placebo vs full object,96.7566
+mnist,patch,-0.4,1,0.02,0.0,0.02,0.0,0.01,0.0,0.01,0.0,0.12,placebo vs full object,0.0178
+mnist,patch,-0.4,2,0.02,0.0,0.01,0.0,0.0,0.0,0.01,0.0,0.12,placebo vs full object,-0.0033
+mnist,patch,-0.4,42,0.03,0.0,0.01,0.0,0.03,0.0,0.01,0.0,0.18,placebo vs full object,0.0078
+mnist,patch,-0.25,1,0.02,0.0,0.02,0.0,0.01,0.0,0.01,0.0,0.14,placebo vs full object,0.0211
+mnist,patch,-0.25,2,0.0,0.0,0.02,0.0,0.0,0.0,0.01,0.0,0.17,placebo vs full object,0.0278
+mnist,patch,-0.25,42,0.03,0.0,0.02,0.0,0.01,0.0,0.01,0.0,0.22,placebo vs full object,0.0668
+mnist,patch,-0.1,1,0.02,0.0,0.01,0.0,0.01,0.0,0.01,0.0,0.13,placebo vs full object,0.01
+mnist,patch,-0.1,2,0.01,0.0,0.03,0.0,0.01,0.0,0.01,0.0,0.2,placebo vs full object,0.0701
+mnist,patch,-0.1,42,0.03,0.0,0.03,0.0,0.03,0.0,0.01,0.0,0.2,placebo vs full object,0.0234
+mnist,patch,-0.05,1,0.02,0.0,0.02,0.0,0.01,0.0,0.01,0.0,0.15,placebo vs full object,0.0145
+mnist,patch,-0.05,2,0.03,0.0,0.06,0.0,0.01,0.0,0.01,0.0,0.18,placebo vs full object,0.0367
+mnist,patch,-0.05,42,0.03,0.0,0.03,0.0,0.01,0.0,0.01,0.0,0.22,placebo vs full object,0.0712
+mnist,patch,0.0,1,0.01,0.0,0.0,0.0,0.0,0.0,0.01,0.0,0.17,placebo vs full object,0.0389
+mnist,patch,0.0,2,0.02,0.0,0.03,0.0,0.0,0.0,0.01,0.0,0.17,placebo vs full object,0.0289
+mnist,patch,0.0,42,0.36,0.0,0.19,0.0,0.17,0.0,0.03,0.0,8.87,placebo vs full object,8.5438
+mnist,patch,0.005,1,0.01,0.0,0.01,0.0,0.0,0.0,0.01,0.0,0.81,placebo vs full object,0.6345
+mnist,patch,0.005,2,0.16,0.0,0.19,0.0,0.05,0.0,0.04,0.0,1.59,placebo vs full object,1.3785
+mnist,patch,0.005,42,0.34,0.0,0.28,0.0,0.28,0.0,0.15,0.0,22.98,placebo vs full object,22.0551
+mnist,patch,0.0075,1,0.04,0.0,0.09,0.0,0.0,0.0,0.03,0.0,13.3,placebo vs full object,12.8215
+mnist,patch,0.0075,2,0.16,0.0,0.24,0.0,0.11,0.0,0.11,0.0,5.77,placebo vs full object,5.5149
+mnist,patch,0.0075,3,0.15,0.0,0.12,0.0,0.08,0.0,0.04,0.0,6.93,placebo vs full object,6.6572
+mnist,patch,0.0075,4,0.03,0.0,0.07,0.0,0.0,0.0,0.01,0.0,0.53,placebo vs full object,0.3806
+mnist,patch,0.0075,5,0.27,0.0,0.29,0.0,0.13,0.0,0.18,0.0,19.03,placebo vs full object,17.7227
+mnist,patch,0.0075,42,0.46,0.0,0.39,0.0,0.3,0.0,0.21,0.0,40.85,placebo vs full object,39.806
+mnist,patch,0.01,1,0.05,0.0,0.05,0.0,0.0,0.0,0.02,0.0,9.13,placebo vs full object,8.7152
+mnist,patch,0.01,2,0.25,0.0,0.35,0.0,0.23,0.0,0.15,0.0,17.52,placebo vs full object,16.6943
+mnist,patch,0.01,42,0.47,0.0,0.47,0.0,0.39,0.0,0.25,0.0,62.21,placebo vs full object,61.264
+mnist,patch,0.015,1,0.14,0.0,0.2,0.0,0.13,0.0,0.21,0.0,39.33,placebo vs full object,37.6443
+mnist,patch,0.015,2,0.26,0.0,0.4,0.0,0.18,0.0,0.23,0.0,30.18,placebo vs full object,29.0383
+mnist,patch,0.015,3,0.15,0.0,0.2,0.0,0.15,0.0,0.18,0.0,31.49,placebo vs full object,29.8764
+mnist,patch,0.015,4,0.35,0.0,0.38,0.0,0.18,0.0,0.11,0.0,10.64,placebo vs full object,10.441
+mnist,patch,0.015,5,0.3,0.0,0.28,0.0,0.17,0.0,0.26,0.0,26.1,placebo vs full object,24.2785
+mnist,patch,0.015,42,0.44,0.0,0.47,0.0,0.4,0.0,0.28,0.0,64.89,placebo vs full object,63.8542
+mnist,patch,0.02,1,0.23,0.0,0.28,0.0,0.17,0.0,0.35,0.0,53.12,placebo vs full object,50.7833
+mnist,patch,0.02,2,0.32,0.0,0.46,0.0,0.22,0.0,0.23,0.0,45.18,placebo vs full object,43.9131
+mnist,patch,0.02,42,0.42,0.0,0.45,0.0,0.35,0.0,0.29,0.0,68.52,placebo vs full object,67.6006
+mnist,patch,0.03,1,0.45,0.0,0.39,0.0,0.31,0.0,0.47,0.0,71.03,placebo vs full object,69.1488
+mnist,patch,0.03,2,0.475,0.01,0.47,0.0,0.35,0.0,0.41,0.0,70.38,placebo vs full object,68.4181
+mnist,patch,0.03,42,0.48,0.0,0.52,0.0,0.44,0.0,0.55,0.0,74.95,placebo vs full object,73.1923
+mnist,patch,0.05,1,0.45,0.0,0.42,0.0,0.38,0.0,0.56,0.0,75.72,placebo vs full object,73.7788
+mnist,patch,0.05,2,0.45,0.0,0.43,0.0,0.29,0.0,0.485,0.01,77.26,placebo vs full object,75.5933
+mnist,patch,0.05,42,0.53,0.0,0.54,0.0,0.52,0.0,0.63,0.0,75.67,placebo vs full object,73.7606
+mnist,patch,0.1,1,0.54,0.0,0.47,0.0,0.465,0.01,0.55,0.0,84.1,placebo vs full object,82.7765
+mnist,patch,0.1,2,0.51,0.0,0.53,0.0,0.41,0.0,0.68,0.0,87.86,placebo vs full object,86.7155
+mnist,patch,0.1,42,0.56,0.0,0.52,0.0,0.48,0.0,0.68,0.0,76.97,placebo vs full object,75.1227
+mnist,patch,0.25,1,0.67,0.0,0.62,0.0,0.495,0.01,0.66,0.0,99.76,placebo vs full object,99.7335
+mnist,patch,0.25,2,0.67,0.0,0.56,0.0,0.5,0.0,0.77,0.0,99.57,placebo vs full object,99.5228
+mnist,patch,0.25,42,0.67,0.0,0.62,0.0,0.6,0.0,0.74,0.0,88.51,placebo vs full object,87.3889
+mnist,patch,0.4,1,0.69,0.0,0.53,0.0,0.57,0.0,0.65,0.0,99.8,placebo vs full object,99.7779
+mnist,patch,0.4,2,0.59,0.0,0.56,0.0,0.415,0.01,0.69,0.0,88.92,placebo vs full object,87.8239
+mnist,patch,0.4,42,0.73,0.0,0.7,0.0,0.6,0.0,0.79,0.0,99.47,placebo vs full object,99.4115
+mnist,texture,-0.4,1,0.01,0.0,0.04,0.0,0.0,0.0,0.0,0.0,0.17,placebo vs full object,0.0478
+mnist,texture,-0.4,2,0.02,0.0,0.08,0.0,0.02,0.0,0.02,0.0,0.17,placebo vs full object,0.0289
+mnist,texture,-0.4,42,0.03,0.0,0.1,0.0,0.03,0.0,0.02,0.0,0.18,placebo vs full object,0.0089
+mnist,texture,-0.25,1,0.02,0.0,0.05,0.0,0.02,0.0,0.03,0.0,0.11,placebo vs full object,-0.0044
+mnist,texture,-0.25,2,0.07,0.0,0.08,0.0,0.04,0.0,0.02,0.0,0.27,placebo vs full object,0.108
+mnist,texture,-0.25,42,0.02,0.0,0.04,0.0,0.04,0.0,0.02,0.0,0.23,placebo vs full object,0.0534
+mnist,texture,-0.1,1,0.02,0.0,0.08,0.0,0.01,0.0,0.02,0.0,0.14,placebo vs full object,0.0278
+mnist,texture,-0.1,2,0.06,0.0,0.08,0.0,0.02,0.0,0.03,0.0,0.64,placebo vs full object,0.4065
+mnist,texture,-0.1,42,0.04,0.0,0.07,0.0,0.03,0.0,0.04,0.0,0.51,placebo vs full object,0.2695
+mnist,texture,-0.05,1,0.03,0.0,0.09,0.0,0.03,0.0,0.02,0.0,0.18,placebo vs full object,0.0401
+mnist,texture,-0.05,2,0.1,0.0,0.1,0.0,0.1,0.0,0.02,0.0,1.3,placebo vs full object,0.992
+mnist,texture,-0.05,42,0.11,0.0,0.12,0.0,0.07,0.0,0.03,0.0,2.43,placebo vs full object,1.9441
+mnist,texture,0.0,1,0.03,0.0,0.08,0.0,0.03,0.0,0.03,0.0,0.21,placebo vs full object,0.0645
+mnist,texture,0.0,2,0.16,0.0,0.22,0.0,0.11,0.0,0.06,0.0,8.88,placebo vs full object,7.8065
+mnist,texture,0.0,42,0.21,0.0,0.29,0.0,0.25,0.0,0.08,0.0,18.24,placebo vs full object,16.5752
+mnist,texture,0.005,1,0.2,0.0,0.14,0.0,0.23,0.0,0.04,0.0,14.24,placebo vs full object,12.5423
+mnist,texture,0.005,2,0.38,0.0,0.55,0.0,0.42,0.0,0.3,0.0,55.64,placebo vs full object,53.1985
+mnist,texture,0.005,42,0.435,0.01,0.64,0.0,0.565,0.01,0.42,0.0,76.75,placebo vs full object,75.3287
+mnist,texture,0.0075,1,0.38,0.0,0.39,0.0,0.4,0.0,0.15,0.0,41.59,placebo vs full object,38.569
+mnist,texture,0.0075,2,0.46,0.0,0.65,0.0,0.44,0.0,0.39,0.0,74.41,placebo vs full object,72.7208
+mnist,texture,0.0075,3,0.35,0.0,0.77,0.0,0.49,0.0,0.33,0.0,60.93,placebo vs full object,58.2233
+mnist,texture,0.0075,4,0.3,0.0,0.335,0.01,0.37,0.0,0.16,0.0,30.38,placebo vs full object,28.2219
+mnist,texture,0.0075,5,0.08,0.0,0.14,0.0,0.06,0.0,0.03,0.0,7.48,placebo vs full object,5.8108
+mnist,texture,0.0075,42,0.39,0.0,0.685,0.01,0.54,0.0,0.43,0.0,82.07,placebo vs full object,80.9788
+mnist,texture,0.01,1,0.43,0.0,0.35,0.0,0.28,0.0,0.21,0.0,38.88,placebo vs full object,36.4334
+mnist,texture,0.01,2,0.385,0.05,0.8,0.0,0.55,0.0,0.47,0.0,80.4,placebo vs full object,78.998
+mnist,texture,0.01,42,0.41,0.0,0.75,0.0,0.53,0.0,0.48,0.0,92.03,placebo vs full object,91.4836
+mnist,texture,0.015,1,0.4,0.0,0.55,0.0,0.45,0.0,0.39,0.0,73.2,placebo vs full object,71.7621
+mnist,texture,0.015,2,0.4,0.0,0.85,0.0,0.635,0.01,0.53,0.0,92.06,placebo vs full object,91.5041
+mnist,texture,0.015,3,0.47,0.0,0.83,0.0,0.56,0.0,0.54,0.0,89.3,placebo vs full object,88.3025
+mnist,texture,0.015,4,0.57,0.0,0.565,0.01,0.53,0.0,0.395,0.01,78.36,placebo vs full object,76.7072
+mnist,texture,0.015,5,0.54,0.0,0.63,0.0,0.37,0.0,0.24,0.0,73.63,placebo vs full object,71.7192
+mnist,texture,0.015,42,0.49,0.0,0.74,0.0,0.58,0.0,0.55,0.0,92.57,placebo vs full object,91.949
+mnist,texture,0.02,1,0.56,0.0,0.69,0.0,0.62,0.0,0.53,0.0,87.94,placebo vs full object,86.9978
+mnist,texture,0.02,2,0.53,0.0,0.77,0.0,0.56,0.0,0.55,0.0,92.39,placebo vs full object,91.7996
+mnist,texture,0.02,42,0.49,0.0,0.79,0.0,0.59,0.0,0.55,0.0,98.38,placebo vs full object,98.2511
+mnist,texture,0.03,1,0.565,0.01,0.75,0.0,0.61,0.0,0.68,0.0,95.45,placebo vs full object,95.0242
+mnist,texture,0.03,2,0.58,0.0,0.85,0.0,0.63,0.0,0.58,0.0,97.01,placebo vs full object,96.7652
+mnist,texture,0.03,42,0.52,0.0,0.84,0.0,0.62,0.0,0.62,0.0,98.65,placebo vs full object,98.5241
+mnist,texture,0.05,1,0.55,0.0,0.77,0.0,0.7,0.0,0.74,0.0,98.51,placebo vs full object,98.3656
+mnist,texture,0.05,2,0.5,0.0,0.86,0.0,0.675,0.01,0.68,0.0,99.35,placebo vs full object,99.293
+mnist,texture,0.05,42,0.52,0.02,0.82,0.0,0.62,0.0,0.66,0.0,99.64,placebo vs full object,99.6075
+mnist,texture,0.1,1,0.65,0.0,0.81,0.0,0.71,0.0,0.67,0.0,99.74,placebo vs full object,99.7148
+mnist,texture,0.1,2,0.59,0.0,0.88,0.0,0.67,0.0,0.72,0.0,99.73,placebo vs full object,99.7043
+mnist,texture,0.1,42,0.575,0.01,0.87,0.0,0.65,0.0,0.72,0.0,99.87,placebo vs full object,99.8574
+mnist,texture,0.25,1,0.65,0.0,0.9,0.0,0.74,0.0,0.83,0.0,99.98,placebo vs full object,99.978
+mnist,texture,0.25,2,0.69,0.0,0.865,0.01,0.71,0.0,0.76,0.0,100.0,placebo vs full object,100.0
+mnist,texture,0.25,42,0.525,0.01,0.92,0.0,0.67,0.0,0.71,0.0,99.95,placebo vs full object,99.9455
+mnist,texture,0.4,1,0.59,0.0,0.92,0.0,0.76,0.0,0.81,0.0,100.0,placebo vs full object,100.0
+mnist,texture,0.4,2,0.67,0.0,0.88,0.0,0.72,0.0,0.73,0.0,100.0,placebo vs full object,100.0
+mnist,texture,0.4,42,0.61,0.0,0.94,0.0,0.71,0.0,0.76,0.0,99.96,placebo vs full object,99.9557
+pet_resnet18,patch,-0.5,1,0.48,0.0,0.505,0.01,0.37,0.0,0.34,0.0,19.16,placebo vs full object,-0.7854
+pet_resnet18,patch,-0.5,2,0.485,0.01,0.47,0.0,0.37,0.0,0.33,0.0,17.72,placebo vs full object,0.2304
+pet_resnet18,patch,-0.5,42,0.47,0.0,0.41,0.0,0.39,0.0,0.35,0.0,15.48,placebo vs full object,-0.1303
+pet_resnet18,patch,-0.4,1,0.465,0.09,0.48,0.0,0.41,0.0,0.32,0.0,21.83,placebo vs full object,3.9445
+pet_resnet18,patch,-0.4,2,0.44,0.0,0.5,0.0,0.34,0.0,0.31,0.0,20.11,placebo vs full object,3.5145
+pet_resnet18,patch,-0.4,42,0.56,0.0,0.51,0.0,0.46,0.0,0.44,0.0,24.83,placebo vs full object,6.0962
+pet_resnet18,patch,-0.3,1,0.495,0.01,0.53,0.0,0.47,0.0,0.52,0.0,34.53,placebo vs full object,14.5746
+pet_resnet18,patch,-0.3,2,0.51,0.0,0.52,0.0,0.5,0.0,0.45,0.0,33.2,placebo vs full object,15.1099
+pet_resnet18,patch,-0.3,42,0.56,0.0,0.48,0.0,0.49,0.0,0.48,0.0,31.86,placebo vs full object,15.3646
+pet_resnet18,patch,-0.2,1,0.52,0.0,0.72,0.0,0.57,0.0,0.51,0.0,57.13,placebo vs full object,41.0641
+pet_resnet18,patch,-0.2,2,0.6,0.0,0.535,0.01,0.48,0.0,0.41,0.0,43.28,placebo vs full object,22.9766
+pet_resnet18,patch,-0.2,42,0.475,0.01,0.61,0.0,0.565,0.01,0.55,0.0,39.38,placebo vs full object,22.9047
+pet_resnet18,patch,-0.1,1,0.79,0.0,0.75,0.0,0.705,0.01,0.63,0.0,72.28,placebo vs full object,60.1323
+pet_resnet18,patch,-0.1,2,0.77,0.02,0.82,0.0,0.61,0.02,0.7,0.0,83.7,placebo vs full object,76.7674
+pet_resnet18,patch,-0.1,42,0.57,0.0,0.76,0.0,0.63,0.0,0.72,0.0,88.55,placebo vs full object,82.683
+pet_resnet18,patch,0.0,1,0.8,0.0,0.73,0.0,0.67,0.06,0.725,0.01,98.83,placebo vs full object,98.2211
+pet_resnet18,patch,0.0,2,0.81,0.0,0.8,0.0,0.77,0.0,0.79,0.0,99.45,placebo vs full object,99.1857
+pet_resnet18,patch,0.0,42,0.71,0.0,0.76,0.0,0.735,0.03,0.7,0.0,98.86,placebo vs full object,98.1678
+pneumonia_mnist,patch,-0.4,1,0.3,0.0,0.405,0.11,0.195,0.01,0.385,0.09,12.82,placebo vs full object,0.0
+pneumonia_mnist,patch,-0.4,2,0.53,0.0,0.485,0.05,0.11,0.0,0.405,0.03,13.3,placebo vs full object,-0.1849
+pneumonia_mnist,patch,-0.4,42,0.25,0.0,0.39,0.32,0.14,0.0,0.595,0.29,18.43,placebo vs full object,2.1121
+pneumonia_mnist,patch,-0.25,1,0.24,0.0,0.35,0.12,0.115,0.01,0.425,0.11,14.58,placebo vs full object,0.0
+pneumonia_mnist,patch,-0.25,2,0.34,0.0,0.505,0.09,0.1,0.0,0.525,0.11,19.39,placebo vs full object,3.2641
+pneumonia_mnist,patch,-0.25,42,0.35,0.0,0.425,0.17,0.12,0.0,0.52,0.12,15.87,placebo vs full object,0.3907
+pneumonia_mnist,patch,-0.1,1,0.24,0.0,0.495,0.33,0.09,0.0,0.63,0.32,23.24,placebo vs full object,3.2396
+pneumonia_mnist,patch,-0.1,2,0.46,0.0,0.505,0.19,0.41,0.04,0.735,0.13,24.84,placebo vs full object,15.1884
+pneumonia_mnist,patch,-0.1,42,0.4,0.0,0.43,0.2,0.17,0.0,0.56,0.22,15.87,placebo vs full object,0.1898
+pneumonia_mnist,patch,-0.075,1,0.4,0.0,0.65,0.18,0.19,0.0,0.715,0.17,26.6,placebo vs full object,10.7165
+pneumonia_mnist,patch,-0.075,2,0.53,0.0,0.57,0.02,0.43,0.0,0.77,0.02,25.16,placebo vs full object,16.7519
+pneumonia_mnist,patch,-0.075,42,0.52,0.0,0.575,0.13,0.24,0.0,0.81,0.14,30.93,placebo vs full object,19.4425
+pneumonia_mnist,patch,-0.05,1,0.49,0.0,0.685,0.15,0.195,0.01,0.75,0.16,36.22,placebo vs full object,8.0847
+pneumonia_mnist,patch,-0.05,2,0.51,0.0,0.545,0.11,0.475,0.03,0.785,0.05,26.12,placebo vs full object,17.5262
+pneumonia_mnist,patch,-0.05,42,0.51,0.0,0.61,0.08,0.315,0.01,0.86,0.08,34.94,placebo vs full object,25.0979
+pneumonia_mnist,patch,-0.025,1,0.42,0.0,0.685,0.33,0.25,0.06,0.695,0.37,43.27,placebo vs full object,14.9093
+pneumonia_mnist,patch,-0.025,2,0.54,0.0,0.675,0.05,0.42,0.06,0.815,0.03,37.02,placebo vs full object,29.1882
+pneumonia_mnist,patch,-0.025,42,0.47,0.0,0.625,0.27,0.235,0.01,0.82,0.22,38.94,placebo vs full object,29.961
+pneumonia_mnist,patch,0.0,1,0.61,0.0,0.8,0.4,0.525,0.05,0.725,0.45,80.13,placebo vs full object,68.5303
+pneumonia_mnist,patch,0.0,2,0.52,0.0,0.65,0.0,0.49,0.0,0.91,0.02,52.08,placebo vs full object,41.7103
+pneumonia_mnist,patch,0.0,42,0.57,0.0,0.575,0.05,0.615,0.01,0.87,0.0,62.5,placebo vs full object,48.233
+pneumonia_mnist,patch,0.005,1,0.53,0.0,0.8,0.22,0.425,0.01,0.69,0.28,54.33,placebo vs full object,29.9755
+pneumonia_mnist,patch,0.005,2,0.55,0.0,0.655,0.03,0.5,0.06,0.835,0.01,79.97,placebo vs full object,64.6924
+pneumonia_mnist,patch,0.005,42,0.53,0.0,0.71,0.0,0.605,0.01,0.95,0.0,70.51,placebo vs full object,54.7838
+pneumonia_mnist,patch,0.01,1,0.49,0.0,0.86,0.2,0.49,0.0,0.755,0.21,98.4,placebo vs full object,97.4914
+pneumonia_mnist,patch,0.01,2,0.54,0.0,0.62,0.0,0.505,0.03,0.87,0.0,79.97,placebo vs full object,64.4921
+pneumonia_mnist,patch,0.01,42,0.54,0.0,0.7,0.0,0.565,0.01,0.93,0.0,78.53,placebo vs full object,62.3663
+pneumonia_mnist,patch,0.02,1,0.55,0.0,0.67,0.0,0.55,0.04,0.81,0.0,57.05,placebo vs full object,42.6109
+pneumonia_mnist,patch,0.02,2,0.56,0.0,0.805,0.01,0.48,0.1,0.96,0.0,71.15,placebo vs full object,55.2158
+pneumonia_mnist,patch,0.02,42,0.53,0.0,0.66,0.0,0.67,0.02,0.99,0.0,77.56,placebo vs full object,60.7761
+pneumonia_mnist,patch,0.05,1,0.48,0.0,0.87,0.2,0.47,0.0,0.775,0.21,99.36,placebo vs full object,98.9864
+pneumonia_mnist,patch,0.05,2,0.62,0.0,0.97,0.02,0.945,0.03,0.98,0.0,92.31,placebo vs full object,82.6763
+pneumonia_mnist,patch,0.05,42,0.53,0.0,0.765,0.01,0.56,0.0,0.84,0.0,92.79,placebo vs full object,83.3372
+pneumonia_mnist,patch,0.1,1,0.49,0.02,0.7,0.1,0.47,0.0,0.79,0.18,99.84,placebo vs full object,99.7447
+pneumonia_mnist,patch,0.1,2,0.7,0.0,1.0,0.0,0.94,0.02,0.99,0.0,98.4,placebo vs full object,97.1311
+pneumonia_mnist,patch,0.1,42,0.56,0.0,0.77,0.0,0.685,0.01,0.95,0.0,98.4,placebo vs full object,95.8398
+pneumonia_mnist,patch,0.25,1,0.6,0.0,0.88,0.0,0.53,0.02,0.835,0.01,97.28,placebo vs full object,93.2372
+pneumonia_mnist,patch,0.25,2,0.96,0.0,1.0,0.0,1.0,0.0,1.0,0.0,99.84,placebo vs full object,99.744
+pneumonia_mnist,patch,0.25,42,0.58,0.02,0.72,0.02,0.665,0.01,0.84,0.02,99.68,placebo vs full object,99.1503
+pneumonia_mnist,patch,0.4,1,0.61,0.0,0.58,0.0,0.51,0.02,0.64,0.0,99.68,placebo vs full object,99.1503
+pneumonia_mnist,patch,0.4,2,0.585,0.07,0.625,0.01,0.585,0.07,0.87,0.02,100.0,placebo vs full object,100.0
+pneumonia_mnist,patch,0.4,42,0.57,0.0,0.54,0.0,0.495,0.07,0.555,0.01,99.52,placebo vs full object,98.7308
+pneumonia_mnist,texture,-0.4,1,0.115,0.01,0.53,0.16,0.355,0.13,0.51,0.16,17.95,placebo vs full object,3.765
+pneumonia_mnist,texture,-0.4,2,0.31,0.02,0.57,0.08,0.535,0.07,0.495,0.09,20.83,placebo vs full object,4.9922
+pneumonia_mnist,texture,-0.4,42,0.2,0.0,0.545,0.19,0.29,0.16,0.685,0.13,16.35,placebo vs full object,2.9807
+pneumonia_mnist,texture,-0.25,1,0.21,0.0,0.785,0.11,0.56,0.08,0.775,0.05,21.15,placebo vs full object,8.7173
+pneumonia_mnist,texture,-0.25,2,0.49,0.0,0.685,0.19,0.48,0.12,0.54,0.16,22.92,placebo vs full object,6.6037
+pneumonia_mnist,texture,-0.25,42,0.25,0.0,0.585,0.03,0.285,0.09,0.675,0.01,20.03,placebo vs full object,9.4337
+pneumonia_mnist,texture,-0.1,1,0.12,0.0,0.92,0.0,0.61,0.02,0.885,0.01,31.89,placebo vs full object,22.16
+pneumonia_mnist,texture,-0.1,2,0.31,0.0,0.865,0.15,0.51,0.08,0.715,0.15,31.09,placebo vs full object,14.8523
+pneumonia_mnist,texture,-0.1,42,0.45,0.0,0.645,0.15,0.445,0.17,0.635,0.01,29.81,placebo vs full object,21.7852
+pneumonia_mnist,texture,-0.075,1,0.37,0.0,0.92,0.02,0.615,0.03,0.94,0.0,37.66,placebo vs full object,28.2293
+pneumonia_mnist,texture,-0.075,2,0.43,0.0,0.82,0.28,0.605,0.21,0.765,0.25,35.42,placebo vs full object,18.5932
+pneumonia_mnist,texture,-0.075,42,0.405,0.01,0.835,0.13,0.515,0.13,0.695,0.01,35.1,placebo vs full object,27.68
+pneumonia_mnist,texture,-0.05,1,0.53,0.0,0.96,0.0,0.555,0.01,0.96,0.0,40.71,placebo vs full object,32.8539
+pneumonia_mnist,texture,-0.05,2,0.56,0.0,0.94,0.02,0.635,0.03,0.725,0.01,36.86,placebo vs full object,27.0395
+pneumonia_mnist,texture,-0.05,42,0.295,0.03,0.905,0.05,0.53,0.06,0.605,0.01,38.3,placebo vs full object,28.7035
+pneumonia_mnist,texture,-0.025,1,0.41,0.0,0.99,0.0,0.625,0.01,0.99,0.0,48.4,placebo vs full object,40.1531
+pneumonia_mnist,texture,-0.025,2,0.97,0.0,1.0,0.0,0.7,0.02,0.975,0.01,49.2,placebo vs full object,34.9052
+pneumonia_mnist,texture,-0.025,42,0.795,0.01,0.945,0.01,0.56,0.0,0.55,0.0,54.17,placebo vs full object,45.7376
+pneumonia_mnist,texture,0.0,1,0.68,0.0,1.0,0.0,0.505,0.01,0.9,0.0,84.62,placebo vs full object,81.0334
+pneumonia_mnist,texture,0.0,2,0.99,0.0,0.925,0.15,0.465,0.07,0.79,0.14,94.39,placebo vs full object,92.7369
+pneumonia_mnist,texture,0.0,42,0.99,0.0,0.99,0.02,0.62,0.0,0.61,0.0,99.04,placebo vs full object,98.7118
+pneumonia_mnist,texture,0.005,1,0.67,0.0,1.0,0.0,0.45,0.0,0.94,0.0,98.4,placebo vs full object,98.0688
+pneumonia_mnist,texture,0.005,2,0.99,0.0,0.975,0.05,0.42,0.0,0.835,0.05,97.28,placebo vs full object,96.3964
+pneumonia_mnist,texture,0.005,42,0.99,0.0,0.96,0.08,0.585,0.01,0.595,0.03,100.0,placebo vs full object,100.0
+pneumonia_mnist,texture,0.01,1,0.9,0.0,1.0,0.0,0.415,0.01,0.84,0.0,95.67,placebo vs full object,94.6497
+pneumonia_mnist,texture,0.01,2,0.99,0.0,0.92,0.16,0.45,0.04,0.84,0.08,77.88,placebo vs full object,71.5389
+pneumonia_mnist,texture,0.01,42,0.96,0.0,1.0,0.0,0.68,0.0,0.66,0.0,95.19,placebo vs full object,94.0566
+pneumonia_mnist,texture,0.02,1,0.76,0.0,1.0,0.0,0.45,0.0,0.79,0.0,93.75,placebo vs full object,92.3678
+pneumonia_mnist,texture,0.02,2,0.99,0.0,0.955,0.09,0.575,0.03,0.815,0.07,96.79,placebo vs full object,95.5286
+pneumonia_mnist,texture,0.02,42,1.0,0.0,0.965,0.07,0.535,0.01,0.56,0.0,100.0,placebo vs full object,100.0
+pneumonia_mnist,texture,0.05,1,0.99,0.0,1.0,0.0,0.47,0.0,0.75,0.0,98.88,placebo vs full object,97.9446
+pneumonia_mnist,texture,0.05,2,0.98,0.0,1.0,0.0,0.8,0.0,0.98,0.0,98.08,placebo vs full object,97.3727
+pneumonia_mnist,texture,0.05,42,0.99,0.0,0.985,0.03,0.59,0.0,0.575,0.01,100.0,placebo vs full object,100.0
+pneumonia_mnist,texture,0.1,1,0.96,0.0,1.0,0.0,0.43,0.0,0.905,0.01,100.0,placebo vs full object,100.0
+pneumonia_mnist,texture,0.1,2,0.99,0.0,0.805,0.39,0.44,0.0,0.83,0.32,99.84,placebo vs full object,99.7535
+pneumonia_mnist,texture,0.1,42,0.99,0.0,0.95,0.1,0.525,0.01,0.555,0.03,100.0,placebo vs full object,100.0
+pneumonia_mnist,texture,0.25,1,1.0,0.0,0.98,0.0,0.53,0.0,0.85,0.0,100.0,placebo vs full object,100.0
+pneumonia_mnist,texture,0.25,2,0.98,0.0,1.0,0.0,0.49,0.0,0.65,0.0,100.0,placebo vs full object,100.0
+pneumonia_mnist,texture,0.25,42,0.74,0.52,1.0,0.0,0.57,0.0,0.77,0.0,100.0,placebo vs full object,100.0
+pneumonia_mnist,texture,0.4,1,0.95,0.0,1.0,0.0,0.595,0.01,0.87,0.0,100.0,placebo vs full object,100.0
+pneumonia_mnist,texture,0.4,2,0.97,0.0,1.0,0.0,0.455,0.01,0.62,0.0,99.84,placebo vs full object,99.8031
+pneumonia_mnist,texture,0.4,42,0.885,0.19,1.0,0.0,0.7,0.0,0.78,0.0,100.0,placebo vs full object,100.0
+cifar10,patch,-0.8,1,0.525,0.01,0.505,0.01,0.6,0.0,0.575,0.01,4.22,shortcut vs placebo,0.8032
+cifar10,patch,-0.8,42,0.535,0.01,0.565,0.01,0.65,0.0,0.58,0.0,3.74,shortcut vs placebo,0.8401
+cifar10,patch,-0.6,1,0.57,0.0,0.74,0.0,0.85,0.0,0.62,0.0,7.61,shortcut vs placebo,3.7236
+cifar10,patch,-0.6,42,0.635,0.01,0.765,0.01,0.9,0.0,0.72,0.0,7.49,shortcut vs placebo,4.5687
+cifar10,patch,-0.4,1,0.8,0.0,0.905,0.01,0.91,0.0,0.89,0.0,17.29,shortcut vs placebo,14.5636
+cifar10,patch,-0.4,42,0.715,0.01,0.87,0.0,0.95,0.0,0.8,0.0,13.73,shortcut vs placebo,11.0272
+cifar10,patch,-0.25,1,0.98,0.0,0.94,0.0,0.97,0.0,0.9,0.0,23.18,shortcut vs placebo,20.6833
+cifar10,patch,-0.25,42,0.83,0.0,0.89,0.0,0.97,0.0,0.9,0.0,22.55,shortcut vs placebo,20.0016
+cifar10,patch,-0.1,1,0.98,0.0,0.94,0.0,0.95,0.0,0.97,0.0,45.07,shortcut vs placebo,42.6817
+cifar10,patch,-0.1,42,0.96,0.0,0.97,0.0,0.97,0.0,0.99,0.0,43.4,shortcut vs placebo,41.0744
+cifar10,patch,0.0,1,0.97,0.0,0.97,0.0,0.98,0.0,0.945,0.11,96.62,shortcut vs placebo,96.3297
+cifar10,patch,0.0,42,0.94,0.0,0.96,0.0,0.99,0.0,0.945,0.09,96.29,shortcut vs placebo,95.9789
+cifar10_resnet18,patch,-0.8,1,0.555,0.03,0.505,0.01,0.635,0.01,0.62,0.02,3.31,shortcut vs placebo,1.2427
+cifar10_resnet18,patch,-0.8,2,0.555,0.03,0.54,0.0,0.595,0.01,0.47,0.0,2.94,shortcut vs placebo,0.9412
+cifar10_resnet18,patch,-0.8,42,0.615,0.01,0.53,0.0,0.56,0.0,0.56,0.0,2.71,shortcut vs placebo,0.8077
+cifar10_resnet18,patch,-0.6,1,0.66,0.02,0.665,0.01,0.73,0.0,0.675,0.01,5.36,shortcut vs placebo,3.4078
+cifar10_resnet18,patch,-0.6,2,0.715,0.03,0.69,0.0,0.755,0.01,0.68,0.0,6.35,shortcut vs placebo,4.326
+cifar10_resnet18,patch,-0.6,42,0.735,0.01,0.645,0.01,0.74,0.0,0.67,0.02,6.58,shortcut vs placebo,4.4503
+cifar10_resnet18,patch,-0.4,1,0.74,0.06,0.78,0.0,0.875,0.01,0.705,0.01,10.8,shortcut vs placebo,8.5743
+cifar10_resnet18,patch,-0.4,2,0.76,0.0,0.725,0.01,0.84,0.0,0.83,0.0,10.83,shortcut vs placebo,8.7163
+cifar10_resnet18,patch,-0.4,42,0.76,0.0,0.72,0.0,0.86,0.0,0.89,0.0,10.25,shortcut vs placebo,7.9676
+cifar10_resnet18,patch,-0.25,1,0.9,0.0,0.81,0.0,0.86,0.0,0.84,0.0,19.72,shortcut vs placebo,17.5017
+cifar10_resnet18,patch,-0.25,2,0.885,0.01,0.835,0.01,0.935,0.01,0.91,0.0,18.68,shortcut vs placebo,16.3107
+cifar10_resnet18,patch,-0.25,42,0.875,0.01,0.74,0.0,0.91,0.0,0.84,0.0,18.4,shortcut vs placebo,16.081
+cifar10_resnet18,patch,-0.1,1,0.9,0.0,0.895,0.01,0.905,0.01,0.9,0.02,35.67,shortcut vs placebo,33.1752
+cifar10_resnet18,patch,-0.1,2,0.93,0.0,0.88,0.0,0.885,0.01,0.95,0.02,38.95,shortcut vs placebo,36.5407
+cifar10_resnet18,patch,-0.1,42,0.93,0.0,0.845,0.01,0.92,0.0,0.93,0.02,34.32,shortcut vs placebo,31.8452
+cifar10_resnet18,patch,0.0,1,0.99,0.0,0.96,0.0,1.0,0.0,1.0,0.0,97.25,shortcut vs placebo,96.997
+cifar10_resnet18,patch,0.0,2,0.97,0.0,0.98,0.0,0.98,0.0,1.0,0.0,96.16,shortcut vs placebo,95.8157
+cifar10_resnet18,patch,0.0,42,0.98,0.0,0.99,0.0,0.97,0.0,1.0,0.0,97.02,shortcut vs placebo,96.7566
+mnist,patch,-0.4,1,0.55,0.0,0.37,0.0,0.42,0.0,0.51,0.0,0.12,shortcut vs placebo,0.0178
+mnist,patch,-0.4,2,0.61,0.0,0.49,0.0,0.47,0.0,0.55,0.0,0.12,shortcut vs placebo,-0.0033
+mnist,patch,-0.4,42,0.55,0.02,0.45,0.0,0.41,0.0,0.6,0.0,0.18,shortcut vs placebo,0.0078
+mnist,patch,-0.25,1,0.57,0.0,0.37,0.0,0.38,0.0,0.57,0.0,0.14,shortcut vs placebo,0.0211
+mnist,patch,-0.25,2,0.59,0.0,0.48,0.0,0.44,0.0,0.56,0.0,0.17,shortcut vs placebo,0.0278
+mnist,patch,-0.25,42,0.58,0.0,0.48,0.0,0.4,0.0,0.55,0.0,0.22,shortcut vs placebo,0.0668
+mnist,patch,-0.1,1,0.55,0.0,0.44,0.0,0.35,0.0,0.495,0.01,0.13,shortcut vs placebo,0.01
+mnist,patch,-0.1,2,0.6,0.0,0.52,0.0,0.45,0.0,0.63,0.0,0.2,shortcut vs placebo,0.0701
+mnist,patch,-0.1,42,0.58,0.0,0.47,0.0,0.46,0.0,0.6,0.0,0.2,shortcut vs placebo,0.0234
+mnist,patch,-0.05,1,0.55,0.0,0.39,0.0,0.41,0.0,0.62,0.0,0.15,shortcut vs placebo,0.0145
+mnist,patch,-0.05,2,0.59,0.0,0.46,0.0,0.47,0.0,0.68,0.0,0.18,shortcut vs placebo,0.0367
+mnist,patch,-0.05,42,0.61,0.0,0.47,0.0,0.395,0.01,0.62,0.0,0.22,shortcut vs placebo,0.0712
+mnist,patch,0.0,1,0.615,0.01,0.47,0.0,0.425,0.01,0.63,0.0,0.17,shortcut vs placebo,0.0389
+mnist,patch,0.0,2,0.63,0.0,0.45,0.0,0.52,0.0,0.63,0.0,0.17,shortcut vs placebo,0.0289
+mnist,patch,0.0,42,0.78,0.0,0.62,0.0,0.535,0.01,0.71,0.0,8.87,shortcut vs placebo,8.5438
+mnist,patch,0.005,1,0.65,0.0,0.54,0.0,0.525,0.01,0.7,0.0,0.81,shortcut vs placebo,0.6345
+mnist,patch,0.005,2,0.6,0.0,0.47,0.0,0.52,0.0,0.67,0.0,1.59,shortcut vs placebo,1.3785
+mnist,patch,0.005,42,0.77,0.0,0.71,0.0,0.64,0.0,0.76,0.0,22.98,shortcut vs placebo,22.0551
+mnist,patch,0.0075,1,0.79,0.0,0.7,0.0,0.74,0.0,0.77,0.0,13.3,shortcut vs placebo,12.8215
+mnist,patch,0.0075,2,0.75,0.0,0.54,0.0,0.62,0.0,0.685,0.01,5.77,shortcut vs placebo,5.5149
+mnist,patch,0.0075,3,0.61,0.0,0.62,0.0,0.56,0.0,0.71,0.0,6.93,shortcut vs placebo,6.6572
+mnist,patch,0.0075,4,0.67,0.0,0.55,0.0,0.48,0.0,0.675,0.01,0.53,shortcut vs placebo,0.3806
+mnist,patch,0.0075,5,0.73,0.0,0.6,0.0,0.65,0.0,0.71,0.0,19.03,shortcut vs placebo,17.7227
+mnist,patch,0.0075,42,0.83,0.0,0.78,0.0,0.75,0.0,0.85,0.0,40.85,shortcut vs placebo,39.806
+mnist,patch,0.01,1,0.83,0.0,0.69,0.0,0.75,0.0,0.83,0.0,9.13,shortcut vs placebo,8.7152
+mnist,patch,0.01,2,0.79,0.0,0.64,0.0,0.71,0.0,0.73,0.0,17.52,shortcut vs placebo,16.6943
+mnist,patch,0.01,42,0.87,0.0,0.815,0.01,0.8,0.0,0.89,0.0,62.21,shortcut vs placebo,61.264
+mnist,patch,0.015,1,0.8,0.0,0.72,0.0,0.765,0.01,0.82,0.0,39.33,shortcut vs placebo,37.6443
+mnist,patch,0.015,2,0.84,0.0,0.68,0.0,0.77,0.0,0.79,0.0,30.18,shortcut vs placebo,29.0383
+mnist,patch,0.015,3,0.67,0.0,0.62,0.0,0.59,0.0,0.76,0.0,31.49,shortcut vs placebo,29.8764
+mnist,patch,0.015,4,0.8,0.0,0.67,0.0,0.71,0.0,0.805,0.01,10.64,shortcut vs placebo,10.441
+mnist,patch,0.015,5,0.71,0.0,0.64,0.0,0.675,0.01,0.72,0.0,26.1,shortcut vs placebo,24.2785
+mnist,patch,0.015,42,0.87,0.0,0.82,0.0,0.84,0.0,0.89,0.0,64.89,shortcut vs placebo,63.8542
+mnist,patch,0.02,1,0.89,0.0,0.79,0.0,0.78,0.0,0.89,0.0,53.12,shortcut vs placebo,50.7833
+mnist,patch,0.02,2,0.86,0.0,0.73,0.0,0.83,0.0,0.81,0.0,45.18,shortcut vs placebo,43.9131
+mnist,patch,0.02,42,0.88,0.0,0.79,0.0,0.8,0.0,0.9,0.0,68.52,shortcut vs placebo,67.6006
+mnist,patch,0.03,1,0.9,0.0,0.81,0.0,0.79,0.0,0.88,0.0,71.03,shortcut vs placebo,69.1488
+mnist,patch,0.03,2,0.85,0.0,0.84,0.0,0.82,0.0,0.88,0.0,70.38,shortcut vs placebo,68.4181
+mnist,patch,0.03,42,0.87,0.0,0.84,0.0,0.83,0.0,0.87,0.0,74.95,shortcut vs placebo,73.1923
+mnist,patch,0.05,1,0.89,0.0,0.86,0.0,0.83,0.0,0.86,0.0,75.72,shortcut vs placebo,73.7788
+mnist,patch,0.05,2,0.89,0.0,0.91,0.0,0.9,0.0,0.9,0.0,77.26,shortcut vs placebo,75.5933
+mnist,patch,0.05,42,0.88,0.0,0.84,0.0,0.84,0.0,0.86,0.0,75.67,shortcut vs placebo,73.7606
+mnist,patch,0.1,1,0.96,0.0,0.9,0.0,0.88,0.0,0.92,0.0,84.1,shortcut vs placebo,82.7765
+mnist,patch,0.1,2,0.93,0.0,0.89,0.0,0.89,0.0,0.91,0.0,87.86,shortcut vs placebo,86.7155
+mnist,patch,0.1,42,0.89,0.0,0.8,0.0,0.82,0.0,0.87,0.0,76.97,shortcut vs placebo,75.1227
+mnist,patch,0.25,1,0.98,0.0,0.92,0.0,0.95,0.0,0.97,0.0,99.76,shortcut vs placebo,99.7335
+mnist,patch,0.25,2,0.95,0.0,0.95,0.0,0.97,0.0,0.96,0.0,99.57,shortcut vs placebo,99.5228
+mnist,patch,0.25,42,0.95,0.0,0.87,0.0,0.85,0.0,0.91,0.0,88.51,shortcut vs placebo,87.3889
+mnist,patch,0.4,1,0.96,0.02,0.98,0.0,0.95,0.0,0.935,0.01,99.8,shortcut vs placebo,99.7779
+mnist,patch,0.4,2,0.93,0.0,0.94,0.0,0.915,0.01,0.91,0.0,88.92,shortcut vs placebo,87.8239
+mnist,patch,0.4,42,0.94,0.0,0.96,0.0,0.93,0.0,0.975,0.01,99.47,shortcut vs placebo,99.4115
+mnist,texture,-0.4,1,0.57,0.0,0.37,0.0,0.37,0.0,0.47,0.0,0.17,shortcut vs placebo,0.0478
+mnist,texture,-0.4,2,0.61,0.0,0.41,0.0,0.48,0.0,0.45,0.0,0.17,shortcut vs placebo,0.0289
+mnist,texture,-0.4,42,0.55,0.0,0.44,0.0,0.43,0.0,0.48,0.0,0.18,shortcut vs placebo,0.0089
+mnist,texture,-0.25,1,0.58,0.0,0.47,0.0,0.41,0.0,0.52,0.0,0.11,shortcut vs placebo,-0.0044
+mnist,texture,-0.25,2,0.56,0.0,0.37,0.0,0.39,0.0,0.46,0.0,0.27,shortcut vs placebo,0.108
+mnist,texture,-0.25,42,0.56,0.0,0.435,0.01,0.39,0.0,0.51,0.0,0.23,shortcut vs placebo,0.0534
+mnist,texture,-0.1,1,0.57,0.0,0.42,0.0,0.39,0.0,0.56,0.0,0.14,shortcut vs placebo,0.0278
+mnist,texture,-0.1,2,0.56,0.0,0.35,0.0,0.39,0.0,0.52,0.0,0.64,shortcut vs placebo,0.4065
+mnist,texture,-0.1,42,0.59,0.0,0.42,0.0,0.4,0.0,0.54,0.0,0.51,shortcut vs placebo,0.2695
+mnist,texture,-0.05,1,0.565,0.01,0.42,0.0,0.41,0.0,0.56,0.0,0.18,shortcut vs placebo,0.0401
+mnist,texture,-0.05,2,0.68,0.0,0.335,0.01,0.38,0.0,0.52,0.0,1.3,shortcut vs placebo,0.992
+mnist,texture,-0.05,42,0.69,0.0,0.41,0.0,0.42,0.0,0.5,0.0,2.43,shortcut vs placebo,1.9441
+mnist,texture,0.0,1,0.63,0.0,0.43,0.0,0.44,0.0,0.58,0.0,0.21,shortcut vs placebo,0.0645
+mnist,texture,0.0,2,0.74,0.0,0.28,0.0,0.44,0.0,0.39,0.0,8.88,shortcut vs placebo,7.8065
+mnist,texture,0.0,42,0.87,0.0,0.415,0.01,0.56,0.0,0.32,0.0,18.24,shortcut vs placebo,16.5752
+mnist,texture,0.005,1,0.89,0.0,0.44,0.0,0.73,0.0,0.42,0.0,14.24,shortcut vs placebo,12.5423
+mnist,texture,0.005,2,0.92,0.0,0.24,0.0,0.71,0.0,0.35,0.02,55.64,shortcut vs placebo,53.1985
+mnist,texture,0.005,42,0.93,0.0,0.27,0.0,0.785,0.01,0.35,0.0,76.75,shortcut vs placebo,75.3287
+mnist,texture,0.0075,1,0.86,0.0,0.48,0.0,0.81,0.0,0.33,0.0,41.59,shortcut vs placebo,38.569
+mnist,texture,0.0075,2,0.9,0.0,0.33,0.0,0.81,0.0,0.38,0.0,74.41,shortcut vs placebo,72.7208
+mnist,texture,0.0075,3,0.9,0.0,0.16,0.0,0.73,0.0,0.38,0.0,60.93,shortcut vs placebo,58.2233
+mnist,texture,0.0075,4,0.88,0.0,0.45,0.0,0.72,0.0,0.415,0.01,30.38,shortcut vs placebo,28.2219
+mnist,texture,0.0075,5,0.82,0.0,0.44,0.0,0.54,0.0,0.44,0.02,7.48,shortcut vs placebo,5.8108
+mnist,texture,0.0075,42,0.89,0.0,0.36,0.0,0.78,0.0,0.255,0.01,82.07,shortcut vs placebo,80.9788
+mnist,texture,0.01,1,0.905,0.01,0.46,0.0,0.78,0.0,0.42,0.0,38.88,shortcut vs placebo,36.4334
+mnist,texture,0.01,2,0.86,0.04,0.21,0.0,0.76,0.0,0.32,0.0,80.4,shortcut vs placebo,78.998
+mnist,texture,0.01,42,0.95,0.0,0.435,0.01,0.89,0.0,0.3,0.0,92.03,shortcut vs placebo,91.4836
+mnist,texture,0.015,1,0.915,0.01,0.47,0.0,0.86,0.0,0.32,0.0,73.2,shortcut vs placebo,71.7621
+mnist,texture,0.015,2,0.885,0.03,0.38,0.0,0.78,0.0,0.3,0.0,92.06,shortcut vs placebo,91.5041
+mnist,texture,0.015,3,0.97,0.0,0.42,0.0,0.9,0.0,0.34,0.0,89.3,shortcut vs placebo,88.3025
+mnist,texture,0.015,4,0.95,0.0,0.53,0.0,0.9,0.0,0.38,0.0,78.36,shortcut vs placebo,76.7072
+mnist,texture,0.015,5,0.96,0.0,0.47,0.0,0.88,0.0,0.33,0.0,73.63,shortcut vs placebo,71.7192
+mnist,texture,0.015,42,0.915,0.01,0.29,0.0,0.86,0.0,0.27,0.0,92.57,shortcut vs placebo,91.949
+mnist,texture,0.02,1,0.97,0.0,0.53,0.0,0.93,0.0,0.3,0.0,87.94,shortcut vs placebo,86.9978
+mnist,texture,0.02,2,0.95,0.0,0.46,0.0,0.9,0.0,0.36,0.0,92.39,shortcut vs placebo,91.7996
+mnist,texture,0.02,42,0.95,0.0,0.37,0.0,0.89,0.0,0.365,0.01,98.38,shortcut vs placebo,98.2511
+mnist,texture,0.03,1,0.97,0.0,0.62,0.0,0.95,0.0,0.43,0.0,95.45,shortcut vs placebo,95.0242
+mnist,texture,0.03,2,0.93,0.0,0.48,0.0,0.85,0.0,0.33,0.0,97.01,shortcut vs placebo,96.7652
+mnist,texture,0.03,42,0.97,0.0,0.36,0.0,0.92,0.0,0.34,0.0,98.65,shortcut vs placebo,98.5241
+mnist,texture,0.05,1,0.98,0.0,0.49,0.0,0.95,0.0,0.33,0.0,98.51,shortcut vs placebo,98.3656
+mnist,texture,0.05,2,0.92,0.0,0.37,0.0,0.86,0.0,0.27,0.0,99.35,shortcut vs placebo,99.293
+mnist,texture,0.05,42,0.98,0.0,0.3,0.0,0.93,0.0,0.31,0.0,99.64,shortcut vs placebo,99.6075
+mnist,texture,0.1,1,0.98,0.0,0.635,0.01,0.92,0.0,0.375,0.01,99.74,shortcut vs placebo,99.7148
+mnist,texture,0.1,2,0.96,0.0,0.37,0.0,0.91,0.0,0.2,0.0,99.73,shortcut vs placebo,99.7043
+mnist,texture,0.1,42,0.98,0.0,0.4,0.0,0.94,0.0,0.28,0.0,99.87,shortcut vs placebo,99.8574
+mnist,texture,0.25,1,0.92,0.0,0.54,0.0,0.9,0.0,0.37,0.0,99.98,shortcut vs placebo,99.978
+mnist,texture,0.25,2,0.98,0.0,0.41,0.0,0.91,0.0,0.265,0.01,100.0,shortcut vs placebo,100.0
+mnist,texture,0.25,42,0.92,0.0,0.29,0.0,0.87,0.0,0.33,0.0,99.95,shortcut vs placebo,99.9455
+mnist,texture,0.4,1,0.97,0.0,0.49,0.0,0.92,0.0,0.36,0.0,100.0,shortcut vs placebo,100.0
+mnist,texture,0.4,2,0.94,0.0,0.42,0.0,0.93,0.0,0.28,0.0,100.0,shortcut vs placebo,100.0
+mnist,texture,0.4,42,0.98,0.0,0.34,0.0,0.94,0.0,0.26,0.0,99.96,shortcut vs placebo,99.9557
+pet_resnet18,patch,-0.5,1,0.52,0.0,0.55,0.0,0.475,0.01,0.51,0.0,19.16,shortcut vs placebo,-0.7854
+pet_resnet18,patch,-0.5,2,0.535,0.11,0.57,0.0,0.615,0.01,0.49,0.0,17.72,shortcut vs placebo,0.2304
+pet_resnet18,patch,-0.5,42,0.6,0.0,0.595,0.01,0.48,0.08,0.56,0.0,15.48,shortcut vs placebo,-0.1303
+pet_resnet18,patch,-0.4,1,0.68,0.18,0.59,0.0,0.635,0.01,0.63,0.0,21.83,shortcut vs placebo,3.9445
+pet_resnet18,patch,-0.4,2,0.65,0.0,0.71,0.0,0.715,0.01,0.66,0.0,20.11,shortcut vs placebo,3.5145
+pet_resnet18,patch,-0.4,42,0.705,0.01,0.79,0.0,0.74,0.0,0.72,0.0,24.83,shortcut vs placebo,6.0962
+pet_resnet18,patch,-0.3,1,0.69,0.02,0.7,0.0,0.765,0.07,0.81,0.0,34.53,shortcut vs placebo,14.5746
+pet_resnet18,patch,-0.3,2,0.74,0.0,0.77,0.0,0.83,0.0,0.83,0.0,33.2,shortcut vs placebo,15.1099
+pet_resnet18,patch,-0.3,42,0.71,0.0,0.74,0.0,0.79,0.0,0.84,0.0,31.86,shortcut vs placebo,15.3646
+pet_resnet18,patch,-0.2,1,0.88,0.0,0.86,0.0,0.93,0.0,0.95,0.0,57.13,shortcut vs placebo,41.0641
+pet_resnet18,patch,-0.2,2,0.8,0.0,0.78,0.0,0.88,0.0,0.87,0.0,43.28,shortcut vs placebo,22.9766
+pet_resnet18,patch,-0.2,42,0.65,0.1,0.69,0.0,0.755,0.01,0.67,0.0,39.38,shortcut vs placebo,22.9047
+pet_resnet18,patch,-0.1,1,0.73,0.0,0.9,0.0,0.97,0.0,0.95,0.0,72.28,shortcut vs placebo,60.1323
+pet_resnet18,patch,-0.1,2,0.93,0.0,0.95,0.0,1.0,0.0,0.99,0.0,83.7,shortcut vs placebo,76.7674
+pet_resnet18,patch,-0.1,42,0.8,0.0,0.92,0.0,1.0,0.0,0.94,0.0,88.55,shortcut vs placebo,82.683
+pet_resnet18,patch,0.0,1,0.67,0.0,0.95,0.0,1.0,0.0,0.97,0.0,98.83,shortcut vs placebo,98.2211
+pet_resnet18,patch,0.0,2,0.92,0.0,0.98,0.0,1.0,0.0,1.0,0.0,99.45,shortcut vs placebo,99.1857
+pet_resnet18,patch,0.0,42,0.73,0.0,0.9,0.0,0.99,0.0,0.95,0.0,98.86,shortcut vs placebo,98.1678
+pneumonia_mnist,patch,-0.4,1,0.44,0.0,0.52,0.22,0.515,0.11,0.515,0.15,12.82,shortcut vs placebo,0.0
+pneumonia_mnist,patch,-0.4,2,0.555,0.01,0.475,0.07,0.455,0.01,0.48,0.12,13.3,shortcut vs placebo,-0.1849
+pneumonia_mnist,patch,-0.4,42,0.59,0.0,0.555,0.31,0.585,0.31,0.465,0.33,18.43,shortcut vs placebo,2.1121
+pneumonia_mnist,patch,-0.25,1,0.53,0.0,0.48,0.18,0.525,0.17,0.535,0.19,14.58,shortcut vs placebo,0.0
+pneumonia_mnist,patch,-0.25,2,0.67,0.0,0.595,0.17,0.5,0.02,0.485,0.21,19.39,shortcut vs placebo,3.2641
+pneumonia_mnist,patch,-0.25,42,0.52,0.0,0.54,0.2,0.54,0.14,0.515,0.21,15.87,shortcut vs placebo,0.3907
+pneumonia_mnist,patch,-0.1,1,0.735,0.03,0.72,0.36,0.76,0.32,0.65,0.34,23.24,shortcut vs placebo,3.2396
+pneumonia_mnist,patch,-0.1,2,0.7,0.0,0.765,0.13,0.645,0.01,0.61,0.2,24.84,shortcut vs placebo,15.1884
+pneumonia_mnist,patch,-0.1,42,0.395,0.01,0.495,0.23,0.505,0.17,0.49,0.24,15.87,shortcut vs placebo,0.1898
+pneumonia_mnist,patch,-0.075,1,0.69,0.0,0.69,0.2,0.77,0.18,0.715,0.25,26.6,shortcut vs placebo,10.7165
+pneumonia_mnist,patch,-0.075,2,0.67,0.0,0.755,0.03,0.68,0.0,0.69,0.04,25.16,shortcut vs placebo,16.7519
+pneumonia_mnist,patch,-0.075,42,0.715,0.03,0.705,0.11,0.75,0.02,0.595,0.15,30.93,shortcut vs placebo,19.4425
+pneumonia_mnist,patch,-0.05,1,0.71,0.0,0.715,0.25,0.775,0.17,0.72,0.26,36.22,shortcut vs placebo,8.0847
+pneumonia_mnist,patch,-0.05,2,0.65,0.0,0.735,0.07,0.66,0.02,0.63,0.14,26.12,shortcut vs placebo,17.5262
+pneumonia_mnist,patch,-0.05,42,0.73,0.0,0.74,0.04,0.77,0.0,0.715,0.07,34.94,shortcut vs placebo,25.0979
+pneumonia_mnist,patch,-0.025,1,0.75,0.0,0.695,0.41,0.73,0.38,0.7,0.44,43.27,shortcut vs placebo,14.9093
+pneumonia_mnist,patch,-0.025,2,0.815,0.03,0.8,0.02,0.775,0.01,0.785,0.05,37.02,shortcut vs placebo,29.1882
+pneumonia_mnist,patch,-0.025,42,0.76,0.0,0.68,0.18,0.655,0.15,0.59,0.26,38.94,shortcut vs placebo,29.961
+pneumonia_mnist,patch,0.0,1,0.73,0.0,0.72,0.48,0.735,0.45,0.715,0.47,80.13,shortcut vs placebo,68.5303
+pneumonia_mnist,patch,0.0,2,0.735,0.03,0.77,0.0,0.665,0.01,0.735,0.01,52.08,shortcut vs placebo,41.7103
+pneumonia_mnist,patch,0.0,42,0.765,0.01,0.695,0.01,0.74,0.0,0.67,0.04,62.5,shortcut vs placebo,48.233
+pneumonia_mnist,patch,0.005,1,0.69,0.0,0.67,0.3,0.76,0.24,0.75,0.3,54.33,shortcut vs placebo,29.9755
+pneumonia_mnist,patch,0.005,2,0.74,0.2,0.75,0.0,0.72,0.02,0.715,0.01,79.97,shortcut vs placebo,64.6924
+pneumonia_mnist,patch,0.005,42,0.755,0.11,0.735,0.01,0.76,0.0,0.75,0.0,70.51,shortcut vs placebo,54.7838
+pneumonia_mnist,patch,0.01,1,0.74,0.02,0.73,0.36,0.76,0.36,0.735,0.33,98.4,shortcut vs placebo,97.4914
+pneumonia_mnist,patch,0.01,2,0.83,0.0,0.79,0.0,0.715,0.01,0.725,0.01,79.97,shortcut vs placebo,64.4921
+pneumonia_mnist,patch,0.01,42,0.775,0.07,0.73,0.0,0.75,0.0,0.79,0.0,78.53,shortcut vs placebo,62.3663
+pneumonia_mnist,patch,0.02,1,0.82,0.0,0.75,0.0,0.77,0.0,0.77,0.0,57.05,shortcut vs placebo,42.6109
+pneumonia_mnist,patch,0.02,2,0.82,0.02,0.745,0.01,0.71,0.0,0.67,0.02,71.15,shortcut vs placebo,55.2158
+pneumonia_mnist,patch,0.02,42,0.755,0.13,0.73,0.0,0.78,0.0,0.745,0.01,77.56,shortcut vs placebo,60.7761
+pneumonia_mnist,patch,0.05,1,0.815,0.01,0.7,0.32,0.735,0.29,0.755,0.33,99.36,shortcut vs placebo,98.9864
+pneumonia_mnist,patch,0.05,2,0.74,0.12,0.75,0.0,0.74,0.0,0.7,0.0,92.31,shortcut vs placebo,82.6763
+pneumonia_mnist,patch,0.05,42,0.815,0.03,0.705,0.01,0.755,0.01,0.74,0.0,92.79,shortcut vs placebo,83.3372
+pneumonia_mnist,patch,0.1,1,0.77,0.2,0.715,0.29,0.71,0.26,0.725,0.27,99.84,shortcut vs placebo,99.7447
+pneumonia_mnist,patch,0.1,2,0.89,0.0,0.92,0.0,0.92,0.0,0.97,0.0,98.4,shortcut vs placebo,97.1311
+pneumonia_mnist,patch,0.1,42,0.775,0.11,0.77,0.0,0.76,0.0,0.68,0.0,98.4,shortcut vs placebo,95.8398
+pneumonia_mnist,patch,0.25,1,0.825,0.01,0.76,0.0,0.755,0.01,0.745,0.01,97.28,shortcut vs placebo,93.2372
+pneumonia_mnist,patch,0.25,2,0.91,0.0,1.0,0.0,1.0,0.0,1.0,0.0,99.84,shortcut vs placebo,99.744
+pneumonia_mnist,patch,0.25,42,0.78,0.2,0.79,0.0,0.76,0.1,0.735,0.07,99.68,shortcut vs placebo,99.1503
+pneumonia_mnist,patch,0.4,1,0.78,0.0,0.775,0.01,0.745,0.03,0.8,0.02,99.68,shortcut vs placebo,99.1503
+pneumonia_mnist,patch,0.4,2,0.735,0.33,0.78,0.04,0.84,0.06,0.77,0.06,100.0,shortcut vs placebo,100.0
+pneumonia_mnist,patch,0.4,42,0.76,0.02,0.795,0.05,0.735,0.07,0.785,0.09,99.52,shortcut vs placebo,98.7308
+pneumonia_mnist,texture,-0.4,1,0.92,0.02,0.63,0.2,0.52,0.14,0.575,0.19,17.95,shortcut vs placebo,3.765
+pneumonia_mnist,texture,-0.4,2,0.75,0.0,0.53,0.06,0.555,0.09,0.555,0.11,20.83,shortcut vs placebo,4.9922
+pneumonia_mnist,texture,-0.4,42,0.81,0.02,0.57,0.2,0.575,0.17,0.545,0.25,16.35,shortcut vs placebo,2.9807
+pneumonia_mnist,texture,-0.25,1,0.775,0.01,0.85,0.08,0.655,0.11,0.865,0.09,21.15,shortcut vs placebo,8.7173
+pneumonia_mnist,texture,-0.25,2,0.59,0.0,0.69,0.22,0.65,0.12,0.775,0.19,22.92,shortcut vs placebo,6.6037
+pneumonia_mnist,texture,-0.25,42,0.725,0.01,0.735,0.07,0.725,0.05,0.71,0.04,20.03,shortcut vs placebo,9.4337
+pneumonia_mnist,texture,-0.1,1,0.93,0.02,0.96,0.0,0.81,0.04,0.98,0.0,31.89,shortcut vs placebo,22.16
+pneumonia_mnist,texture,-0.1,2,0.82,0.0,0.735,0.19,0.63,0.14,0.865,0.19,31.09,shortcut vs placebo,14.8523
+pneumonia_mnist,texture,-0.1,42,0.635,0.01,0.785,0.05,0.71,0.1,0.75,0.2,29.81,shortcut vs placebo,21.7852
+pneumonia_mnist,texture,-0.075,1,0.88,0.0,0.95,0.0,0.905,0.03,0.93,0.0,37.66,shortcut vs placebo,28.2293
+pneumonia_mnist,texture,-0.075,2,0.76,0.0,0.775,0.29,0.775,0.23,0.82,0.3,35.42,shortcut vs placebo,18.5932
+pneumonia_mnist,texture,-0.075,42,0.81,0.0,0.86,0.04,0.79,0.1,0.855,0.17,35.1,shortcut vs placebo,27.68
+pneumonia_mnist,texture,-0.05,1,0.8,0.0,0.96,0.0,0.815,0.01,0.96,0.0,40.71,shortcut vs placebo,32.8539
+pneumonia_mnist,texture,-0.05,2,0.82,0.0,0.895,0.01,0.825,0.01,0.975,0.03,36.86,shortcut vs placebo,27.0395
+pneumonia_mnist,texture,-0.05,42,0.935,0.05,0.835,0.01,0.805,0.05,0.945,0.07,38.3,shortcut vs placebo,28.7035
+pneumonia_mnist,texture,-0.025,1,0.97,0.0,0.97,0.0,0.86,0.0,0.98,0.0,48.4,shortcut vs placebo,40.1531
+pneumonia_mnist,texture,-0.025,2,0.605,0.01,0.955,0.01,0.795,0.03,1.0,0.0,49.2,shortcut vs placebo,34.9052
+pneumonia_mnist,texture,-0.025,42,0.61,0.02,0.85,0.0,0.775,0.01,0.97,0.0,54.17,shortcut vs placebo,45.7376
+pneumonia_mnist,texture,0.0,1,0.86,0.0,0.97,0.0,0.91,0.0,1.0,0.0,84.62,shortcut vs placebo,81.0334
+pneumonia_mnist,texture,0.0,2,0.64,0.0,0.735,0.21,0.56,0.08,0.91,0.18,94.39,shortcut vs placebo,92.7369
+pneumonia_mnist,texture,0.0,42,0.595,0.01,0.94,0.0,0.93,0.0,1.0,0.0,99.04,shortcut vs placebo,98.7118
+pneumonia_mnist,texture,0.005,1,0.9,0.0,0.98,0.0,0.88,0.0,1.0,0.0,98.4,shortcut vs placebo,98.0688
+pneumonia_mnist,texture,0.005,2,0.615,0.01,0.895,0.05,0.595,0.03,0.96,0.08,97.28,shortcut vs placebo,96.3964
+pneumonia_mnist,texture,0.005,42,0.655,0.01,0.905,0.01,0.895,0.01,0.985,0.03,100.0,shortcut vs placebo,100.0
+pneumonia_mnist,texture,0.01,1,0.74,0.0,0.98,0.0,0.87,0.0,1.0,0.0,95.67,shortcut vs placebo,94.6497
+pneumonia_mnist,texture,0.01,2,0.59,0.0,0.88,0.12,0.67,0.08,0.91,0.18,77.88,shortcut vs placebo,71.5389
+pneumonia_mnist,texture,0.01,42,0.73,0.0,0.95,0.0,0.98,0.0,1.0,0.0,95.19,shortcut vs placebo,94.0566
+pneumonia_mnist,texture,0.02,1,0.84,0.0,0.98,0.0,0.81,0.0,1.0,0.0,93.75,shortcut vs placebo,92.3678
+pneumonia_mnist,texture,0.02,2,0.56,0.0,0.765,0.13,0.56,0.06,0.955,0.09,96.79,shortcut vs placebo,95.5286
+pneumonia_mnist,texture,0.02,42,0.65,0.0,0.925,0.01,0.9,0.0,1.0,0.0,100.0,shortcut vs placebo,100.0
+pneumonia_mnist,texture,0.05,1,0.61,0.0,0.915,0.01,0.85,0.0,1.0,0.0,98.88,shortcut vs placebo,97.9446
+pneumonia_mnist,texture,0.05,2,0.69,0.0,0.965,0.01,0.91,0.0,1.0,0.0,98.08,shortcut vs placebo,97.3727
+pneumonia_mnist,texture,0.05,42,0.58,0.0,0.925,0.01,0.89,0.0,0.985,0.01,100.0,shortcut vs placebo,100.0
+pneumonia_mnist,texture,0.1,1,0.78,0.0,0.985,0.01,0.92,0.0,1.0,0.0,100.0,shortcut vs placebo,100.0
+pneumonia_mnist,texture,0.1,2,0.64,0.0,0.75,0.38,0.62,0.18,0.825,0.35,99.84,shortcut vs placebo,99.7535
+pneumonia_mnist,texture,0.1,42,0.58,0.0,0.875,0.01,0.845,0.01,0.975,0.03,100.0,shortcut vs placebo,100.0
+pneumonia_mnist,texture,0.25,1,0.5,0.0,0.85,0.0,0.935,0.03,0.88,0.0,100.0,shortcut vs placebo,100.0
+pneumonia_mnist,texture,0.25,2,0.49,0.0,0.96,0.0,0.92,0.0,1.0,0.0,100.0,shortcut vs placebo,100.0
+pneumonia_mnist,texture,0.25,42,0.37,0.34,0.91,0.0,0.91,0.0,0.99,0.0,100.0,shortcut vs placebo,100.0
+pneumonia_mnist,texture,0.4,1,0.48,0.0,0.83,0.0,1.0,0.0,0.95,0.0,100.0,shortcut vs placebo,100.0
+pneumonia_mnist,texture,0.4,2,0.36,0.0,0.93,0.0,0.9,0.0,1.0,0.0,99.84,shortcut vs placebo,99.8031
+pneumonia_mnist,texture,0.4,42,0.52,0.06,0.77,0.0,0.99,0.0,0.9,0.0,100.0,shortcut vs placebo,100.0
+cifar10,patch,-0.8,1,0.82,0.0,0.74,0.0,0.23,0.0,0.19,0.0,4.22,random vs full object,0.8032
+cifar10,patch,-0.8,42,0.81,0.0,0.76,0.0,0.22,0.0,0.18,0.0,3.74,random vs full object,0.8401
+cifar10,patch,-0.6,1,0.88,0.0,0.8,0.0,0.3,0.0,0.24,0.0,7.61,random vs full object,3.7236
+cifar10,patch,-0.6,42,0.81,0.0,0.81,0.0,0.27,0.0,0.16,0.0,7.49,random vs full object,4.5687
+cifar10,patch,-0.4,1,0.86,0.0,0.79,0.0,0.36,0.0,0.4,0.0,17.29,random vs full object,14.5636
+cifar10,patch,-0.4,42,0.88,0.0,0.77,0.0,0.3,0.0,0.265,0.01,13.73,random vs full object,11.0272
+cifar10,patch,-0.25,1,0.83,0.0,0.75,0.0,0.52,0.0,0.46,0.0,23.18,random vs full object,20.6833
+cifar10,patch,-0.25,42,0.96,0.0,0.87,0.0,0.43,0.0,0.37,0.0,22.55,random vs full object,20.0016
+cifar10,patch,-0.1,1,0.93,0.0,0.83,0.0,0.67,0.0,0.65,0.0,45.07,random vs full object,42.6817
+cifar10,patch,-0.1,42,0.78,0.0,0.79,0.0,0.74,0.0,0.68,0.0,43.4,random vs full object,41.0744
+cifar10,patch,0.0,1,0.955,0.03,0.92,0.12,0.95,0.06,0.96,0.0,96.62,random vs full object,96.3297
+cifar10,patch,0.0,42,0.965,0.03,0.905,0.13,0.96,0.02,0.97,0.0,96.29,random vs full object,95.9789
+cifar10_resnet18,patch,-0.8,1,0.63,0.0,0.49,0.0,0.11,0.02,0.22,0.0,3.31,random vs full object,1.2427
+cifar10_resnet18,patch,-0.8,2,0.77,0.0,0.575,0.01,0.15,0.0,0.205,0.01,2.94,random vs full object,0.9412
+cifar10_resnet18,patch,-0.8,42,0.77,0.0,0.62,0.0,0.12,0.0,0.21,0.0,2.71,random vs full object,0.8077
+cifar10_resnet18,patch,-0.6,1,0.71,0.0,0.65,0.0,0.2,0.0,0.22,0.0,5.36,random vs full object,3.4078
+cifar10_resnet18,patch,-0.6,2,0.8,0.0,0.65,0.0,0.22,0.0,0.29,0.0,6.35,random vs full object,4.326
+cifar10_resnet18,patch,-0.6,42,0.68,0.0,0.63,0.0,0.17,0.0,0.23,0.0,6.58,random vs full object,4.4503
+cifar10_resnet18,patch,-0.4,1,0.72,0.0,0.75,0.0,0.22,0.04,0.26,0.0,10.8,random vs full object,8.5743
+cifar10_resnet18,patch,-0.4,2,0.7,0.0,0.7,0.0,0.36,0.0,0.36,0.0,10.83,random vs full object,8.7163
+cifar10_resnet18,patch,-0.4,42,0.79,0.0,0.78,0.0,0.21,0.0,0.31,0.0,10.25,random vs full object,7.9676
+cifar10_resnet18,patch,-0.25,1,0.83,0.0,0.9,0.0,0.43,0.0,0.39,0.0,19.72,random vs full object,17.5017
+cifar10_resnet18,patch,-0.25,2,0.86,0.0,0.895,0.01,0.26,0.02,0.46,0.0,18.68,random vs full object,16.3107
+cifar10_resnet18,patch,-0.25,42,0.74,0.0,0.86,0.0,0.23,0.0,0.39,0.0,18.4,random vs full object,16.081
+cifar10_resnet18,patch,-0.1,1,0.83,0.0,0.945,0.01,0.59,0.02,0.44,0.0,35.67,random vs full object,33.1752
+cifar10_resnet18,patch,-0.1,2,0.92,0.0,0.88,0.0,0.63,0.02,0.68,0.0,38.95,random vs full object,36.5407
+cifar10_resnet18,patch,-0.1,42,0.83,0.0,0.87,0.0,0.55,0.02,0.55,0.0,34.32,random vs full object,31.8452
+cifar10_resnet18,patch,0.0,1,0.985,0.01,0.99,0.0,0.985,0.01,0.94,0.0,97.25,random vs full object,96.997
+cifar10_resnet18,patch,0.0,2,0.98,0.0,0.965,0.01,0.96,0.0,0.98,0.0,96.16,random vs full object,95.8157
+cifar10_resnet18,patch,0.0,42,0.99,0.0,0.98,0.0,0.96,0.02,0.96,0.0,97.02,random vs full object,96.7566
+mnist,patch,-0.4,1,0.02,0.0,0.02,0.0,0.01,0.0,0.02,0.0,0.12,random vs full object,0.0178
+mnist,patch,-0.4,2,0.03,0.0,0.01,0.0,0.01,0.0,0.01,0.0,0.12,random vs full object,-0.0033
+mnist,patch,-0.4,42,0.02,0.0,0.02,0.0,0.02,0.0,0.03,0.0,0.18,random vs full object,0.0078
+mnist,patch,-0.25,1,0.01,0.0,0.01,0.0,0.01,0.0,0.01,0.0,0.14,random vs full object,0.0211
+mnist,patch,-0.25,2,0.01,0.0,0.05,0.0,0.01,0.0,0.01,0.0,0.17,random vs full object,0.0278
+mnist,patch,-0.25,42,0.02,0.0,0.01,0.0,0.01,0.0,0.01,0.0,0.22,random vs full object,0.0668
+mnist,patch,-0.1,1,0.01,0.0,0.01,0.0,0.01,0.0,0.01,0.0,0.13,random vs full object,0.01
+mnist,patch,-0.1,2,0.01,0.0,0.04,0.0,0.01,0.0,0.01,0.0,0.2,random vs full object,0.0701
+mnist,patch,-0.1,42,0.02,0.0,0.01,0.0,0.02,0.0,0.02,0.0,0.2,random vs full object,0.0234
+mnist,patch,-0.05,1,0.02,0.0,0.03,0.0,0.01,0.0,0.02,0.0,0.15,random vs full object,0.0145
+mnist,patch,-0.05,2,0.01,0.0,0.08,0.0,0.01,0.0,0.01,0.0,0.18,random vs full object,0.0367
+mnist,patch,-0.05,42,0.02,0.0,0.02,0.0,0.01,0.0,0.01,0.0,0.22,random vs full object,0.0712
+mnist,patch,0.0,1,0.0,0.0,0.01,0.0,0.0,0.0,0.0,0.0,0.17,random vs full object,0.0389
+mnist,patch,0.0,2,0.01,0.0,0.05,0.0,0.01,0.0,0.01,0.0,0.17,random vs full object,0.0289
+mnist,patch,0.0,42,0.37,0.0,0.21,0.0,0.17,0.0,0.03,0.0,8.87,random vs full object,8.5438
+mnist,patch,0.005,1,0.01,0.0,0.01,0.0,0.0,0.0,0.01,0.0,0.81,random vs full object,0.6345
+mnist,patch,0.005,2,0.14,0.0,0.14,0.0,0.04,0.0,0.05,0.0,1.59,random vs full object,1.3785
+mnist,patch,0.005,42,0.34,0.0,0.28,0.0,0.3,0.0,0.14,0.0,22.98,random vs full object,22.0551
+mnist,patch,0.0075,1,0.07,0.0,0.09,0.0,0.03,0.0,0.02,0.0,13.3,random vs full object,12.8215
+mnist,patch,0.0075,2,0.14,0.0,0.24,0.0,0.09,0.0,0.12,0.0,5.77,random vs full object,5.5149
+mnist,patch,0.0075,3,0.14,0.0,0.12,0.0,0.13,0.0,0.05,0.0,6.93,random vs full object,6.6572
+mnist,patch,0.0075,4,0.01,0.0,0.05,0.0,0.01,0.0,0.01,0.0,0.53,random vs full object,0.3806
+mnist,patch,0.0075,5,0.33,0.0,0.28,0.0,0.16,0.0,0.21,0.0,19.03,random vs full object,17.7227
+mnist,patch,0.0075,42,0.48,0.0,0.43,0.0,0.38,0.0,0.24,0.0,40.85,random vs full object,39.806
+mnist,patch,0.01,1,0.05,0.0,0.04,0.0,0.0,0.0,0.02,0.0,9.13,random vs full object,8.7152
+mnist,patch,0.01,2,0.27,0.0,0.29,0.0,0.25,0.0,0.2,0.0,17.52,random vs full object,16.6943
+mnist,patch,0.01,42,0.49,0.0,0.47,0.0,0.46,0.0,0.27,0.0,62.21,random vs full object,61.264
+mnist,patch,0.015,1,0.17,0.0,0.22,0.0,0.135,0.01,0.16,0.0,39.33,random vs full object,37.6443
+mnist,patch,0.015,2,0.26,0.0,0.31,0.0,0.19,0.0,0.25,0.0,30.18,random vs full object,29.0383
+mnist,patch,0.015,3,0.18,0.0,0.2,0.0,0.15,0.0,0.14,0.0,31.49,random vs full object,29.8764
+mnist,patch,0.015,4,0.34,0.0,0.33,0.0,0.2,0.0,0.12,0.0,10.64,random vs full object,10.441
+mnist,patch,0.015,5,0.29,0.0,0.25,0.0,0.19,0.0,0.26,0.0,26.1,random vs full object,24.2785
+mnist,patch,0.015,42,0.455,0.01,0.5,0.0,0.46,0.0,0.28,0.0,64.89,random vs full object,63.8542
+mnist,patch,0.02,1,0.245,0.01,0.375,0.01,0.19,0.0,0.34,0.02,53.12,random vs full object,50.7833
+mnist,patch,0.02,2,0.3,0.0,0.39,0.0,0.23,0.0,0.26,0.0,45.18,random vs full object,43.9131
+mnist,patch,0.02,42,0.44,0.0,0.435,0.01,0.41,0.0,0.35,0.0,68.52,random vs full object,67.6006
+mnist,patch,0.03,1,0.41,0.0,0.45,0.0,0.405,0.01,0.47,0.0,71.03,random vs full object,69.1488
+mnist,patch,0.03,2,0.48,0.0,0.51,0.0,0.35,0.0,0.38,0.0,70.38,random vs full object,68.4181
+mnist,patch,0.03,42,0.49,0.0,0.52,0.0,0.48,0.0,0.525,0.01,74.95,random vs full object,73.1923
+mnist,patch,0.05,1,0.46,0.0,0.46,0.0,0.42,0.0,0.59,0.0,75.72,random vs full object,73.7788
+mnist,patch,0.05,2,0.48,0.0,0.47,0.0,0.26,0.0,0.51,0.0,77.26,random vs full object,75.5933
+mnist,patch,0.05,42,0.55,0.0,0.55,0.0,0.57,0.0,0.61,0.0,75.67,random vs full object,73.7606
+mnist,patch,0.1,1,0.55,0.0,0.46,0.0,0.51,0.0,0.49,0.0,84.1,random vs full object,82.7765
+mnist,patch,0.1,2,0.595,0.01,0.56,0.0,0.44,0.0,0.66,0.0,87.86,random vs full object,86.7155
+mnist,patch,0.1,42,0.56,0.0,0.46,0.0,0.57,0.0,0.65,0.0,76.97,random vs full object,75.1227
+mnist,patch,0.25,1,0.62,0.0,0.61,0.0,0.53,0.02,0.76,0.0,99.76,random vs full object,99.7335
+mnist,patch,0.25,2,0.61,0.0,0.59,0.0,0.51,0.0,0.74,0.0,99.57,random vs full object,99.5228
+mnist,patch,0.25,42,0.63,0.0,0.61,0.0,0.64,0.0,0.72,0.0,88.51,random vs full object,87.3889
+mnist,patch,0.4,1,0.68,0.0,0.59,0.0,0.605,0.01,0.72,0.0,99.8,random vs full object,99.7779
+mnist,patch,0.4,2,0.6,0.0,0.62,0.0,0.425,0.01,0.69,0.0,88.92,random vs full object,87.8239
+mnist,patch,0.4,42,0.74,0.0,0.64,0.0,0.63,0.0,0.76,0.0,99.47,random vs full object,99.4115
+mnist,texture,-0.4,1,0.01,0.0,0.02,0.0,0.01,0.0,0.0,0.0,0.17,random vs full object,0.0478
+mnist,texture,-0.4,2,0.02,0.0,0.05,0.0,0.06,0.0,0.01,0.0,0.17,random vs full object,0.0289
+mnist,texture,-0.4,42,0.05,0.0,0.06,0.0,0.06,0.0,0.02,0.0,0.18,random vs full object,0.0089
+mnist,texture,-0.25,1,0.01,0.0,0.03,0.0,0.01,0.0,0.01,0.0,0.11,random vs full object,-0.0044
+mnist,texture,-0.25,2,0.07,0.0,0.04,0.0,0.09,0.0,0.01,0.0,0.27,random vs full object,0.108
+mnist,texture,-0.25,42,0.03,0.0,0.05,0.0,0.05,0.0,0.03,0.0,0.23,random vs full object,0.0534
+mnist,texture,-0.1,1,0.02,0.0,0.02,0.0,0.02,0.0,0.01,0.0,0.14,random vs full object,0.0278
+mnist,texture,-0.1,2,0.08,0.0,0.04,0.0,0.07,0.0,0.03,0.0,0.64,random vs full object,0.4065
+mnist,texture,-0.1,42,0.06,0.0,0.03,0.0,0.07,0.0,0.03,0.0,0.51,random vs full object,0.2695
+mnist,texture,-0.05,1,0.02,0.0,0.03,0.0,0.03,0.0,0.01,0.0,0.18,random vs full object,0.0401
+mnist,texture,-0.05,2,0.12,0.0,0.07,0.0,0.15,0.0,0.02,0.0,1.3,random vs full object,0.992
+mnist,texture,-0.05,42,0.13,0.0,0.09,0.0,0.1,0.0,0.05,0.0,2.43,random vs full object,1.9441
+mnist,texture,0.0,1,0.02,0.0,0.06,0.0,0.03,0.0,0.03,0.0,0.21,random vs full object,0.0645
+mnist,texture,0.0,2,0.25,0.0,0.08,0.0,0.19,0.0,0.06,0.0,8.88,random vs full object,7.8065
+mnist,texture,0.0,42,0.21,0.0,0.28,0.0,0.31,0.0,0.11,0.0,18.24,random vs full object,16.5752
+mnist,texture,0.005,1,0.19,0.0,0.15,0.0,0.22,0.0,0.05,0.0,14.24,random vs full object,12.5423
+mnist,texture,0.005,2,0.46,0.0,0.47,0.0,0.42,0.0,0.31,0.0,55.64,random vs full object,53.1985
+mnist,texture,0.005,42,0.425,0.01,0.64,0.0,0.51,0.0,0.39,0.0,76.75,random vs full object,75.3287
+mnist,texture,0.0075,1,0.375,0.01,0.35,0.0,0.4,0.0,0.19,0.0,41.59,random vs full object,38.569
+mnist,texture,0.0075,2,0.51,0.0,0.58,0.0,0.46,0.0,0.36,0.0,74.41,random vs full object,72.7208
+mnist,texture,0.0075,3,0.34,0.0,0.71,0.0,0.47,0.0,0.37,0.0,60.93,random vs full object,58.2233
+mnist,texture,0.0075,4,0.32,0.0,0.4,0.0,0.41,0.0,0.17,0.0,30.38,random vs full object,28.2219
+mnist,texture,0.0075,5,0.12,0.0,0.14,0.0,0.13,0.0,0.09,0.0,7.48,random vs full object,5.8108
+mnist,texture,0.0075,42,0.37,0.0,0.63,0.0,0.47,0.0,0.35,0.0,82.07,random vs full object,80.9788
+mnist,texture,0.01,1,0.38,0.0,0.35,0.0,0.34,0.0,0.22,0.0,38.88,random vs full object,36.4334
+mnist,texture,0.01,2,0.44,0.04,0.705,0.01,0.59,0.0,0.43,0.0,80.4,random vs full object,78.998
+mnist,texture,0.01,42,0.42,0.0,0.69,0.0,0.63,0.0,0.48,0.0,92.03,random vs full object,91.4836
+mnist,texture,0.015,1,0.43,0.0,0.53,0.0,0.45,0.0,0.43,0.0,73.2,random vs full object,71.7621
+mnist,texture,0.015,2,0.43,0.0,0.81,0.0,0.63,0.0,0.44,0.0,92.06,random vs full object,91.5041
+mnist,texture,0.015,3,0.57,0.0,0.8,0.0,0.61,0.0,0.48,0.0,89.3,random vs full object,88.3025
+mnist,texture,0.015,4,0.62,0.0,0.58,0.0,0.51,0.0,0.34,0.0,78.36,random vs full object,76.7072
+mnist,texture,0.015,5,0.56,0.0,0.61,0.0,0.42,0.0,0.3,0.0,73.63,random vs full object,71.7192
+mnist,texture,0.015,42,0.5,0.0,0.73,0.0,0.58,0.0,0.51,0.0,92.57,random vs full object,91.949
+mnist,texture,0.02,1,0.53,0.0,0.7,0.0,0.63,0.0,0.495,0.01,87.94,random vs full object,86.9978
+mnist,texture,0.02,2,0.54,0.0,0.71,0.0,0.57,0.0,0.52,0.0,92.39,random vs full object,91.7996
+mnist,texture,0.02,42,0.53,0.0,0.75,0.0,0.6,0.0,0.52,0.0,98.38,random vs full object,98.2511
+mnist,texture,0.03,1,0.53,0.0,0.76,0.0,0.69,0.0,0.69,0.0,95.45,random vs full object,95.0242
+mnist,texture,0.03,2,0.62,0.0,0.83,0.0,0.58,0.0,0.58,0.0,97.01,random vs full object,96.7652
+mnist,texture,0.03,42,0.535,0.01,0.835,0.01,0.63,0.0,0.58,0.0,98.65,random vs full object,98.5241
+mnist,texture,0.05,1,0.58,0.0,0.78,0.0,0.66,0.0,0.64,0.0,98.51,random vs full object,98.3656
+mnist,texture,0.05,2,0.47,0.0,0.8,0.0,0.58,0.0,0.68,0.0,99.35,random vs full object,99.293
+mnist,texture,0.05,42,0.575,0.01,0.79,0.0,0.64,0.0,0.6,0.0,99.64,random vs full object,99.6075
+mnist,texture,0.1,1,0.53,0.0,0.8,0.0,0.71,0.0,0.67,0.0,99.74,random vs full object,99.7148
+mnist,texture,0.1,2,0.62,0.0,0.88,0.0,0.7,0.0,0.62,0.0,99.73,random vs full object,99.7043
+mnist,texture,0.1,42,0.56,0.0,0.82,0.0,0.66,0.0,0.685,0.01,99.87,random vs full object,99.8574
+mnist,texture,0.25,1,0.585,0.01,0.87,0.0,0.74,0.0,0.72,0.0,99.98,random vs full object,99.978
+mnist,texture,0.25,2,0.69,0.0,0.85,0.0,0.68,0.0,0.7,0.0,100.0,random vs full object,100.0
+mnist,texture,0.25,42,0.485,0.01,0.86,0.0,0.65,0.0,0.59,0.0,99.95,random vs full object,99.9455
+mnist,texture,0.4,1,0.6,0.0,0.89,0.0,0.77,0.0,0.75,0.0,100.0,random vs full object,100.0
+mnist,texture,0.4,2,0.69,0.0,0.89,0.0,0.68,0.0,0.74,0.0,100.0,random vs full object,100.0
+mnist,texture,0.4,42,0.62,0.0,0.92,0.0,0.69,0.0,0.67,0.0,99.96,random vs full object,99.9557
+pet_resnet18,patch,-0.5,1,0.58,0.0,0.49,0.0,0.36,0.0,0.35,0.0,19.16,random vs full object,-0.7854
+pet_resnet18,patch,-0.5,2,0.485,0.01,0.51,0.0,0.4,0.0,0.36,0.0,17.72,random vs full object,0.2304
+pet_resnet18,patch,-0.5,42,0.52,0.0,0.47,0.0,0.39,0.0,0.34,0.0,15.48,random vs full object,-0.1303
+pet_resnet18,patch,-0.4,1,0.515,0.17,0.49,0.0,0.39,0.0,0.35,0.0,21.83,random vs full object,3.9445
+pet_resnet18,patch,-0.4,2,0.44,0.0,0.52,0.0,0.425,0.01,0.32,0.0,20.11,random vs full object,3.5145
+pet_resnet18,patch,-0.4,42,0.65,0.0,0.57,0.0,0.43,0.0,0.47,0.0,24.83,random vs full object,6.0962
+pet_resnet18,patch,-0.3,1,0.61,0.0,0.57,0.0,0.49,0.02,0.48,0.0,34.53,random vs full object,14.5746
+pet_resnet18,patch,-0.3,2,0.58,0.0,0.54,0.0,0.49,0.0,0.51,0.0,33.2,random vs full object,15.1099
+pet_resnet18,patch,-0.3,42,0.71,0.0,0.49,0.0,0.46,0.0,0.51,0.0,31.86,random vs full object,15.3646
+pet_resnet18,patch,-0.2,1,0.62,0.0,0.75,0.0,0.585,0.01,0.55,0.0,57.13,random vs full object,41.0641
+pet_resnet18,patch,-0.2,2,0.66,0.0,0.53,0.0,0.5,0.0,0.41,0.0,43.28,random vs full object,22.9766
+pet_resnet18,patch,-0.2,42,0.49,0.02,0.59,0.0,0.59,0.0,0.48,0.0,39.38,random vs full object,22.9047
+pet_resnet18,patch,-0.1,1,0.75,0.0,0.77,0.0,0.68,0.0,0.71,0.0,72.28,random vs full object,60.1323
+pet_resnet18,patch,-0.1,2,0.76,0.0,0.815,0.01,0.605,0.01,0.76,0.0,83.7,random vs full object,76.7674
+pet_resnet18,patch,-0.1,42,0.605,0.01,0.78,0.0,0.71,0.0,0.755,0.01,88.55,random vs full object,82.683
+pet_resnet18,patch,0.0,1,0.82,0.0,0.79,0.0,0.72,0.04,0.81,0.0,98.83,random vs full object,98.2211
+pet_resnet18,patch,0.0,2,0.82,0.0,0.85,0.0,0.8,0.0,0.93,0.0,99.45,random vs full object,99.1857
+pet_resnet18,patch,0.0,42,0.75,0.0,0.8,0.0,0.755,0.01,0.78,0.0,98.86,random vs full object,98.1678
+pneumonia_mnist,patch,-0.4,1,0.31,0.0,0.385,0.13,0.19,0.0,0.49,0.12,12.82,random vs full object,0.0
+pneumonia_mnist,patch,-0.4,2,0.53,0.0,0.51,0.04,0.16,0.0,0.39,0.06,13.3,random vs full object,-0.1849
+pneumonia_mnist,patch,-0.4,42,0.25,0.0,0.435,0.31,0.14,0.0,0.61,0.32,18.43,random vs full object,2.1121
+pneumonia_mnist,patch,-0.25,1,0.25,0.0,0.345,0.13,0.105,0.01,0.45,0.08,14.58,random vs full object,0.0
+pneumonia_mnist,patch,-0.25,2,0.33,0.0,0.49,0.08,0.09,0.0,0.505,0.13,19.39,random vs full object,3.2641
+pneumonia_mnist,patch,-0.25,42,0.42,0.0,0.48,0.14,0.11,0.0,0.56,0.14,15.87,random vs full object,0.3907
+pneumonia_mnist,patch,-0.1,1,0.25,0.0,0.54,0.32,0.09,0.0,0.625,0.31,23.24,random vs full object,3.2396
+pneumonia_mnist,patch,-0.1,2,0.5,0.0,0.505,0.19,0.415,0.03,0.725,0.13,24.84,random vs full object,15.1884
+pneumonia_mnist,patch,-0.1,42,0.42,0.0,0.415,0.21,0.17,0.0,0.585,0.23,15.87,random vs full object,0.1898
+pneumonia_mnist,patch,-0.075,1,0.45,0.0,0.665,0.15,0.2,0.02,0.75,0.14,26.6,random vs full object,10.7165
+pneumonia_mnist,patch,-0.075,2,0.53,0.0,0.605,0.03,0.45,0.0,0.8,0.02,25.16,random vs full object,16.7519
+pneumonia_mnist,patch,-0.075,42,0.53,0.0,0.615,0.13,0.27,0.0,0.81,0.14,30.93,random vs full object,19.4425
+pneumonia_mnist,patch,-0.05,1,0.46,0.0,0.735,0.15,0.15,0.02,0.765,0.17,36.22,random vs full object,8.0847
+pneumonia_mnist,patch,-0.05,2,0.52,0.0,0.565,0.13,0.45,0.04,0.805,0.05,26.12,random vs full object,17.5262
+pneumonia_mnist,patch,-0.05,42,0.54,0.0,0.645,0.09,0.3,0.0,0.86,0.08,34.94,random vs full object,25.0979
+pneumonia_mnist,patch,-0.025,1,0.36,0.0,0.72,0.38,0.265,0.11,0.695,0.39,43.27,random vs full object,14.9093
+pneumonia_mnist,patch,-0.025,2,0.53,0.0,0.705,0.05,0.465,0.05,0.815,0.03,37.02,random vs full object,29.1882
+pneumonia_mnist,patch,-0.025,42,0.48,0.0,0.625,0.25,0.24,0.0,0.865,0.19,38.94,random vs full object,29.961
+pneumonia_mnist,patch,0.0,1,0.64,0.0,0.78,0.44,0.525,0.05,0.715,0.45,80.13,random vs full object,68.5303
+pneumonia_mnist,patch,0.0,2,0.53,0.0,0.625,0.01,0.505,0.01,0.88,0.0,52.08,random vs full object,41.7103
+pneumonia_mnist,patch,0.0,42,0.59,0.0,0.555,0.05,0.62,0.0,0.92,0.0,62.5,random vs full object,48.233
+pneumonia_mnist,patch,0.005,1,0.455,0.01,0.83,0.22,0.45,0.0,0.695,0.25,54.33,random vs full object,29.9755
+pneumonia_mnist,patch,0.005,2,0.53,0.0,0.64,0.02,0.535,0.01,0.84,0.0,79.97,random vs full object,64.6924
+pneumonia_mnist,patch,0.005,42,0.54,0.0,0.73,0.0,0.66,0.0,0.99,0.0,70.51,random vs full object,54.7838
+pneumonia_mnist,patch,0.01,1,0.48,0.0,0.85,0.2,0.485,0.01,0.76,0.22,98.4,random vs full object,97.4914
+pneumonia_mnist,patch,0.01,2,0.52,0.0,0.64,0.0,0.53,0.0,0.895,0.01,79.97,random vs full object,64.4921
+pneumonia_mnist,patch,0.01,42,0.54,0.0,0.68,0.0,0.58,0.0,0.93,0.0,78.53,random vs full object,62.3663
+pneumonia_mnist,patch,0.02,1,0.59,0.0,0.68,0.0,0.625,0.03,0.8,0.0,57.05,random vs full object,42.6109
+pneumonia_mnist,patch,0.02,2,0.54,0.0,0.865,0.01,0.505,0.05,0.97,0.0,71.15,random vs full object,55.2158
+pneumonia_mnist,patch,0.02,42,0.54,0.0,0.66,0.0,0.69,0.0,0.99,0.0,77.56,random vs full object,60.7761
+pneumonia_mnist,patch,0.05,1,0.48,0.0,0.845,0.21,0.475,0.01,0.77,0.22,99.36,random vs full object,98.9864
+pneumonia_mnist,patch,0.05,2,0.61,0.0,0.96,0.0,0.985,0.01,0.98,0.0,92.31,random vs full object,82.6763
+pneumonia_mnist,patch,0.05,42,0.53,0.0,0.75,0.0,0.54,0.0,0.88,0.0,92.79,random vs full object,83.3372
+pneumonia_mnist,patch,0.1,1,0.52,0.02,0.7,0.1,0.47,0.0,0.815,0.15,99.84,random vs full object,99.7447
+pneumonia_mnist,patch,0.1,2,0.77,0.0,1.0,0.0,0.975,0.01,1.0,0.0,98.4,random vs full object,97.1311
+pneumonia_mnist,patch,0.1,42,0.6,0.0,0.8,0.0,0.685,0.01,0.96,0.0,98.4,random vs full object,95.8398
+pneumonia_mnist,patch,0.25,1,0.68,0.0,0.9,0.0,0.54,0.0,0.82,0.0,97.28,random vs full object,93.2372
+pneumonia_mnist,patch,0.25,2,0.95,0.0,1.0,0.0,1.0,0.0,1.0,0.0,99.84,random vs full object,99.744
+pneumonia_mnist,patch,0.25,42,0.605,0.01,0.74,0.0,0.665,0.03,0.845,0.05,99.68,random vs full object,99.1503
+pneumonia_mnist,patch,0.4,1,0.66,0.0,0.565,0.01,0.53,0.0,0.67,0.02,99.68,random vs full object,99.1503
+pneumonia_mnist,patch,0.4,2,0.6,0.04,0.605,0.01,0.605,0.03,0.87,0.0,100.0,random vs full object,100.0
+pneumonia_mnist,patch,0.4,42,0.57,0.0,0.53,0.0,0.515,0.03,0.545,0.01,99.52,random vs full object,98.7308
+pneumonia_mnist,texture,-0.4,1,0.18,0.0,0.505,0.19,0.4,0.16,0.585,0.11,17.95,random vs full object,3.765
+pneumonia_mnist,texture,-0.4,2,0.41,0.0,0.575,0.09,0.59,0.04,0.51,0.08,20.83,random vs full object,4.9922
+pneumonia_mnist,texture,-0.4,42,0.23,0.0,0.62,0.2,0.3,0.16,0.65,0.14,16.35,random vs full object,2.9807
+pneumonia_mnist,texture,-0.25,1,0.24,0.0,0.83,0.1,0.57,0.1,0.845,0.07,21.15,random vs full object,8.7173
+pneumonia_mnist,texture,-0.25,2,0.49,0.0,0.725,0.15,0.505,0.15,0.56,0.14,22.92,random vs full object,6.6037
+pneumonia_mnist,texture,-0.25,42,0.31,0.0,0.645,0.03,0.33,0.1,0.745,0.01,20.03,random vs full object,9.4337
+pneumonia_mnist,texture,-0.1,1,0.18,0.0,0.91,0.0,0.7,0.02,0.93,0.0,31.89,random vs full object,22.16
+pneumonia_mnist,texture,-0.1,2,0.43,0.0,0.86,0.16,0.46,0.16,0.69,0.14,31.09,random vs full object,14.8523
+pneumonia_mnist,texture,-0.1,42,0.47,0.0,0.69,0.12,0.485,0.21,0.695,0.01,29.81,random vs full object,21.7852
+pneumonia_mnist,texture,-0.075,1,0.45,0.0,0.945,0.01,0.6,0.04,0.97,0.0,37.66,random vs full object,28.2293
+pneumonia_mnist,texture,-0.075,2,0.54,0.0,0.83,0.3,0.55,0.24,0.795,0.25,35.42,random vs full object,18.5932
+pneumonia_mnist,texture,-0.075,42,0.475,0.03,0.86,0.12,0.575,0.15,0.805,0.01,35.1,random vs full object,27.68
+pneumonia_mnist,texture,-0.05,1,0.64,0.0,0.99,0.0,0.61,0.02,0.97,0.0,40.71,random vs full object,32.8539
+pneumonia_mnist,texture,-0.05,2,0.67,0.0,0.96,0.02,0.6,0.02,0.77,0.02,36.86,random vs full object,27.0395
+pneumonia_mnist,texture,-0.05,42,0.325,0.03,0.95,0.04,0.545,0.09,0.655,0.01,38.3,random vs full object,28.7035
+pneumonia_mnist,texture,-0.025,1,0.54,0.0,0.995,0.01,0.705,0.01,0.98,0.0,48.4,random vs full object,40.1531
+pneumonia_mnist,texture,-0.025,2,0.96,0.0,0.99,0.0,0.65,0.04,0.95,0.0,49.2,random vs full object,34.9052
+pneumonia_mnist,texture,-0.025,42,0.795,0.01,0.97,0.02,0.57,0.0,0.6,0.0,54.17,random vs full object,45.7376
+pneumonia_mnist,texture,0.0,1,0.77,0.0,1.0,0.0,0.545,0.01,0.94,0.0,84.62,random vs full object,81.0334
+pneumonia_mnist,texture,0.0,2,1.0,0.0,0.935,0.13,0.435,0.03,0.755,0.17,94.39,random vs full object,92.7369
+pneumonia_mnist,texture,0.0,42,0.96,0.0,0.99,0.02,0.61,0.0,0.645,0.01,99.04,random vs full object,98.7118
+pneumonia_mnist,texture,0.005,1,0.82,0.0,1.0,0.0,0.5,0.0,0.94,0.0,98.4,random vs full object,98.0688
+pneumonia_mnist,texture,0.005,2,1.0,0.0,0.965,0.07,0.43,0.0,0.85,0.06,97.28,random vs full object,96.3964
+pneumonia_mnist,texture,0.005,42,0.99,0.0,0.965,0.07,0.61,0.0,0.66,0.06,100.0,random vs full object,100.0
+pneumonia_mnist,texture,0.01,1,0.88,0.0,1.0,0.0,0.46,0.0,0.84,0.0,95.67,random vs full object,94.6497
+pneumonia_mnist,texture,0.01,2,0.99,0.0,0.94,0.12,0.46,0.06,0.855,0.11,77.88,random vs full object,71.5389
+pneumonia_mnist,texture,0.01,42,0.89,0.0,1.0,0.0,0.78,0.0,0.77,0.0,95.19,random vs full object,94.0566
+pneumonia_mnist,texture,0.02,1,0.9,0.0,1.0,0.0,0.46,0.0,0.8,0.0,93.75,random vs full object,92.3678
+pneumonia_mnist,texture,0.02,2,1.0,0.0,0.96,0.08,0.545,0.03,0.815,0.09,96.79,random vs full object,95.5286
+pneumonia_mnist,texture,0.02,42,0.97,0.0,0.965,0.07,0.61,0.0,0.625,0.03,100.0,random vs full object,100.0
+pneumonia_mnist,texture,0.05,1,0.97,0.0,1.0,0.0,0.49,0.0,0.77,0.0,98.88,random vs full object,97.9446
+pneumonia_mnist,texture,0.05,2,0.99,0.0,1.0,0.0,0.805,0.01,0.93,0.0,98.08,random vs full object,97.3727
+pneumonia_mnist,texture,0.05,42,0.995,0.01,0.985,0.03,0.65,0.0,0.615,0.03,100.0,random vs full object,100.0
+pneumonia_mnist,texture,0.1,1,0.99,0.0,1.0,0.0,0.455,0.01,0.9,0.0,100.0,random vs full object,100.0
+pneumonia_mnist,texture,0.1,2,0.99,0.0,0.83,0.34,0.455,0.01,0.82,0.32,99.84,random vs full object,99.7535
+pneumonia_mnist,texture,0.1,42,1.0,0.0,0.945,0.11,0.59,0.0,0.585,0.07,100.0,random vs full object,100.0
+pneumonia_mnist,texture,0.25,1,1.0,0.0,0.99,0.0,0.58,0.0,0.81,0.0,100.0,random vs full object,100.0
+pneumonia_mnist,texture,0.25,2,1.0,0.0,1.0,0.0,0.47,0.0,0.67,0.0,100.0,random vs full object,100.0
+pneumonia_mnist,texture,0.25,42,0.775,0.45,1.0,0.0,0.51,0.0,0.775,0.01,100.0,random vs full object,100.0
+pneumonia_mnist,texture,0.4,1,1.0,0.0,1.0,0.0,0.6,0.0,0.86,0.0,100.0,random vs full object,100.0
+pneumonia_mnist,texture,0.4,2,0.89,0.0,1.0,0.0,0.58,0.0,0.65,0.0,99.84,random vs full object,99.8031
+pneumonia_mnist,texture,0.4,42,0.95,0.1,1.0,0.0,0.72,0.0,0.79,0.0,100.0,random vs full object,100.0
+cifar10,patch,-0.8,1,0.56,0.0,0.495,0.01,0.48,0.0,0.49,0.0,4.22,placebo vs random,0.8032
+cifar10,patch,-0.8,42,0.485,0.01,0.49,0.0,0.43,0.0,0.44,0.0,3.74,placebo vs random,0.8401
+cifar10,patch,-0.6,1,0.47,0.0,0.45,0.0,0.42,0.0,0.49,0.0,7.61,placebo vs random,3.7236
+cifar10,patch,-0.6,42,0.395,0.01,0.48,0.0,0.43,0.0,0.505,0.01,7.49,placebo vs random,4.5687
+cifar10,patch,-0.4,1,0.49,0.0,0.54,0.0,0.43,0.0,0.43,0.0,17.29,placebo vs random,14.5636
+cifar10,patch,-0.4,42,0.415,0.01,0.54,0.0,0.465,0.01,0.44,0.0,13.73,placebo vs random,11.0272
+cifar10,patch,-0.25,1,0.44,0.0,0.54,0.0,0.42,0.0,0.48,0.0,23.18,placebo vs random,20.6833
+cifar10,patch,-0.25,42,0.43,0.0,0.505,0.01,0.485,0.01,0.42,0.0,22.55,placebo vs random,20.0016
+cifar10,patch,-0.1,1,0.51,0.0,0.47,0.0,0.43,0.0,0.35,0.0,45.07,placebo vs random,42.6817
+cifar10,patch,-0.1,42,0.49,0.0,0.56,0.0,0.46,0.0,0.47,0.0,43.4,placebo vs random,41.0744
+cifar10,patch,0.0,1,0.505,0.01,0.485,0.05,0.5,0.04,0.345,0.07,96.62,placebo vs random,96.3297
+cifar10,patch,0.0,42,0.455,0.01,0.44,0.04,0.545,0.01,0.45,0.02,96.29,placebo vs random,95.9789
+cifar10_resnet18,patch,-0.8,1,0.53,0.06,0.53,0.02,0.555,0.01,0.505,0.01,3.31,placebo vs random,1.2427
+cifar10_resnet18,patch,-0.8,2,0.35,0.04,0.5,0.0,0.44,0.0,0.54,0.0,2.94,placebo vs random,0.9412
+cifar10_resnet18,patch,-0.8,42,0.45,0.04,0.54,0.0,0.46,0.0,0.44,0.0,2.71,placebo vs random,0.8077
+cifar10_resnet18,patch,-0.6,1,0.495,0.03,0.55,0.0,0.57,0.02,0.395,0.01,5.36,placebo vs random,3.4078
+cifar10_resnet18,patch,-0.6,2,0.415,0.01,0.46,0.0,0.405,0.01,0.41,0.0,6.35,placebo vs random,4.326
+cifar10_resnet18,patch,-0.6,42,0.465,0.01,0.55,0.04,0.455,0.01,0.56,0.0,6.58,placebo vs random,4.4503
+cifar10_resnet18,patch,-0.4,1,0.49,0.02,0.49,0.0,0.47,0.02,0.435,0.01,10.8,placebo vs random,8.5743
+cifar10_resnet18,patch,-0.4,2,0.445,0.01,0.59,0.0,0.505,0.01,0.48,0.0,10.83,placebo vs random,8.7163
+cifar10_resnet18,patch,-0.4,42,0.4,0.02,0.49,0.0,0.49,0.0,0.43,0.0,10.25,placebo vs random,7.9676
+cifar10_resnet18,patch,-0.25,1,0.41,0.0,0.435,0.01,0.49,0.0,0.47,0.0,19.72,placebo vs random,17.5017
+cifar10_resnet18,patch,-0.25,2,0.4,0.0,0.47,0.0,0.505,0.01,0.545,0.01,18.68,placebo vs random,16.3107
+cifar10_resnet18,patch,-0.25,42,0.505,0.01,0.5,0.0,0.43,0.0,0.43,0.0,18.4,placebo vs random,16.081
+cifar10_resnet18,patch,-0.1,1,0.49,0.0,0.52,0.0,0.47,0.0,0.49,0.0,35.67,placebo vs random,33.1752
+cifar10_resnet18,patch,-0.1,2,0.55,0.0,0.45,0.0,0.535,0.03,0.44,0.0,38.95,placebo vs random,36.5407
+cifar10_resnet18,patch,-0.1,42,0.45,0.0,0.53,0.0,0.49,0.02,0.5,0.04,34.32,placebo vs random,31.8452
+cifar10_resnet18,patch,0.0,1,0.485,0.01,0.5,0.0,0.47,0.0,0.47,0.0,97.25,placebo vs random,96.997
+cifar10_resnet18,patch,0.0,2,0.52,0.0,0.52,0.0,0.54,0.0,0.44,0.0,96.16,placebo vs random,95.8157
+cifar10_resnet18,patch,0.0,42,0.55,0.0,0.53,0.0,0.46,0.0,0.48,0.0,97.02,placebo vs random,96.7566
+mnist,patch,-0.4,1,0.48,0.0,0.5,0.0,0.5,0.02,0.37,0.0,0.12,placebo vs random,0.0178
+mnist,patch,-0.4,2,0.49,0.0,0.45,0.0,0.47,0.0,0.41,0.0,0.12,placebo vs random,-0.0033
+mnist,patch,-0.4,42,0.4,0.0,0.4,0.0,0.51,0.0,0.4,0.0,0.18,placebo vs random,0.0078
+mnist,patch,-0.25,1,0.48,0.0,0.5,0.0,0.5,0.0,0.36,0.0,0.14,placebo vs random,0.0211
+mnist,patch,-0.25,2,0.47,0.0,0.505,0.01,0.48,0.0,0.39,0.0,0.17,placebo vs random,0.0278
+mnist,patch,-0.25,42,0.44,0.0,0.48,0.02,0.46,0.0,0.44,0.0,0.22,placebo vs random,0.0668
+mnist,patch,-0.1,1,0.49,0.0,0.5,0.0,0.49,0.0,0.39,0.0,0.13,placebo vs random,0.01
+mnist,patch,-0.1,2,0.5,0.0,0.49,0.0,0.45,0.0,0.44,0.0,0.2,placebo vs random,0.0701
+mnist,patch,-0.1,42,0.46,0.0,0.4,0.0,0.46,0.0,0.43,0.0,0.2,placebo vs random,0.0234
+mnist,patch,-0.05,1,0.5,0.0,0.5,0.0,0.52,0.0,0.32,0.0,0.15,placebo vs random,0.0145
+mnist,patch,-0.05,2,0.48,0.0,0.55,0.0,0.46,0.0,0.36,0.0,0.18,placebo vs random,0.0367
+mnist,patch,-0.05,42,0.45,0.0,0.48,0.0,0.45,0.0,0.405,0.01,0.22,placebo vs random,0.0712
+mnist,patch,0.0,1,0.54,0.0,0.48,0.0,0.52,0.0,0.4,0.0,0.17,placebo vs random,0.0389
+mnist,patch,0.0,2,0.48,0.0,0.49,0.0,0.445,0.01,0.41,0.0,0.17,placebo vs random,0.0289
+mnist,patch,0.0,42,0.5,0.0,0.45,0.0,0.475,0.01,0.44,0.0,8.87,placebo vs random,8.5438
+mnist,patch,0.005,1,0.48,0.0,0.43,0.0,0.53,0.0,0.385,0.01,0.81,placebo vs random,0.6345
+mnist,patch,0.005,2,0.5,0.0,0.545,0.01,0.44,0.0,0.41,0.0,1.59,placebo vs random,1.3785
+mnist,patch,0.005,42,0.53,0.0,0.46,0.0,0.49,0.0,0.455,0.01,22.98,placebo vs random,22.0551
+mnist,patch,0.0075,1,0.48,0.0,0.46,0.0,0.5,0.0,0.45,0.0,13.3,placebo vs random,12.8215
+mnist,patch,0.0075,2,0.51,0.0,0.59,0.0,0.48,0.0,0.46,0.0,5.77,placebo vs random,5.5149
+mnist,patch,0.0075,3,0.5,0.0,0.47,0.0,0.53,0.0,0.42,0.0,6.93,placebo vs random,6.6572
+mnist,patch,0.0075,4,0.49,0.0,0.47,0.0,0.55,0.0,0.375,0.01,0.53,placebo vs random,0.3806
+mnist,patch,0.0075,5,0.47,0.0,0.53,0.0,0.45,0.0,0.43,0.0,19.03,placebo vs random,17.7227
+mnist,patch,0.0075,42,0.49,0.0,0.48,0.0,0.47,0.0,0.51,0.0,40.85,placebo vs random,39.806
+mnist,patch,0.01,1,0.51,0.0,0.42,0.0,0.49,0.0,0.47,0.0,9.13,placebo vs random,8.7152
+mnist,patch,0.01,2,0.55,0.0,0.57,0.0,0.48,0.0,0.48,0.0,17.52,placebo vs random,16.6943
+mnist,patch,0.01,42,0.57,0.0,0.47,0.0,0.45,0.0,0.55,0.0,62.21,placebo vs random,61.264
+mnist,patch,0.015,1,0.44,0.0,0.41,0.0,0.44,0.0,0.47,0.0,39.33,placebo vs random,37.6443
+mnist,patch,0.015,2,0.51,0.0,0.55,0.0,0.45,0.0,0.44,0.0,30.18,placebo vs random,29.0383
+mnist,patch,0.015,3,0.48,0.0,0.46,0.0,0.555,0.01,0.47,0.0,31.49,placebo vs random,29.8764
+mnist,patch,0.015,4,0.48,0.0,0.54,0.0,0.53,0.0,0.49,0.0,10.64,placebo vs random,10.441
+mnist,patch,0.015,5,0.49,0.0,0.48,0.0,0.48,0.0,0.46,0.0,26.1,placebo vs random,24.2785
+mnist,patch,0.015,42,0.57,0.0,0.48,0.0,0.41,0.0,0.49,0.0,64.89,placebo vs random,63.8542
+mnist,patch,0.02,1,0.48,0.0,0.42,0.0,0.45,0.0,0.49,0.0,53.12,placebo vs random,50.7833
+mnist,patch,0.02,2,0.55,0.0,0.575,0.01,0.43,0.0,0.49,0.0,45.18,placebo vs random,43.9131
+mnist,patch,0.02,42,0.54,0.0,0.48,0.0,0.43,0.0,0.49,0.0,68.52,placebo vs random,67.6006
+mnist,patch,0.03,1,0.535,0.01,0.5,0.0,0.485,0.01,0.47,0.0,71.03,placebo vs random,69.1488
+mnist,patch,0.03,2,0.525,0.01,0.49,0.0,0.49,0.0,0.52,0.0,70.38,placebo vs random,68.4181
+mnist,patch,0.03,42,0.52,0.0,0.45,0.0,0.39,0.0,0.53,0.0,74.95,placebo vs random,73.1923
+mnist,patch,0.05,1,0.55,0.0,0.51,0.0,0.47,0.0,0.57,0.0,75.72,placebo vs random,73.7788
+mnist,patch,0.05,2,0.49,0.0,0.48,0.0,0.47,0.0,0.56,0.0,77.26,placebo vs random,75.5933
+mnist,patch,0.05,42,0.54,0.0,0.5,0.0,0.44,0.0,0.54,0.0,75.67,placebo vs random,73.7606
+mnist,patch,0.1,1,0.46,0.0,0.52,0.0,0.47,0.0,0.59,0.0,84.1,placebo vs random,82.7765
+mnist,patch,0.1,2,0.45,0.0,0.45,0.0,0.465,0.01,0.57,0.0,87.86,placebo vs random,86.7155
+mnist,patch,0.1,42,0.48,0.0,0.495,0.01,0.45,0.0,0.54,0.0,76.97,placebo vs random,75.1227
+mnist,patch,0.25,1,0.49,0.0,0.52,0.0,0.43,0.0,0.51,0.0,99.76,placebo vs random,99.7335
+mnist,patch,0.25,2,0.515,0.01,0.44,0.0,0.47,0.0,0.52,0.0,99.57,placebo vs random,99.5228
+mnist,patch,0.25,42,0.43,0.0,0.51,0.0,0.51,0.0,0.53,0.0,88.51,placebo vs random,87.3889
+mnist,patch,0.4,1,0.46,0.0,0.52,0.02,0.465,0.01,0.52,0.0,99.8,placebo vs random,99.7779
+mnist,patch,0.4,2,0.51,0.0,0.49,0.0,0.49,0.0,0.49,0.0,88.92,placebo vs random,87.8239
+mnist,patch,0.4,42,0.53,0.0,0.52,0.0,0.52,0.0,0.55,0.0,99.47,placebo vs random,99.4115
+mnist,texture,-0.4,1,0.505,0.01,0.52,0.0,0.51,0.0,0.34,0.0,0.17,placebo vs random,0.0478
+mnist,texture,-0.4,2,0.47,0.0,0.45,0.0,0.44,0.0,0.44,0.0,0.17,placebo vs random,0.0289
+mnist,texture,-0.4,42,0.5,0.0,0.47,0.0,0.46,0.02,0.4,0.0,0.18,placebo vs random,0.0089
+mnist,texture,-0.25,1,0.5,0.0,0.535,0.01,0.51,0.0,0.385,0.01,0.11,placebo vs random,-0.0044
+mnist,texture,-0.25,2,0.49,0.0,0.48,0.0,0.455,0.01,0.38,0.0,0.27,placebo vs random,0.108
+mnist,texture,-0.25,42,0.47,0.0,0.49,0.0,0.52,0.0,0.46,0.0,0.23,placebo vs random,0.0534
+mnist,texture,-0.1,1,0.505,0.01,0.53,0.0,0.5,0.0,0.41,0.0,0.14,placebo vs random,0.0278
+mnist,texture,-0.1,2,0.46,0.0,0.53,0.0,0.385,0.01,0.435,0.01,0.64,placebo vs random,0.4065
+mnist,texture,-0.1,42,0.48,0.0,0.48,0.0,0.49,0.0,0.45,0.0,0.51,placebo vs random,0.2695
+mnist,texture,-0.05,1,0.53,0.0,0.48,0.0,0.48,0.0,0.4,0.0,0.18,placebo vs random,0.0401
+mnist,texture,-0.05,2,0.49,0.0,0.54,0.0,0.41,0.0,0.38,0.0,1.3,placebo vs random,0.992
+mnist,texture,-0.05,42,0.51,0.0,0.51,0.0,0.44,0.0,0.4,0.0,2.43,placebo vs random,1.9441
+mnist,texture,0.0,1,0.49,0.0,0.49,0.0,0.51,0.0,0.39,0.0,0.21,placebo vs random,0.0645
+mnist,texture,0.0,2,0.44,0.0,0.58,0.0,0.49,0.0,0.47,0.0,8.88,placebo vs random,7.8065
+mnist,texture,0.0,42,0.5,0.0,0.53,0.0,0.54,0.0,0.43,0.0,18.24,placebo vs random,16.5752
+mnist,texture,0.005,1,0.47,0.0,0.53,0.0,0.47,0.0,0.55,0.0,14.24,placebo vs random,12.5423
+mnist,texture,0.005,2,0.44,0.0,0.64,0.0,0.515,0.01,0.5,0.0,55.64,placebo vs random,53.1985
+mnist,texture,0.005,42,0.435,0.01,0.58,0.0,0.52,0.0,0.54,0.0,76.75,placebo vs random,75.3287
+mnist,texture,0.0075,1,0.51,0.0,0.55,0.0,0.52,0.0,0.49,0.0,41.59,placebo vs random,38.569
+mnist,texture,0.0075,2,0.345,0.01,0.6,0.0,0.44,0.0,0.5,0.0,74.41,placebo vs random,72.7208
+mnist,texture,0.0075,3,0.52,0.0,0.58,0.0,0.46,0.0,0.45,0.0,60.93,placebo vs random,58.2233
+mnist,texture,0.0075,4,0.55,0.0,0.51,0.0,0.57,0.0,0.49,0.0,30.38,placebo vs random,28.2219
+mnist,texture,0.0075,5,0.56,0.0,0.52,0.0,0.455,0.01,0.48,0.0,7.48,placebo vs random,5.8108
+mnist,texture,0.0075,42,0.54,0.0,0.54,0.0,0.51,0.0,0.48,0.0,82.07,placebo vs random,80.9788
+mnist,texture,0.01,1,0.47,0.0,0.55,0.0,0.46,0.0,0.52,0.0,38.88,placebo vs random,36.4334
+mnist,texture,0.01,2,0.41,0.06,0.6,0.0,0.535,0.01,0.49,0.0,80.4,placebo vs random,78.998
+mnist,texture,0.01,42,0.51,0.0,0.57,0.0,0.47,0.0,0.53,0.0,92.03,placebo vs random,91.4836
+mnist,texture,0.015,1,0.48,0.0,0.6,0.0,0.485,0.01,0.57,0.0,73.2,placebo vs random,71.7621
+mnist,texture,0.015,2,0.43,0.02,0.54,0.0,0.56,0.0,0.53,0.0,92.06,placebo vs random,91.5041
+mnist,texture,0.015,3,0.39,0.0,0.58,0.0,0.47,0.0,0.49,0.0,89.3,placebo vs random,88.3025
+mnist,texture,0.015,4,0.49,0.0,0.57,0.0,0.5,0.0,0.53,0.0,78.36,placebo vs random,76.7072
+mnist,texture,0.015,5,0.49,0.0,0.57,0.0,0.48,0.0,0.53,0.0,73.63,placebo vs random,71.7192
+mnist,texture,0.015,42,0.49,0.0,0.45,0.0,0.525,0.01,0.585,0.01,92.57,placebo vs random,91.949
+mnist,texture,0.02,1,0.41,0.0,0.58,0.0,0.46,0.0,0.58,0.0,87.94,placebo vs random,86.9978
+mnist,texture,0.02,2,0.415,0.01,0.62,0.0,0.41,0.0,0.48,0.0,92.39,placebo vs random,91.7996
+mnist,texture,0.02,42,0.485,0.01,0.5,0.02,0.53,0.0,0.58,0.0,98.38,placebo vs random,98.2511
+mnist,texture,0.03,1,0.51,0.0,0.545,0.01,0.47,0.0,0.49,0.0,95.45,placebo vs random,95.0242
+mnist,texture,0.03,2,0.4,0.0,0.53,0.0,0.45,0.0,0.5,0.0,97.01,placebo vs random,96.7652
+mnist,texture,0.03,42,0.46,0.0,0.57,0.0,0.49,0.0,0.58,0.0,98.65,placebo vs random,98.5241
+mnist,texture,0.05,1,0.49,0.0,0.52,0.0,0.46,0.0,0.54,0.0,98.51,placebo vs random,98.3656
+mnist,texture,0.05,2,0.51,0.0,0.57,0.0,0.57,0.0,0.585,0.01,99.35,placebo vs random,99.293
+mnist,texture,0.05,42,0.47,0.0,0.51,0.0,0.5,0.0,0.62,0.0,99.64,placebo vs random,99.6075
+mnist,texture,0.1,1,0.5,0.0,0.48,0.0,0.52,0.0,0.52,0.0,99.74,placebo vs random,99.7148
+mnist,texture,0.1,2,0.44,0.0,0.55,0.0,0.545,0.01,0.655,0.01,99.73,placebo vs random,99.7043
+mnist,texture,0.1,42,0.5,0.0,0.53,0.0,0.48,0.0,0.585,0.01,99.87,placebo vs random,99.8574
+mnist,texture,0.25,1,0.5,0.0,0.56,0.0,0.5,0.0,0.59,0.0,99.98,placebo vs random,99.978
+mnist,texture,0.25,2,0.45,0.0,0.54,0.0,0.53,0.0,0.53,0.0,100.0,placebo vs random,100.0
+mnist,texture,0.25,42,0.51,0.0,0.54,0.0,0.51,0.0,0.56,0.0,99.95,placebo vs random,99.9455
+mnist,texture,0.4,1,0.52,0.0,0.51,0.0,0.46,0.0,0.58,0.0,100.0,placebo vs random,100.0
+mnist,texture,0.4,2,0.48,0.0,0.51,0.0,0.49,0.0,0.52,0.0,100.0,placebo vs random,100.0
+mnist,texture,0.4,42,0.46,0.0,0.47,0.0,0.48,0.0,0.59,0.0,99.96,placebo vs random,99.9557
+pet_resnet18,patch,-0.5,1,0.4,0.0,0.44,0.0,0.44,0.0,0.48,0.0,19.16,placebo vs random,-0.7854
+pet_resnet18,patch,-0.5,2,0.455,0.07,0.48,0.02,0.435,0.03,0.515,0.01,17.72,placebo vs random,0.2304
+pet_resnet18,patch,-0.5,42,0.365,0.01,0.48,0.0,0.455,0.03,0.48,0.0,15.48,placebo vs random,-0.1303
+pet_resnet18,patch,-0.4,1,0.44,0.16,0.51,0.0,0.525,0.03,0.42,0.0,21.83,placebo vs random,3.9445
+pet_resnet18,patch,-0.4,2,0.5,0.0,0.44,0.0,0.43,0.0,0.49,0.0,20.11,placebo vs random,3.5145
+pet_resnet18,patch,-0.4,42,0.5,0.0,0.375,0.01,0.52,0.0,0.47,0.0,24.83,placebo vs random,6.0962
+pet_resnet18,patch,-0.3,1,0.365,0.01,0.49,0.0,0.53,0.1,0.49,0.0,34.53,placebo vs random,14.5746
+pet_resnet18,patch,-0.3,2,0.405,0.01,0.45,0.0,0.39,0.0,0.31,0.0,33.2,placebo vs random,15.1099
+pet_resnet18,patch,-0.3,42,0.43,0.0,0.415,0.01,0.52,0.02,0.44,0.0,31.86,placebo vs random,15.3646
+pet_resnet18,patch,-0.2,1,0.4,0.0,0.51,0.0,0.445,0.01,0.44,0.0,57.13,placebo vs random,41.0641
+pet_resnet18,patch,-0.2,2,0.48,0.02,0.49,0.0,0.39,0.0,0.42,0.0,43.28,placebo vs random,22.9766
+pet_resnet18,patch,-0.2,42,0.485,0.07,0.485,0.01,0.55,0.0,0.485,0.01,39.38,placebo vs random,22.9047
+pet_resnet18,patch,-0.1,1,0.54,0.0,0.45,0.0,0.41,0.0,0.39,0.0,72.28,placebo vs random,60.1323
+pet_resnet18,patch,-0.1,2,0.445,0.01,0.57,0.0,0.49,0.02,0.38,0.0,83.7,placebo vs random,76.7674
+pet_resnet18,patch,-0.1,42,0.55,0.0,0.47,0.0,0.45,0.0,0.45,0.0,88.55,placebo vs random,82.683
+pet_resnet18,patch,0.0,1,0.53,0.0,0.45,0.0,0.47,0.06,0.34,0.0,98.83,placebo vs random,98.2211
+pet_resnet18,patch,0.0,2,0.515,0.01,0.48,0.0,0.405,0.01,0.325,0.01,99.45,placebo vs random,99.1857
+pet_resnet18,patch,0.0,42,0.41,0.0,0.47,0.0,0.48,0.02,0.35,0.0,98.86,placebo vs random,98.1678
+pneumonia_mnist,patch,-0.4,1,0.52,0.0,0.46,0.16,0.49,0.12,0.41,0.16,12.82,placebo vs random,0.0
+pneumonia_mnist,patch,-0.4,2,0.37,0.0,0.44,0.08,0.485,0.01,0.475,0.11,13.3,placebo vs random,-0.1849
+pneumonia_mnist,patch,-0.4,42,0.48,0.0,0.42,0.32,0.435,0.27,0.435,0.33,18.43,placebo vs random,2.1121
+pneumonia_mnist,patch,-0.25,1,0.48,0.0,0.41,0.18,0.525,0.19,0.49,0.14,14.58,placebo vs random,0.0
+pneumonia_mnist,patch,-0.25,2,0.39,0.0,0.485,0.19,0.57,0.04,0.55,0.18,19.39,placebo vs random,3.2641
+pneumonia_mnist,patch,-0.25,42,0.49,0.0,0.385,0.15,0.43,0.08,0.425,0.19,15.87,placebo vs random,0.3907
+pneumonia_mnist,patch,-0.1,1,0.505,0.03,0.385,0.35,0.465,0.33,0.45,0.36,23.24,placebo vs random,3.2396
+pneumonia_mnist,patch,-0.1,2,0.41,0.0,0.355,0.25,0.48,0.06,0.52,0.22,24.84,placebo vs random,15.1884
+pneumonia_mnist,patch,-0.1,42,0.49,0.0,0.375,0.25,0.43,0.16,0.405,0.21,15.87,placebo vs random,0.1898
+pneumonia_mnist,patch,-0.075,1,0.47,0.0,0.515,0.21,0.475,0.19,0.42,0.22,26.6,placebo vs random,10.7165
+pneumonia_mnist,patch,-0.075,2,0.44,0.0,0.39,0.12,0.465,0.01,0.485,0.13,25.16,placebo vs random,16.7519
+pneumonia_mnist,patch,-0.075,42,0.435,0.01,0.37,0.22,0.405,0.05,0.42,0.18,30.93,placebo vs random,19.4425
+pneumonia_mnist,patch,-0.05,1,0.51,0.0,0.525,0.23,0.48,0.2,0.45,0.22,36.22,placebo vs random,8.0847
+pneumonia_mnist,patch,-0.05,2,0.415,0.01,0.415,0.21,0.46,0.1,0.515,0.17,26.12,placebo vs random,17.5262
+pneumonia_mnist,patch,-0.05,42,0.45,0.0,0.405,0.15,0.385,0.03,0.435,0.11,34.94,placebo vs random,25.0979
+pneumonia_mnist,patch,-0.025,1,0.47,0.0,0.51,0.4,0.49,0.36,0.46,0.4,43.27,placebo vs random,14.9093
+pneumonia_mnist,patch,-0.025,2,0.405,0.03,0.37,0.08,0.46,0.04,0.5,0.1,37.02,placebo vs random,29.1882
+pneumonia_mnist,patch,-0.025,42,0.4,0.0,0.42,0.3,0.41,0.22,0.495,0.27,38.94,placebo vs random,29.961
+pneumonia_mnist,patch,0.0,1,0.47,0.0,0.505,0.49,0.51,0.46,0.485,0.47,80.13,placebo vs random,68.5303
+pneumonia_mnist,patch,0.0,2,0.385,0.01,0.375,0.01,0.46,0.0,0.425,0.01,52.08,placebo vs random,41.7103
+pneumonia_mnist,patch,0.0,42,0.445,0.01,0.42,0.06,0.38,0.0,0.4,0.06,62.5,placebo vs random,48.233
+pneumonia_mnist,patch,0.005,1,0.51,0.0,0.53,0.28,0.48,0.32,0.505,0.29,54.33,placebo vs random,29.9755
+pneumonia_mnist,patch,0.005,2,0.5,0.16,0.405,0.01,0.395,0.01,0.485,0.01,79.97,placebo vs random,64.6924
+pneumonia_mnist,patch,0.005,42,0.485,0.09,0.435,0.01,0.41,0.02,0.39,0.02,70.51,placebo vs random,54.7838
+pneumonia_mnist,patch,0.01,1,0.46,0.04,0.53,0.32,0.48,0.36,0.515,0.35,98.4,placebo vs random,97.4914
+pneumonia_mnist,patch,0.01,2,0.48,0.02,0.42,0.0,0.385,0.01,0.42,0.0,79.97,placebo vs random,64.4921
+pneumonia_mnist,patch,0.01,42,0.455,0.05,0.41,0.0,0.455,0.01,0.45,0.0,78.53,placebo vs random,62.3663
+pneumonia_mnist,patch,0.02,1,0.41,0.0,0.46,0.0,0.39,0.0,0.49,0.02,57.05,placebo vs random,42.6109
+pneumonia_mnist,patch,0.02,2,0.54,0.0,0.44,0.02,0.46,0.02,0.54,0.04,71.15,placebo vs random,55.2158
+pneumonia_mnist,patch,0.02,42,0.47,0.12,0.47,0.0,0.45,0.0,0.45,0.0,77.56,placebo vs random,60.7761
+pneumonia_mnist,patch,0.05,1,0.475,0.01,0.54,0.36,0.475,0.35,0.54,0.34,99.36,placebo vs random,98.9864
+pneumonia_mnist,patch,0.05,2,0.5,0.08,0.47,0.0,0.41,0.02,0.56,0.0,92.31,placebo vs random,82.6763
+pneumonia_mnist,patch,0.05,42,0.45,0.02,0.46,0.0,0.445,0.01,0.41,0.02,92.79,placebo vs random,83.3372
+pneumonia_mnist,patch,0.1,1,0.51,0.18,0.52,0.34,0.535,0.25,0.49,0.28,99.84,placebo vs random,99.7447
+pneumonia_mnist,patch,0.1,2,0.44,0.0,0.43,0.0,0.415,0.01,0.575,0.01,98.4,placebo vs random,97.1311
+pneumonia_mnist,patch,0.1,42,0.455,0.09,0.43,0.02,0.45,0.02,0.45,0.0,98.4,placebo vs random,95.8398
+pneumonia_mnist,patch,0.25,1,0.42,0.0,0.45,0.02,0.42,0.0,0.535,0.01,97.28,placebo vs random,93.2372
+pneumonia_mnist,patch,0.25,2,0.49,0.0,0.44,0.0,0.435,0.01,0.5,0.0,99.84,placebo vs random,99.744
+pneumonia_mnist,patch,0.25,42,0.455,0.15,0.47,0.12,0.41,0.06,0.455,0.05,99.68,placebo vs random,99.1503
+pneumonia_mnist,patch,0.4,1,0.43,0.0,0.41,0.02,0.425,0.07,0.445,0.01,99.68,placebo vs random,99.1503
+pneumonia_mnist,patch,0.4,2,0.525,0.27,0.4,0.02,0.35,0.12,0.415,0.03,100.0,placebo vs random,100.0
+pneumonia_mnist,patch,0.4,42,0.485,0.03,0.405,0.05,0.41,0.14,0.415,0.11,99.52,placebo vs random,98.7308
+pneumonia_mnist,texture,-0.4,1,0.35,0.0,0.485,0.19,0.495,0.13,0.44,0.2,17.95,placebo vs random,3.765
+pneumonia_mnist,texture,-0.4,2,0.42,0.0,0.46,0.1,0.44,0.06,0.475,0.11,20.83,placebo vs random,4.9922
+pneumonia_mnist,texture,-0.4,42,0.325,0.03,0.475,0.25,0.495,0.19,0.4,0.22,16.35,placebo vs random,2.9807
+pneumonia_mnist,texture,-0.25,1,0.44,0.0,0.41,0.12,0.475,0.09,0.425,0.15,21.15,placebo vs random,8.7173
+pneumonia_mnist,texture,-0.25,2,0.41,0.0,0.465,0.21,0.49,0.16,0.435,0.25,22.92,placebo vs random,6.6037
+pneumonia_mnist,texture,-0.25,42,0.4,0.0,0.435,0.11,0.485,0.11,0.415,0.11,20.03,placebo vs random,9.4337
+pneumonia_mnist,texture,-0.1,1,0.42,0.02,0.425,0.03,0.465,0.03,0.38,0.06,31.89,placebo vs random,22.16
+pneumonia_mnist,texture,-0.1,2,0.33,0.0,0.48,0.24,0.495,0.13,0.44,0.22,31.09,placebo vs random,14.8523
+pneumonia_mnist,texture,-0.1,42,0.455,0.01,0.54,0.12,0.475,0.17,0.455,0.21,29.81,placebo vs random,21.7852
+pneumonia_mnist,texture,-0.075,1,0.45,0.02,0.46,0.02,0.485,0.07,0.375,0.03,37.66,placebo vs random,28.2293
+pneumonia_mnist,texture,-0.075,2,0.41,0.0,0.46,0.3,0.49,0.24,0.435,0.31,35.42,placebo vs random,18.5932
+pneumonia_mnist,texture,-0.075,42,0.4,0.04,0.565,0.13,0.51,0.16,0.495,0.19,35.1,placebo vs random,27.68
+pneumonia_mnist,texture,-0.05,1,0.37,0.0,0.405,0.03,0.465,0.07,0.36,0.02,40.71,placebo vs random,32.8539
+pneumonia_mnist,texture,-0.05,2,0.37,0.0,0.52,0.1,0.52,0.02,0.46,0.08,36.86,placebo vs random,27.0395
+pneumonia_mnist,texture,-0.05,42,0.42,0.08,0.5,0.06,0.455,0.11,0.52,0.08,38.3,placebo vs random,28.7035
+pneumonia_mnist,texture,-0.025,1,0.37,0.0,0.43,0.0,0.43,0.04,0.3,0.02,48.4,placebo vs random,40.1531
+pneumonia_mnist,texture,-0.025,2,0.52,0.0,0.525,0.07,0.55,0.06,0.475,0.11,49.2,placebo vs random,34.9052
+pneumonia_mnist,texture,-0.025,42,0.5,0.0,0.47,0.0,0.48,0.02,0.42,0.02,54.17,placebo vs random,45.7376
+pneumonia_mnist,texture,0.0,1,0.37,0.0,0.41,0.0,0.5,0.02,0.29,0.0,84.62,placebo vs random,81.0334
+pneumonia_mnist,texture,0.0,2,0.52,0.0,0.485,0.21,0.555,0.05,0.485,0.25,94.39,placebo vs random,92.7369
+pneumonia_mnist,texture,0.0,42,0.5,0.0,0.485,0.01,0.41,0.0,0.25,0.0,99.04,placebo vs random,98.7118
+pneumonia_mnist,texture,0.005,1,0.38,0.0,0.415,0.01,0.495,0.03,0.31,0.0,98.4,placebo vs random,98.0688
+pneumonia_mnist,texture,0.005,2,0.53,0.0,0.5,0.08,0.535,0.03,0.42,0.12,97.28,placebo vs random,96.3964
+pneumonia_mnist,texture,0.005,42,0.53,0.0,0.445,0.05,0.415,0.01,0.285,0.01,100.0,placebo vs random,100.0
+pneumonia_mnist,texture,0.01,1,0.465,0.01,0.43,0.0,0.475,0.01,0.32,0.0,95.67,placebo vs random,94.6497
+pneumonia_mnist,texture,0.01,2,0.49,0.0,0.445,0.23,0.49,0.06,0.48,0.26,77.88,placebo vs random,71.5389
+pneumonia_mnist,texture,0.01,42,0.51,0.0,0.47,0.0,0.42,0.0,0.26,0.0,95.19,placebo vs random,94.0566
+pneumonia_mnist,texture,0.02,1,0.39,0.0,0.47,0.0,0.48,0.0,0.37,0.0,93.75,placebo vs random,92.3678
+pneumonia_mnist,texture,0.02,2,0.45,0.0,0.455,0.17,0.51,0.04,0.44,0.24,96.79,placebo vs random,95.5286
+pneumonia_mnist,texture,0.02,42,0.52,0.0,0.475,0.03,0.435,0.01,0.27,0.0,100.0,placebo vs random,100.0
+pneumonia_mnist,texture,0.05,1,0.51,0.0,0.47,0.0,0.515,0.01,0.36,0.0,98.88,placebo vs random,97.9446
+pneumonia_mnist,texture,0.05,2,0.51,0.0,0.475,0.01,0.6,0.0,0.51,0.0,98.08,placebo vs random,97.3727
+pneumonia_mnist,texture,0.05,42,0.53,0.0,0.475,0.01,0.4,0.0,0.275,0.01,100.0,placebo vs random,100.0
+pneumonia_mnist,texture,0.1,1,0.45,0.0,0.43,0.0,0.48,0.0,0.32,0.0,100.0,placebo vs random,100.0
+pneumonia_mnist,texture,0.1,2,0.51,0.0,0.455,0.37,0.515,0.07,0.485,0.35,99.84,placebo vs random,99.7535
+pneumonia_mnist,texture,0.1,42,0.54,0.0,0.49,0.04,0.405,0.01,0.315,0.03,100.0,placebo vs random,100.0
+pneumonia_mnist,texture,0.25,1,0.61,0.0,0.44,0.0,0.44,0.04,0.43,0.0,100.0,placebo vs random,100.0
+pneumonia_mnist,texture,0.25,2,0.57,0.0,0.41,0.0,0.44,0.0,0.33,0.0,100.0,placebo vs random,100.0
+pneumonia_mnist,texture,0.25,42,0.66,0.46,0.46,0.0,0.47,0.0,0.35,0.0,100.0,placebo vs random,100.0
+pneumonia_mnist,texture,0.4,1,0.495,0.01,0.45,0.0,0.45,0.02,0.42,0.0,100.0,placebo vs random,100.0
+pneumonia_mnist,texture,0.4,2,0.54,0.0,0.4,0.0,0.45,0.0,0.38,0.0,99.84,placebo vs random,99.8031
+pneumonia_mnist,texture,0.4,42,0.46,0.04,0.46,0.0,0.52,0.0,0.32,0.0,100.0,placebo vs random,100.0
+cifar10,patch,-0.8,1,0.51,0.0,0.56,0.0,0.61,0.0,0.575,0.01,4.22,shortcut vs random,0.8032
+cifar10,patch,-0.8,42,0.445,0.01,0.565,0.01,0.625,0.01,0.61,0.02,3.74,shortcut vs random,0.8401
+cifar10,patch,-0.6,1,0.485,0.01,0.66,0.0,0.84,0.0,0.69,0.0,7.61,shortcut vs random,3.7236
+cifar10,patch,-0.6,42,0.56,0.0,0.76,0.0,0.89,0.0,0.67,0.0,7.49,shortcut vs random,4.5687
+cifar10,patch,-0.4,1,0.86,0.0,0.92,0.0,0.91,0.0,0.82,0.0,17.29,shortcut vs random,14.5636
+cifar10,patch,-0.4,42,0.61,0.0,0.9,0.0,0.94,0.0,0.81,0.0,13.73,shortcut vs random,11.0272
+cifar10,patch,-0.25,1,0.94,0.0,0.98,0.0,0.95,0.0,0.87,0.0,23.18,shortcut vs random,20.6833
+cifar10,patch,-0.25,42,0.85,0.0,0.93,0.0,0.96,0.0,0.88,0.0,22.55,shortcut vs random,20.0016
+cifar10,patch,-0.1,1,0.94,0.0,0.945,0.01,0.97,0.0,0.94,0.0,45.07,shortcut vs random,42.6817
+cifar10,patch,-0.1,42,0.97,0.0,0.99,0.0,0.97,0.0,0.96,0.0,43.4,shortcut vs random,41.0744
+cifar10,patch,0.0,1,0.95,0.02,0.99,0.0,0.98,0.0,0.91,0.18,96.62,shortcut vs random,96.3297
+cifar10,patch,0.0,42,0.96,0.0,0.96,0.0,1.0,0.0,0.9,0.18,96.29,shortcut vs random,95.9789
+cifar10_resnet18,patch,-0.8,1,0.53,0.06,0.53,0.0,0.64,0.0,0.58,0.02,3.31,shortcut vs random,1.2427
+cifar10_resnet18,patch,-0.8,2,0.405,0.13,0.52,0.0,0.57,0.0,0.52,0.0,2.94,shortcut vs random,0.9412
+cifar10_resnet18,patch,-0.8,42,0.54,0.02,0.51,0.0,0.525,0.01,0.55,0.0,2.71,shortcut vs random,0.8077
+cifar10_resnet18,patch,-0.6,1,0.69,0.02,0.66,0.0,0.745,0.01,0.655,0.01,5.36,shortcut vs random,3.4078
+cifar10_resnet18,patch,-0.6,2,0.665,0.03,0.73,0.0,0.685,0.01,0.6,0.0,6.35,shortcut vs random,4.326
+cifar10_resnet18,patch,-0.6,42,0.785,0.01,0.73,0.0,0.78,0.0,0.665,0.01,6.58,shortcut vs random,4.4503
+cifar10_resnet18,patch,-0.4,1,0.715,0.07,0.84,0.02,0.9,0.02,0.705,0.01,10.8,shortcut vs random,8.5743
+cifar10_resnet18,patch,-0.4,2,0.755,0.01,0.78,0.0,0.81,0.0,0.745,0.01,10.83,shortcut vs random,8.7163
+cifar10_resnet18,patch,-0.4,42,0.73,0.0,0.8,0.0,0.85,0.0,0.81,0.0,10.25,shortcut vs random,7.9676
+cifar10_resnet18,patch,-0.25,1,0.815,0.01,0.82,0.0,0.88,0.0,0.87,0.0,19.72,shortcut vs random,17.5017
+cifar10_resnet18,patch,-0.25,2,0.87,0.0,0.79,0.0,0.905,0.01,0.915,0.01,18.68,shortcut vs random,16.3107
+cifar10_resnet18,patch,-0.25,42,0.87,0.0,0.805,0.01,0.85,0.0,0.85,0.02,18.4,shortcut vs random,16.081
+cifar10_resnet18,patch,-0.1,1,0.895,0.01,0.89,0.0,0.91,0.0,0.91,0.02,35.67,shortcut vs random,33.1752
+cifar10_resnet18,patch,-0.1,2,0.905,0.01,0.88,0.0,0.93,0.0,0.955,0.01,38.95,shortcut vs random,36.5407
+cifar10_resnet18,patch,-0.1,42,0.92,0.0,0.86,0.0,0.89,0.0,0.92,0.04,34.32,shortcut vs random,31.8452
+cifar10_resnet18,patch,0.0,1,0.94,0.0,0.95,0.0,0.98,0.0,1.0,0.0,97.25,shortcut vs random,96.997
+cifar10_resnet18,patch,0.0,2,0.97,0.0,1.0,0.0,0.99,0.0,1.0,0.0,96.16,shortcut vs random,95.8157
+cifar10_resnet18,patch,0.0,42,0.98,0.0,0.98,0.0,0.98,0.0,1.0,0.0,97.02,shortcut vs random,96.7566
+mnist,patch,-0.4,1,0.56,0.0,0.4,0.0,0.42,0.0,0.41,0.0,0.12,shortcut vs random,0.0178
+mnist,patch,-0.4,2,0.52,0.0,0.5,0.0,0.37,0.0,0.49,0.0,0.12,shortcut vs random,-0.0033
+mnist,patch,-0.4,42,0.5,0.0,0.41,0.0,0.38,0.0,0.49,0.0,0.18,shortcut vs random,0.0078
+mnist,patch,-0.25,1,0.58,0.0,0.4,0.0,0.4,0.0,0.405,0.01,0.14,shortcut vs random,0.0211
+mnist,patch,-0.25,2,0.49,0.0,0.51,0.0,0.42,0.0,0.495,0.01,0.17,shortcut vs random,0.0278
+mnist,patch,-0.25,42,0.56,0.0,0.45,0.0,0.39,0.0,0.52,0.0,0.22,shortcut vs random,0.0668
+mnist,patch,-0.1,1,0.57,0.0,0.42,0.0,0.42,0.0,0.44,0.0,0.13,shortcut vs random,0.01
+mnist,patch,-0.1,2,0.52,0.0,0.565,0.01,0.44,0.0,0.53,0.0,0.2,shortcut vs random,0.0701
+mnist,patch,-0.1,42,0.61,0.0,0.4,0.0,0.43,0.0,0.56,0.0,0.2,shortcut vs random,0.0234
+mnist,patch,-0.05,1,0.57,0.0,0.39,0.0,0.47,0.0,0.41,0.0,0.15,shortcut vs random,0.0145
+mnist,patch,-0.05,2,0.52,0.0,0.54,0.0,0.48,0.0,0.55,0.0,0.18,shortcut vs random,0.0367
+mnist,patch,-0.05,42,0.55,0.0,0.4,0.0,0.38,0.0,0.56,0.0,0.22,shortcut vs random,0.0712
+mnist,patch,0.0,1,0.62,0.0,0.39,0.0,0.43,0.0,0.47,0.0,0.17,shortcut vs random,0.0389
+mnist,patch,0.0,2,0.52,0.0,0.5,0.0,0.45,0.0,0.5,0.0,0.17,shortcut vs random,0.0289
+mnist,patch,0.0,42,0.73,0.0,0.57,0.0,0.5,0.0,0.65,0.0,8.87,shortcut vs random,8.5438
+mnist,patch,0.005,1,0.65,0.0,0.48,0.0,0.55,0.0,0.61,0.0,0.81,shortcut vs random,0.6345
+mnist,patch,0.005,2,0.61,0.0,0.51,0.0,0.56,0.0,0.59,0.0,1.59,shortcut vs random,1.3785
+mnist,patch,0.005,42,0.75,0.0,0.65,0.0,0.62,0.0,0.64,0.0,22.98,shortcut vs random,22.0551
+mnist,patch,0.0075,1,0.83,0.0,0.7,0.0,0.715,0.01,0.705,0.01,13.3,shortcut vs random,12.8215
+mnist,patch,0.0075,2,0.66,0.0,0.56,0.0,0.6,0.0,0.6,0.0,5.77,shortcut vs random,5.5149
+mnist,patch,0.0075,3,0.64,0.0,0.6,0.0,0.59,0.0,0.66,0.0,6.93,shortcut vs random,6.6572
+mnist,patch,0.0075,4,0.65,0.0,0.53,0.0,0.53,0.0,0.54,0.0,0.53,shortcut vs random,0.3806
+mnist,patch,0.0075,5,0.71,0.0,0.69,0.0,0.64,0.0,0.67,0.0,19.03,shortcut vs random,17.7227
+mnist,patch,0.0075,42,0.82,0.0,0.765,0.01,0.73,0.0,0.8,0.0,40.85,shortcut vs random,39.806
+mnist,patch,0.01,1,0.8,0.0,0.68,0.0,0.74,0.0,0.78,0.0,9.13,shortcut vs random,8.7152
+mnist,patch,0.01,2,0.71,0.0,0.66,0.0,0.65,0.0,0.66,0.0,17.52,shortcut vs random,16.6943
+mnist,patch,0.01,42,0.86,0.0,0.8,0.0,0.82,0.0,0.87,0.0,62.21,shortcut vs random,61.264
+mnist,patch,0.015,1,0.85,0.0,0.7,0.0,0.82,0.02,0.74,0.0,39.33,shortcut vs random,37.6443
+mnist,patch,0.015,2,0.83,0.0,0.78,0.0,0.75,0.0,0.78,0.0,30.18,shortcut vs random,29.0383
+mnist,patch,0.015,3,0.69,0.0,0.62,0.0,0.64,0.0,0.63,0.0,31.49,shortcut vs random,29.8764
+mnist,patch,0.015,4,0.79,0.0,0.66,0.0,0.715,0.01,0.74,0.0,10.64,shortcut vs random,10.441
+mnist,patch,0.015,5,0.77,0.0,0.71,0.0,0.65,0.0,0.68,0.0,26.1,shortcut vs random,24.2785
+mnist,patch,0.015,42,0.87,0.0,0.8,0.0,0.815,0.01,0.85,0.0,64.89,shortcut vs random,63.8542
+mnist,patch,0.02,1,0.87,0.0,0.8,0.0,0.84,0.0,0.85,0.0,53.12,shortcut vs random,50.7833
+mnist,patch,0.02,2,0.86,0.0,0.77,0.0,0.86,0.0,0.78,0.0,45.18,shortcut vs random,43.9131
+mnist,patch,0.02,42,0.87,0.0,0.84,0.0,0.83,0.0,0.84,0.0,68.52,shortcut vs random,67.6006
+mnist,patch,0.03,1,0.89,0.0,0.86,0.0,0.87,0.0,0.85,0.0,71.03,shortcut vs random,69.1488
+mnist,patch,0.03,2,0.9,0.0,0.86,0.0,0.89,0.0,0.9,0.0,70.38,shortcut vs random,68.4181
+mnist,patch,0.03,42,0.88,0.0,0.84,0.0,0.83,0.0,0.84,0.0,74.95,shortcut vs random,73.1923
+mnist,patch,0.05,1,0.87,0.0,0.9,0.0,0.85,0.0,0.85,0.0,75.72,shortcut vs random,73.7788
+mnist,patch,0.05,2,0.9,0.0,0.845,0.01,0.92,0.0,0.9,0.0,77.26,shortcut vs random,75.5933
+mnist,patch,0.05,42,0.86,0.0,0.83,0.0,0.84,0.0,0.86,0.0,75.67,shortcut vs random,73.7606
+mnist,patch,0.1,1,0.905,0.01,0.9,0.0,0.91,0.0,0.91,0.0,84.1,shortcut vs random,82.7765
+mnist,patch,0.1,2,0.91,0.0,0.92,0.0,0.93,0.0,0.94,0.0,87.86,shortcut vs random,86.7155
+mnist,patch,0.1,42,0.88,0.0,0.85,0.0,0.82,0.0,0.855,0.01,76.97,shortcut vs random,75.1227
+mnist,patch,0.25,1,0.96,0.0,0.95,0.0,0.935,0.01,0.95,0.0,99.76,shortcut vs random,99.7335
+mnist,patch,0.25,2,0.94,0.0,0.95,0.0,0.96,0.0,0.95,0.0,99.57,shortcut vs random,99.5228
+mnist,patch,0.25,42,0.91,0.0,0.89,0.0,0.88,0.0,0.89,0.0,88.51,shortcut vs random,87.3889
+mnist,patch,0.4,1,0.955,0.01,0.96,0.0,0.95,0.0,0.95,0.0,99.8,shortcut vs random,99.7779
+mnist,patch,0.4,2,0.91,0.0,0.92,0.0,0.92,0.0,0.9,0.0,88.92,shortcut vs random,87.8239
+mnist,patch,0.4,42,0.94,0.0,0.94,0.0,0.93,0.0,0.94,0.0,99.47,shortcut vs random,99.4115
+mnist,texture,-0.4,1,0.53,0.0,0.52,0.0,0.47,0.0,0.46,0.0,0.17,shortcut vs random,0.0478
+mnist,texture,-0.4,2,0.51,0.0,0.4,0.0,0.44,0.0,0.4,0.0,0.17,shortcut vs random,0.0289
+mnist,texture,-0.4,42,0.62,0.0,0.41,0.0,0.39,0.0,0.43,0.0,0.18,shortcut vs random,0.0089
+mnist,texture,-0.25,1,0.55,0.0,0.48,0.0,0.48,0.0,0.47,0.0,0.11,shortcut vs random,-0.0044
+mnist,texture,-0.25,2,0.485,0.01,0.34,0.0,0.37,0.0,0.4,0.0,0.27,shortcut vs random,0.108
+mnist,texture,-0.25,42,0.53,0.0,0.41,0.0,0.44,0.0,0.41,0.0,0.23,shortcut vs random,0.0534
+mnist,texture,-0.1,1,0.525,0.01,0.48,0.0,0.48,0.0,0.47,0.0,0.14,shortcut vs random,0.0278
+mnist,texture,-0.1,2,0.58,0.0,0.36,0.0,0.34,0.0,0.46,0.0,0.64,shortcut vs random,0.4065
+mnist,texture,-0.1,42,0.55,0.0,0.48,0.0,0.35,0.02,0.45,0.0,0.51,shortcut vs random,0.2695
+mnist,texture,-0.05,1,0.57,0.0,0.43,0.0,0.45,0.0,0.445,0.01,0.18,shortcut vs random,0.0401
+mnist,texture,-0.05,2,0.66,0.0,0.35,0.0,0.34,0.0,0.47,0.0,1.3,shortcut vs random,0.992
+mnist,texture,-0.05,42,0.625,0.01,0.425,0.01,0.39,0.0,0.43,0.0,2.43,shortcut vs random,1.9441
+mnist,texture,0.0,1,0.57,0.0,0.42,0.0,0.46,0.0,0.46,0.0,0.21,shortcut vs random,0.0645
+mnist,texture,0.0,2,0.73,0.0,0.32,0.0,0.415,0.01,0.425,0.01,8.88,shortcut vs random,7.8065
+mnist,texture,0.0,42,0.81,0.0,0.42,0.0,0.56,0.0,0.39,0.0,18.24,shortcut vs random,16.5752
+mnist,texture,0.005,1,0.84,0.0,0.44,0.0,0.7,0.0,0.44,0.0,14.24,shortcut vs random,12.5423
+mnist,texture,0.005,2,0.89,0.0,0.3,0.0,0.74,0.0,0.36,0.0,55.64,shortcut vs random,53.1985
+mnist,texture,0.005,42,0.94,0.0,0.285,0.01,0.77,0.0,0.41,0.0,76.75,shortcut vs random,75.3287
+mnist,texture,0.0075,1,0.89,0.0,0.54,0.0,0.74,0.0,0.385,0.03,41.59,shortcut vs random,38.569
+mnist,texture,0.0075,2,0.87,0.0,0.39,0.0,0.81,0.0,0.355,0.01,74.41,shortcut vs random,72.7208
+mnist,texture,0.0075,3,0.96,0.0,0.17,0.0,0.73,0.0,0.38,0.0,60.93,shortcut vs random,58.2233
+mnist,texture,0.0075,4,0.85,0.0,0.42,0.0,0.74,0.0,0.39,0.0,30.38,shortcut vs random,28.2219
+mnist,texture,0.0075,5,0.84,0.0,0.42,0.0,0.54,0.0,0.4,0.0,7.48,shortcut vs random,5.8108
+mnist,texture,0.0075,42,0.91,0.0,0.33,0.0,0.77,0.0,0.33,0.0,82.07,shortcut vs random,80.9788
+mnist,texture,0.01,1,0.91,0.0,0.46,0.0,0.72,0.0,0.39,0.0,38.88,shortcut vs random,36.4334
+mnist,texture,0.01,2,0.865,0.05,0.31,0.0,0.79,0.0,0.37,0.0,80.4,shortcut vs random,78.998
+mnist,texture,0.01,42,0.96,0.0,0.41,0.0,0.85,0.0,0.4,0.0,92.03,shortcut vs random,91.4836
+mnist,texture,0.015,1,0.92,0.0,0.55,0.0,0.85,0.0,0.34,0.0,73.2,shortcut vs random,71.7621
+mnist,texture,0.015,2,0.865,0.03,0.44,0.0,0.83,0.0,0.42,0.0,92.06,shortcut vs random,91.5041
+mnist,texture,0.015,3,0.93,0.0,0.44,0.0,0.86,0.0,0.3,0.0,89.3,shortcut vs random,88.3025
+mnist,texture,0.015,4,0.97,0.0,0.525,0.01,0.9,0.0,0.45,0.0,78.36,shortcut vs random,76.7072
+mnist,texture,0.015,5,0.95,0.0,0.56,0.0,0.82,0.0,0.42,0.0,73.63,shortcut vs random,71.7192
+mnist,texture,0.015,42,0.93,0.0,0.24,0.0,0.83,0.0,0.37,0.0,92.57,shortcut vs random,91.949
+mnist,texture,0.02,1,0.97,0.0,0.56,0.0,0.94,0.0,0.37,0.0,87.94,shortcut vs random,86.9978
+mnist,texture,0.02,2,0.96,0.0,0.47,0.0,0.92,0.0,0.35,0.0,92.39,shortcut vs random,91.7996
+mnist,texture,0.02,42,0.9,0.0,0.4,0.0,0.88,0.0,0.44,0.0,98.38,shortcut vs random,98.2511
+mnist,texture,0.03,1,0.97,0.0,0.64,0.0,0.93,0.0,0.41,0.0,95.45,shortcut vs random,95.0242
+mnist,texture,0.03,2,0.95,0.0,0.5,0.0,0.9,0.0,0.34,0.0,97.01,shortcut vs random,96.7652
+mnist,texture,0.03,42,0.95,0.0,0.37,0.0,0.92,0.0,0.36,0.0,98.65,shortcut vs random,98.5241
+mnist,texture,0.05,1,0.99,0.0,0.58,0.0,0.95,0.0,0.37,0.0,98.51,shortcut vs random,98.3656
+mnist,texture,0.05,2,0.94,0.0,0.41,0.0,0.87,0.0,0.32,0.0,99.35,shortcut vs random,99.293
+mnist,texture,0.05,42,0.95,0.0,0.41,0.0,0.93,0.0,0.38,0.0,99.64,shortcut vs random,99.6075
+mnist,texture,0.1,1,0.97,0.0,0.645,0.01,0.93,0.0,0.44,0.0,99.74,shortcut vs random,99.7148
+mnist,texture,0.1,2,0.95,0.0,0.41,0.0,0.94,0.0,0.28,0.0,99.73,shortcut vs random,99.7043
+mnist,texture,0.1,42,0.96,0.0,0.4,0.0,0.93,0.0,0.34,0.0,99.87,shortcut vs random,99.8574
+mnist,texture,0.25,1,0.94,0.0,0.52,0.0,0.92,0.0,0.43,0.0,99.98,shortcut vs random,99.978
+mnist,texture,0.25,2,0.98,0.0,0.5,0.0,0.97,0.0,0.415,0.01,100.0,shortcut vs random,100.0
+mnist,texture,0.25,42,0.96,0.0,0.29,0.0,0.89,0.0,0.31,0.0,99.95,shortcut vs random,99.9455
+mnist,texture,0.4,1,0.95,0.0,0.49,0.0,0.94,0.0,0.44,0.0,100.0,shortcut vs random,100.0
+mnist,texture,0.4,2,0.95,0.0,0.51,0.0,0.98,0.0,0.35,0.0,100.0,shortcut vs random,100.0
+mnist,texture,0.4,42,0.98,0.0,0.33,0.0,0.94,0.0,0.3,0.0,99.96,shortcut vs random,99.9557
+pet_resnet18,patch,-0.5,1,0.4,0.0,0.51,0.0,0.5,0.0,0.49,0.0,19.16,shortcut vs random,-0.7854
+pet_resnet18,patch,-0.5,2,0.5,0.1,0.5,0.02,0.56,0.02,0.54,0.0,17.72,shortcut vs random,0.2304
+pet_resnet18,patch,-0.5,42,0.45,0.0,0.57,0.0,0.525,0.05,0.57,0.0,15.48,shortcut vs random,-0.1303
+pet_resnet18,patch,-0.4,1,0.505,0.19,0.5,0.0,0.73,0.0,0.61,0.0,21.83,shortcut vs random,3.9445
+pet_resnet18,patch,-0.4,2,0.58,0.0,0.64,0.0,0.665,0.01,0.62,0.0,20.11,shortcut vs random,3.5145
+pet_resnet18,patch,-0.4,42,0.72,0.0,0.73,0.0,0.71,0.0,0.68,0.0,24.83,shortcut vs random,6.0962
+pet_resnet18,patch,-0.3,1,0.56,0.0,0.74,0.0,0.79,0.08,0.77,0.0,34.53,shortcut vs random,14.5746
+pet_resnet18,patch,-0.3,2,0.75,0.0,0.73,0.0,0.78,0.0,0.715,0.01,33.2,shortcut vs random,15.1099
+pet_resnet18,patch,-0.3,42,0.64,0.0,0.77,0.0,0.79,0.0,0.83,0.0,31.86,shortcut vs random,15.3646
+pet_resnet18,patch,-0.2,1,0.74,0.0,0.81,0.0,0.93,0.0,0.94,0.0,57.13,shortcut vs random,41.0641
+pet_resnet18,patch,-0.2,2,0.69,0.0,0.71,0.0,0.81,0.0,0.86,0.0,43.28,shortcut vs random,22.9766
+pet_resnet18,patch,-0.2,42,0.595,0.07,0.65,0.0,0.72,0.0,0.64,0.0,39.38,shortcut vs random,22.9047
+pet_resnet18,patch,-0.1,1,0.725,0.01,0.91,0.0,0.96,0.0,0.91,0.0,72.28,shortcut vs random,60.1323
+pet_resnet18,patch,-0.1,2,0.87,0.0,0.93,0.0,0.99,0.0,0.98,0.0,83.7,shortcut vs random,76.7674
+pet_resnet18,patch,-0.1,42,0.74,0.0,0.92,0.0,0.99,0.0,0.95,0.0,88.55,shortcut vs random,82.683
+pet_resnet18,patch,0.0,1,0.7,0.0,0.9,0.0,0.99,0.0,0.95,0.0,98.83,shortcut vs random,98.2211
+pet_resnet18,patch,0.0,2,0.91,0.0,0.97,0.0,1.0,0.0,0.99,0.0,99.45,shortcut vs random,99.1857
+pet_resnet18,patch,0.0,42,0.68,0.0,0.86,0.0,0.99,0.0,0.96,0.0,98.86,shortcut vs random,98.1678
+pneumonia_mnist,patch,-0.4,1,0.46,0.0,0.55,0.16,0.51,0.14,0.445,0.17,12.82,shortcut vs random,0.0
+pneumonia_mnist,patch,-0.4,2,0.475,0.01,0.495,0.07,0.49,0.02,0.435,0.11,13.3,shortcut vs random,-0.1849
+pneumonia_mnist,patch,-0.4,42,0.55,0.0,0.535,0.31,0.515,0.25,0.435,0.35,18.43,shortcut vs random,2.1121
+pneumonia_mnist,patch,-0.25,1,0.52,0.0,0.515,0.17,0.48,0.16,0.525,0.11,14.58,shortcut vs random,0.0
+pneumonia_mnist,patch,-0.25,2,0.62,0.0,0.535,0.17,0.555,0.01,0.435,0.17,19.39,shortcut vs random,3.2641
+pneumonia_mnist,patch,-0.25,42,0.52,0.0,0.505,0.17,0.48,0.08,0.43,0.18,15.87,shortcut vs random,0.3907
+pneumonia_mnist,patch,-0.1,1,0.725,0.01,0.68,0.38,0.725,0.33,0.58,0.36,23.24,shortcut vs random,3.2396
+pneumonia_mnist,patch,-0.1,2,0.615,0.01,0.62,0.14,0.66,0.02,0.585,0.21,24.84,shortcut vs random,15.1884
+pneumonia_mnist,patch,-0.1,42,0.435,0.01,0.465,0.25,0.47,0.16,0.44,0.24,15.87,shortcut vs random,0.1898
+pneumonia_mnist,patch,-0.075,1,0.7,0.0,0.74,0.22,0.76,0.18,0.745,0.19,26.6,shortcut vs random,10.7165
+pneumonia_mnist,patch,-0.075,2,0.615,0.01,0.73,0.02,0.7,0.0,0.675,0.03,25.16,shortcut vs random,16.7519
+pneumonia_mnist,patch,-0.075,42,0.7,0.02,0.665,0.09,0.65,0.02,0.54,0.16,30.93,shortcut vs random,19.4425
+pneumonia_mnist,patch,-0.05,1,0.71,0.0,0.755,0.27,0.76,0.18,0.685,0.23,36.22,shortcut vs random,8.0847
+pneumonia_mnist,patch,-0.05,2,0.645,0.01,0.715,0.09,0.705,0.01,0.62,0.14,26.12,shortcut vs random,17.5262
+pneumonia_mnist,patch,-0.05,42,0.765,0.01,0.71,0.02,0.71,0.02,0.645,0.05,34.94,shortcut vs random,25.0979
+pneumonia_mnist,patch,-0.025,1,0.75,0.0,0.715,0.41,0.735,0.37,0.68,0.42,43.27,shortcut vs random,14.9093
+pneumonia_mnist,patch,-0.025,2,0.765,0.01,0.775,0.03,0.75,0.0,0.74,0.06,37.02,shortcut vs random,29.1882
+pneumonia_mnist,patch,-0.025,42,0.715,0.01,0.64,0.18,0.66,0.16,0.54,0.28,38.94,shortcut vs random,29.961
+pneumonia_mnist,patch,0.0,1,0.69,0.0,0.73,0.48,0.72,0.44,0.745,0.47,80.13,shortcut vs random,68.5303
+pneumonia_mnist,patch,0.0,2,0.72,0.02,0.7,0.02,0.64,0.0,0.705,0.01,52.08,shortcut vs random,41.7103
+pneumonia_mnist,patch,0.0,42,0.7,0.02,0.675,0.01,0.68,0.04,0.645,0.05,62.5,shortcut vs random,48.233
+pneumonia_mnist,patch,0.005,1,0.73,0.0,0.725,0.33,0.735,0.29,0.765,0.33,54.33,shortcut vs random,29.9755
+pneumonia_mnist,patch,0.005,2,0.77,0.18,0.74,0.0,0.69,0.02,0.725,0.03,79.97,shortcut vs random,64.6924
+pneumonia_mnist,patch,0.005,42,0.74,0.12,0.685,0.01,0.72,0.02,0.7,0.0,70.51,shortcut vs random,54.7838
+pneumonia_mnist,patch,0.01,1,0.685,0.03,0.74,0.34,0.735,0.31,0.765,0.33,98.4,shortcut vs random,97.4914
+pneumonia_mnist,patch,0.01,2,0.755,0.05,0.7,0.02,0.695,0.01,0.695,0.01,79.97,shortcut vs random,64.4921
+pneumonia_mnist,patch,0.01,42,0.72,0.04,0.725,0.01,0.74,0.0,0.75,0.0,78.53,shortcut vs random,62.3663
+pneumonia_mnist,patch,0.02,1,0.69,0.0,0.76,0.0,0.76,0.0,0.8,0.0,57.05,shortcut vs random,42.6109
+pneumonia_mnist,patch,0.02,2,0.755,0.01,0.79,0.0,0.77,0.0,0.7,0.02,71.15,shortcut vs random,55.2158
+pneumonia_mnist,patch,0.02,42,0.765,0.15,0.755,0.01,0.72,0.04,0.725,0.01,77.56,shortcut vs random,60.7761
+pneumonia_mnist,patch,0.05,1,0.69,0.0,0.745,0.35,0.725,0.33,0.765,0.37,99.36,shortcut vs random,98.9864
+pneumonia_mnist,patch,0.05,2,0.72,0.08,0.785,0.03,0.795,0.01,0.77,0.02,92.31,shortcut vs random,82.6763
+pneumonia_mnist,patch,0.05,42,0.735,0.03,0.74,0.02,0.77,0.02,0.68,0.02,92.79,shortcut vs random,83.3372
+pneumonia_mnist,patch,0.1,1,0.73,0.2,0.71,0.3,0.73,0.28,0.685,0.27,99.84,shortcut vs random,99.7447
+pneumonia_mnist,patch,0.1,2,0.78,0.0,0.945,0.01,0.925,0.01,0.99,0.0,98.4,shortcut vs random,97.1311
+pneumonia_mnist,patch,0.1,42,0.77,0.1,0.7,0.0,0.77,0.02,0.655,0.01,98.4,shortcut vs random,95.8398
+pneumonia_mnist,patch,0.25,1,0.74,0.0,0.755,0.01,0.75,0.0,0.72,0.02,97.28,shortcut vs random,93.2372
+pneumonia_mnist,patch,0.25,2,0.91,0.0,0.99,0.0,1.0,0.0,1.0,0.0,99.84,shortcut vs random,99.744
+pneumonia_mnist,patch,0.25,42,0.745,0.17,0.75,0.04,0.745,0.09,0.71,0.08,99.68,shortcut vs random,99.1503
+pneumonia_mnist,patch,0.4,1,0.71,0.0,0.735,0.03,0.735,0.03,0.765,0.01,99.68,shortcut vs random,99.1503
+pneumonia_mnist,patch,0.4,2,0.755,0.31,0.74,0.02,0.76,0.1,0.73,0.06,100.0,shortcut vs random,100.0
+pneumonia_mnist,patch,0.4,42,0.715,0.01,0.765,0.13,0.715,0.15,0.765,0.11,99.52,shortcut vs random,98.7308
+pneumonia_mnist,texture,-0.4,1,0.8,0.0,0.595,0.15,0.525,0.15,0.565,0.19,17.95,shortcut vs random,3.765
+pneumonia_mnist,texture,-0.4,2,0.6,0.0,0.47,0.08,0.52,0.06,0.525,0.13,20.83,shortcut vs random,4.9922
+pneumonia_mnist,texture,-0.4,42,0.68,0.0,0.52,0.2,0.55,0.22,0.49,0.26,16.35,shortcut vs random,2.9807
+pneumonia_mnist,texture,-0.25,1,0.71,0.0,0.84,0.08,0.63,0.1,0.82,0.08,21.15,shortcut vs random,8.7173
+pneumonia_mnist,texture,-0.25,2,0.56,0.02,0.755,0.19,0.64,0.18,0.725,0.19,22.92,shortcut vs random,6.6037
+pneumonia_mnist,texture,-0.25,42,0.63,0.0,0.63,0.06,0.65,0.04,0.635,0.03,20.03,shortcut vs random,9.4337
+pneumonia_mnist,texture,-0.1,1,0.785,0.01,0.965,0.01,0.815,0.03,0.925,0.01,31.89,shortcut vs random,22.16
+pneumonia_mnist,texture,-0.1,2,0.66,0.0,0.775,0.19,0.67,0.14,0.87,0.16,31.09,shortcut vs random,14.8523
+pneumonia_mnist,texture,-0.1,42,0.615,0.01,0.765,0.07,0.67,0.08,0.695,0.13,29.81,shortcut vs random,21.7852
+pneumonia_mnist,texture,-0.075,1,0.745,0.01,0.96,0.0,0.855,0.01,0.89,0.02,37.66,shortcut vs random,28.2293
+pneumonia_mnist,texture,-0.075,2,0.675,0.01,0.79,0.28,0.785,0.23,0.82,0.3,35.42,shortcut vs random,18.5932
+pneumonia_mnist,texture,-0.075,42,0.69,0.02,0.875,0.07,0.76,0.06,0.82,0.12,35.1,shortcut vs random,27.68
+pneumonia_mnist,texture,-0.05,1,0.74,0.0,0.94,0.0,0.785,0.01,0.95,0.0,40.71,shortcut vs random,32.8539
+pneumonia_mnist,texture,-0.05,2,0.68,0.0,0.9,0.0,0.79,0.04,0.96,0.02,36.86,shortcut vs random,27.0395
+pneumonia_mnist,texture,-0.05,42,0.825,0.03,0.83,0.02,0.78,0.04,0.925,0.05,38.3,shortcut vs random,28.7035
+pneumonia_mnist,texture,-0.025,1,0.82,0.0,0.96,0.0,0.85,0.0,0.965,0.01,48.4,shortcut vs random,40.1531
+pneumonia_mnist,texture,-0.025,2,0.6,0.0,0.965,0.01,0.85,0.04,0.995,0.01,49.2,shortcut vs random,34.9052
+pneumonia_mnist,texture,-0.025,42,0.57,0.0,0.85,0.0,0.77,0.0,0.945,0.01,54.17,shortcut vs random,45.7376
+pneumonia_mnist,texture,0.0,1,0.76,0.0,0.94,0.0,0.84,0.0,1.0,0.0,84.62,shortcut vs random,81.0334
+pneumonia_mnist,texture,0.0,2,0.59,0.0,0.745,0.15,0.58,0.08,0.915,0.17,94.39,shortcut vs random,92.7369
+pneumonia_mnist,texture,0.0,42,0.63,0.0,0.94,0.0,0.87,0.0,0.985,0.01,99.04,shortcut vs random,98.7118
+pneumonia_mnist,texture,0.005,1,0.76,0.0,0.92,0.0,0.89,0.0,1.0,0.0,98.4,shortcut vs random,98.0688
+pneumonia_mnist,texture,0.005,2,0.56,0.0,0.84,0.04,0.645,0.05,0.97,0.06,97.28,shortcut vs random,96.3964
+pneumonia_mnist,texture,0.005,42,0.615,0.01,0.885,0.01,0.85,0.0,0.97,0.06,100.0,shortcut vs random,100.0
+pneumonia_mnist,texture,0.01,1,0.77,0.0,0.94,0.0,0.85,0.0,1.0,0.0,95.67,shortcut vs random,94.6497
+pneumonia_mnist,texture,0.01,2,0.6,0.0,0.825,0.17,0.715,0.09,0.915,0.17,77.88,shortcut vs random,71.5389
+pneumonia_mnist,texture,0.01,42,0.64,0.0,0.96,0.0,0.93,0.0,0.99,0.0,95.19,shortcut vs random,94.0566
+pneumonia_mnist,texture,0.02,1,0.71,0.0,0.92,0.0,0.81,0.0,1.0,0.0,93.75,shortcut vs random,92.3678
+pneumonia_mnist,texture,0.02,2,0.59,0.0,0.755,0.15,0.625,0.07,0.935,0.13,96.79,shortcut vs random,95.5286
+pneumonia_mnist,texture,0.02,42,0.61,0.0,0.91,0.0,0.86,0.0,0.98,0.02,100.0,shortcut vs random,100.0
+pneumonia_mnist,texture,0.05,1,0.6,0.0,0.92,0.0,0.81,0.0,1.0,0.0,98.88,shortcut vs random,97.9446
+pneumonia_mnist,texture,0.05,2,0.68,0.0,0.97,0.0,0.975,0.01,1.0,0.0,98.08,shortcut vs random,97.3727
+pneumonia_mnist,texture,0.05,42,0.58,0.0,0.93,0.0,0.855,0.01,0.975,0.03,100.0,shortcut vs random,100.0
+pneumonia_mnist,texture,0.1,1,0.71,0.0,0.94,0.0,0.87,0.0,1.0,0.0,100.0,shortcut vs random,100.0
+pneumonia_mnist,texture,0.1,2,0.655,0.01,0.73,0.36,0.63,0.12,0.82,0.36,99.84,shortcut vs random,99.7535
+pneumonia_mnist,texture,0.1,42,0.58,0.0,0.885,0.01,0.76,0.0,0.955,0.07,100.0,shortcut vs random,100.0
+pneumonia_mnist,texture,0.25,1,0.56,0.0,0.79,0.0,0.91,0.0,0.88,0.0,100.0,shortcut vs random,100.0
+pneumonia_mnist,texture,0.25,2,0.51,0.0,0.96,0.0,0.85,0.0,1.0,0.0,100.0,shortcut vs random,100.0
+pneumonia_mnist,texture,0.25,42,0.505,0.33,0.89,0.0,0.855,0.01,0.99,0.0,100.0,shortcut vs random,100.0
+pneumonia_mnist,texture,0.4,1,0.45,0.0,0.84,0.0,1.0,0.0,0.94,0.0,100.0,shortcut vs random,100.0
+pneumonia_mnist,texture,0.4,2,0.37,0.0,0.915,0.01,0.835,0.01,1.0,0.0,99.84,shortcut vs random,99.8031
+pneumonia_mnist,texture,0.4,42,0.46,0.04,0.78,0.0,0.98,0.0,0.91,0.0,100.0,shortcut vs random,100.0

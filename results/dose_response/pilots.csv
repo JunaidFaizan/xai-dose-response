@@ -1,0 +1,4 @@
+base,shortcut,dose,swap_fraction,shortcut_noise,seed,epochs,best_val_accuracy,test_accuracy,test_accuracy_no_shortcut,test_accuracy_conflicting,reliance,training_minutes,classes,chance_floor,reliance_corrected,model_set,status
+cifar10_resnet18,patch,-0.05,0.0,0.05,42,15,95.52,98.52,57.82,33.44,50.61,14.68,10,4.6866666666666665,48.18143666503462,A2,not scored yet
+pet_resnet18_pretrained,patch,0.0,0.0,-0.0,7,15,99.8,99.81,93.98,63.94,36.06,1.38,2,6.019999999999996,31.96424771227921,A2_pilot,SD1 pilot (never pooled)
+pet_resnet18_pretrained,patch,-0.5,0.0,0.5,7,15,97.4,97.19,97.22,97.44,2.56,1.38,2,2.780000000000001,-0.22629088664883878,A2_pilot,SD1 pilot (never pooled)

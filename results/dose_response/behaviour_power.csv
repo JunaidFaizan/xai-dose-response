@@ -11,9 +11,9 @@ mnist,patch,shortcut_dominant,51,10.0,1.0,0.06893833391465641,35
 mnist,texture,follows_shortcut_causal,51,2.0,1.0,0.09319015519822059,29
 mnist,texture,follows_shortcut,51,2.0,1.0,0.09272113046878949,29
 mnist,texture,shortcut_dominant,51,3.0,1.0,0.09670497325294006,35
-pet_resnet18,patch,follows_shortcut_causal,18,8.0,2.0,0.09731236802019037,15
-pet_resnet18,patch,follows_shortcut,18,26.0,8.5,0.06617316795580336,18
-pet_resnet18,patch,shortcut_dominant,18,17.5,6.5,0.07637377342199073,18
+pet_resnet18,patch,follows_shortcut_causal,21,11.0,3.0,0.09364590287940232,18
+pet_resnet18,patch,follows_shortcut,21,27.0,7.0,0.06534716510413412,21
+pet_resnet18,patch,shortcut_dominant,21,19.0,8.0,0.07395214135918764,21
 pneumonia_mnist,patch,follows_shortcut_causal,42,6.5,10.0,0.08308042430294216,31
 pneumonia_mnist,patch,follows_shortcut,42,18.5,5.5,0.07324043564944635,36
 pneumonia_mnist,patch,shortcut_dominant,42,34.5,3.0,0.06044060828308754,41

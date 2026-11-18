@@ -1,0 +1,15 @@
+{
+  "base": "pet_resnet18",
+  "shortcut": "patch",
+  "dose": -0.15,
+  "swap_fraction": 0.0,
+  "shortcut_noise": 0.15,
+  "seed": 2,
+  "epochs": 30,
+  "best_val_accuracy": 88.4,
+  "test_accuracy": 92.26,
+  "test_accuracy_no_shortcut": 71.19,
+  "test_accuracy_conflicting": 39.66,
+  "reliance": 60.34,
+  "training_minutes": 26.66
+}
