@@ -229,13 +229,13 @@ No metric, oracle, method or behaviour score of any pilot model had been
 computed when these notes were written, and no confirmatory SD1 model or
 further SD2 CIFAR-10 model had been trained.
 
-**Third-party timestamp of these notes:** the author will add them as a new
-version of Zenodo record
-[10.5281/zenodo.24285532](https://doi.org/10.5281/zenodo.24285532) (concept
-DOI [10.5281/zenodo.24285531](https://doi.org/10.5281/zenodo.24285531))
-before session 2.
-**TODO (author): replace this line with the new version's DOI and
-publication time once Zenodo has published it.**
+**Third-party timestamp of these notes:** Zenodo version 2 of the record,
+DOI [10.5281/zenodo.24333540](https://doi.org/10.5281/zenodo.24333540)
+(concept DOI [10.5281/zenodo.24285531](https://doi.org/10.5281/zenodo.24285531)),
+published 2026-11-18 07:08 UTC, before session 2. It archives this file as
+committed in `3db4a0e` (MD5 6002dc67463714abc580aee3959255d1). The
+predictions P5–P9 are unchanged and remain archived in version 1
+([10.5281/zenodo.24285532](https://doi.org/10.5281/zenodo.24285532)).
 
 **Note A2-C1 (2026-11-17): SD2 CIFAR-10 doses.** Pilot
 `cifar10_resnet18_patch_dose-005_seed42`: reliance 50.61, test accuracy
