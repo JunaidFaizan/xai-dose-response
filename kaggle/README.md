@@ -116,47 +116,67 @@ Pre-registered in `docs/PREDICTIONS_amendments.md` (A2) with the predictions P5�
    `behaviour` does nothing for the Kaggle-scored models (their behaviour files are in the zip). `analyze` includes the 3 Pet −0.15 models; the pilots have no scores and are not pooled. `--model-set pre_a2` writes the 234 models from before A2 to `results\dose_response\pre_a2_models\`.
 10. Read `a2_pilot_report.json` (unzipped into the project folder): reliance, accuracies, r_c and the A2 dose set for the CIFAR pilot and the SD1 pilot at dose 0. Write the two dated A2 completion notes in `docs/PREDICTIONS_amendments.md` (CIFAR pilot r_c → dose set; SD1 pilot r_c → dose set), add them to the timestamped record, and commit them **before session 2**.
 
-Dose −0.05 on Pet is **not** part of A2. Adding it needs a new dated amendment before it is trained.
+Dose −0.05 on Pet is **not** part of A2. Adding it needs a new dated amendment before it is trained. `analyze` labels any model outside the registered designs `unregistered`, prints a warning and leaves it out of every model set.
 
-After A2 models arrive, `paper/build_paper.py` needs an update: it asserts that every model is in the original set or A1.
+**Session 1 result (2026-11-17).** Completion notes A2-C1 and A2-C2 in `docs/PREDICTIONS_amendments.md`; the pilot report is kept as `docs/kaggle_runs/a2_session1_pilot_report.json` (the copy in the project root is ignored by git). CIFAR pilot r_c 48.18 → CIFAR doses −0.05, −0.03, −0.02, −0.01. SD1 pilot r_c 31.96 at dose 0 → SD1 doses −0.5, −0.2, 0, +0.1, +0.25, +0.4. The 3 Pet −0.15 models are pooled in `analyze`; the pilots are listed in `results\dose_response\pilots.csv`, not pooled.
 
 ## Amendment A2: session 2 (final SD2 CIFAR-10 doses, SD1 confirmatory set)
 
-Run only after the two completion notes of step 10 are committed.
+Run only after the two completion notes are committed (done: A2-C1 and A2-C2) **and** added as a new version of the Zenodo record (step 0).
 
-1. **Import Notebook** → `kaggle\dose_response_a2_session2.ipynb`.
-2. **+ Add Input**: `xai-a2-bundle`, and the session-1 notebook's Output (**+ Add Input → Your Work → Notebooks**), so `a2_session1_results.zip` is attached and the CIFAR pilot checkpoint is reused (train skips a model whose metrics JSON exists).
-3. In the parameters cell, set `CIFAR_DOSES` and `SD1_DOSES` from the completion notes, for example `CIFAR_DOSES = [-0.09, -0.075, -0.06, -0.05]`. The notebook stops if both are empty.
-4. GPU T4 x2 and Internet on, then **Save Version → Save & Run All (Commit)**. Each filled list is trained with seeds 42, 1, 2, then evaluated, placebo-scored and behaviour-labelled.
-5. Download `a2_session2_results.zip`, unzip it into the project folder with `Expand-Archive` as above, and re-run the three `analyze` commands.
+0. **Timestamp the completion notes.** On Zenodo, open record [10.5281/zenodo.24285532](https://doi.org/10.5281/zenodo.24285532) → **New version** → replace `PREDICTIONS_amendments.md` with the committed file (keep `PREDICTIONS_pretrained.md`) → **Publish**. Then replace the `TODO (author)` line in the A2 completion notes with the new version's DOI and publication time, and commit.
+1. **Update the bundle dataset.** The code in the bundle changed after session 1 (`dose_response.py`: model-set rules and `pilots.csv`; `xai/models.py`: docstring). Training and scoring are unchanged, but the bundle should match the committed code. Rebuild it on the laptop and upload it to the existing dataset: Kaggle → **Your Work → Datasets → `xai-a2-bundle` → New Version** → drop in `kaggle\xai_a2_bundle.zip` → **Create**.
 
-**SD2 small CNN on the laptop (CPU).** After the CIFAR completion note, with the same 4 final doses (`<final 4>`) and seeds 42 and 1:
+   ```powershell
+   pwsh -File kaggle\make_bundle.ps1 -Dataset a2
+   ```
+
+2. **Create → New Notebook → File → Import Notebook** → `kaggle\dose_response_a2_session2.ipynb`.
+3. **+ Add Input → Your Datasets** → `xai-a2-bundle` (latest version).
+4. **+ Add Input → Your Work → Notebooks** → the session-1 notebook (the committed version whose Output holds `a2_session1_results.zip`). Cell 2 unpacks it (or copies the files if Kaggle shows them unpacked) and stops with an error if `cifar10_resnet18_patch_dose-005_seed42.pt` or its metrics JSON is missing. The pilot is one of the 12 CIFAR models: `train` skips it because its metrics JSON exists, and it is scored in this session.
+5. The parameters cell is pre-filled from the notes: `CIFAR_DOSES = [-0.05, -0.03, -0.02, -0.01]`, `SD1_DOSES = [-0.5, -0.2, 0, 0.1, 0.25, 0.4]`, `SEEDS = [42, 1, 2]` (seed 7 is refused). Don't change them.
+6. **Settings → Accelerator → GPU T4 x2**, **Settings → Internet → On**, then run cells 1–3 once to check: cell 2 prints "CIFAR pilot found: it is reused, not retrained"; cell 3 prints a GPU name, "Pet and CIFAR-10 data found" and "ImageNet ResNet-18 weights ready".
+7. **Save Version → Save & Run All (Commit) → Save**. It trains 11 CIFAR-10 ResNet-18 models and 18 SD1 models, and scores all 30 (metrics, oracle maps, controls, behaviour labels).
+8. When it finishes, download `a2_session2_results.zip` from **Output**, unzip it into the project folder and re-run the analyses:
+
+   ```powershell
+   Expand-Archive $HOME\Downloads\a2_session2_results.zip -DestinationPath . -Force
+   .\.venv\Scripts\python.exe -W ignore dose_response.py behaviour
+   .\.venv\Scripts\python.exe -W ignore dose_response.py analyze
+   .\.venv\Scripts\python.exe -W ignore dose_response.py analyze --model-set original
+   .\.venv\Scripts\python.exe -W ignore dose_response.py analyze --model-set pre_a2
+   ```
+
+**Session 2 time estimate** (measured in session 1, `docs/kaggle_runs/a2_session1_pilot_report.json` and the 2 h 05 min session):
+
+- CIFAR-10 ResNet-18: 11 models to train × 14.7 min = 162 min; scoring 12 models × about 1 min (0.6 min evaluation, audit-2 §4.1, plus controls and behaviour) = 12 min.
+- SD1: 18 × 1.4 min training = 25 min. Scoring was not timed separately. Session 1 spent 125 − 97 = 28 min outside training (setup plus scoring the 3 Pet −0.15 models), so scoring a `pet_resnet18` model takes at most 9.3 min. The pretrained network is cheaper per image, so 3–9.3 min per SD1 model = 54–167 min.
+- Setup about 5 min.
+- **Total ≈ 4.3–6.2 h**, under the 11-hour margin of Kaggle's 12-hour limit, so no split is needed.
+
+**SD2 small CNN on the laptop (CPU), you run it in your own terminal.** The same 4 final doses (A2-C1) and seeds 42 and 1, 8 models:
 
 ```powershell
-.\.venv\Scripts\python.exe -W ignore dose_response.py train --bases cifar10 --shortcuts patch --doses <final 4> --seeds 42 1
-.\.venv\Scripts\python.exe -W ignore dose_response.py evaluate --bases cifar10 --shortcuts patch --doses <final 4> --seeds 42 1
-.\.venv\Scripts\python.exe -W ignore dose_response.py placebo --bases cifar10 --shortcuts patch --doses <final 4> --seeds 42 1
-.\.venv\Scripts\python.exe -W ignore dose_response.py behaviour --selection-only --bases cifar10 --shortcuts patch --doses <final 4> --seeds 42 1
+.\.venv\Scripts\python.exe -W ignore dose_response.py train --bases cifar10 --shortcuts patch --doses -0.05 -0.03 -0.02 -0.01 --seeds 42 1
+.\.venv\Scripts\python.exe -W ignore dose_response.py evaluate --bases cifar10 --shortcuts patch --doses -0.05 -0.03 -0.02 -0.01 --seeds 42 1
+.\.venv\Scripts\python.exe -W ignore dose_response.py placebo --bases cifar10 --shortcuts patch --doses -0.05 -0.03 -0.02 -0.01 --seeds 42 1
+.\.venv\Scripts\python.exe -W ignore dose_response.py behaviour --selection-only --bases cifar10 --shortcuts patch --doses -0.05 -0.03 -0.02 -0.01 --seeds 42 1
 ```
 
-Training takes about 8 × 22.5 min on the CPU (mean `training_minutes` of the `cifar10` models in `results\dose_response\models.csv`).
+Training takes about 8 × 22.5 min ≈ 3 h on the CPU (mean `training_minutes` of the `cifar10` models in `results\dose_response\models.csv`). Then re-run the three `analyze` commands above.
 
 ## A2 time estimates
 
-Sources: the mean `training_minutes` per base in `results\dose_response\models.csv`, and the evaluation times in `docs/audit2/05_additions.md` §4.1.
+Session 1 measured values (`docs/kaggle_runs/a2_session1_pilot_report.json`, Pet −0.15 `training_minutes`):
 
-| Model | Training per model | Evaluation per model |
+| Model | Training per model | Scoring per model |
 |---|---|---|
-| Pet ResNet-18 from scratch (`pet_resnet18`, 30 epochs) | 25.4 min (the audit brief quotes 23.2) | about 8.6 min |
-| CIFAR-10 ResNet-18 (`cifar10_resnet18`, 15 epochs) | 10.7 min | about 0.6 min |
-| Pet ImageNet-pretrained ResNet-18 (`pet_resnet18_pretrained`, 15 epochs) | about 2–5 min (estimate) | about 3–9 min (estimate) |
+| Pet ResNet-18 from scratch (`pet_resnet18`, 30 epochs) | 26.6 min | at most 9.3 min (session total minus training) |
+| CIFAR-10 ResNet-18 (`cifar10_resnet18`, 15 epochs) | 14.7 min | about 0.6 min evaluation (audit-2 §4.1 estimate) |
+| Pet ImageNet-pretrained ResNet-18 (`pet_resnet18_pretrained`, 15 epochs) | 1.4 min | not measured; 3–9.3 min assumed |
 
-The pretrained estimate comes from compute: at 128 px the standard ImageNet stem costs about 0.59 GFLOPs per image, while the CIFAR stem used by `pet_resnet18` (no early downsampling) costs about 15× more. Replace it with the minutes printed by cell 3 of session 1.
-
-- **Session 1** ≈ 10.7 + 2 × (2–5) + 3 × (25.4 + 8.6 + 1) min ≈ 2.0–2.3 h.
-- **Session 2** ≈ 11 × 10.7 + 12 × 0.6 + 18 × (5–14) min ≈ 3.6–6.4 h.
-
-Both stay under Kaggle's 12-hour limit per run.
+- **Session 1** took 2 h 05 min (estimate was 2.0–2.3 h).
+- **Session 2** ≈ 4.3–6.2 h (above). Both stay under Kaggle's 12-hour limit per run.
 
 ## If something goes wrong
 

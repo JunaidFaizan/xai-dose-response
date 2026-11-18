@@ -221,29 +221,50 @@ A2_SESSION2_INTRO = f"""# {TITLE}
 Run only after the two dated A2 completion notes (CIFAR pilot r_c → dose set;
 SD1 pilot r_c → dose set) are committed in `docs/PREDICTIONS_amendments.md`.
 
-1. Fill `CIFAR_DOSES` and `SD1_DOSES` in the parameters cell from those notes.
+1. The parameters cell holds the final doses of notes A2-C1 and A2-C2:
+   CIFAR-10 ResNet-18 -0.05, -0.03, -0.02, -0.01; pretrained Pet -0.5, -0.2, 0,
+   +0.1, +0.25, +0.4. Do not change them.
 2. **+ Add Input**: the bundle dataset and the Output of the session-1 notebook
-   (it holds `a2_session1_results.zip`, so the CIFAR pilot checkpoint is reused).
+   (it holds `a2_session1_results.zip`). The CIFAR pilot (dose -0.05, seed 42)
+   is one of the 12 SD2 models: it is reused and scored, not retrained. The
+   setup cell stops if it is missing.
 3. **Settings → Accelerator → GPU T4 x2**, **Internet on**, then
    **Save Version → Save & Run All (Commit)**.
 
-Each non-empty list is trained with seeds 42 1 2 and scored; the results are
-packed into `a2_session2_results.zip` in the notebook's Output."""
+Each list is trained with seeds 42 1 2 (11 CIFAR-10 + 18 SD1 models to
+train), then scored; the results are packed into `a2_session2_results.zip`
+in the notebook's Output."""
 
-A2_PARAMETERS = """# Parameters: copy the final doses from the dated A2 completion notes
-# (docs/PREDICTIONS_amendments.md), e.g. CIFAR_DOSES = [-0.09, -0.075, -0.06, -0.05].
-CIFAR_DOSES = []  # cifar10_resnet18, seeds 42 1 2
-SD1_DOSES = []    # pet_resnet18_pretrained, seeds 42 1 2
-SEEDS = [42, 1, 2]
-assert CIFAR_DOSES or SD1_DOSES, 'Fill CIFAR_DOSES and/or SD1_DOSES from the A2 completion notes first.'"""
+A2_PARAMETERS = """# Parameters: the final doses of the dated A2 completion notes A2-C1 and A2-C2
+# (docs/PREDICTIONS_amendments.md, 2026-11-17).
+CIFAR_DOSES = [-0.05, -0.03, -0.02, -0.01]    # cifar10_resnet18 (A2-C1: pilot r_c 48.18 < 50)
+SD1_DOSES = [-0.5, -0.2, 0, 0.1, 0.25, 0.4]   # pet_resnet18_pretrained (A2-C2: pilot r_c 31.96 < 60)
+SEEDS = [42, 1, 2]  # confirmatory seeds; seed 7 is the SD1 pilot seed and is never used here
+assert CIFAR_DOSES or SD1_DOSES, 'Fill CIFAR_DOSES and/or SD1_DOSES from the A2 completion notes first.'
+assert 7 not in SEEDS, 'Seed 7 is reserved for the SD1 pilots.'"""
 
-EXTRACT_SESSION1 = """
-# Reuse the session-1 checkpoints (train skips models whose metrics JSON exists)
+CIFAR_PILOT_NAME = "cifar10_resnet18_patch_dose-005_seed42"
+
+EXTRACT_SESSION1 = f"""
+# Reuse the session-1 CIFAR pilot ({CIFAR_PILOT_NAME}, one of the 12 SD2 models):
+# train skips a model whose metrics JSON exists, so it is scored but not retrained.
+# The session-1 Output is attached either as the zip or already unpacked.
 import zipfile
+PILOT = '{CIFAR_PILOT_NAME}'
 for archive in glob.glob('/kaggle/input/**/a2_session1_results.zip', recursive=True):
     with zipfile.ZipFile(archive) as z:
         z.extractall(WORK)
-    print('extracted', archive)"""
+    print('extracted', archive)
+os.makedirs('checkpoint/dose', exist_ok=True)
+for f in glob.glob(f'/kaggle/input/**/checkpoint/dose/{{PILOT}}*', recursive=True):
+    if not os.path.exists(os.path.join('checkpoint/dose', os.path.basename(f))):
+        shutil.copy(f, 'checkpoint/dose/')
+        print('copied', f)
+if -0.05 in CIFAR_DOSES:
+    for suffix in ('.pt', '_metrics.json'):
+        assert os.path.exists(f'checkpoint/dose/{{PILOT}}{{suffix}}'), (
+            f'{{PILOT}}{{suffix}} not found: attach the session-1 notebook Output (+ Add Input -> Your Work).')
+    print('CIFAR pilot found: it is reused, not retrained')"""
 
 SESSION2_RUN = """# 3. Train and score every model of the filled lists
 def run(*args):
