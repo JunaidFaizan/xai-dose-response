@@ -51,7 +51,7 @@ Update the row when a task changes state. States: `todo`, `in progress`, `done (
 
 | ID | Task | Owner | Depends on | Status |
 |---|---|---|---|---|
-| T1.1 | Integrate A2 session 1, fix review findings R1–R5, prepare session 2 | Agent (workflow `a2-session1-integrate-session2-prep`) | — | in progress |
+| T1.1 | Integrate A2 session 1, fix review findings R1–R5, prepare session 2 | Agent (workflow `a2-session1-integrate-session2-prep`) | — | done (d5ee7a7) |
 | T1.2 | Zenodo new version with the A2 completion notes | Author | T1.1 notes (3db4a0e) | todo |
 | T1.3 | **Kaggle S2:** CIFAR ResNet-18 SD2 (11 models) + SD1 confirmatory (18 models) | Author | T1.1, T1.2 | todo |
 | T1.4 | Laptop: CIFAR small CNN SD2, 8 models (4 doses × seeds 42, 1) | Author | T1.1 | todo |
