@@ -27,7 +27,7 @@ before any SD3 or SD4 model or score is produced.
   Scored on every registered model except pilots, on the first 100 (28/32 px
   small CNNs) or 50 (CIFAR-10 ResNet-18, Pet, SD1, SD4) of the existing
   scoring images; 25 for the Pet-sized settings if the A3 timing gate applies.
-- **SD4:** `pet_resnet18_pretrained` with the content-coded watermark of A3
+- **SD4:** `pet_resnet18_pretrained` with the watermark shortcut of A3 (partly position-coded within the corner)
   (cat: two vertical 4 px bars, box rows 0–11, columns 0–3 and 20–23; dog:
   two horizontal 4 px bars, box rows 0–3 and 8–11, columns 6–17; 96 stroke
   pixels each, in the 24×12 px box at image rows 116–127, columns 104–127,

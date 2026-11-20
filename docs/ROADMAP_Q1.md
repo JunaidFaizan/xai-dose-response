@@ -53,8 +53,8 @@ Update the row when a task changes state. States: `todo`, `in progress`, `done (
 |---|---|---|---|---|
 | T1.1 | Integrate A2 session 1, fix review findings R1–R5, prepare session 2 | Agent (workflow `a2-session1-integrate-session2-prep`) | — | done (d5ee7a7) |
 | T1.2 | Zenodo new version with the A2 completion notes | Author | T1.1 notes (3db4a0e) | done (10.5281/zenodo.24333540) |
-| T1.3 | **Kaggle S2:** CIFAR ResNet-18 SD2 (11 models) + SD1 confirmatory (18 models) | Author | T1.1, T1.2 | todo |
-| T1.4 | Laptop: CIFAR small CNN SD2, 8 models (4 doses × seeds 42, 1) | Author | T1.1 | todo |
+| T1.3 | **Kaggle S2:** CIFAR ResNet-18 SD2 (11 models) + SD1 confirmatory (18 models) | Author | T1.1, T1.2 | done (results 2acc59a) |
+| T1.4 | Laptop: CIFAR small CNN SD2, 8 models (4 doses × seeds 42, 1) | Author | T1.1 | in progress |
 | T1.5 | Integrate S2 and laptop results; judge P5–P9; update paper | Agent | T1.3, T1.4 | todo |
 | T2.1 | Amendment A3 + `docs/PREDICTIONS_sd3_sd4.md` (P10–P13) | Agent | — | done (976da10; first d5c8655, revised a079fe1) |
 | T2.2 | Zenodo new version with A3 | Author | T2.1 | todo |

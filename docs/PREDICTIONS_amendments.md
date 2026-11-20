@@ -285,9 +285,12 @@ The second audit (`docs/audit2/00_combined_audit2.md`; `docs/audit2/05_additions
   `deletion_inpaint` fill is only inspired by ROAD (`xai/metrics.py` says so).
   SD3 scores the existing oracle and control maps with ROAD's own Noisy
   Linear Imputation, in both removal orders.
-- **SD4, a content-coded watermark.** Every existing shortcut is coded by
+- **SD4, a watermark shortcut.** Every existing shortcut is coded by
   position (patch) or by a fixed pixel pattern (texture). SD4 adds a
-  semi-transparent mark whose shape, not its position, codes the class. It
+  semi-transparent mark in one shared corner for both classes, whose stroke
+  arrangement codes the class. The strokes of the two marks occupy different
+  pixels, so the coding is partly positional within the corner (see the
+  record note below). It
   runs on the SD1 network, so SD4 against SD1 changes only the shortcut form.
 
 ### Sources checked on 2026-11-18
@@ -421,7 +424,7 @@ four existing metrics (`dose_response.py`, `xai/dose_analysis.py`), with
 new files and tables only. The existing metrics, their outputs and the
 `original` and `pre_a2` model sets stay unchanged.
 
-### SD4: content-coded watermark on the pretrained Pet network
+### SD4: watermark shortcut on the pretrained Pet network
 
 New shortcut type `watermark`, used only with `pet_resnet18_pretrained`.
 Network, ImageNet weights, optimiser, learning rate, 15 epochs, data,
@@ -443,7 +446,8 @@ The two stroke masks share no pixel (a 2 px gap, columns 4–5 and 18–19,
 separates them) and have the same number of stroke pixels, so the shortcut
 and placebo maps have the same size and both marks add the same amount of
 white. The class is coded by the arrangement of the strokes, not by mark
-area or brightness. They are drawn from these coordinates
+area or brightness; because the strokes are disjoint, that arrangement is
+also a within-corner position difference. They are drawn from these coordinates
 in code, with no font, and the two masks are saved with the code before the
 pilot. On a stroke pixel the image becomes (1 − α) × pixel + α × 1 in every
 channel, with opacity **α = 0.4**. Pixels off the stroke are not changed.
