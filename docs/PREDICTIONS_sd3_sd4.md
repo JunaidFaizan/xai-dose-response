@@ -21,7 +21,9 @@ before any SD3 or SD4 model or score is produced.
   https://arxiv.org/abs/2202.00449; reference code
   https://github.com/tleemann/road_evaluation, MIT licence), in two orders:
   ROAD MoRF (`road_morf`, low area is better) and ROAD LeRF (`road_lerf`,
-  high area is better). Removal shares 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 0.9.
+  high area is better). Removal shares 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 0.9
+  (share removed, in both orders; for LeRF this differs from the reference
+  LeRF grid, see A3).
   Scored on every registered model except pilots, on the first 100 (28/32 px
   small CNNs) or 50 (CIFAR-10 ResNet-18, Pet, SD1, SD4) of the existing
   scoring images; 25 for the Pet-sized settings if the A3 timing gate applies.

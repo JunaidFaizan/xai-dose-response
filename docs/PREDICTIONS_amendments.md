@@ -336,9 +336,15 @@ committed before scoring, so a rerun gives identical scores.
 
 In the reference code, `percentages` gives for LeRF the share of pixels
 *kept* (it removes `salient_order[int(n*p):]`). Here q is the share
-*removed* in both orders, so that both curves run over the same grid. This is
-a difference of parametrisation only; the set of grid points is the same,
-since LeRF with kept share p removes 1 − p.
+*removed* in both orders, so that both curves run over the same grid of
+removed shares. For LeRF this is a different grid from the reference: the
+reference LeRF with kept shares p = 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 0.9 removes
+the shares 1 − p = 0.1, 0.3, 0.5, 0.6, 0.7, 0.8, 0.9, while LeRF here removes
+q = 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 0.9. The rounding also differs: the
+reference LeRF removes n − int(n × p) pixels, while here both orders remove
+int(n × q) pixels. MoRF is identical to the reference in grid and rounding.
+The LeRF results are therefore not directly comparable with LeRF values
+reported with the reference grid.
 
 **Removal-step grid.** The reference package fixes no default: `run_road`
 takes a `percentages` list. The reference demo notebook uses
@@ -348,19 +354,25 @@ points. The roadmap's alternative, 10 steps up to 100%, is not used: at
 q = 1 no pixel is known, the right-hand side of the linear system is zero and
 the system matrix has zero row sums, so the solve is singular (or returns
 the zero image). The number of removed pixels at share q is
-`int(n × q)` for n pixels, as in the reference.
+`int(n × q)` for n pixels in both orders (as in the reference for MoRF; see
+above for LeRF).
 
 **Ranking and ties.** Pixels are ranked with the existing `_ranking` in
 `xai/metrics.py` (random permutation, then a stable descending sort), with
 the same NumPy generator seeds per model as the existing oracle and control
 scoring. The reference instead adds 1e-4 Gaussian noise to the map
-rescaled to [0, 1]. Both break ties in binary oracle maps at random; the
-existing rule is kept so that ROAD and the four existing metrics remove the
-same pixels in the same order.
+rescaled to [0, 1]. Both break ties in binary oracle maps at random. The
+existing rule is kept so that ROAD and the four existing metrics use the
+same tie-breaking rule (random permutation, stable sort) with fixed seeds,
+which makes every score deterministic. This does not mean that the metrics
+remove tied pixels in the same order: in the existing scoring one generator
+is drawn from in turn for every metric and map, so tie orders already differ
+between the four existing metrics.
 
 **Score per image and map.** The area under the probability-of-label curve
 over q ∈ [0, 0.9] by the trapezoid rule on the uneven grid, divided by 0.9.
-The division does not change any preference.
+Preferences and the tie tolerance (1e-4, below) are applied to this
+normalised score.
 
 **Maps scored.** For every scored model and image: the shortcut oracle, the
 object oracle, the size-matched object map (`object_matched`), the random
@@ -422,12 +434,16 @@ Model names follow `model_name()`, for example
 (rows 116–127, columns 104–127 of the 128×128 image). Box coordinates below
 are row, column from the box's top-left pixel.
 
-- **Cat mark:** the outline of the box, 2 px thick (rows 0–1 and 10–11, and
-  columns 0–1 and 22–23): 128 stroke pixels.
-- **Dog mark:** two horizontal bars, rows 3–4 and rows 7–8, columns 2–21:
-  80 stroke pixels.
+- **Cat mark:** two vertical bars, 4 px wide and the full box height:
+  rows 0–11, columns 0–3 and columns 20–23. 2 × 12 × 4 = 96 stroke pixels.
+- **Dog mark:** two horizontal bars, 4 px thick and 12 px long: rows 0–3
+  and rows 8–11, columns 6–17. 2 × 4 × 12 = 96 stroke pixels.
 
-The two stroke masks share no pixel. They are drawn from these coordinates
+The two stroke masks share no pixel (a 2 px gap, columns 4–5 and 18–19,
+separates them) and have the same number of stroke pixels, so the shortcut
+and placebo maps have the same size and both marks add the same amount of
+white. The class is coded by the arrangement of the strokes, not by mark
+area or brightness. They are drawn from these coordinates
 in code, with no font, and the two masks are saved with the code before the
 pilot. On a stroke pixel the image becomes (1 − α) × pixel + α × 1 in every
 channel, with opacity **α = 0.4**. Pixels off the stroke are not changed.
