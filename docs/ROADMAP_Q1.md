@@ -56,7 +56,7 @@ Update the row when a task changes state. States: `todo`, `in progress`, `done (
 | T1.3 | **Kaggle S2:** CIFAR ResNet-18 SD2 (11 models) + SD1 confirmatory (18 models) | Author | T1.1, T1.2 | todo |
 | T1.4 | Laptop: CIFAR small CNN SD2, 8 models (4 doses × seeds 42, 1) | Author | T1.1 | todo |
 | T1.5 | Integrate S2 and laptop results; judge P5–P9; update paper | Agent | T1.3, T1.4 | todo |
-| T2.1 | Amendment A3 + `docs/PREDICTIONS_sd3_sd4.md` (P10–P13) | Agent | — | done (d5c8655) |
+| T2.1 | Amendment A3 + `docs/PREDICTIONS_sd3_sd4.md` (P10–P13) | Agent | — | done (976da10; first d5c8655, revised a079fe1) |
 | T2.2 | Zenodo new version with A3 | Author | T2.1 | todo |
 | T3.1 | SD3 code: ROAD fill (noisy linear imputation, MoRF and LeRF) | Agent | T2.1 | todo |
 | T3.2 | SD3 timing test on 1 Pet model and 1 CIFAR ResNet-18 model (CPU, laptop) | Author | T3.1 | todo |
