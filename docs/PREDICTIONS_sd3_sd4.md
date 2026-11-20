@@ -28,7 +28,9 @@ before any SD3 or SD4 model or score is produced.
   small CNNs) or 50 (CIFAR-10 ResNet-18, Pet, SD1, SD4) of the existing
   scoring images; 25 for the Pet-sized settings if the A3 timing gate applies.
 - **SD4:** `pet_resnet18_pretrained` with the content-coded watermark of A3
-  (cat: 2 px box outline, dog: two bars, both 24×12 px at the bottom right,
+  (cat: two vertical 4 px bars, box rows 0–11, columns 0–3 and 20–23; dog:
+  two horizontal 4 px bars, box rows 0–3 and 8–11, columns 6–17; 96 stroke
+  pixels each, in the 24×12 px box at image rows 116–127, columns 104–127,
   opacity 0.4). The confirmatory set is 18 models (6 doses × seeds 42, 1, 2),
   with doses fixed by the A3 pilot rule. The seed-7 pilots are excluded from
   every test below.
@@ -77,8 +79,8 @@ Spearman tests, bootstrap intervals). Additions:
     confirmed". If fewer than three settings are testable, P10 as a whole is
     "not testable", and the per-setting results are still reported.
   - Not testable in a setting: Deletion (black) mean preference(R over O)
-    at its lowest-dose models is at most 0.05 on the same images (no bias
-    left to lower), or the setting's lowest-dose models have no ROAD scores.
+    at its lowest-dose models is at most 0.05 on the same images (floor:
+    nothing left to lower), or the setting's lowest-dose models have no ROAD scores.
 
 - **P11. ROAD over-detects less than black deletion on Pet.** On
   `pet_resnet18` (from scratch), the over-detection rate of ROAD in the S vs

@@ -520,3 +520,25 @@ before those models are trained.
   SD1 or `pet_resnet18`.
 - Analyses with the A2 and A3 models are labelled clearly, and the
   `original` and `pre_a2` analyses are reproduced unchanged.
+
+### Record notes (added 2026-11-18, before the Zenodo version 3 upload)
+
+- **Revision after push.** A3 and P10–P13 were first committed in d5c8655
+  and pushed to origin/main. Commit a079fe1 and the commit that adds this
+  note then revised the A3 text (LeRF description, watermark mark shapes,
+  tie wording) and the SD4 mark description and one wording in
+  `PREDICTIONS_sd3_sd4.md`. No prediction, threshold or test was changed,
+  no SD3 or SD4 model or score existed, and no third-party timestamp had
+  been made. The Zenodo version 3 upload is the version of record.
+- **Order of P10 and the SD1 black-deletion scores.** P10 was committed in
+  d5c8655 before the SD1 confirmatory results, including their Deletion
+  (black) scores, entered the repository in commit 2acc59a (A2 session 2).
+  Both commits predate the Zenodo version 3 timestamp. The git history
+  shows that P10's SD1 arm was written before those values were in the
+  repository.
+- **What SD4 isolates.** The two marks occupy disjoint pixels in the same
+  box, so a model can separate the classes by stroke shape and also by
+  which pixels in the corner are brightened. Compared with SD1, SD4 changes
+  the shortcut's shape, contrast (semi-transparent white, α = 0.4) and
+  within-corner layout, and it keeps one shared corner. It is not a purely
+  content-coded shortcut, and the paper describes it in these terms.
