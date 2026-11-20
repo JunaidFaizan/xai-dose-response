@@ -2,9 +2,9 @@ base,shortcut,label,models,median_minority_count,median_within_class_minority_co
 cifar10,patch,follows_shortcut_causal,12,6.5,1.0,0.09682458365518543,11
 cifar10,patch,follows_shortcut,12,8.5,1.0,0.11119527475884718,12
 cifar10,patch,shortcut_dominant,12,6.5,1.0,0.1179327101745839,12
-cifar10_resnet18,patch,follows_shortcut_causal,18,5.0,1.0,0.12225241173045644,17
-cifar10_resnet18,patch,follows_shortcut,18,6.0,1.0,0.12749321411720127,18
-cifar10_resnet18,patch,shortcut_dominant,18,4.0,1.0,0.1480486500369989,18
+cifar10_resnet18,patch,follows_shortcut_causal,30,13.5,1.0,0.08391204399010299,29
+cifar10_resnet18,patch,follows_shortcut,30,14.0,1.0,0.08360972989100848,30
+cifar10_resnet18,patch,shortcut_dominant,30,11.0,1.0,0.09272113046878949,30
 mnist,patch,follows_shortcut_causal,51,10.0,1.0,0.06783196760459953,32
 mnist,patch,follows_shortcut,51,10.0,1.0,0.06614050857505463,32
 mnist,patch,shortcut_dominant,51,10.0,1.0,0.06893833391465641,35
@@ -14,6 +14,9 @@ mnist,texture,shortcut_dominant,51,3.0,1.0,0.09670497325294006,35
 pet_resnet18,patch,follows_shortcut_causal,21,11.0,3.0,0.09364590287940232,18
 pet_resnet18,patch,follows_shortcut,21,27.0,7.0,0.06534716510413412,21
 pet_resnet18,patch,shortcut_dominant,21,19.0,8.0,0.07395214135918764,21
+pet_resnet18_pretrained,patch,follows_shortcut_causal,18,1.0,1.0,0.23217544827744677,14
+pet_resnet18_pretrained,patch,follows_shortcut,18,4.0,1.0,0.1480486500369989,18
+pet_resnet18_pretrained,patch,shortcut_dominant,18,4.0,4.0,0.1480486500369989,15
 pneumonia_mnist,patch,follows_shortcut_causal,42,6.5,10.0,0.08308042430294216,31
 pneumonia_mnist,patch,follows_shortcut,42,18.5,5.5,0.07324043564944635,36
 pneumonia_mnist,patch,shortcut_dominant,42,34.5,3.0,0.06044060828308754,41

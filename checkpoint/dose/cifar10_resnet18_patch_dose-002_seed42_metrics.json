@@ -1,0 +1,15 @@
+{
+  "base": "cifar10_resnet18",
+  "shortcut": "patch",
+  "dose": -0.02,
+  "swap_fraction": 0.0,
+  "shortcut_noise": 0.02,
+  "seed": 42,
+  "epochs": 15,
+  "best_val_accuracy": 97.18,
+  "test_accuracy": 98.71,
+  "test_accuracy_no_shortcut": 43.79,
+  "test_accuracy_conflicting": 17.08,
+  "reliance": 71.53,
+  "training_minutes": 13.18
+}
