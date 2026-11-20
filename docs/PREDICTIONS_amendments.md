@@ -257,3 +257,250 @@ r_c 31.96, training time 1.38 min. Pilot
 doses −0.5, −0.2, 0, +0.1, +0.25, +0.4. With seeds 42, 1, 2 this is 18
 confirmatory models. There is no deviation from the rule. The two seed-7
 pilots stay outside the confirmatory set, as stated above.
+
+## Amendment A3 (2026-11-18): exact ROAD (SD3) and watermark shortcut (SD4)
+
+Written and committed on 2026-11-18, before any SD3 or SD4 model or score
+existed. No SD4 model has been trained, no ROAD score has been computed (not
+even for timing), and the code for either has not been written. The
+predictions for SD3 and SD4 (P10–P13) are in `docs/PREDICTIONS_sd3_sd4.md`,
+committed together with this amendment. Nothing in A1 or A2, and no
+prediction P1–P9, is changed by A3.
+
+**Third-party timestamp:** TODO (author): Zenodo version 3 DOI. This
+amendment and `docs/PREDICTIONS_sd3_sd4.md` are uploaded as a new version of
+the record [10.5281/zenodo.24285532](https://doi.org/10.5281/zenodo.24285532)
+(concept DOI [10.5281/zenodo.24285531](https://doi.org/10.5281/zenodo.24285531))
+before any SD3 or SD4 model or score is produced. This includes the SD3
+timing runs and the SD4 pilot.
+
+### Purpose
+
+The second audit (`docs/audit2/00_combined_audit2.md`; `docs/audit2/05_additions.md`
+§4.3, items SD3 and SD4) asks for two more tests:
+
+- **SD3, exact ROAD.** The paper explains the form dependence of the
+  perturbation metrics by class information leaking through the shape of the
+  removed pixels, the mechanism described by ROAD. The existing
+  `deletion_inpaint` fill is only inspired by ROAD (`xai/metrics.py` says so).
+  SD3 scores the existing oracle and control maps with ROAD's own Noisy
+  Linear Imputation, in both removal orders.
+- **SD4, a content-coded watermark.** Every existing shortcut is coded by
+  position (patch) or by a fixed pixel pattern (texture). SD4 adds a
+  semi-transparent mark whose shape, not its position, codes the class. It
+  runs on the SD1 network, so SD4 against SD1 changes only the shortcut form.
+
+### Sources checked on 2026-11-18
+
+- Rong, Leemann, Borisov, Kasneci and Kasneci, "A Consistent and Efficient
+  Evaluation Strategy for Attribution Methods", ICML 2022, PMLR, pages
+  18770–18795: https://arxiv.org/abs/2202.00449 (v2, 14 June 2022; the
+  abstract attributes perturbation results to information leakage through
+  the shape of the removed pixels and proposes ROAD). The venue and pages
+  come from the BibTeX entry in the repository README below.
+- Reference code: https://github.com/tleemann/road_evaluation (branch `main`,
+  last push 2023-06-26). Files read: `road/imputations.py`
+  (`NoisyLinearImputer`), `road/imputed_dataset.py` (`ImputedDataset`, the
+  MoRF/LeRF masks), `road/road.py` (`run_road`) and `RoadBenchmarkDemo.ipynb`
+  (the percentages used).
+- Licence: MIT, "Copyright (c) 2022 Tobias Leemann"
+  (https://github.com/tleemann/road_evaluation/blob/main/LICENSE; the GitHub
+  API reports `mit`). MIT allows porting with the copyright and permission
+  notice kept, so the plan to port the operator into `xai/road.py` (task
+  T3.1) stands.
+
+### SD3: exact ROAD on the existing oracle and control maps
+
+**Imputation operator.** Noisy Linear Imputation exactly as
+`NoisyLinearImputer` in the reference code: each removed pixel is set to the
+weighted mean of its 8 neighbours (weight 1/6 for the 4 edge neighbours and
+1/12 for the 4 diagonal ones; neighbours outside the image are left out and
+their weight dropped), solved jointly for all removed pixels of an image as
+one sparse linear system per image and removal step, separately per
+channel. Gaussian noise with standard deviation 0.01 (the reference default
+`noise=0.01`, absolute, on images in [0, 1]) is then added to the imputed
+pixels only. As in the reference, the result is not clipped. Imputation is
+done on the [0, 1] image before the model's own input transform (the SD1
+and SD4 models normalise inside their forward pass). The noise comes from a
+CPU generator with a fixed seed per model and image, set in the code
+committed before scoring, so a rerun gives identical scores.
+
+**Removal orders.**
+
+- **MoRF** (`road_morf`): the share q of pixels ranked highest by the map is
+  removed and imputed. A faithful map makes the probability of the label
+  fall fast, so a LOW area is better (as Deletion).
+- **LeRF** (`road_lerf`): the share q of pixels ranked lowest is removed and
+  imputed. A faithful map keeps the probability high, so a HIGH area is
+  better.
+
+In the reference code, `percentages` gives for LeRF the share of pixels
+*kept* (it removes `salient_order[int(n*p):]`). Here q is the share
+*removed* in both orders, so that both curves run over the same grid. This is
+a difference of parametrisation only; the set of grid points is the same,
+since LeRF with kept share p removes 1 − p.
+
+**Removal-step grid.** The reference package fixes no default: `run_road`
+takes a `percentages` list. The reference demo notebook uses
+q = 0.1, 0.2, 0.3, 0.4, 0.5, 0.7, 0.9. That grid is used here, with q = 0 (the
+unmodified image) added as the first curve point, so each curve has 8
+points. The roadmap's alternative, 10 steps up to 100%, is not used: at
+q = 1 no pixel is known, the right-hand side of the linear system is zero and
+the system matrix has zero row sums, so the solve is singular (or returns
+the zero image). The number of removed pixels at share q is
+`int(n × q)` for n pixels, as in the reference.
+
+**Ranking and ties.** Pixels are ranked with the existing `_ranking` in
+`xai/metrics.py` (random permutation, then a stable descending sort), with
+the same NumPy generator seeds per model as the existing oracle and control
+scoring. The reference instead adds 1e-4 Gaussian noise to the map
+rescaled to [0, 1]. Both break ties in binary oracle maps at random; the
+existing rule is kept so that ROAD and the four existing metrics remove the
+same pixels in the same order.
+
+**Score per image and map.** The area under the probability-of-label curve
+over q ∈ [0, 0.9] by the trapezoid rule on the uneven grid, divided by 0.9.
+The division does not change any preference.
+
+**Maps scored.** For every scored model and image: the shortcut oracle, the
+object oracle, the size-matched object map (`object_matched`), the random
+map and the placebo map, built by the existing functions in
+`dose_response.py` (for SD4 as defined below).
+
+**Images.** The images are the first N of each model's existing 100 scoring
+images, taken from the same seeded permutation (`IMAGE_SEED`), so ROAD and
+the existing metrics are compared on the same images:
+
+| Setting | Bases | N per model |
+|---|---|---|
+| 28 and 32 px small CNNs | `mnist` (patch, texture), `pneumonia_mnist` (patch, texture), `cifar10` | 100 |
+| CIFAR-10 ResNet-18 | `cifar10_resnet18` | 50 |
+| Pet from scratch | `pet_resnet18` | 50 |
+| Pretrained Pet (SD1) | `pet_resnet18_pretrained`, patch | 50 |
+| Watermark (SD4) | `pet_resnet18_pretrained`, watermark | 50 |
+
+Comparisons between ROAD and an existing metric use the existing metric's
+per-image scores on the same N images. The existing 100-image values are
+reported next to them.
+
+**Timing gate.** One Pet model is timed before the Pet-sized settings are
+scored (roadmap tasks T3.2 and T4.2). The timing runs take place after the
+Zenodo upload above. Only their wall time is read; their scores are not
+inspected and are recomputed in the scoring run. If one Pet model takes more
+than 15 minutes of ROAD scoring on Kaggle (or on hardware the author records
+as equivalent), N for `pet_resnet18`, SD1 and SD4 becomes 25 (the first 25
+of the same images). The measured time and the resulting N are recorded in a
+dated note under this amendment, committed before any ROAD score of those
+settings is produced. Otherwise N stays 50. N for the other settings does
+not change.
+
+**Models scored.** Every registered scored model: the 234 models of the
+original set and A1, the 23 SD2 and 18 SD1 confirmatory models of A2, and
+the 18 SD4 confirmatory models below. Pilot models are not scored with ROAD:
+the two A2 SD1 pilots and the two SD4 pilots. A model that has not been
+trained when ROAD is scored is scored later with the same code, and the
+report states which models are included.
+
+**Rules.** Preference, ties (AUC difference within 1e-4 counts as half),
+over-detection rate with Clopper–Pearson intervals, the margin FPR, the r_c
+bands, the switch rules and the bootstrap are those already used for the
+four existing metrics (`dose_response.py`, `xai/dose_analysis.py`), with
+`road_morf` and `road_lerf` added as two more metrics. ROAD is reported in
+new files and tables only. The existing metrics, their outputs and the
+`original` and `pre_a2` model sets stay unchanged.
+
+### SD4: content-coded watermark on the pretrained Pet network
+
+New shortcut type `watermark`, used only with `pet_resnet18_pretrained`.
+Network, ImageNet weights, optimiser, learning rate, 15 epochs, data,
+128×128 resolution, splits, fills, metrics and controls are those of SD1.
+Model names follow `model_name()`, for example
+`pet_resnet18_pretrained_watermark_dose+000_seed7`.
+
+**Marks.** Two white, semi-transparent marks, one per class, in a 24 px wide
+× 12 px high box in the bottom-right corner, flush with the image edges
+(rows 116–127, columns 104–127 of the 128×128 image). Box coordinates below
+are row, column from the box's top-left pixel.
+
+- **Cat mark:** the outline of the box, 2 px thick (rows 0–1 and 10–11, and
+  columns 0–1 and 22–23): 128 stroke pixels.
+- **Dog mark:** two horizontal bars, rows 3–4 and rows 7–8, columns 2–21:
+  80 stroke pixels.
+
+The two stroke masks share no pixel. They are drawn from these coordinates
+in code, with no font, and the two masks are saved with the code before the
+pilot. On a stroke pixel the image becomes (1 − α) × pixel + α × 1 in every
+channel, with opacity **α = 0.4**. Pixels off the stroke are not changed.
+
+**Training doses.** Exactly as for the patch: a negative dose d gives that
+share of training images the other class's mark (`shortcut_noise` = −d); a
+positive dose swaps that share of training images for an image of the other
+class while keeping the label and mark (`swap_fraction` = d).
+
+**Reliance and behaviour.** The conflicting test image carries the other
+class's mark. Reliance is the share of conflicting test images on which the
+model predicts the mark's class, and r_c is the chance-corrected reliance
+used for every setting. The primary behavioural label is
+`follows_shortcut_causal`, as in A2: the model follows the swapped-in mark on
+the conflicting image, with undetermined images dropped. The check labels
+`follows_shortcut` and `shortcut_dominant` and the undetermined share are
+reported next to it.
+
+**Oracle and control maps** (aligned test images, as for the patch):
+
+- Shortcut oracle: the stroke mask of the shown mark.
+- Object oracle: the pet mask with the stroke pixels of the shown mark
+  removed.
+- Size-matched object map: `compact_matched` with k = the number of stroke
+  pixels of the shown mark.
+- Placebo: the other class's stroke mask in the same box. These pixels are
+  unchanged on the shown image.
+- Random map: `random_map`, as for every setting.
+
+**Pilot (Kaggle GPU).** Seed 7, doses 0 and +0.25: 2 models. They are
+reported as pilots and excluded from every test. Only their reliance and
+accuracies are read before the final doses are recorded. No metric, oracle,
+method, control, behaviour or ROAD score is computed for them before the
+completion note is committed.
+
+**Rule: the SD4 doses are finalised after the pilot.**
+
+| Pilot r_c at dose 0 | Final SD4 doses |
+|---|---|
+| 60 or above | −0.5, −0.4, −0.3, −0.2, −0.1, 0 |
+| below 60 | −0.5, −0.2, 0, +0.1, +0.25, +0.4 |
+
+**Stopping rule.** If the +0.25 pilot has r_c below 20, the watermark is
+taken as not learned. SD4 then stops, no confirmatory SD4 model is trained,
+P12 and P13 are reported as "not testable", and SD4 is reported as a
+negative design result. The design can be changed only by a new dated
+amendment committed (and uploaded to Zenodo) before any confirmatory SD4
+model is trained.
+
+**Completion note.** After the pilot, the author records both pilots'
+reliance, accuracies, chance floor and r_c, and the final SD4 doses, in a
+dated completion note under this amendment, with the values copied from the
+pilot run's report file. The note is committed and uploaded as a new
+version of the Zenodo record before any confirmatory SD4 model is trained.
+The final doses follow the rule above unless the note gives a reason to
+deviate.
+
+**Confirmatory set.** The 6 final doses × seeds 42, 1, 2: 18 models. If
+fewer than two of them reach r_c above 50, predictions that need models
+above 50 are reported as "not testable", and SD4 is reported as a negative
+result. No doses or seeds are added except by a new dated amendment written
+before those models are trained.
+
+### Commitments
+
+- Every model and score listed above is reported and included in its
+  analyses, whatever its reliance or result. No model is dropped or re-run
+  with another seed after its result is seen. Pilots are reported
+  separately.
+- The only design choices left open are the SD4 doses (fixed by the rule
+  above) and N for the Pet-sized settings (fixed by the timing gate). Each is
+  recorded in a dated note before the models or scores it affects exist.
+- SD4 results are reported as a separate setting. They are not pooled with
+  SD1 or `pet_resnet18`.
+- Analyses with the A2 and A3 models are labelled clearly, and the
+  `original` and `pre_a2` analyses are reproduced unchanged.
