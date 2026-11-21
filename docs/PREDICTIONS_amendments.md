@@ -267,8 +267,12 @@ predictions for SD3 and SD4 (P10–P13) are in `docs/PREDICTIONS_sd3_sd4.md`,
 committed together with this amendment. Nothing in A1 or A2, and no
 prediction P1–P9, is changed by A3.
 
-**Third-party timestamp:** TODO (author): Zenodo version 3 DOI. This
-amendment and `docs/PREDICTIONS_sd3_sd4.md` are uploaded as a new version of
+**Third-party timestamp:** Zenodo version 3, DOI
+[10.5281/zenodo.24416017](https://doi.org/10.5281/zenodo.24416017), published
+2026-11-21 09:56 UTC (MD5 of this file as uploaded:
+382482ac2f7b87e251e78f420353de55, commit `6cef0e8`). No SD3 or SD4 model,
+score or timing run existed at upload time. This
+amendment and `docs/PREDICTIONS_sd3_sd4.md` were uploaded as a new version of
 the record [10.5281/zenodo.24285532](https://doi.org/10.5281/zenodo.24285532)
 (concept DOI [10.5281/zenodo.24285531](https://doi.org/10.5281/zenodo.24285531))
 before any SD3 or SD4 model or score is produced. This includes the SD3

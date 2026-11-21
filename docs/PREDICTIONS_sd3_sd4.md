@@ -9,8 +9,11 @@ existed. The design (ROAD operator, removal orders and grid, images, model
 sets, timing gate, watermark, doses, pilots and stopping rule) is amendment
 A3 in `docs/PREDICTIONS_amendments.md`.
 
-**Third-party timestamp:** TODO (author): Zenodo version 3 DOI. This file
-and `docs/PREDICTIONS_amendments.md` are uploaded together as a new version
+**Third-party timestamp:** Zenodo version 3, DOI
+[10.5281/zenodo.24416017](https://doi.org/10.5281/zenodo.24416017), published
+2026-11-21 09:56 UTC (MD5 of this file as uploaded:
+0ccbc01534200f30ca82e9076e1baec0, commit `6cef0e8`). This file
+and `docs/PREDICTIONS_amendments.md` were uploaded together as a new version
 of the record [10.5281/zenodo.24285532](https://doi.org/10.5281/zenodo.24285532)
 (concept DOI [10.5281/zenodo.24285531](https://doi.org/10.5281/zenodo.24285531))
 before any SD3 or SD4 model or score is produced.
