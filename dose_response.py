@@ -78,6 +78,17 @@ kaggle/dose_response_a2_session1.ipynb and _session2.ipynb)
     pooled with the confirmatory models); the final doses follow
     a2_dose_set() applied to the pilot's r_c at dose 0.
 
+Watermark shortcut (amendment A3 SD4, pet_resnet18_pretrained only; Kaggle GPU)
+    The SD1 network and settings with a class-coded semi-transparent mark
+    (alpha 0.4) in the bottom-right 24x12 corner box instead of the patch
+    (--shortcuts watermark; xai/data.py, xai/watermark_masks.npy). Pilot:
+    doses 0 and +0.25, seed 7 (model set "A3_pilot", never pooled, not
+    scored). The final doses follow a3_dose_set() applied to the dose-0
+    pilot's r_c; SD4 stops if the +0.25 pilot's r_c is below 20
+    (a3_sd4_stopped). Confirmatory models (6 doses x seeds 42, 1, 2, model
+    set "A3") are registered only once the dated completion note sets
+    A3_SD4_RULE.
+
 Output
     checkpoint/dose/<base>_<shortcut>_dose<+NNN>_seed<N>.pt (+ _metrics.json)
     results/dose_response/scores_oracle.csv, scores_methods.csv  per-image scores
@@ -129,7 +140,7 @@ from torch.utils.data import DataLoader
 
 from train_models import accuracy, predict_all
 from utils import random_seed
-from xai.data import SHORTCUT_TYPES, info, num_classes, shortcut_split
+from xai.data import A3_SHORTCUT_TYPES, SHORTCUT_TYPES, WATERMARK_BASES, info, num_classes, shortcut_split
 from xai.explain import METHODS, explain
 from xai.metrics import (BLUR_KERNEL, BLUR_SIGMA, FAITHFULNESS_METRICS, INPAINT_ITERATIONS, ROAD_METRICS,
                          _ranking, area_under_curve, perturbation_curve, relevance_mass_accuracy)
@@ -724,6 +735,36 @@ A2_DESIGN = {"cifar10_resnet18": (("patch",), A2_CIFAR_DOSE_SETS["below 50"], (4
              "pet_resnet18_pretrained": (("patch",), A2_SD1_DOSE_SETS["below 60"], (42, 1, 2))}
 A2_PILOT_DESIGN = {"pet_resnet18_pretrained": (("patch",), [0.0, -0.5], (7,))}
 
+# Amendment A3, SD4 (docs/PREDICTIONS_amendments.md): watermark on
+# pet_resnet18_pretrained. Dose rule keyed by the dose-0 pilot's r_c (%), and
+# the stopping rule on the +0.25 pilot's r_c.
+A3_SD4_DOSE_SETS = {"60 or above": [-0.5, -0.4, -0.3, -0.2, -0.1, 0.0],
+                    "below 60": [-0.5, -0.2, 0.0, 0.1, 0.25, 0.4]}
+A3_STOP_RC = 20
+A3_PILOT_DESIGN = {"pet_resnet18_pretrained": (("watermark",), [0.0, 0.25], (7,))}
+# Set to the A3_SD4_DOSE_SETS key by the dated SD4 completion note (roadmap
+# T4.3). Stays None if SD4 stops; until then no confirmatory SD4 model is
+# registered.
+A3_SD4_RULE = None
+
+
+def a3_dose_set(pilot_rc):
+    """Final SD4 doses given the dose-0 pilot's r_c (%): "60 or above" includes 60."""
+    return list(A3_SD4_DOSE_SETS["60 or above" if pilot_rc >= 60 else "below 60"])
+
+
+def a3_sd4_stopped(rc):
+    """A3 stopping rule: SD4 stops if the +0.25 pilot's r_c (%) is below 20."""
+    return rc < A3_STOP_RC
+
+
+def a3_design():
+    """The confirmatory SD4 design (6 doses x seeds 42, 1, 2), or {} while
+    A3_SD4_RULE is None."""
+    if A3_SD4_RULE is None:
+        return {}
+    return {"pet_resnet18_pretrained": (("watermark",), A3_SD4_DOSE_SETS[A3_SD4_RULE], (42, 1, 2))}
+
 
 def _in_design(design, base, shortcut, dose, seed):
     if base not in design:
@@ -733,12 +774,20 @@ def _in_design(design, base, shortcut, dose, seed):
 
 
 def model_set_of(row):
-    """'A2_pilot' for the SD1 pilot models (pet_resnet18_pretrained, doses 0 and
-    -0.5, seed 7), 'A2' for the models added by amendment A2 at the final doses
-    of its completion notes (A2_DESIGN), 'A1' for a model added by amendment A1,
-    'original' for the designs before A1 (ORIGINAL_DESIGN), and 'unregistered'
-    for anything else (e.g. Pet dose -0.05, which needs a new amendment)."""
+    """'A3_pilot' for the SD4 watermark pilots (pet_resnet18_pretrained, doses 0
+    and +0.25, seed 7), 'A3' for the confirmatory SD4 models once the completion
+    note sets A3_SD4_RULE (a3_design), 'A2_pilot' for the SD1 pilot models
+    (pet_resnet18_pretrained, doses 0 and -0.5, seed 7), 'A2' for the models
+    added by amendment A2 at the final doses of its completion notes
+    (A2_DESIGN), 'A1' for a model added by amendment A1, 'original' for the
+    designs before A1 (ORIGINAL_DESIGN), and 'unregistered' for anything else
+    (e.g. Pet dose -0.05, which needs a new amendment). The A3 sets hold
+    watermark models only, so patch models keep their sets."""
     base, shortcut, dose, seed = row["base"], row["shortcut"], float(row["dose"]), int(row["seed"])
+    if _in_design(A3_PILOT_DESIGN, base, shortcut, dose, seed):
+        return "A3_pilot"
+    if _in_design(a3_design(), base, shortcut, dose, seed):
+        return "A3"
     if _in_design(A2_PILOT_DESIGN, base, shortcut, dose, seed):
         return "A2_pilot"
     if _in_design(A2_DESIGN, base, shortcut, dose, seed):
@@ -757,12 +806,12 @@ def model_set_of(row):
 
 def in_model_set(run, model_set):
     """Whether a model (metrics JSON or models.csv row) belongs to a model set:
-    'all' = every registered model except the SD1 pilots, 'pre_a2' = original +
-    A1 (the 234 models before amendment A2), otherwise the exact model_set_of
-    value. Unregistered models belong to no set."""
+    'all' = every registered model except the SD1 and SD4 pilots, 'pre_a2' =
+    original + A1 (the 234 models before amendment A2), otherwise the exact
+    model_set_of value. Unregistered models belong to no set."""
     kind = model_set_of(run)
     if model_set == "all":
-        return kind not in ("A2_pilot", "unregistered")
+        return kind not in ("A2_pilot", "A3_pilot", "unregistered")
     if model_set == "pre_a2":
         return kind in ("original", "A1")
     return kind == model_set
@@ -1558,6 +1607,7 @@ def analyze(args=None):
         pooled = [m and n in scored for m, n in zip(member, names)]
         not_pooled = models[[not p and s != "unregistered" for p, s in zip(pooled, models.model_set)]]
         not_pooled = not_pooled.assign(status=["SD1 pilot (never pooled)" if s == "A2_pilot"
+                                               else "SD4 pilot (never pooled)" if s == "A3_pilot"
                                                else "not scored yet" for s in not_pooled.model_set])
         keep = {n for n, p in zip(names, pooled) if p}
         if scored - keep:  # scored but unregistered (or a scored SD1 pilot): drop its scores
@@ -1639,11 +1689,17 @@ def analyze(args=None):
     if not_pooled is not None and len(not_pooled):
         columns = keys + ["model_set", "status", "reliance", "test_accuracy", "test_accuracy_no_shortcut",
                           "chance_floor", "reliance_corrected", "training_minutes"]
-        text += "\n\n" + "\n".join([
-            "## Amendment A2 models not pooled (pilots.csv)", "",
-            "SD1 pilots are never pooled. A2 models without score files (the CIFAR-10 ResNet-18 pilot until "
-            "session 2) are not pooled until they are scored. Neither kind is in models.csv or any table above.",
-            "", markdown(not_pooled[columns].round(2)), ""])
+        if (not_pooled.model_set == "A3_pilot").any():  # SD4 pilots present (amendment A3)
+            heading = "## Amendment A2 and A3 models not pooled (pilots.csv)"
+            sentence = ("SD1 and SD4 pilots are never pooled. Models without score files (the CIFAR-10 ResNet-18 "
+                        "pilot until session 2, confirmatory models before scoring) are not pooled until they are "
+                        "scored. None of these is in models.csv or any table above.")
+        else:
+            heading = "## Amendment A2 models not pooled (pilots.csv)"
+            sentence = ("SD1 pilots are never pooled. A2 models without score files (the CIFAR-10 ResNet-18 pilot "
+                        "until session 2) are not pooled until they are scored. Neither kind is in models.csv or "
+                        "any table above.")
+        text += "\n\n" + "\n".join([heading, "", sentence, "", markdown(not_pooled[columns].round(2)), ""])
     if model_set == "all":  # SD3: appended last, only once ROAD scores exist
         road_lines = road_analysis(oracle, models, reps, out)
         if road_lines:
@@ -1668,7 +1724,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("step", choices=["train", "evaluate", "placebo", "behaviour", "analyze", "all", "road"])
     parser.add_argument("--bases", nargs="+", default=DEFAULT_BASES, choices=list(BASES))
-    parser.add_argument("--shortcuts", nargs="+", default=list(SHORTCUT_TYPES), choices=list(SHORTCUT_TYPES))
+    parser.add_argument("--shortcuts", nargs="+", default=list(SHORTCUT_TYPES),
+                        choices=list(SHORTCUT_TYPES) + list(A3_SHORTCUT_TYPES))
     parser.add_argument("--doses", nargs="+", type=float, default=DOSES)
     parser.add_argument("--seeds", nargs="+", type=int, default=SEEDS)
     parser.add_argument("--samples", type=int, default=100, help="test images per model")
@@ -1689,6 +1746,11 @@ def main():
     args = parser.parse_args()
     for base in args.bases:
         info(base)  # validates the name
+    if "watermark" in args.shortcuts:
+        other = [b for b in args.bases if b not in WATERMARK_BASES]
+        if other:
+            parser.error(f"--shortcuts watermark is used only with --bases {' '.join(WATERMARK_BASES)} "
+                         f"(amendment A3), not {' '.join(other)}")
     keep_awake()
     if args.step in ("train", "all"):
         train(args)
