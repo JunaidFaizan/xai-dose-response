@@ -1,7 +1,7 @@
 base,shortcut,label,models,median_minority_count,median_within_class_minority_count,median_hanley_mcneil_se,models_with_both_labels
-cifar10,patch,follows_shortcut_causal,12,6.5,1.0,0.09682458365518543,11
-cifar10,patch,follows_shortcut,12,8.5,1.0,0.11119527475884718,12
-cifar10,patch,shortcut_dominant,12,6.5,1.0,0.1179327101745839,12
+cifar10,patch,follows_shortcut_causal,20,19.0,1.0,0.07132674875181882,19
+cifar10,patch,follows_shortcut,20,19.5,1.0,0.07363402554689982,20
+cifar10,patch,shortcut_dominant,20,11.0,1.0,0.09272113046878949,20
 cifar10_resnet18,patch,follows_shortcut_causal,30,13.5,1.0,0.08391204399010299,29
 cifar10_resnet18,patch,follows_shortcut,30,14.0,1.0,0.08360972989100848,30
 cifar10_resnet18,patch,shortcut_dominant,30,11.0,1.0,0.09272113046878949,30

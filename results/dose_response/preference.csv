@@ -9,6 +9,14 @@ cifar10,patch,-0.25,1,0.96,0.0,0.83,0.0,0.755,0.01,0.6,0.0,23.18,shortcut vs ful
 cifar10,patch,-0.25,42,0.96,0.0,0.88,0.0,0.74,0.0,0.515,0.01,22.55,shortcut vs full object,20.0016
 cifar10,patch,-0.1,1,0.97,0.0,0.89,0.0,0.88,0.0,0.81,0.0,45.07,shortcut vs full object,42.6817
 cifar10,patch,-0.1,42,0.88,0.0,0.94,0.0,0.93,0.0,0.9,0.0,43.4,shortcut vs full object,41.0744
+cifar10,patch,-0.05,1,0.91,0.0,0.89,0.0,0.86,0.0,0.69,0.0,53.16,shortcut vs full object,50.9123
+cifar10,patch,-0.05,42,0.94,0.0,0.895,0.01,0.94,0.0,0.87,0.0,57.05,shortcut vs full object,54.8697
+cifar10,patch,-0.03,1,0.99,0.0,0.94,0.0,0.9,0.0,0.85,0.0,70.83,shortcut vs full object,69.3288
+cifar10,patch,-0.03,42,0.97,0.0,0.98,0.0,0.95,0.0,0.91,0.0,75.08,shortcut vs full object,73.7482
+cifar10,patch,-0.02,1,0.96,0.0,0.98,0.0,0.92,0.0,0.79,0.0,73.06,shortcut vs full object,71.6149
+cifar10,patch,-0.02,42,0.94,0.0,0.97,0.0,0.97,0.0,0.97,0.0,77.2,shortcut vs full object,75.8909
+cifar10,patch,-0.01,1,0.99,0.0,0.97,0.0,0.97,0.0,1.0,0.0,84.34,shortcut vs full object,83.3314
+cifar10,patch,-0.01,42,0.98,0.0,0.98,0.0,0.98,0.0,1.0,0.0,94.78,shortcut vs full object,94.3923
 cifar10,patch,0.0,1,0.99,0.0,0.98,0.0,1.0,0.0,0.99,0.0,96.62,shortcut vs full object,96.3297
 cifar10,patch,0.0,42,0.99,0.0,0.97,0.0,0.97,0.0,0.98,0.0,96.29,shortcut vs full object,95.9789
 cifar10_resnet18,patch,-0.8,1,0.65,0.0,0.56,0.0,0.15,0.0,0.3,0.0,3.31,shortcut vs full object,1.2427
@@ -276,6 +284,14 @@ cifar10,patch,-0.25,1,0.93,0.0,0.98,0.0,0.96,0.0,0.9,0.0,23.18,shortcut vs size-
 cifar10,patch,-0.25,42,0.86,0.0,0.89,0.0,0.97,0.0,0.89,0.0,22.55,shortcut vs size-matched object,20.0016
 cifar10,patch,-0.1,1,0.95,0.0,0.95,0.0,0.98,0.0,0.95,0.0,45.07,shortcut vs size-matched object,42.6817
 cifar10,patch,-0.1,42,0.95,0.0,0.99,0.0,0.98,0.0,0.99,0.0,43.4,shortcut vs size-matched object,41.0744
+cifar10,patch,-0.05,1,0.845,0.01,0.95,0.0,0.97,0.0,0.87,0.0,53.16,shortcut vs size-matched object,50.9123
+cifar10,patch,-0.05,42,0.96,0.0,0.97,0.0,0.97,0.0,0.96,0.0,57.05,shortcut vs size-matched object,54.8697
+cifar10,patch,-0.03,1,0.895,0.01,0.95,0.0,0.92,0.0,0.99,0.0,70.83,shortcut vs size-matched object,69.3288
+cifar10,patch,-0.03,42,0.89,0.0,0.98,0.0,0.98,0.0,1.0,0.0,75.08,shortcut vs size-matched object,73.7482
+cifar10,patch,-0.02,1,0.855,0.01,0.98,0.0,0.93,0.0,0.97,0.0,73.06,shortcut vs size-matched object,71.6149
+cifar10,patch,-0.02,42,0.95,0.0,0.99,0.0,0.99,0.0,1.0,0.0,77.2,shortcut vs size-matched object,75.8909
+cifar10,patch,-0.01,1,0.95,0.0,0.98,0.0,0.96,0.0,0.99,0.0,84.34,shortcut vs size-matched object,83.3314
+cifar10,patch,-0.01,42,0.96,0.0,0.98,0.0,0.99,0.0,0.99,0.0,94.78,shortcut vs size-matched object,94.3923
 cifar10,patch,0.0,1,0.97,0.0,0.97,0.0,0.96,0.0,0.915,0.17,96.62,shortcut vs size-matched object,96.3297
 cifar10,patch,0.0,42,0.95,0.0,0.97,0.0,0.99,0.0,0.885,0.21,96.29,shortcut vs size-matched object,95.9789
 cifar10_resnet18,patch,-0.8,1,0.525,0.03,0.545,0.01,0.655,0.01,0.47,0.02,3.31,shortcut vs size-matched object,1.2427
@@ -543,6 +559,14 @@ cifar10,patch,-0.25,1,0.79,0.0,0.725,0.01,0.515,0.01,0.44,0.0,23.18,placebo vs f
 cifar10,patch,-0.25,42,0.96,0.0,0.84,0.0,0.39,0.0,0.3,0.0,22.55,placebo vs full object,20.0016
 cifar10,patch,-0.1,1,0.93,0.0,0.86,0.0,0.64,0.0,0.6,0.0,45.07,placebo vs full object,42.6817
 cifar10,patch,-0.1,42,0.8,0.0,0.82,0.0,0.65,0.0,0.65,0.0,43.4,placebo vs full object,41.0744
+cifar10,patch,-0.05,1,0.92,0.0,0.86,0.0,0.6,0.0,0.51,0.0,53.16,placebo vs full object,50.9123
+cifar10,patch,-0.05,42,0.89,0.0,0.84,0.0,0.72,0.0,0.76,0.0,57.05,placebo vs full object,54.8697
+cifar10,patch,-0.03,1,0.975,0.01,0.94,0.0,0.78,0.0,0.72,0.0,70.83,placebo vs full object,69.3288
+cifar10,patch,-0.03,42,0.955,0.01,0.94,0.0,0.81,0.0,0.72,0.0,75.08,placebo vs full object,73.7482
+cifar10,patch,-0.02,1,0.94,0.0,0.93,0.0,0.76,0.0,0.6,0.0,73.06,placebo vs full object,71.6149
+cifar10,patch,-0.02,42,0.91,0.0,0.85,0.0,0.89,0.0,0.87,0.0,77.2,placebo vs full object,75.8909
+cifar10,patch,-0.01,1,0.94,0.0,0.97,0.0,0.93,0.0,0.8,0.0,84.34,placebo vs full object,83.3314
+cifar10,patch,-0.01,42,0.98,0.0,0.98,0.0,0.96,0.0,0.97,0.0,94.78,placebo vs full object,94.3923
 cifar10,patch,0.0,1,0.955,0.03,0.935,0.09,0.93,0.08,0.96,0.0,96.62,placebo vs full object,96.3297
 cifar10,patch,0.0,42,0.94,0.08,0.925,0.11,0.95,0.02,0.95,0.0,96.29,placebo vs full object,95.9789
 cifar10_resnet18,patch,-0.8,1,0.68,0.0,0.55,0.0,0.105,0.01,0.22,0.0,3.31,placebo vs full object,1.2427
@@ -810,6 +834,14 @@ cifar10,patch,-0.25,1,0.98,0.0,0.94,0.0,0.97,0.0,0.9,0.0,23.18,shortcut vs place
 cifar10,patch,-0.25,42,0.83,0.0,0.89,0.0,0.97,0.0,0.9,0.0,22.55,shortcut vs placebo,20.0016
 cifar10,patch,-0.1,1,0.98,0.0,0.94,0.0,0.95,0.0,0.97,0.0,45.07,shortcut vs placebo,42.6817
 cifar10,patch,-0.1,42,0.96,0.0,0.97,0.0,0.97,0.0,0.99,0.0,43.4,shortcut vs placebo,41.0744
+cifar10,patch,-0.05,1,0.82,0.0,0.98,0.0,0.98,0.0,0.92,0.0,53.16,shortcut vs placebo,50.9123
+cifar10,patch,-0.05,42,0.96,0.0,0.97,0.0,0.99,0.0,0.94,0.0,57.05,shortcut vs placebo,54.8697
+cifar10,patch,-0.03,1,0.94,0.0,0.92,0.0,0.98,0.0,0.98,0.0,70.83,shortcut vs placebo,69.3288
+cifar10,patch,-0.03,42,0.91,0.0,0.965,0.01,0.98,0.0,0.98,0.0,75.08,shortcut vs placebo,73.7482
+cifar10,patch,-0.02,1,0.95,0.0,0.95,0.0,0.94,0.0,0.95,0.0,73.06,shortcut vs placebo,71.6149
+cifar10,patch,-0.02,42,0.93,0.0,0.98,0.0,0.97,0.0,1.0,0.0,77.2,shortcut vs placebo,75.8909
+cifar10,patch,-0.01,1,0.96,0.0,0.97,0.0,0.98,0.0,1.0,0.0,84.34,shortcut vs placebo,83.3314
+cifar10,patch,-0.01,42,0.96,0.0,0.97,0.0,0.98,0.0,1.0,0.0,94.78,shortcut vs placebo,94.3923
 cifar10,patch,0.0,1,0.97,0.0,0.97,0.0,0.98,0.0,0.945,0.11,96.62,shortcut vs placebo,96.3297
 cifar10,patch,0.0,42,0.94,0.0,0.96,0.0,0.99,0.0,0.945,0.09,96.29,shortcut vs placebo,95.9789
 cifar10_resnet18,patch,-0.8,1,0.555,0.03,0.505,0.01,0.635,0.01,0.62,0.02,3.31,shortcut vs placebo,1.2427
@@ -1077,6 +1109,14 @@ cifar10,patch,-0.25,1,0.83,0.0,0.75,0.0,0.52,0.0,0.46,0.0,23.18,random vs full o
 cifar10,patch,-0.25,42,0.96,0.0,0.87,0.0,0.43,0.0,0.37,0.0,22.55,random vs full object,20.0016
 cifar10,patch,-0.1,1,0.93,0.0,0.83,0.0,0.67,0.0,0.65,0.0,45.07,random vs full object,42.6817
 cifar10,patch,-0.1,42,0.78,0.0,0.79,0.0,0.74,0.0,0.68,0.0,43.4,random vs full object,41.0744
+cifar10,patch,-0.05,1,0.91,0.0,0.87,0.0,0.64,0.0,0.55,0.0,53.16,random vs full object,50.9123
+cifar10,patch,-0.05,42,0.86,0.0,0.84,0.0,0.74,0.0,0.76,0.0,57.05,random vs full object,54.8697
+cifar10,patch,-0.03,1,0.955,0.01,0.89,0.0,0.78,0.0,0.73,0.0,70.83,random vs full object,69.3288
+cifar10,patch,-0.03,42,0.94,0.0,0.95,0.0,0.8,0.0,0.75,0.0,75.08,random vs full object,73.7482
+cifar10,patch,-0.02,1,0.95,0.0,0.9,0.0,0.76,0.0,0.6,0.0,73.06,random vs full object,71.6149
+cifar10,patch,-0.02,42,0.89,0.0,0.84,0.0,0.87,0.0,0.85,0.0,77.2,random vs full object,75.8909
+cifar10,patch,-0.01,1,0.97,0.0,0.98,0.0,0.92,0.0,0.85,0.0,84.34,random vs full object,83.3314
+cifar10,patch,-0.01,42,0.98,0.0,0.98,0.0,0.95,0.0,0.94,0.0,94.78,random vs full object,94.3923
 cifar10,patch,0.0,1,0.955,0.03,0.92,0.12,0.95,0.06,0.96,0.0,96.62,random vs full object,96.3297
 cifar10,patch,0.0,42,0.965,0.03,0.905,0.13,0.96,0.02,0.97,0.0,96.29,random vs full object,95.9789
 cifar10_resnet18,patch,-0.8,1,0.63,0.0,0.49,0.0,0.11,0.02,0.22,0.0,3.31,random vs full object,1.2427
@@ -1344,6 +1384,14 @@ cifar10,patch,-0.25,1,0.44,0.0,0.54,0.0,0.42,0.0,0.48,0.0,23.18,placebo vs rando
 cifar10,patch,-0.25,42,0.43,0.0,0.505,0.01,0.485,0.01,0.42,0.0,22.55,placebo vs random,20.0016
 cifar10,patch,-0.1,1,0.51,0.0,0.47,0.0,0.43,0.0,0.35,0.0,45.07,placebo vs random,42.6817
 cifar10,patch,-0.1,42,0.49,0.0,0.56,0.0,0.46,0.0,0.47,0.0,43.4,placebo vs random,41.0744
+cifar10,patch,-0.05,1,0.415,0.03,0.52,0.0,0.47,0.0,0.42,0.0,53.16,placebo vs random,50.9123
+cifar10,patch,-0.05,42,0.47,0.0,0.44,0.0,0.425,0.01,0.51,0.0,57.05,placebo vs random,54.8697
+cifar10,patch,-0.03,1,0.45,0.0,0.51,0.0,0.46,0.0,0.42,0.0,70.83,placebo vs random,69.3288
+cifar10,patch,-0.03,42,0.35,0.0,0.47,0.0,0.51,0.0,0.49,0.0,75.08,placebo vs random,73.7482
+cifar10,patch,-0.02,1,0.46,0.0,0.495,0.01,0.47,0.0,0.45,0.0,73.06,placebo vs random,71.6149
+cifar10,patch,-0.02,42,0.33,0.0,0.53,0.0,0.48,0.0,0.47,0.0,77.2,placebo vs random,75.8909
+cifar10,patch,-0.01,1,0.4,0.0,0.52,0.0,0.5,0.0,0.48,0.0,84.34,placebo vs random,83.3314
+cifar10,patch,-0.01,42,0.43,0.0,0.47,0.0,0.49,0.0,0.5,0.0,94.78,placebo vs random,94.3923
 cifar10,patch,0.0,1,0.505,0.01,0.485,0.05,0.5,0.04,0.345,0.07,96.62,placebo vs random,96.3297
 cifar10,patch,0.0,42,0.455,0.01,0.44,0.04,0.545,0.01,0.45,0.02,96.29,placebo vs random,95.9789
 cifar10_resnet18,patch,-0.8,1,0.53,0.06,0.53,0.02,0.555,0.01,0.505,0.01,3.31,placebo vs random,1.2427
@@ -1611,6 +1659,14 @@ cifar10,patch,-0.25,1,0.94,0.0,0.98,0.0,0.95,0.0,0.87,0.0,23.18,shortcut vs rand
 cifar10,patch,-0.25,42,0.85,0.0,0.93,0.0,0.96,0.0,0.88,0.0,22.55,shortcut vs random,20.0016
 cifar10,patch,-0.1,1,0.94,0.0,0.945,0.01,0.97,0.0,0.94,0.0,45.07,shortcut vs random,42.6817
 cifar10,patch,-0.1,42,0.97,0.0,0.99,0.0,0.97,0.0,0.96,0.0,43.4,shortcut vs random,41.0744
+cifar10,patch,-0.05,1,0.835,0.01,0.93,0.0,0.96,0.0,0.91,0.0,53.16,shortcut vs random,50.9123
+cifar10,patch,-0.05,42,0.96,0.0,0.93,0.0,0.97,0.0,0.96,0.0,57.05,shortcut vs random,54.8697
+cifar10,patch,-0.03,1,0.925,0.01,0.94,0.0,0.97,0.0,0.98,0.0,70.83,shortcut vs random,69.3288
+cifar10,patch,-0.03,42,0.87,0.02,0.96,0.0,0.99,0.0,0.955,0.01,75.08,shortcut vs random,73.7482
+cifar10,patch,-0.02,1,0.91,0.0,0.97,0.0,0.95,0.0,0.945,0.01,73.06,shortcut vs random,71.6149
+cifar10,patch,-0.02,42,0.95,0.0,1.0,0.0,0.99,0.0,0.98,0.0,77.2,shortcut vs random,75.8909
+cifar10,patch,-0.01,1,0.955,0.01,0.96,0.0,0.97,0.0,0.965,0.01,84.34,shortcut vs random,83.3314
+cifar10,patch,-0.01,42,0.96,0.0,0.97,0.0,0.99,0.0,0.99,0.0,94.78,shortcut vs random,94.3923
 cifar10,patch,0.0,1,0.95,0.02,0.99,0.0,0.98,0.0,0.91,0.18,96.62,shortcut vs random,96.3297
 cifar10,patch,0.0,42,0.96,0.0,0.96,0.0,1.0,0.0,0.9,0.18,96.29,shortcut vs random,95.9789
 cifar10_resnet18,patch,-0.8,1,0.53,0.06,0.53,0.0,0.64,0.0,0.58,0.02,3.31,shortcut vs random,1.2427

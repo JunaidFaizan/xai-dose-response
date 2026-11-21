@@ -1,0 +1,15 @@
+{
+  "base": "cifar10",
+  "shortcut": "patch",
+  "dose": -0.02,
+  "swap_fraction": 0.0,
+  "shortcut_noise": 0.02,
+  "seed": 42,
+  "epochs": 10,
+  "best_val_accuracy": 97.44,
+  "test_accuracy": 99.21,
+  "test_accuracy_no_shortcut": 51.13,
+  "test_accuracy_conflicting": 14.02,
+  "reliance": 77.2,
+  "training_minutes": 21.55
+}

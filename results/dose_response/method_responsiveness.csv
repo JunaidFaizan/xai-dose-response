@@ -1,9 +1,9 @@
 base,shortcut,method,responsiveness_rho,p_value,mass_low_reliance,mass_high_reliance
-cifar10,patch,Grad-CAM,0.741,0.006,0.012,0.08
-cifar10,patch,Integrated Gradients,0.986,0.0,0.013,0.32
-cifar10,patch,Occlusion,0.993,0.0,0.008,0.467
-cifar10,patch,Saliency,0.972,0.0,0.003,0.115
-cifar10,patch,SmoothGrad,0.972,0.0,0.004,0.103
+cifar10,patch,Grad-CAM,0.585,0.007,0.012,0.08
+cifar10,patch,Integrated Gradients,0.976,0.0,0.013,0.32
+cifar10,patch,Occlusion,0.97,0.0,0.008,0.467
+cifar10,patch,Saliency,0.988,0.0,0.003,0.115
+cifar10,patch,SmoothGrad,0.988,0.0,0.004,0.103
 cifar10_resnet18,patch,Grad-CAM,0.466,0.009,0.012,0.022
 cifar10_resnet18,patch,Integrated Gradients,0.889,0.0,0.017,0.084
 cifar10_resnet18,patch,Occlusion,0.792,0.0,0.005,0.338
