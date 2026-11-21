@@ -18,6 +18,8 @@
               inspired by ROAD (Rong et al., 2022), which showed that the
               shape of the removed region can leak class information (this is
               not the official ROAD noisy linear imputation)
+   Exact ROAD (amendment A3, SD3) is in xai/road.py, scored only by
+   `dose_response.py road`; its two metrics are listed in ROAD_METRICS.
 
 2. Sanity check: cascading model randomization (Adebayo et al., 2018)
    Layers are re-initialised from the output layer down. An explanation that
@@ -49,6 +51,12 @@ FAITHFULNESS_METRICS = {
     "deletion_blur": ("Deletion (blur)", "deletion", "blur", False),
     "deletion_inpaint": ("Deletion (inpaint)", "deletion", "inpaint", False),
     "insertion_blur": ("Insertion (blur)", "insertion", "blur", True),
+}
+# Exact ROAD (xai/road.py), kept apart so the existing scoring is unchanged.
+# name: (title, higher_is_better)
+ROAD_METRICS = {
+    "road_morf": ("ROAD (MoRF)", False),
+    "road_lerf": ("ROAD (LeRF)", True),
 }
 
 # sigma 4 was chosen so a fully blurred image gives near-chance confidence
