@@ -113,7 +113,7 @@ Pre-registered in `docs/PREDICTIONS_amendments.md` (A2) with the predictions P5�
    .\.venv\Scripts\python.exe -W ignore dose_response.py analyze --model-set pre_a2
    ```
 
-   `behaviour` does nothing for the Kaggle-scored models (their behaviour files are in the zip). `analyze` includes the 3 Pet −0.15 models; the pilots have no scores and are not pooled. `--model-set pre_a2` writes the 234 models from before A2 to `results\dose_response\pre_a2_models\`.
+   `behaviour` does nothing for the Kaggle-scored models (their behaviour files are in the zip). `analyze` includes the 3 Pet −0.15 models; the pilots have no scores and are not pooled; `analyze` lists them in `results\dose_response\pilots.csv` and in a separate section of `summary.md`. `--model-set pre_a2` writes the 234 models from before A2 to `results\dose_response\pre_a2_models\`.
 10. Read `a2_pilot_report.json` (unzipped into the project folder): reliance, accuracies, r_c and the A2 dose set for the CIFAR pilot and the SD1 pilot at dose 0. Write the two dated A2 completion notes in `docs/PREDICTIONS_amendments.md` (CIFAR pilot r_c → dose set; SD1 pilot r_c → dose set), add them to the timestamped record, and commit them **before session 2**.
 
 Dose −0.05 on Pet is **not** part of A2. Adding it needs a new dated amendment before it is trained. `analyze` labels any model outside the registered designs `unregistered`, prints a warning and leaves it out of every model set.
@@ -135,7 +135,7 @@ Run only after the two completion notes are committed (done: A2-C1 and A2-C2) **
 3. **+ Add Input → Your Datasets** → `xai-a2-bundle` (latest version).
 4. **+ Add Input → Your Work → Notebooks** → the session-1 notebook (the committed version whose Output holds `a2_session1_results.zip`). Cell 2 unpacks it (or copies the files if Kaggle shows them unpacked) and stops with an error if `cifar10_resnet18_patch_dose-005_seed42.pt` or its metrics JSON is missing. The pilot is one of the 12 CIFAR models: `train` skips it because its metrics JSON exists, and it is scored in this session.
 5. The parameters cell is pre-filled from the notes: `CIFAR_DOSES = [-0.05, -0.03, -0.02, -0.01]`, `SD1_DOSES = [-0.5, -0.2, 0, 0.1, 0.25, 0.4]`, `SEEDS = [42, 1, 2]` (seed 7 is refused). Don't change them.
-6. **Settings → Accelerator → GPU T4 x2**, **Settings → Internet → On**, then run cells 1–3 once to check: cell 2 prints "CIFAR pilot found: it is reused, not retrained"; cell 3 prints a GPU name, "Pet and CIFAR-10 data found" and "ImageNet ResNet-18 weights ready".
+6. **Settings → Accelerator → GPU T4 x2**, **Settings → Internet → On**, then run the first three code cells once to check: the Parameters cell, cell 1 (Copy) and cell 2 (Install). The Copy cell prints "CIFAR pilot found: it is reused, not retrained"; the Install cell prints a GPU name, "Pet and CIFAR-10 data found" and "ImageNet ResNet-18 weights ready".
 7. **Save Version → Save & Run All (Commit) → Save**. It trains 11 CIFAR-10 ResNet-18 models and 18 SD1 models, and scores all 30 (metrics, oracle maps, controls, behaviour labels).
 8. When it finishes, download `a2_session2_results.zip` from **Output**, unzip it into the project folder and re-run the analyses:
 

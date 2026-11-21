@@ -32,7 +32,7 @@ A chapter-by-chapter plan for the M.Tech report (about 55–65 pages). The thesi
   2. Measure reliance on conflicting images and correct it for chance
   3. Score fixed oracle maps (shortcut, object, size-matched, placebo, random) with four deletion/insertion metrics
   4. Label each scored image by forward passes (does the model follow the shortcut here?) and test the metrics against these labels
-  5. Repeat on Oxford-IIIT Pet (real masks, pre-registered), CIFAR-10 (two networks), MNIST and PneumoniaMNIST; 237 models
+  5. Repeat on Oxford-IIIT Pet (real masks, pre-registered), CIFAR-10 (two networks), MNIST and PneumoniaMNIST; 275 models (including the separate pre-registered ImageNet-pretrained Pet setting SD1, 18 models)
   6. Run five explanation methods on every model; supporting sanity-check study; interactive dashboard
 - Contributions (the 4 in `PAPER_OUTLINE.md`)
 - Where the project came from: it extends the B.Tech digit recognition app
@@ -86,7 +86,7 @@ Use the tables and figures of `paper/paper_draft.docx` (natural images first; th
 
 The discussion points from `PAPER_OUTLINE.md`, in more depth, plus:
 - The effect of dataset: natural images with real masks, colour images with a Gaussian prior, digits and radiographs
-- Why chance correction and behavioural labels change the conclusions (lowest PneumoniaMNIST reliance about 15% raw is about 0% chance-corrected; the behavioural switch is 37–54% r_c where it is identified and bracketed (Pet 54.1%, bracketed since the A2 Pet models), depends on the label and is not identified on CIFAR-10)
+- Why chance correction and behavioural labels change the conclusions (lowest PneumoniaMNIST reliance about 15% raw is about 0% chance-corrected; the behavioural switch is 37–60% r_c where it is identified and bracketed (Pet 54.1%, bracketed since the A2 Pet models; CIFAR-10 55.2% ResNet-18 and 60.3% small CNN, identified since the A2 models filled its reliance gap) and depends on the label)
 - The collinearity of reliance and object competence (`confound.csv`)
 - What the results mean for practitioners in medical imaging
 
