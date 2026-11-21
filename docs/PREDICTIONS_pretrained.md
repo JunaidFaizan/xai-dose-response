@@ -126,3 +126,91 @@ analysed.
 
 Not yet run. Results are added here after the analysis, without changing the
 text above.
+
+### Outcome recorded 2026-11-21 (after the full A2 analysis)
+
+Appended after the analysis; nothing above was changed. The line "Not yet
+run" above was written before the analysis and is kept as committed.
+
+Data: the 18 SD1 confirmatory models (Kaggle session 2), the 12 CIFAR-10
+ResNet-18 SD2 models (pilot from session 1, 11 from session 2), the 3 Pet
+−0.15 models (session 1) and the 8 CIFAR-10 small-CNN SD2 models (laptop).
+`dose_response.py analyze` over all 275 registered models (code as of
+2dbef8d, unchanged since). The two SD1 pilots (seed 7) are listed in
+`results/dose_response/pilots.csv` and are not used. SD1 is analysed as its
+own setting and is not pooled with `pet_resnet18`. All numbers are from
+`results/dose_response/overdetection.csv`, `responsiveness_corrected.csv`,
+`behaviour_switch.csv` and `switch_differences.csv`. Verdicts are judged on
+point estimates, as for P1–P4.
+
+**SD1 testability.** Of the 18 SD1 models, 9 have r_c ≤ 50 (r_c −0.08 to
+31.21, doses −0.5, −0.2, 0) and 9 have r_c > 50 (96.43 to 98.83, doses
++0.1, +0.25, +0.4). The A2 rule (at least two models above 50) is met, so
+P5–P8 are testable.
+
+| Prediction | Result | Verdict |
+|---|---|---|
+| P5: over-detection rate (S vs O) of black and of blur deletion > 0.5 | black 0.89 (8/9, CP 95% 0.52–1.00), blur 0.56 (5/9, CP 0.21–0.86) | **Holds** (blur's interval reaches well below 0.5; margin FPR 0.44 for both) |
+| P6: inpaint and insertion each over-detect less than both black and blur | inpaint 0.33 (3/9), insertion 0.44 (4/9), against black 0.89 and blur 0.56 | **Holds** |
+| P7: shortcut vs size-matched object switches within 5 r_c points of the lowest-r_c model (−0.08) for ≥ 3 of 4 metrics | black 1.67, blur 1.66, inpaint −0.04 (all at the lowest-reliance edge); insertion already above 0.5 at the lowest reliance (preference 0.56), which counts as the edge | **Holds** (4 of 4) |
+| P8 (a): ρ(r_c, preference S over O) > 0.8 for ≥ 3 of 4 | black 0.86, blur 0.86, inpaint 0.97, insertion 0.90 | (a) holds (4 of 4) |
+| P8 (b): ρ(r_c, excess preference) > 0, one-sided BH p < 0.05 over the four metrics, for ≥ 3 of 4 | black 0.11 (p_bh 0.44), blur −0.33 (0.91), inpaint 0.71 (0.0018), insertion 0.37 (0.13) | (b) fails (1 of 4) |
+| **P8 overall** (both parts must hold) | | **Fails** |
+| P9 (a): behavioural switch identified in each SD2 setting | Pet 54.1 (bracketed), CIFAR-10 ResNet-18 55.2 (bracketed), CIFAR-10 small CNN 60.3 (bracketed) | (a) met in all three settings |
+| P9 (b): every identified S vs O metric switch below the behavioural switch, paired bootstrap interval of the difference above 0 | Pet: black 52.8 [38.0, 62.9], inpaint 49.4 [34.2, 59.8], insertion 48.7 [34.0, 58.4]; CIFAR ResNet-18: inpaint 46.5 [32.9, 52.5], insertion 46.5 [38.7, 51.6]; CIFAR small CNN: inpaint 55.9 [46.2, 63.5], insertion 42.6 [33.1, 51.8] | **Holds** (7 of 7 cells) |
+
+Notes on the table:
+
+- P8 (b): the BH adjustment over the four SD1 metrics is applied to
+  `p_excess_one_sided` of `overdetection.csv`, as the prediction states. The
+  column `p_bh_excess_one_sided` in that file adjusts over all settings and
+  metrics instead (0.58, 1.00, 0.0014, 0.14); it gives the same count (1 of
+  4).
+- P9 (b): metric switches against the full object map: Pet black 1.3 (edge),
+  inpaint 4.6, insertion 5.4; CIFAR ResNet-18 inpaint 8.7, insertion 8.6;
+  CIFAR small CNN inpaint 4.3 (edge), insertion 17.7. Differences are
+  behavioural − metric switch in r_c points with the paired two-level 95%
+  interval. The crossed-bootstrap intervals also lie above 0 (lowest end
+  29.4, small-CNN insertion). Black and blur deletion on both CIFAR-10
+  settings and blur deletion on Pet already prefer the shortcut map at the
+  lowest reliance, so they have no metric switch and are not part of (b).
+- Behavioural switch per SD2 setting (primary label, r_c, bracketing):
+  Pet 54.1 (9.5 below, 6.0 above); CIFAR ResNet-18 55.2 (3.1 below, 9.6
+  above); CIFAR small CNN 60.3 (5.4 below, 9.1 above). Without the A2 models
+  (`pre_a2_models/`) they were 54.5 not bracketed (Pet), > 36.5 and > 42.7
+  not identified (CIFAR-10). The check labels: CIFAR ResNet-18 54.0 (not
+  bracketed) and 58.4; CIFAR small CNN 58.2 and 57.4 (both not bracketed);
+  Pet 29.4 and 48.3 (both not bracketed).
+
+Summary: four of five predictions hold (P5, P6, P7, P9). P8 fails on part
+(b): on the pretrained network the metrics rank models by reliance, but the
+shortcut's preference beyond a random ordering rises significantly only for
+inpainting deletion.
+
+### Pre-specified secondary outcomes (no verdict), recorded 2026-11-21
+
+- **SD1 behavioural switch: not identified.** The isotonic crossing under
+  the primary label is at r_c 49.1, but no model lies between r_c 31.2
+  (dose 0) and 96.4 (dose +0.1), so it is reported as a bound: > 31.2 (not
+  identified). Check labels: 43.9 and 64.2, also not identified.
+- **SD1 class-stratified AUROC** (S vs O, primary label): pooled 0.79
+  (black), 0.83 (blur), 0.97 (inpaint), 0.83 (insertion); within-model median
+  0.84, 0.96, 0.995, 0.59. Under the check labels, pooled 0.78–0.97
+  (moved-only) and 0.78–0.95 (dominance). Undetermined share (primary label):
+  mean 0.25, max 0.48, Spearman ρ with r_c 0.91.
+- **SD1 `confound.csv` / `confound_rc.csv`:** ρ(r_c, accuracy without the
+  shortcut) = −0.96 (raw reliance −0.98). Partial ρ of preference with r_c
+  given that accuracy: black 0.16, blur 0.41, inpaint 0.78 (p_bh 0.001),
+  insertion 0.16.
+- **S–O, R–O, S–R at the lowest SD1 dose (−0.5):** black 0.50 / 0.53 /
+  0.44; blur 0.45 / 0.44 / 0.52; inpaint 0.24 / 0.28 / 0.48; insertion
+  0.20 / 0.15 / 0.64.
+- **Exploratory comparison with `pet_resnet18` (from scratch, 21 models):**
+  S vs O over-detection black 0.79, blur 0.93, inpaint 0.64, insertion 0.64
+  (SD1: 0.89, 0.56, 0.33, 0.44); ρ with r_c 0.86–0.97 on SD1. Grad-CAM maps
+  are 4×4 on SD1 against 16×16 from scratch, so method-level comparisons mix
+  pretraining with map resolution (`method_responsiveness_corrected.csv`:
+  SD1 Grad-CAM shortcut mass 0.005 → 0.017).
+- **SD2 CIFAR-10 small CNN** (not an SD1 outcome, recorded for P9): the 8
+  laptop models reach r_c 50.9–94.4 (doses −0.05 to −0.01), filling the gap
+  between 42.7 (dose −0.1) and 96.0 (dose 0).
