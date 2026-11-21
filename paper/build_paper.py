@@ -42,7 +42,7 @@ from PIL import Image  # noqa: E402
 PAPER = Path(__file__).resolve().parent
 ROOT = PAPER.parent
 sys.path.insert(0, str(ROOT))
-from xai.stats import clopper_pearson, format_p, pava  # noqa: E402
+from xai.stats import bh, clopper_pearson, format_p, pava  # noqa: E402
 
 DR = ROOT / "results" / "dose_response"
 AN = ROOT / "results" / "analysis"
@@ -65,6 +65,7 @@ MODELS = pd.read_csv(DR / "models.csv")
 PREF = pd.read_csv(DR / "preference.csv")
 RESP = pd.read_csv(DR / "responsiveness_corrected.csv")
 RESP_ORIG = pd.read_csv(DR / "original_models" / "responsiveness_corrected.csv")
+RESP_PRE_A2 = pd.read_csv(DR / "pre_a2_models" / "responsiveness_corrected.csv")
 LEGACY = pd.read_csv(DR / "responsiveness.csv")
 METHOD = pd.read_csv(DR / "method_responsiveness_corrected.csv")
 EFFECT = pd.read_csv(DR / "effect_sizes.csv")
@@ -114,10 +115,17 @@ SETTINGS = [  # (base, shortcut, label, short label)
 ]
 NATURAL = SETTINGS[:3]
 MECHANISM = SETTINGS[3:]
-LABEL = {(b, s): label for b, s, label, _ in SETTINGS}
-SHORT = {(b, s): short for b, s, _, short in SETTINGS}
+# Amendment A2, SD1: the ImageNet-pretrained Pet network is a separate setting. It is never pooled
+# with pet_resnet18 and is kept out of SETTINGS, so every main-study table, count and figure covers
+# the seven settings above; SD1 has its own section and tables (Section 5.10).
+SD1 = ("pet_resnet18_pretrained", "patch", "Oxford-IIIT Pet, patch (ImageNet-pretrained ResNet-18, SD1)",
+       "Pet pretrained (SD1)")
+SD1_KEY = SD1[:2]
+LABEL = {(b, s): label for b, s, label, _ in SETTINGS + [SD1]}
+SHORT = {(b, s): short for b, s, _, short in SETTINGS + [SD1]}
 NETS = {"mnist": "Small CNN", "pneumonia_mnist": "Small CNN", "cifar10": "CIFAR CNN (0.77M)",
-        "cifar10_resnet18": "ResNet-18 (11.2M)", "pet_resnet18": "ResNet-18 (11.2M)"}
+        "cifar10_resnet18": "ResNet-18 (11.2M)", "pet_resnet18": "ResNet-18 (11.2M)",
+        "pet_resnet18_pretrained": "ImageNet-pretrained ResNet-18 (11.2M)"}
 BASE_NAMES = {"mnist": "MNIST", "pneumonia_mnist": "PneumoniaMNIST", "cifar10": "CIFAR-10 (small CNN)",
               "cifar10_resnet18": "CIFAR-10 (ResNet-18)", "pet_resnet18": "Oxford-IIIT Pet (ResNet-18)",
               "pet_resnet18_pretrained": "Oxford-IIIT Pet (ImageNet-pretrained ResNet-18)"}
@@ -126,8 +134,13 @@ S_RANDOM, S_PLACEBO = "shortcut vs random", "shortcut vs placebo"
 R_OBJECT, P_OBJECT, P_RANDOM = "random vs full object", "placebo vs full object", "placebo vs random"
 SHORTCUT_COMPARISONS = [FULL, MATCHED, S_PLACEBO, S_RANDOM]
 
-assert set(zip(MODELS.base, MODELS.shortcut)) == {(b, s) for b, s, _, _ in SETTINGS}, \
-    "SETTINGS must cover every (base, shortcut) in models.csv"
+assert set(zip(MODELS.base, MODELS.shortcut)) == {(b, s) for b, s, _, _ in SETTINGS + [SD1]}, \
+    "SETTINGS and SD1 must cover every (base, shortcut) in models.csv"
+
+
+def main_only(df):
+    """Rows of the seven main settings (drops the separate SD1 setting)."""
+    return df[[(b, s) != SD1_KEY for b, s in zip(df.base, df.shortcut)]]
 
 
 def _one(df, **keys):
@@ -333,9 +346,19 @@ N_A1 = int((MODELS.model_set == "A1").sum())
 N_A2 = int((MODELS.model_set == "A2").sum())
 assert N_ORIGINAL + N_A1 + N_A2 == N_MODELS, set(MODELS.model_set)
 A2_MODELS = MODELS[MODELS.model_set == "A2"]
-assert set(A2_MODELS.base) <= {"pet_resnet18"}, "SD1/CIFAR SD2 models arrived: update the A2 text"
-N_A2_PET = len(A2_MODELS)
-A2_PET_DOSES = sorted(A2_MODELS.dose.unique())
+A2_COUNTS = A2_MODELS.groupby("base").size().to_dict()
+# The text below describes the complete A2 design: 23 SD2 models and 18 SD1 confirmatory models.
+assert A2_COUNTS == {"pet_resnet18": 3, "cifar10_resnet18": 12, "cifar10": 8, "pet_resnet18_pretrained": 18}, \
+    A2_COUNTS
+A2_SD2 = A2_MODELS[A2_MODELS.base != SD1[0]]
+N_A2_SD2 = len(A2_SD2)
+N_SD1 = A2_COUNTS[SD1[0]]
+N_MAIN = N_MODELS - N_SD1  # models of the seven main settings
+A2_PET = A2_MODELS[A2_MODELS.base == "pet_resnet18"]
+N_A2_PET = len(A2_PET)
+A2_PET_DOSES = sorted(A2_PET.dose.unique())
+A2_CIFAR_DOSES = sorted(A2_MODELS[A2_MODELS.base == "cifar10_resnet18"].dose.unique())
+assert A2_CIFAR_DOSES == sorted(A2_MODELS[A2_MODELS.base == "cifar10"].dose.unique())
 PILOTS = pd.read_csv(DR / "pilots.csv") if (DR / "pilots.csv").exists() else MODELS.iloc[:0].assign(status="")
 _KEYS = ["base", "shortcut", "dose", "seed"]
 assert not len(PILOTS.merge(MODELS[_KEYS], on=_KEYS)), "pilots are never pooled"
@@ -751,7 +774,7 @@ def table_positioning():
 
 def table_reliance():
     body = []
-    for base, shortcut, label, _ in SETTINGS:
+    for base, shortcut, label, _ in SETTINGS + [SD1]:
         g, lv = group(base, shortcut), levels(base, shortcut)
         lowest, highest = lv.loc[lv.reliance.idxmin()], lv.loc[lv.reliance.idxmax()]
         a1, a2 = int((g.model_set == "A1").sum()), int((g.model_set == "A2").sum())
@@ -771,7 +794,8 @@ def table_reliance():
          "Accuracy without shortcut (%), low \u2192 high reliance"],
         body, widths=[3.4, 2.2, 2.4, 1.8, 1.8, 1.8, 2.6],
         note=f"Source: results/dose_response/models.csv ({N_MODELS} models: {N_ORIGINAL} original, {N_A1} "
-             f"from amendment A1 and {N_A2} from amendment A2; the A2 pilots are not included, see "
+             f"from amendment A1 and {N_A2} from amendment A2, of which {N_SD1} form the separate SD1 setting in "
+             f"the last row; the A2 pilots are not included, see "
              f"results/dose_response/pilots.csv). R: percentage of conflicting test images whose prediction follows the "
              f"shortcut. {RC} = 100 (R \u2212 f)/(100 \u2212 f) with chance floor f = (100 \u2212 accuracy "
              "without shortcut)/(C \u2212 1); it is not clipped and can be slightly negative.")
@@ -963,7 +987,8 @@ def table_controls():
 
 
 def table_pairs():
-    sel = PAIRS[PAIRS.comparison.isin([FULL, MATCHED, R_OBJECT]) & (PAIRS.p_bh < 0.05)]
+    pairs = main_only(PAIRS)
+    sel = pairs[pairs.comparison.isin([FULL, MATCHED, R_OBJECT]) & (pairs.p_bh < 0.05)]
     order = {(b, s): i for i, (b, s, *_) in enumerate(SETTINGS)}
     sel = sel.assign(o=[order[(b, s)] for b, s in zip(sel.base, sel.shortcut)]).sort_values(["comparison", "o"])
     body = [[r.comparison, SHORT[(r.base, r.shortcut)], r.metric_a, r.metric_b,
@@ -971,7 +996,7 @@ def table_pairs():
              format_p(r.p_bh), format_p(r.p_holm),
              f"{f3(r.delta_pref_low)} {ci(r.delta_pref_low_ci_low, r.delta_pref_low_ci_high, f3)}"]
             for r in sel.itertuples()]
-    n_tested = len(PAIRS[PAIRS.comparison.isin([FULL, MATCHED, R_OBJECT])])
+    n_tested = len(pairs[pairs.comparison.isin([FULL, MATCHED, R_OBJECT])])
     return table(
         f"Paired metric-vs-metric differences that are significant after Benjamini\u2013Hochberg ({len(sel)} of "
         f"{n_tested} pairs tested)",
@@ -979,7 +1004,8 @@ def table_pairs():
          "\u0394 preference, lowest dose [CI]"],
         body, widths=[2.6, 1.9, 2.0, 2.0, 2.8, 1.1, 1.1, 2.8], size=7,
         note="Source: results/dose_response/metric_pairs.csv. Paired two-level bootstrap (the same resamples "
-             "for both metrics); two-sided bootstrap p, adjusted within each comparison family (BH and Holm).")
+             "for both metrics); two-sided bootstrap p, adjusted within each comparison family (BH and Holm; "
+             "the families also contain the SD1 pairs, which are not listed here).")
 
 
 def table_methods():
@@ -1002,7 +1028,7 @@ def table_methods():
 
 def table_confound():
     body = []
-    for (base, shortcut), g in CONF_RC.groupby(["base", "shortcut"], sort=False):
+    for (base, shortcut), g in main_only(CONF_RC).groupby(["base", "shortcut"], sort=False):
         first = g.iloc[0]
         values = [SHORT[(base, shortcut)], str(int(first.models)), f2(first.rho_rc_competence)]
         for metric in METRICS:
@@ -1022,7 +1048,8 @@ def table_confound():
              "order of confound.csv (from the least collinear setting on raw reliance). Partial "
              "Spearman: Pearson correlation of rank residuals after a linear fit on the accuracy rank; p from "
              "a t distribution with n \u2212 3 degrees of freedom, adjusted by Benjamini\u2013Hochberg over the "
-             f"{len(CONF_RC)} tests of the table.")
+             f"{len(CONF_RC)} tests of confound_rc.csv (the {len(main_only(CONF_RC))} of the table and the "
+             f"{len(CONF_RC) - len(main_only(CONF_RC))} SD1 tests of Section 5.10).")
 
 
 def table_kendall():
@@ -1070,17 +1097,119 @@ def table_sets():
     for base, shortcut, label, short in MECHANISM:
         for i, metric in enumerate(METRICS):
             a, o = row(FULL, base, shortcut, metric), row(FULL, base, shortcut, metric, RESP_ORIG)
+            p = row(FULL, base, shortcut, metric, RESP_PRE_A2)
+            assert all(np.isclose(a[c], p[c]) for c in ("rho_rc", "fpr", "balanced_accuracy")) and (
+                (pd.isna(a.switch_iso_rc) and pd.isna(p.switch_iso_rc)) or np.isclose(a.switch_iso_rc, p.switch_iso_rc)), \
+                "note: mechanism rows of all models equal those with the A1 models"
             body.append([short if i == 0 else "", metric, f"{f3(o.rho_rc)} \u2192 {f3(a.rho_rc)}",
                          f"{f3(o.fpr)} \u2192 {f3(a.fpr)}", f"{f3(o.balanced_accuracy)} \u2192 {f3(a.balanced_accuracy)}",
                          f"{fmt_switch(o, lo=None)} \u2192 {fmt_switch(a, lo=None)}"])
     return table(
-        f"Model-set check promised by amendment A1 (shortcut vs full object): the {N_ORIGINAL} original models "
-        f"\u2192 all {N_MODELS} models",
+        f"Model-set check promised by amendment A1 (shortcut vs full object, mechanism settings): the "
+        f"{N_ORIGINAL} original models \u2192 the models including the {N_A1} A1 models",
         ["Setting", "Metric", f"\u03c1 on {RC}", "Over-detection FPR", "Balanced accuracy", f"Switch, {RC} %"],
         body, widths=[2.2, 2.4, 2.6, 2.4, 2.6, 3.8], size=7.5,
         note="Sources: results/dose_response/original_models/responsiveness_corrected.csv and "
-             "results/dose_response/responsiveness_corrected.csv. Pet and CIFAR-10 received no new models, so "
-             "their rows are identical in both sets and are omitted.")
+             "results/dose_response/responsiveness_corrected.csv (analysis of all models; the mechanism "
+             "settings received no A2 model, so these rows equal those with the A1 models only). Pet and "
+             "CIFAR-10 received no A1 model and are omitted; their A2 models are discussed in Sections 5.4 and 5.10.")
+
+
+def table_a2_outcomes(verdicts, over, full, matched, edge, bh4, p8a_n, p8b_n, p9_rows, bsw):
+    """P5-P9 (docs/PREDICTIONS_pretrained.md) with the numbers that decide them."""
+    def fpr(m):
+        o = over[m]
+        return f"{m} {f2(o.fpr)} ({int(o.k_fpr)}/{int(o.n_below)})"
+
+    def msw(m):
+        r = matched[m]
+        return f"{m} {fmt_switch(r, lo=None)}" if not pd.isna(r.switch_iso_rc) else f"{m} > 0.5 at lowest"
+
+    p9_text = "; ".join(
+        f"{SHORT[k]}: behavioural {switch_text(bsw[k])}, "
+        + (", ".join(f"{r.metric} {f1(r.difference)} {ci(r.diff_ci_low, r.diff_ci_high, f1)}" for r in tested)
+           or "no metric switch")
+        for k, (_, tested, _) in p9_rows.items())
+    body = [
+        ["P5", "Over-detection rate (S vs O, " + RC + " \u2264 50) of black and of blur deletion > 0.5",
+         "; ".join(fpr(m) for m in BB), verdicts["P5"]],
+        ["P6", "Over-detection rate of inpaint and of insertion below both black and blur",
+         "; ".join(fpr(m) for m in II), verdicts["P6"]],
+        ["P7", "Size-matched switch within 5 points of the lowest-" + RC + " model for \u2265 3 of 4 metrics",
+         "; ".join(msw(m) for m in METRICS) + f" ({sum(edge.values())} of 4 at the edge)", verdicts["P7"]],
+        ["P8", f"(a) \u03c1({RC}, S\u2013O preference) > 0.8 for \u2265 3 of 4; (b) \u03c1({RC}, excess) > 0 "
+               "with one-sided BH p < 0.05 (over the four) for \u2265 3 of 4; both must hold",
+         "(a) " + ", ".join(f2(full[m].rho_rc) for m in METRICS) + f" ({p8a_n} of 4); (b) "
+         + ", ".join(f"{f2(over[m].rho_excess_rc)} (p_bh {format_p(bh4[m])})" for m in METRICS)
+         + f" ({p8b_n} of 4)", verdicts["P8"]],
+        ["P9", "SD2 settings: (a) behavioural switch identified; (b) every identified S vs O metric switch below it, "
+               "paired bootstrap interval of the difference above 0", p9_text, verdicts["P9"]],
+    ]
+    return table(
+        "Pre-registered predictions P5\u2013P9 of amendment A2 (docs/PREDICTIONS_pretrained.md) with their "
+        "verdicts. P5\u2013P8: the SD1 models; P9: the three SD2 settings with their A2 models",
+        ["Pred.", "Test as pre-registered", "Result", "Verdict"],
+        body, widths=[1.0, 5.0, 8.4, 1.6], size=7,
+        note="Sources: results/dose_response/overdetection.csv (P5, P6, P8b), responsiveness_corrected.csv "
+             "(P7: shortcut vs size-matched object; P8a: shortcut vs full object), behaviour_switch.csv and "
+             "switch_differences.csv (P9, primary label). P8b adjusts the four one-sided p-values of "
+             "overdetection.csv (p_excess_one_sided) by Benjamini\u2013Hochberg over the four metrics, as "
+             "pre-registered. Verdicts are judged on point estimates, as for P1\u2013P4. (e): switch at the "
+             "lowest-reliance edge. P9 differences: behavioural \u2212 metric switch in points [paired two-level "
+             "95% CI]; metrics already above 0.5 at the lowest reliance have no switch and are not tested.")
+
+
+def table_sd1(bh4):
+    body = []
+    for key in (SD1_KEY, ("pet_resnet18", "patch")):
+        for i, metric in enumerate(METRICS):
+            r, x, o, m = (row(FULL, *key, metric), xrow(FULL, *key, metric), orow(*key, metric),
+                          row(MATCHED, *key, metric))
+            body.append([
+                SHORT[key] if i == 0 else "", metric,
+                f"{f2(r.rho_rc)} {ci(x.rho_rc_bca_ci_low, x.rho_rc_bca_ci_high)}",
+                f"{f2(r.pref_low)} \u2192 {f2(r.pref_high)}",
+                f"{f2(o.fpr)} {ci(o.fpr_cp_low, o.fpr_cp_high)} ({int(o.k_fpr)}/{int(o.n_below)})",
+                f"{f2(o.fpr_margin)} ({int(o.k_fpr_margin)}/{int(o.n_below)})",
+                f"{f2(o.pref_so_low)} / {f2(o.pref_ro_low)} / {f2(o.pref_sr_low)}",
+                f"{f2(o.rho_excess_rc)} ({format_p(bh4[metric] if key == SD1_KEY else o.p_bh_excess_one_sided)})",
+                fmt_switch(r), fmt_switch(m, lo=None),
+            ])
+    return table(
+        "SD1 (ImageNet-pretrained ResNet-18 on Pet) next to the Pet ResNet-18 from scratch (exploratory "
+        "comparison; the two settings are not pooled)",
+        ["Setting", "Metric", f"\u03c1 with {RC}, S vs O [BCa CI]", "S\u2013O preference, lowest \u2192 highest dose",
+         "FPR [CP 95% CI] (k/n)", "Margin FPR (k/n)", "S\u2013O / R\u2013O / S\u2013R, lowest dose",
+         f"\u03c1(excess, {RC}) (p_bh)", f"Switch S vs O, {RC} % [crossed CI]", f"Switch S vs size-matched, {RC} %"],
+        body, widths=[1.6, 1.8, 1.9, 1.6, 2.0, 1.2, 1.9, 1.6, 2.0, 1.4], size=6.5,
+        note="Sources: results/dose_response/responsiveness_corrected.csv, intervals_crossed.csv and "
+             "overdetection.csv. p_bh of the excess: for SD1 Benjamini\u2013Hochberg over its four metrics (as P8 "
+             "pre-registers); for Pet the value of overdetection.csv (BH over all settings and metrics). Switch "
+             "marks as in the main responsiveness table of Section 5.2.")
+
+
+def table_p9(p9_rows, bsw):
+    body = []
+    for key, (_, tested, untested) in p9_rows.items():
+        b = bsw[key]
+        for i, r in enumerate(sorted(tested + untested, key=lambda r: METRICS.index(r.metric))):
+            body.append([
+                SHORT[key] if i == 0 else "", switch_text(b) if i == 0 else "", r.metric,
+                f1(r.metric_switch_rc) + (" (e)" if r.metric_switch_status == "identified at lowest-reliance edge"
+                                          else "") if not pd.isna(r.metric_switch_rc) else "none (> 0.5 at lowest)",
+                "\u2013" if pd.isna(r.difference) else f"{f1(r.difference)} {ci(r.diff_ci_low, r.diff_ci_high, f1)}",
+                "\u2013" if pd.isna(r.difference) else ci(r.diff_crossed_ci_low, r.diff_crossed_ci_high, f1),
+                r.verdict,
+            ])
+    return table(
+        "P9: behavioural and metric switches (shortcut vs full object, primary label) in the three SD2 settings, "
+        "with the A2 models",
+        ["Setting", f"Behavioural switch, {RC}", "Metric", f"Metric switch, {RC} %",
+         "Difference [two-level CI]", "Difference [crossed CI]", "Verdict (switch_differences.csv)"],
+        body, widths=[2.0, 2.0, 2.2, 2.0, 2.6, 2.2, 3.0], size=7,
+        note="Source: results/dose_response/switch_differences.csv and behaviour_switch.csv. Difference = "
+             "behavioural \u2212 metric switch on the same bootstrap resamples. (e): metric switch at the "
+             "lowest-reliance edge.")
 
 
 # ------------------------------------------------------------------ helpers for the text
@@ -1116,8 +1245,9 @@ def build():
                                       "Preference for random map", show_behaviour=False),
         "p_random": preference_figure(P_RANDOM, FIG_OUT / "fig_rc_placebo_vs_random.png",
                                       "Preference for placebo map", show_behaviour=False),
-        "behaviour": rearrange_panels(DR / "behaviour_auroc.png", FIG_OUT / "fig_behaviour_auroc.png", N_SETTINGS),
-        "methods": rearrange_panels(DR / "method_dose_response.png", FIG_OUT / "fig_methods.png", N_SETTINGS),
+        # the analyze figures have one panel per setting in models.csv, SD1 included
+        "behaviour": rearrange_panels(DR / "behaviour_auroc.png", FIG_OUT / "fig_behaviour_auroc.png", len(N_SETTING)),
+        "methods": rearrange_panels(DR / "method_dose_response.png", FIG_OUT / "fig_methods.png", len(N_SETTING)),
     }
 
     # ---- numbers used throughout (all from the CSVs)
@@ -1167,7 +1297,7 @@ def build():
         robust[m] = (sig_positive(sel), len(sel), sel.rho_rc.min())
     robust_all = [m for m, (ok, n, _) in robust.items() if ok == n]
     pt_pairs = {b: prow(FULL, "pneumonia_mnist", "texture", "Deletion (black)", b) for b in METRICS[1:]}
-    n_pairs_sig = int((PAIRS.p_bh < 0.05).sum())
+    n_pairs_sig = int((main_only(PAIRS).p_bh < 0.05).sum())
     pt_black_sr = row(S_RANDOM, "pneumonia_mnist", "texture", "Deletion (black)")
     pt_black_sp = row(S_PLACEBO, "pneumonia_mnist", "texture", "Deletion (black)")
     pt_black_m = row(MATCHED, "pneumonia_mnist", "texture", "Deletion (black)")
@@ -1175,18 +1305,19 @@ def build():
     mt_sr_blur = row(S_RANDOM, "mnist", "texture", "Deletion (blur)")
     mt_sr_ins = row(S_RANDOM, "mnist", "texture", "Insertion (blur)")
     mt_sp_ins = row(S_PLACEBO, "mnist", "texture", "Insertion (blur)")
-    ig = METHOD[METHOD.method == "Integrated Gradients"].rho_rc
+    ig = main_only(METHOD[METHOD.method == "Integrated Gradients"]).rho_rc
     mt_away = {m: mrow("mnist", "texture", m) for m in ["Saliency", "SmoothGrad", "Grad-CAM"]}
     pt_meth = {m: mrow("pneumonia_mnist", "texture", m) for m in ["Saliency", "SmoothGrad", "Grad-CAM"]}
     assert all(r.rho_rc < 0 for r in mt_away.values()) and pt_meth["Saliency"].rho_rc > 0 \
         and pt_meth["SmoothGrad"].rho_rc > 0 and pt_meth["Grad-CAM"].rho_rc < 0
     gc_lowest = sum(min(METHODS, key=lambda m: mrow(b, s, m).mass_high) == "Grad-CAM" for b, s, *_ in sf_patch_settings)
-    conf_first = CONF.iloc[0]
-    assert (conf_first.base, conf_first.shortcut) == ("cifar10", "patch"), "text leads with the CIFAR CNN"
     conf_cifar = CONF_RC[(CONF_RC.base == "cifar10")]
-    assert CONF_RC.iloc[0].base == "cifar10" and CONF_RC.rho_rc_competence.max() == conf_cifar.rho_rc_competence.max(), \
-        "text: the CIFAR small CNN is the least collinear setting on r_c"
-    conf_set = CONF_RC.groupby(["base", "shortcut"]).rho_rc_competence.first()
+    conf_set = main_only(CONF_RC).groupby(["base", "shortcut"]).rho_rc_competence.first()
+    cnn_pre_a2 = pd.read_csv(DR / "pre_a2_models" / "confound_rc.csv").query("base == 'cifar10'").iloc[0]
+    assert cnn_pre_a2.rho_rc_competence == pd.read_csv(DR / "pre_a2_models" / "confound_rc.csv"
+                                                       ).rho_rc_competence.max(), "text: least collinear before A2"
+    conf_all_sig = {k for k, g in main_only(CONF_RC).groupby(["base", "shortcut"]) if (g.p_bh_rc < 0.05).all()}
+    assert ("cifar10", "patch") in conf_all_sig, "text: the CIFAR CNN keeps all four partial rho significant"
     collinear = conf_set[conf_set <= -0.95]
     # ---- audit-2 numbers (M1-M4; from the new CSVs)
     bsw = {(b, s): swrow(b, s) for b, s, *_ in SETTINGS}
@@ -1194,7 +1325,7 @@ def build():
     cifar_bsw = [bsw[(b, s)] for b, s, *_ in NATURAL[1:]]
     pet_label_sw = [swrow("pet_resnet18", "patch", lab).behavioural_switch_rc for lab in BEHAVIOUR_LABELS]
     pt_label_sw = [swrow("pneumonia_mnist", "texture", lab).behavioural_switch_rc for lab in BEHAVIOUR_LABELS]
-    und_rho = BSWITCH[BSWITCH.primary & BSWITCH.undetermined_rate_max.gt(0.1)].rho_undetermined_rc
+    und_rho = main_only(BSWITCH[BSWITCH.primary & BSWITCH.undetermined_rate_max.gt(0.1)]).rho_undetermined_rc
     pp_dom_pooled = BEH[(BEH.comparison == FULL) & (BEH.base == "pneumonia_mnist") & (BEH.shortcut == "patch")
                         & (BEH.label == "shortcut_dominant")].auroc_pooled_strat
     mp_dom_black = brow(FULL, "mnist", "patch", "Deletion (black)", "shortcut_dominant")
@@ -1205,7 +1336,8 @@ def build():
     pet_ii_margin = [over[("pet_resnet18", m)].fpr_margin for m in II]
     cifar_bb_margin = [over[(b, m)].fpr_margin for b, *_ in NATURAL[1:] for m in BB]
     pet_black_over = over[("pet_resnet18", "Deletion (black)")]
-    max_so_ro = (OVER.pref_so_low - OVER.pref_ro_low).abs().max()
+    over_main = main_only(OVER)
+    max_so_ro = (over_main.pref_so_low - over_main.pref_ro_low).abs().max()
     nat_over = OVER[OVER.base.isin([b for b, *_ in NATURAL])]
     nat_excess_sig = nat_over[nat_over.p_bh_excess_one_sided < 0.05]
     nat_excess_ns = nat_over[nat_over.p_bh_excess_one_sided >= 0.05]
@@ -1218,14 +1350,14 @@ def build():
     p1_black_x = _one(CROSSED_PRE_A2, comparison=FULL, base="pet_resnet18", shortcut="patch",
                       metric="Deletion (black)")  # the 18 original Pet models, like PET
     assert p1_black_x.models == 18, "P1-P4 use the 18 original Pet models"
-    full_x = CROSSED[CROSSED.comparison == FULL].merge(
+    full_x = main_only(CROSSED[CROSSED.comparison == FULL]).merge(
         RESP[RESP.comparison == FULL], on=["comparison", "base", "shortcut", "metric"], suffixes=("_x", ""))
     pref_width_ratio = ((full_x.pref_low_crossed_ci_high - full_x.pref_low_crossed_ci_low)
                         / (full_x.pref_low_ci_high - full_x.pref_low_ci_low))
     pp_black_x = xrow(FULL, "pneumonia_mnist", "patch", "Deletion (black)")
     pp_black_r = row(FULL, "pneumonia_mnist", "patch", "Deletion (black)")
     mp_x = CROSSED[(CROSSED.comparison == FULL) & (CROSSED.base == "mnist") & (CROSSED.shortcut == "patch")]
-    sd = SWDIFF[(SWDIFF.comparison == FULL) & SWDIFF.primary]
+    sd = main_only(SWDIFF[(SWDIFF.comparison == FULL) & SWDIFF.primary])
     sd_order = {(b, s): i for i, (b, s, *_) in enumerate(SETTINGS)}
     sd = sd.assign(o=[sd_order[(b, s)] for b, s in zip(sd.base, sd.shortcut)]).sort_values(["o", "metric"])
     sd_mp = {m: drow(FULL, "mnist", "patch", m) for m in METRICS}
@@ -1234,7 +1366,7 @@ def build():
     sd_nd = sd[sd.verdict == "not distinguishable"]
     sd_later = sd[sd.verdict == "metric later"]
     sd_crossed_lost = sd[(sd.verdict == "metric earlier") & (sd.diff_crossed_ci_low <= 0)]
-    conf_rc_sig = int((CONF_RC.p_bh_rc < 0.05).sum())
+    conf_rc_sig = int((main_only(CONF_RC).p_bh_rc < 0.05).sum())
     # The per-model table agrees with the summary: margin FPR = share of low-r_c models that say shortcut
     # with a margin (natural images, every metric).
     for (b, m), o in over.items():
@@ -1255,7 +1387,17 @@ def build():
     assert np.isclose(pet_above - pet_bsw.behavioural_switch_rc, pet_bsw.distance_above)
     assert pet_below in set(pet_a2_rc), "the model just below the Pet switch is an A2 model"
     assert (pet_a2_rc < pet_bsw.behavioural_switch_rc).sum() == 2 and len(pet_a2_rc) == 3, "text: two below, one above"
-    assert all(r.status.startswith("not identified") for r in cifar_bsw), "CIFAR-10 switch not identified"
+    assert all(r.status == "identified" and r.bracketed and r.behavioural_switch_rc > 50 for r in cifar_bsw), \
+        "CIFAR-10 switch identified and bracketed above 50 (A2)"
+    cifar_pre_a2 = [_one(PRE_A2_SWITCH, base=b, shortcut=s, label=PRIMARY_LABEL) for b, s, *_ in NATURAL[1:]]
+    assert all(r.status.startswith("not identified") for r in cifar_pre_a2), "CIFAR-10 before A2: not identified"
+    cifar_check_sw = {(b, s, lab): swrow(b, s, lab) for b, s, *_ in NATURAL[1:] for lab in BEHAVIOUR_LABELS[1:]}
+    assert all(r.status == "identified" for r in cifar_check_sw.values()), "CIFAR-10 check labels identified"
+    cifar_check_nb = [
+        " and ".join(f"the {LABEL_NAMES[lab].replace(' (check)', ' check')}" for lab in BEHAVIOUR_LABELS[1:]
+                     if not cifar_check_sw[(b, s, lab)].bracketed) + f" on {short}"
+        for b, s, _, short in NATURAL[1:]
+        if any(not cifar_check_sw[(b, s, lab)].bracketed for lab in BEHAVIOUR_LABELS[1:])]
     mp_bsw = bsw[("mnist", "patch")]
     assert mp_bsw.status == "identified" and mp_bsw.bracketed and 45 <= mp_bsw.behavioural_switch_rc <= 60, \
         "text: the assumed 50% is close to the bracketed MNIST patch switch"
@@ -1300,6 +1442,50 @@ def build():
     inst = GT_INSTANCE.set_index(["dataset", "metric"]).spearman_with_ground_truth
     del_inst = [inst[(d, m)] for d in ("decoy_mnist", "decoy_pneumonia") for m in METRICS[:3]]
     ins_inst = [inst[(d, "Insertion (blur)")] for d in ("decoy_mnist", "decoy_pneumonia")]
+    # ---- amendment A2: P5-P9 exactly as written in docs/PREDICTIONS_pretrained.md
+    sd1_g = group(*SD1_KEY)
+    assert len(sd1_g) == N_SD1 and (sd1_g.reliance_corrected > 50).sum() >= 2, "SD1 testable (A2 rule)"
+    sd1_over = {m: orow(*SD1_KEY, m) for m in METRICS}
+    sd1_full = {m: row(FULL, *SD1_KEY, m) for m in METRICS}
+    sd1_matched = {m: row(MATCHED, *SD1_KEY, m) for m in METRICS}
+    sd1_bh4 = dict(zip(METRICS, bh([sd1_over[m].p_excess_one_sided for m in METRICS])))  # BH over the four
+    sd1_bsw = swrow(*SD1_KEY)
+    sd1_gap = largest_gap(sd1_g.reliance_corrected, lo=-5, hi=105)
+    assert sd1_bsw.status.startswith("not identified") and sd1_gap[0] < sd1_bsw.behavioural_switch_rc < sd1_gap[1]
+    assert all(swrow(*SD1_KEY, lab).status.startswith("not identified") for lab in BEHAVIOUR_LABELS)
+    assert np.isclose(sd1_gap[1], sd1_g[sd1_g.dose == 0.1].reliance_corrected.min()) and np.isclose(
+        sd1_gap[0], sd1_g[sd1_g.dose == 0].reliance_corrected.max()), "text: the gap lies between doses 0 and +0.1"
+    p5 = all(sd1_over[m].fpr > 0.5 for m in BB)
+    p6 = all(sd1_over[m].fpr < min(sd1_over[b].fpr for b in BB) for m in II)
+    sd1_low = sd1_g.reliance_corrected.min()
+    sd1_edge = {m: r.switch_status in ("identified at lowest-reliance edge", "above 0.5 at lowest reliance")
+                for m, r in sd1_matched.items()}
+    assert all(not e or pd.isna(sd1_matched[m].switch_iso_rc) or sd1_matched[m].switch_iso_rc - sd1_low <= 5
+               for m, e in sd1_edge.items()), "edge = within 5 r_c points of the lowest-r_c model"
+    p7 = sum(sd1_edge.values()) >= 3
+    p8a_n = sum(r.rho_rc > 0.8 for r in sd1_full.values())
+    p8b_n = sum(sd1_over[m].rho_excess_rc > 0 and sd1_bh4[m] < 0.05 for m in METRICS)
+    p8 = p8a_n >= 3 and p8b_n >= 3
+    p9_settings = NATURAL  # the three SD2 settings: Pet, CIFAR ResNet-18, CIFAR CNN
+    assert {b for b, *_ in p9_settings} == set(A2_SD2.base)
+    p9_rows = {}
+    for b, s, *_ in p9_settings:
+        a_ok = bsw[(b, s)].status == "identified"
+        cells = [drow(FULL, b, s, m) for m in METRICS]
+        found = ("identified", "identified at lowest-reliance edge")
+        p9_rows[(b, s)] = (a_ok, [r for r in cells if r.metric_switch_status in found],
+                           [r for r in cells if r.metric_switch_status not in found])
+    p9_testable = all(a for a, *_ in p9_rows.values())
+    p9 = p9_testable and all(r.diff_ci_low > 0 for _, tested, _ in p9_rows.values() for r in tested)
+    verdict = {True: "holds", False: "fails"}
+    p_verdicts = {"P5": verdict[p5], "P6": verdict[p6], "P7": verdict[p7], "P8": verdict[p8],
+                  "P9": verdict[p9] if p9_testable else "not testable"}
+    held = [p for p, v in p_verdicts.items() if v == "holds"]
+    failed = [p for p, v in p_verdicts.items() if v == "fails"]
+    # the text below states this pattern; rebuild the wording if a verdict changes
+    assert held == ["P5", "P6", "P7", "P9"] and failed == ["P8"], p_verdicts
+    assert p8a_n == 4 and p8b_n == 1, (p8a_n, p8b_n)
+    sd1_pet = {m: row(FULL, "pet_resnet18", "patch", m) for m in METRICS}
 
     # ---- front matter
     notice = para(DRAFT_NOTICE, bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, size=12)
@@ -1321,19 +1507,18 @@ def build():
     para("E-mail: [email]", align=WD_ALIGN_PARAGRAPH.CENTER, size=10)
 
     abstract = (
-        "Deletion and insertion curves decide which explanation of an image classifier counts as faithful, "
-        "but whether they track what a model relies on is rarely tested. We trained "
+        "Deletion and insertion curves decide which explanations count as faithful, "
+        "but whether they track a model's reliance is rarely tested. We trained "
         f"{N_MODELS} CNNs in which a signed training dose sets the measured reliance on an injected class-coded "
         "shortcut, on Oxford-IIIT Pet with object masks, CIFAR-10, MNIST and "
         "PneumoniaMNIST, and scored fixed oracle explanations with four metrics. The metrics respond to "
         "reliance: preference for the shortcut map over the object map rises with chance-corrected reliance "
-        f"in {n_full_sig} of {n_full} cells (Spearman \u03c1 = {span(full_sig.rho_rc)} in "
-        "those cells). They are not calibrated to it. Among models with chance-corrected reliance at most 50%, "
+        f"in {n_full_sig} of {n_full} cells (\u03c1 = {span(full_sig.rho_rc)}). They are not calibrated to it. Among models with chance-corrected reliance at most 50%, "
         f"black and blur deletion prefer the shortcut map for {pct_span(pet_bb_fpr)} of Pet models "
         f"({pct_span(pet_bb_margin)} with a per-model margin) and, against a centred "
         f"Gaussian object prior, {pct_span(cifar_bb_fpr)} of CIFAR-10 models. On Pet the metrics switch at "
         f"{span(pet_switch, f1)}% chance-corrected reliance, while the models follow the "
-        "shortcut on half the images only at "
+        "shortcut on half the images at "
         f"{switch_text(pet_bsw, note=f'{span(pet_label_sw, f1)}% across behavioural labels')}. Against per-image "
         f"behavioural labels the class-stratified AUROC is {span(pooled_nat)} "
         f"on natural images, but within a model only {span(within_nat)}. Their verdicts depend on "
@@ -1342,7 +1527,8 @@ def build():
         "deletion prefers a random ordering over a centred object map "
         f"{pct_span([ro[(b, 'Deletion (black)')].pref_low for b, *_ in NATURAL[1:]])} "
         "of the time at low reliance. A pre-registered test on Pet confirmed three of four "
-        "predictions; black deletion failed the form-matched control.")
+        "predictions; black deletion failed the form-matched control. A second, on an ImageNet-pretrained "
+        "network and gap-filled settings, confirmed four of five.")
     assert word_count(abstract) <= 250, word_count(abstract)
     p = para("")
     add_runs(p, "**Abstract** " + abstract)
@@ -1402,9 +1588,9 @@ def build():
         "towards 0%, and on CIFAR-10 black and blur deletion prefer a random pixel ordering over a centred "
         "object map. Real masks on Pet reduce this form bias but do not remove the over-detection.",
         "**A pre-registered test and a pre-registered amendment.** The Pet predictions P1\u2013P4 were committed "
-        f"before training; {N_A1} models that fill reliance gaps were added under a dated amendment (A1) and "
-        f"{N_A2_PET} Pet models under a second one (A2, whose pretrained-network and further CIFAR-10 models are "
-        "pending), and every model set is reported.",
+        f"before training; {N_A1} models that fill reliance gaps were added under a dated amendment (A1), and a "
+        f"second one (A2) added {N_A2_SD2} natural-image models in the remaining reliance gaps and {N_SD1} "
+        "ImageNet-pretrained Pet models with predictions P5\u2013P9. Every model set is reported.",
     ])
     para("Section 2 positions the work, Sections 3 and 4 describe the protocol and setup, Section 5 reports the "
          "results (natural images first), and Sections 6\u20138 discuss them, state the limitations and conclude. "
@@ -1579,7 +1765,8 @@ def build():
         "intervals describe uncertainty. The main responsiveness tables give crossed and BCa intervals; the "
         "other tables give two-level intervals.",
         "**Multiplicity**: Benjamini\u2013Hochberg within each family (each comparison, the methods, the metric "
-        "pairs, each behavioural label), and Holm over the union of the headline tests. Correlation p-values "
+        "pairs, each behavioural label), and Holm over the union of the headline tests; the families of the "
+        "analysis of all models also contain the SD1 setting. Correlation p-values "
         "use Spearman's t approximation; p-values below 0.001 are printed as p < 0.001.",
         "**Effect size**: the median per-image AUC gap at the lowest and the highest dose.",
     ])
@@ -1587,7 +1774,8 @@ def build():
     para("Five methods are run on every model with Captum " + cite("captum") + ": Saliency (absolute gradient), "
          "SmoothGrad (25 samples, noise 0.15), Integrated Gradients (50 steps, black baseline), Grad-CAM on the "
          "last convolutional feature maps (6\u00d76 for the 28\u00d728 CNN, 16\u00d716 for the CIFAR CNN, 4\u00d74 "
-         "for the CIFAR ResNet-18 and 16\u00d716 for the Pet ResNet-18, upsampled bilinearly), and Occlusion "
+         "for the CIFAR ResNet-18, 16\u00d716 for the Pet ResNet-18 and 4\u00d74 for the pretrained Pet ResNet-18 "
+         "of SD1, upsampled bilinearly), and Occlusion "
          "(window and stride 4 and 2 at 28 and 32 px, 16 and 8 on Pet). For each method we compute the share of "
          "positive attribution on the shortcut pixels (relevance mass accuracy " + cite("arras") + ").")
 
@@ -1600,17 +1788,20 @@ def build():
     para("**Networks and training.** A small CNN with four convolutional layers on the 28\u00d728 data; on "
          "CIFAR-10 a CNN with batch normalisation (0.77M parameters) and a ResNet-18 " + cite("he") + " (11.2M "
          "parameters) with a 3\u00d73 stride-1 first convolution and no initial max-pooling; on Pet the same "
-         "ResNet-18, also with this CIFAR-style stem. All networks are trained from scratch with Adam (learning "
+         "ResNet-18, also with this CIFAR-style stem. Apart from the separate pretrained SD1 network (amendment A2, "
+         "below), all networks are trained from scratch with Adam (learning "
          f"rate 10\u207b\u00b3, batch size 128) for {EPOCHS['mnist']} (MNIST), {EPOCHS['pneumonia_mnist']} "
          f"(PneumoniaMNIST), {EPOCHS['cifar10']} (CIFAR CNN), {EPOCHS['cifar10_resnet18']} (CIFAR ResNet-18) and "
          f"{EPOCHS['pet_resnet18']} epochs (Pet), keeping the best validation checkpoint, without augmentation. "
          f"The ResNet-18 models were trained on a free Kaggle T4 GPU (about {MINUTES['cifar10_resnet18']:.0f} "
          f"minutes per CIFAR model and {MINUTES['pet_resnet18']:.0f} per Pet model); all others on a laptop CPU.")
     counts = "; ".join(f"{BASE_NAMES[b]} {N_BASE[b]}" for b in ["pet_resnet18", "cifar10_resnet18", "cifar10",
-                                                                 "mnist", "pneumonia_mnist"])
+                                                                 "mnist", "pneumonia_mnist",
+                                                                 "pet_resnet18_pretrained"])
     para(f"**Models.** {N_MODELS} models in total ({counts}). Seeds: "
          + "; ".join(f"{BASE_NAMES[b]} {', '.join(str(s) for s in SEEDS[b])}" for b in
-                     ["pet_resnet18", "cifar10_resnet18", "cifar10", "mnist", "pneumonia_mnist"])
+                     ["pet_resnet18", "cifar10_resnet18", "cifar10", "mnist", "pneumonia_mnist",
+                      "pet_resnet18_pretrained"])
          + f". {N_ORIGINAL} models existed before amendment A1 (docs/PREDICTIONS_amendments.md, commit 8738b32, "
          f"committed before any of its models was trained); A1 added {N_A1} MNIST and PneumoniaMNIST models at "
          "new doses near the steep part of the dose-response curve, with six seeds at the two steepest MNIST "
@@ -1620,18 +1811,30 @@ def build():
         f"{BASE_NAMES.get(p.base, p.base)} dose {f2(p.dose)}, seed {int(p.seed)} ({RC} {f1(p.reliance_corrected)}%, "
         + ("an SD1 pilot" if p.model_set == "A2_pilot" else "one of the SD2 models, not scored yet") + ")"
         for p in PILOTS.itertuples())
+    def a2_seeds(base):
+        return ", ".join(str(s) for s in sorted(A2_MODELS[A2_MODELS.base == base].seed.unique(),
+                                                key=[42, 1, 2].index))
+
+    sd1_doses = ", ".join(("+" if d > 0 else "") + f"{d:g}" for d in DOSES[SD1[0]]).replace("-", MINUS)
     para("**Amendment A2.** A second dated amendment (docs/PREDICTIONS_amendments.md, A2, with predictions "
          "P5\u2013P9 in docs/PREDICTIONS_pretrained.md; Zenodo record 10.5281/zenodo.24285532) adds natural-image "
-         "doses inside the reliance gaps (SD2) and an ImageNet-pretrained ResNet-18 on Pet (SD1). So far "
-         f"{N_A2_PET} of its models are analysed: Pet from scratch at dose {f2(A2_PET_DOSES[0])}, seeds "
-         f"{', '.join(str(s) for s in sorted(A2_MODELS.seed.unique(), key=[42, 1, 2].index))}. They are pooled "
-         f"with the other Pet models, and results without them are written to results/dose_response/pre_a2_models/ "
-         f"({N_ORIGINAL + N_A1} models). The pilots are listed separately and are not pooled (results/dose_response/"
-         f"pilots.csv): {pilot_text}. The pilots fixed the final doses under the amendment's rules (completion "
-         "notes A2-C1 and A2-C2, 2026-11-17): CIFAR-10 doses \u22120.05, \u22120.03, \u22120.02 and \u22120.01, and "
-         "SD1 doses \u22120.5, \u22120.2, 0, +0.1, +0.25 and +0.4. The confirmatory SD1 models and the further "
-         "CIFAR-10 SD2 models are not trained yet, so their results are pending and none of P5\u2013P9 is judged "
-         "here. When SD1 is reported, its Grad-CAM maps are coarser than those of the Pet ResNet-18 from scratch: "
+         "doses inside the reliance gaps (SD2) and an ImageNet-pretrained ResNet-18 on Pet (SD1). Pilots fixed "
+         "the final doses under the amendment's rules (completion notes A2-C1 and A2-C2, 2026-11-17, Zenodo "
+         "10.5281/zenodo.24333540). SD2 adds "
+         f"{N_A2_SD2} models: Pet from scratch at dose {f2(A2_PET_DOSES[0])} ({N_A2_PET} models), and CIFAR-10 at "
+         f"doses {', '.join(f2(d) for d in A2_CIFAR_DOSES)} with ResNet-18 ({A2_COUNTS['cifar10_resnet18']} "
+         f"models, seeds {a2_seeds('cifar10_resnet18')}) "
+         f"and the small CNN ({A2_COUNTS['cifar10']} models, seeds {a2_seeds('cifar10')}). "
+         "The CIFAR-10 ResNet-18 pilot (dose \u22120.05, seed 42) is one of these models, as A2 specifies. The SD2 "
+         "models are pooled with the existing models of their setting, and results without any A2 model are "
+         f"written to results/dose_response/pre_a2_models/ ({N_ORIGINAL + N_A1} models). SD1 has {N_SD1} "
+         f"confirmatory models (doses {sd1_doses}, seeds {a2_seeds(SD1[0])}), the ImageNet-pretrained ResNet-18 with the "
+         "standard ImageNet stem, fine-tuned for "
+         f"{EPOCHS[SD1[0]]} epochs with Adam (learning rate 10\u207b\u2074, batch size 128) on the same Pet data, "
+         "shortcut, oracle maps and metrics. SD1 is a separate setting: it is never pooled with the Pet "
+         "ResNet-18 from scratch, and it is reported in Section 5.10 only. The pilots are listed separately and "
+         f"are not pooled (results/dose_response/pilots.csv): {pilot_text}. The SD1 Grad-CAM maps are coarser "
+         "than those of the Pet ResNet-18 from scratch: "
          "with the standard ImageNet stem the last residual stage is 4\u00d74 at 128\u00d7128, against 16\u00d716 "
          "with the CIFAR-style stem, so method-level comparisons between the two mix pretraining with map "
          "resolution. The oracle-map metrics do not use Grad-CAM and are not affected.")
@@ -1686,10 +1889,11 @@ def build():
            f"Preference for the shortcut map over the full object map against chance-corrected reliance {RC}, for "
            "the four metrics in the seven settings (natural images first). Dots are single models; lines are the "
            "increasing isotonic fits used for the switch points. Dotted line: the assumed 50% ideal; dashed line: "
-           "the behavioural switch, where the models' per-image follow rate crosses 0.5 (primary label; not "
-           "identified on " + " and ".join(SHORT[(r.base, r.shortcut)] for r in bsw.values()
-                                           if r.status.startswith("not identified"))
-           + ", where the line only marks the isotonic crossing inside a reliance gap"
+           "the behavioural switch, where the models' per-image follow rate crosses 0.5 (primary label"
+           + "".join("; not identified on " + " and ".join(ni)
+                     + ", where the line only marks the isotonic crossing inside a reliance gap" for ni in
+                     [[SHORT[(r.base, r.shortcut)] for r in bsw.values() if r.status.startswith("not identified")]]
+                     if ni)
            + "".join(", and not bracketed on " + " and ".join(nb) for nb in
                      [[SHORT[(r.base, r.shortcut)] for r in bsw.values()
                        if r.status == "identified" and not r.bracketed]] if nb)
@@ -1713,7 +1917,7 @@ def build():
     o_bb = [over[("pet_resnet18", m)] for m in BB]
     para(f"Table {t_over} decomposes the over-detection. At the lowest dose the shortcut-vs-object preference "
          "(S\u2013O) equals the random-vs-object preference (R\u2013O) within "
-         f"{f2(max_so_ro)} in all {len(OVER)} metric\u2013setting cells, and the shortcut-vs-random preference "
+         f"{f2(max_so_ro)} in all {len(over_main)} metric\u2013setting cells, and the shortcut-vs-random preference "
          f"(S\u2013R) is {span(nat_over.pref_sr_low)} on the natural images. At low reliance the metrics thus rate "
          "the shortcut pixels about like random pixels, which is correct, and the preference above 0.5 comes "
          "from the object map not beating a random ordering. On CIFAR-10 that object map is a centred Gaussian "
@@ -1796,8 +2000,6 @@ def build():
          f"bands (Fig. {f_beh}) the PneumoniaMNIST patch AUROC "
          f"falls to {span(pp_band.auroc_strat)} above {RC} = 60%, where the metrics rank the images the "
          f"wrong way round (with only {span(pp_band.n_neg, lambda v: f'{v:.0f}')} non-followed images per band).")
-    assert all(swrow(b, s, lab).status.startswith("not identified") for b, s, *_ in NATURAL[1:]
-               for lab in BEHAVIOUR_LABELS), "text: on CIFAR-10 no label identifies the switch"
     for b in ("mnist", "pneumonia_mnist"):
         sel = BEH[(BEH.comparison == FULL) & (BEH.base == b) & (BEH.shortcut == "patch")]
         assert sel[sel.label == "shortcut_dominant"].auroc_pooled_strat.min() > \
@@ -1806,8 +2008,12 @@ def build():
          "the metric switches. Under the primary label the models follow the shortcut on half of the images at "
          f"the following {RC}: "
          + "; ".join(f"{switch_text(bsw[(b, s)])} on {short}" for b, s, _, short in SETTINGS)
-         + ". On CIFAR-10 the crossing falls in a reliance gap without models, so it is only known to lie above "
-         "the last model below the gap. On Pet it is identified and, with the "
+         + ". On CIFAR-10 it is identified and bracketed with the amendment-A2 models at doses "
+         f"{', '.join(f2(d) for d in A2_CIFAR_DOSES)} ({A2_COUNTS['cifar10_resnet18']} ResNet-18 and "
+         f"{A2_COUNTS['cifar10']} CNN models). Without them (results/dose_response/pre_a2_models/) the crossing "
+         "fell in a reliance gap without models and was only known to lie above the last model below the gap: "
+         + " and ".join(f"{switch_text(r)} on {SHORT[(r.base, r.shortcut)]}" for r in cifar_pre_a2)
+         + ". On Pet it is identified and, with the "
          f"{N_A2_PET} amendment-A2 models at dose {f2(A2_PET_DOSES[0])}, also bracketed: the nearest models lie "
          f"{f1(pet_bsw.distance_below)} points below ({RC} {f1(pet_below)}, an A2 model) and "
          f"{f1(pet_bsw.distance_above)} points above. Without the A2 models (the {N_ORIGINAL + N_A1} models, "
@@ -1816,7 +2022,9 @@ def build():
          "spread at this dose is wide. The two check "
          "labels are still not bracketed on Pet. The assumed 50% is close to "
          f"the bracketed MNIST patch switch ({f1(mp_bsw.behavioural_switch_rc)}%) and too high for PneumoniaMNIST; "
-         "on CIFAR-10 it can be neither confirmed nor rejected. Measured against the behaviour the over-detection "
+         "on CIFAR-10 the bracketed switches lie above it ("
+         + " and ".join(f"{f1(r.behavioural_switch_rc)}% on {SHORT[(r.base, r.shortcut)]}" for r in cifar_bsw)
+         + "). Measured against the behaviour the over-detection "
          f"remains: on the natural images the calibration gap (preference minus follow rate) is positive in every "
          f"cell ({span(gap_nat)}), and {span(gap_det_nat)} when the preference is computed on the same "
          "determined images as the follow rate.")
@@ -1829,7 +2037,11 @@ def build():
          "second condition, so it also counts errors; the shortcut-dominance check asks whether the shortcut is "
          "more necessary than the object on the aligned image. The Pet switch is "
          f"{span(pet_label_sw, f1)}% depending on the label, and the PneumoniaMNIST texture switch "
-         f"{span(pt_label_sw, f1)}%; on CIFAR-10 no label identifies it. Only the primary label leaves images "
+         f"{span(pt_label_sw, f1)}%; on CIFAR-10 every label identifies it, at "
+         + " and ".join(f"{span([swrow(b, s, lab).behavioural_switch_rc for lab in BEHAVIOUR_LABELS], f1)}% on "
+                        f"{short}" for b, s, _, short in NATURAL[1:])
+         + (", but it is not bracketed under " + "; ".join(cifar_check_nb) if cifar_check_nb else "")
+         + ". Only the primary label leaves images "
          f"undetermined, on average {pct(pet_und.undetermined_rate_mean)} on Pet (up to "
          f"{pct(pet_und.undetermined_rate_max)} for one model) and {pct(pp_und.undetermined_rate_mean)} on "
          "PneumoniaMNIST patch, and the share rises with reliance (Spearman \u03c1 with "
@@ -1843,7 +2055,8 @@ def build():
     figure(figs["behaviour"],
            f"Class-stratified AUROC of each metric's per-image AUC gap against the behavioural label, within {RC} "
            "bands (shortcut vs full object). Panels rearranged from results/dose_response/behaviour_auroc.png "
-           "(alphabetical setting order)")
+           "(alphabetical setting order; the pet_resnet18_pretrained panel is the separate SD1 setting, "
+           "Section 5.10)")
 
     heading("5.5. Mechanism settings: size and switch identification", 2)
     f_matched = COUNTERS["fig"] + 1
@@ -1942,7 +2155,7 @@ def build():
          "variants missed in " + ", ".join(f"{n_ - ok_} of {n_} cases ({m})" for m, (ok_, n_, _) in robust.items()
                                             if ok_ < n_) + ". Against the full object map alone, black, blur and "
          f"inpainting deletion are positive and significant in all {N_SETTINGS} settings. A paired test does "
-         f"not make inpainting the best variant (Table {t_pairs}): {n_pairs_sig} of {len(PAIRS)} metric pairs "
+         f"not make inpainting the best variant (Table {t_pairs}): {n_pairs_sig} of {len(main_only(PAIRS))} metric pairs "
          f"differ at p_bh < 0.05, and on PneumoniaMNIST texture black deletion has the higher \u03c1 against "
          f"the full object map (black \u2212 inpaint \u0394\u03c1 = {f3(pt_pairs['Deletion (inpaint)'].delta_rho_rc)} "
          f"{ci(pt_pairs['Deletion (inpaint)'].delta_rho_rc_ci_low, pt_pairs['Deletion (inpaint)'].delta_rho_rc_ci_high, f3)}, "
@@ -1968,24 +2181,113 @@ def build():
     figure(figs["methods"],
            "Share of positive attribution that each explanation method places on the shortcut pixels, against raw "
            "reliance. Panels rearranged from results/dose_response/method_dose_response.png (alphabetical setting "
-           "order)")
+           "order; the pet_resnet18_pretrained panel is the separate SD1 setting, whose Grad-CAM maps are 4\u00d74)")
     table_methods()
 
     heading("5.9. Reliance and object competence", 2)
     t_conf = COUNTERS["table"] + 1
     cnn = conf_cifar.iloc[0]
+    least = [k for k, v in conf_set.sort_values(ascending=False).items() if v > cnn.rho_rc_competence]
     para("A model that relies more on the shortcut is also worse at the object, so a metric that responds to "
          "reliance may be responding to object competence. Table "
          f"{t_conf} separates the two on {RC}. Reliance and accuracy without the shortcut are least collinear "
-         f"for the CIFAR small CNN (\u03c1 = {f2(cnn.rho_rc_competence)}), where the partial \u03c1 of preference "
-         f"with {RC} given competence stays at {span(conf_cifar.partial_rc_given_acc)}. In "
+         "on " + " and ".join(f"{SHORT[k]} (\u03c1 = {f2(conf_set[k])})" for k in least)
+         + f", then the CIFAR small CNN (\u03c1 = {f2(cnn.rho_rc_competence)}; "
+         f"{f2(cnn_pre_a2.rho_rc_competence)} without its {A2_COUNTS['cifar10']} A2 models, which fill its "
+         f"reliance gap). The partial \u03c1 of preference with {RC} given competence stays significant for all "
+         "four metrics on "
+         + " and ".join(f"{SHORT[k]} ({span([ccrow(*k, m).partial_rc_given_acc for m in METRICS])})"
+                        for k in sorted(conf_all_sig, key=lambda k: list(SHORT).index(k)))
+         + ". In "
          f"{len(collinear)} of {len(conf_set)} settings the two are collinear (\u03c1 \u2264 \u22120.95), and there "
          "the partial correlations are smaller and in places not significant (MNIST texture "
          f"{signed_span(CONF_RC[(CONF_RC.base == 'mnist') & (CONF_RC.shortcut == 'texture')].partial_rc_given_acc)}). "
-         f"After Benjamini\u2013Hochberg over the {len(CONF_RC)} tests, {conf_rc_sig} partial correlations remain "
-         "significant. Outside the CIFAR small CNN our design cannot fully separate reliance from object "
-         "competence.")
+         f"After Benjamini\u2013Hochberg over the {len(CONF_RC)} tests, {conf_rc_sig} of the {len(main_only(CONF_RC))} "
+         "partial correlations of the main settings remain significant. Where reliance and competence are "
+         "collinear, our design cannot fully separate the two.")
     table_confound()
+
+    heading("5.10. Pre-registered amendment A2: pretrained Pet (SD1) and the filled reliance gaps (SD2)", 2)
+    t_a2 = COUNTERS["table"] + 1
+    sd1_bb = [sd1_over[m] for m in BB]
+    sd1_ii = [sd1_over[m] for m in II]
+    sd1_conf = {m: ccrow(*SD1_KEY, m) for m in METRICS}
+    sd1_beh = {m: brow(FULL, *SD1_KEY, m) for m in METRICS}
+    sd1_levels = levels(*SD1_KEY)
+    sd1_dose0 = sd1_levels[sd1_levels.dose == 0].iloc[0]
+    para("Amendment A2 and its predictions P5\u2013P9 (docs/PREDICTIONS_pretrained.md) were committed and "
+         "timestamped on Zenodo before any SD1 or SD2 model was trained; the verdicts below apply the "
+         f"pre-registered rules literally, to point estimates, and are summarised in Table {t_a2}. P5\u2013P8 use "
+         f"the {N_SD1} SD1 models, an ImageNet-pretrained ResNet-18 fine-tuned on Pet with the same patch "
+         f"shortcut (Section 4). Their {RC} spans {f1(sd1_low)}% to {f1(sd1_g.reliance_corrected.max())}%: at "
+         f"dose 0 the pretrained models reach only {f1(sd1_dose0.reliance_corrected)}% on average, while every "
+         f"model at the next dose (+0.1) has at least {f1(sd1_gap[1])}%, so {int(sd1_over[METRICS[0]].n_below)} "
+         f"models lie at or below {RC} = 50 and {int(sd1_over[METRICS[0]].n_above)} above it.")
+    para(f"**Over-detection persists after pretraining (P5 {p_verdicts['P5']}).** Among the "
+         f"{int(sd1_bb[0].n_below)} SD1 models with {RC} \u2264 50, black deletion prefers the shortcut map for "
+         f"{int(sd1_bb[0].k_fpr)} ({f2(sd1_bb[0].fpr)} {ci(sd1_bb[0].fpr_cp_low, sd1_bb[0].fpr_cp_high)}) and "
+         f"blur deletion for {int(sd1_bb[1].k_fpr)} ({f2(sd1_bb[1].fpr)} "
+         f"{ci(sd1_bb[1].fpr_cp_low, sd1_bb[1].fpr_cp_high)}), so both rates exceed 0.5 as predicted; the "
+         "Clopper\u2013Pearson interval of blur deletion still reaches well below 0.5, and with a per-model "
+         f"margin both fall to {span([o.fpr_margin for o in sd1_bb])}. **Inpainting and insertion over-detect "
+         f"less (P6 {p_verdicts['P6']}):** {f2(sd1_ii[0].fpr)} and {f2(sd1_ii[1].fpr)}, each below both black "
+         f"and blur deletion. Split by reliance, the over-detection at {RC} \u2264 10 is "
+         + ", ".join(f"{f2(sd1_over[m].fpr_rc_le10)} ({m})" for m in METRICS)
+         + f" over {int(sd1_bb[0].n_rc_le10)} models, and every metric over-detects for all "
+         f"{int(sd1_bb[0].n_rc_10_50)} models with 10 < {RC} \u2264 50. "
+         f"**The size-matched comparison switches at the edge (P7 {p_verdicts['P7']}):** against the "
+         f"size-matched object map {sum(sd1_edge.values())} of 4 metrics switch within 5 points of the "
+         f"lowest-{RC} model or already prefer the shortcut map there.")
+    para(f"**The metrics respond to reliance, but the excess preference does not rise (P8 "
+         f"{p_verdicts['P8']}).** Part (a) holds: Spearman \u03c1 between {RC} and the shortcut-vs-object "
+         f"preference is {', '.join(f2(sd1_full[m].rho_rc) for m in METRICS)} for the four metrics, above 0.8 "
+         f"in {p8a_n} of 4. Part (b) fails: \u03c1 between {RC} and the excess shortcut preference (S\u2013O "
+         "\u2212 R\u2013O) is "
+         + ", ".join(f2(sd1_over[m].rho_excess_rc) for m in METRICS)
+         + " (one-sided p_bh over the four metrics "
+         + ", ".join(format_p(sd1_bh4[m]) for m in METRICS)
+         + f"), positive and significant in {p8b_n} of 4 (inpainting deletion only), against the required 3. "
+         "For the other three metrics the rise of the shortcut-vs-object preference with reliance is not "
+         "significantly larger than the rise of the random-vs-object preference, so the shortcut pixels add "
+         f"little beyond a random ordering. At the lowest dose S\u2013O, R\u2013O and S\u2013R are "
+         + "; ".join(f"{f2(sd1_over[m].pref_so_low)}, {f2(sd1_over[m].pref_ro_low)} and "
+                     f"{f2(sd1_over[m].pref_sr_low)} ({m})" for m in METRICS)
+         + ".")
+    p9_tested = [r for _, tested, _ in p9_rows.values() for r in tested]
+    p9_untested = [r for *_, untested in p9_rows.values() for r in untested]
+    assert all(r.metric_switch_status == "above 0.5 at lowest reliance" for r in p9_untested)
+    para(f"**Metrics switch before behaviour (P9 {p_verdicts['P9']}).** With the A2 models the behavioural "
+         "switch is identified and bracketed in all three SD2 settings: "
+         + "; ".join(f"{switch_text(bsw[(b, s)])} on {short}" for b, s, _, short in p9_settings)
+         + f". In each of the {len(p9_tested)} cells with an identified metric switch against the full object "
+         "map, the paired bootstrap interval of the difference (behavioural \u2212 metric switch) lies above 0 "
+         f"(differences {span([r.difference for r in p9_tested], f1)} points, lower interval ends "
+         f"{span([r.diff_ci_low for r in p9_tested], f1)}; Table {t_a2 + 2}). The other {len(p9_untested)} "
+         "cells have no metric switch because the metric already prefers the shortcut map at the lowest "
+         "reliance, which P9 does not test.")
+    para(f"**Secondary outcomes (no verdict).** The SD1 behavioural switch is not identified: the isotonic "
+         f"crossing lies at {f1(sd1_bsw.behavioural_switch_rc)}%, but no model lies between {RC} "
+         f"{f1(sd1_gap[0])}% and {f1(sd1_gap[1])}%, so it is only known to lie above {f1(sd1_gap[0])}% "
+         "(the same holds under both check labels). Against the primary label, the class-stratified pooled "
+         f"AUROC is {span([r.auroc_pooled_strat for r in sd1_beh.values()])} and the within-model median "
+         f"{span([r.median_model_auroc_strat for r in sd1_beh.values()])}; "
+         f"{pct(sd1_bsw.undetermined_rate_mean)} of the images are undetermined on average (up to "
+         f"{pct(sd1_bsw.undetermined_rate_max)}), with Spearman \u03c1 = {f2(sd1_bsw.rho_undetermined_rc)} "
+         f"between that share and {RC}. Reliance and object competence are collinear on SD1 "
+         f"(\u03c1({RC}, acc) = {f2(sd1_conf[METRICS[0]].rho_rc_competence)}), and the partial \u03c1 of "
+         f"preference with {RC} given competence is "
+         + ", ".join(f"{f2(sd1_conf[m].partial_rc_given_acc)} ({m})" for m in METRICS)
+         + f". Compared exploratorily with the Pet ResNet-18 from scratch (Table {t_a2 + 1}), the pretrained "
+         f"network gives a similar responsiveness (\u03c1 = {span([r.rho_rc for r in sd1_full.values()])} against "
+         f"{span([r.rho_rc for r in sd1_pet.values()])}) and lower over-detection by blur deletion, inpainting "
+         "and insertion. Method-level comparisons between the two networks are confounded by the 4\u00d74 "
+         "Grad-CAM maps of the pretrained network (16\u00d716 from scratch, Section 4).")
+    assert all(sd1_over[m].fpr < over[("pet_resnet18", m)].fpr for m in METRICS[1:]), "text: lower over-detection"
+    assert all(sd1_over[m].fpr_rc_10_50 == 1 for m in METRICS), "text: every metric over-detects at 10-50"
+    assert [m for m in METRICS if sd1_over[m].rho_excess_rc > 0 and sd1_bh4[m] < 0.05] == ["Deletion (inpaint)"]
+    table_a2_outcomes(p_verdicts, sd1_over, sd1_full, sd1_matched, sd1_edge, sd1_bh4, p8a_n, p8b_n, p9_rows, bsw)
+    table_sd1(sd1_bh4)
+    table_p9(p9_rows, bsw)
 
     # ---- 6 Discussion
     heading("6. Discussion")
@@ -2033,9 +2335,9 @@ def build():
         "All metrics come from one family (ordered pixel removal or insertion with three fills). Other families "
         "such as faithfulness correlation or region perturbation were not tested, and the inpainting variant "
         "is inspired by ROAD but is not ROAD.",
-        "All analysed networks are trained from scratch; the Pet ResNet-18 uses a CIFAR-style stem at "
-        "128\u00d7128. The ImageNet-pretrained Pet setting (SD1, amendment A2) is pre-registered but its "
-        "confirmatory models are pending, and no transformer backbone was tested.",
+        "The networks of the main study are trained from scratch; the Pet ResNet-18 uses a CIFAR-style stem at "
+        f"128\u00d7128. The only pretrained network is the ImageNet ResNet-18 of SD1 ({N_SD1} models, one "
+        "dataset and one shortcut), and no transformer backbone was tested.",
         "The shortcut is synthetic (a white patch or a brightened texture). The dose varies the shortcut's "
         "predictivity, not its availability " + cite("hermann") + ".",
         "The oracle maps have limits: on PneumoniaMNIST the object map is an intensity ranking of the whole "
@@ -2044,9 +2346,11 @@ def build():
         "20\u201325% of the patch intensity in place; and the inpainting curve ends on noise around black.",
         f"Reliance and object competence are collinear in {len(collinear)} of {len(conf_set)} settings (Section 5.9).",
         "The chance correction assumes that errors spread evenly over the wrong classes.",
-        "A reliance gap remains on CIFAR-10 until the A2 doses are trained, so the CIFAR-10 behavioural "
-        "switch is not identified; the A2 Pet models bracket the Pet switch under the primary label only, and "
-        "each A2 Pet dose has only three seeds with a wide spread. Each model is scored on 100 "
+        "The behavioural switches on the natural images rest on the A2 models in the former reliance gaps: "
+        "on Pet they bracket the switch under the primary label only, the A2 Pet dose has only three seeds "
+        "with a wide spread, and the CIFAR-10 small CNN has two seeds per dose. On SD1 the reliance jumps from "
+        f"{RC} {f1(sd1_gap[0])}% to {f1(sd1_gap[1])}% between adjacent doses, so its behavioural switch is not "
+        "identified. Each model is scored on 100 "
         "images, the within-model AUROCs on natural images have null standard errors of about "
         f"{span([p.median_hanley_mcneil_se for p in nat_power])}, and the low-reliance preferences "
         "on Pet are near ties.",
@@ -2065,9 +2369,13 @@ def build():
          "least half of the Pet models and nearly all CIFAR-10 models that barely use it, the metrics switch far below the reliance at which the models follow the "
          "shortcut on half of the images, and within a model they separate followed from non-followed images "
          "only weakly. The pre-registered Pet test confirmed three of four predictions and showed black "
-         "deletion failing a form-matched control. Metrics should be validated at several measured reliance "
+         "deletion failing a form-matched control. The pre-registered amendment confirmed four of five further "
+         "predictions: black and blur deletion also over-detect on an ImageNet-pretrained network, and the "
+         "metrics switch before behaviour once the natural-image reliance gaps are filled; the excess shortcut "
+         "preference of the pretrained network did not rise significantly with reliance for three of the four "
+         "metrics. Metrics should be validated at several measured reliance "
          "levels, against behavioural ground truth and with size- and form-matched controls, before they are "
-         "used to rank explanation methods. Future work should test other metric families, pretrained "
+         "used to rank explanation methods. Future work should test other metric families, other pretrained "
          "backbones and realistic shortcuts.")
 
     # ---- Declarations
@@ -2128,11 +2436,15 @@ def build():
 
     # ---- Appendix C
     heading("Appendix C. Original and amended model sets")
-    para(f"Amendment A1 committed to reporting both the {N_ORIGINAL} original models and all {N_MODELS} models. "
-         "The added models strengthen the rank correlations slightly and weaken the decision-level results: "
-         "over-detection rises and the switch points move. Amendment A2 makes the same commitment for its models: "
-         f"the {N_ORIGINAL + N_A1} models without them are analysed in results/dose_response/pre_a2_models/, and "
-         f"the {N_MODELS}-model column below includes the {N_A2_PET} A2 Pet models.")
+    para(f"Amendment A1 committed to reporting both the {N_ORIGINAL} original models (results/dose_response/"
+         f"original_models/) and the {N_ORIGINAL + N_A1} models that include its {N_A1} added MNIST and "
+         "PneumoniaMNIST models. The added models strengthen the rank correlations slightly and weaken the "
+         "decision-level results: over-detection rises and the switch points move. Amendment A2 makes the same "
+         f"commitment for its {N_A2} models: the {N_ORIGINAL + N_A1} models without them are analysed in "
+         f"results/dose_response/pre_a2_models/, and the analysis of all {N_MODELS} models adds the {N_A2_SD2} "
+         f"SD2 models to their settings and the {N_SD1} SD1 models as a separate setting. A2 added no MNIST or "
+         "PneumoniaMNIST model, so the table below compares the original models with the models including A1; "
+         "the A2 changes on the natural images are in Sections 5.4 and 5.10.")
     table_sets()
 
     # ---- References
