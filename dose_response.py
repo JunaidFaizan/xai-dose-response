@@ -5,6 +5,8 @@ Usage:
     python dose_response.py train
     python dose_response.py evaluate --samples 100
     python dose_response.py analyze
+    python dose_response.py road             # exact ROAD (amendment A3, SD3); not part of "all"
+    python dose_response.py road --time-only --models NAME ...   # timing gate, scores discarded
 
 Design
     For each base dataset (MNIST, PneumoniaMNIST) and shortcut type (a local
@@ -76,6 +78,17 @@ kaggle/dose_response_a2_session1.ipynb and _session2.ipynb)
     pooled with the confirmatory models); the final doses follow
     a2_dose_set() applied to the pilot's r_c at dose 0.
 
+Watermark shortcut (amendment A3 SD4, pet_resnet18_pretrained only; Kaggle GPU)
+    The SD1 network and settings with a class-coded semi-transparent mark
+    (alpha 0.4) in the bottom-right 24x12 corner box instead of the patch
+    (--shortcuts watermark; xai/data.py, xai/watermark_masks.npy). Pilot:
+    doses 0 and +0.25, seed 7 (model set "A3_pilot", never pooled, not
+    scored). The final doses follow a3_dose_set() applied to the dose-0
+    pilot's r_c; SD4 stops if the +0.25 pilot's r_c is below 20
+    (a3_sd4_stopped). Confirmatory models (6 doses x seeds 42, 1, 2, model
+    set "A3") are registered only once the dated completion note sets
+    A3_SD4_RULE.
+
 Output
     checkpoint/dose/<base>_<shortcut>_dose<+NNN>_seed<N>.pt (+ _metrics.json)
     results/dose_response/scores_oracle.csv, scores_methods.csv  per-image scores
@@ -98,6 +111,11 @@ Output
         pilots, and A2 models without scores yet), with a summary.md section;
         models outside every pre-registered design are "unregistered" and
         excluded from every model set (model_set_of)
+    results/dose_response/per_model/<name>_road.csv  exact ROAD scores (python
+        dose_response.py road; amendment A3, SD3), road_timing.csv (--time-only),
+        and from analyze (model set all, only when ROAD scores exist):
+        road_models.csv, preference_road.csv, responsiveness_corrected_road.csv,
+        overdetection_road.csv and an appended "Exact ROAD" section of summary.md
     analyze --model-set original writes the same files for the 192 models
     from before amendment A1 to results/dose_response/original_models/, and
     analyze --model-set pre_a2 the 234 models from before amendment A2 to
@@ -122,12 +140,13 @@ from torch.utils.data import DataLoader
 
 from train_models import accuracy, predict_all
 from utils import random_seed
-from xai.data import SHORTCUT_TYPES, info, num_classes, shortcut_split
+from xai.data import A3_SHORTCUT_TYPES, SHORTCUT_TYPES, WATERMARK_BASES, info, num_classes, shortcut_split
 from xai.explain import METHODS, explain
-from xai.metrics import (BLUR_KERNEL, BLUR_SIGMA, FAITHFULNESS_METRICS, INPAINT_ITERATIONS,
-                         area_under_curve, perturbation_curve, relevance_mass_accuracy)
+from xai.metrics import (BLUR_KERNEL, BLUR_SIGMA, FAITHFULNESS_METRICS, INPAINT_ITERATIONS, ROAD_METRICS,
+                         _ranking, area_under_curve, perturbation_curve, relevance_mass_accuracy)
 from xai.models import build_model
 from xai.paths import CHECKPOINT_DIR, RESULTS_DIR
+from xai.road import ROAD_GRID, ROAD_NOISE, noisy_linear_impute, removed_pixels, road_auc, road_noise_seed
 from xai import dose_analysis
 from xai.stats import chance_floor, corrected_reliance, format_p
 
@@ -528,6 +547,117 @@ def behaviour(args):
         print(f"behaviour {name} ({time.perf_counter() - start:.1f} s)", flush=True)
 
 
+# ------------------------------------------------- exact ROAD (amendment A3, SD3)
+
+# Images per model: the first N of the 100 scoring images (A3 table). The Pet
+# value is changed to 25 only by a dated A3 timing-gate note (T3.2/T4.2).
+ROAD_PET_IMAGES = 50
+ROAD_IMAGES = {"mnist": 100, "pneumonia_mnist": 100, "cifar10": 100, "cifar10_resnet18": 50,
+               "pet_resnet18": ROAD_PET_IMAGES, "pet_resnet18_pretrained": ROAD_PET_IMAGES}
+ROAD_MAPS = ("shortcut", "object", "object_matched", "placebo", "random")
+
+
+def road_one(base, shortcut, dose, seed, images):
+    """Exact ROAD scores (xai/road.py) of the five maps on the first `images`
+    of the model's scoring images. Ranking ties are broken by the generators
+    of the existing scoring: seed 0 for the three oracle maps (shared, drawn
+    image -> metric -> map as in evaluate_one) and the CONTROL_MAPS seeds for
+    the placebo and random maps. The imputation noise comes from a CPU
+    generator seeded per model and image (road_noise_seed). Column
+    road_<order>_<map> = road_auc of the 8-point curve over ROAD_GRID."""
+    assert images <= 100, "ROAD uses the first N of the 100 scoring images"
+    name = model_name(base, shortcut, dose, seed)
+    model = load(base, shortcut, dose, seed)
+    test_set = shortcut_split(base, shortcut, "test")  # aligned, as in evaluate_one
+    generator = torch.Generator().manual_seed(IMAGE_SEED)
+    indices = torch.randperm(len(test_set), generator=generator)[:100].tolist()[:images]
+    oracle_rng = np.random.default_rng(0)
+    rngs = {"shortcut": oracle_rng, "object": oracle_rng, "object_matched": oracle_rng,
+            **{control: np.random.default_rng(rng_seed) for control, (_, rng_seed) in CONTROL_MAPS.items()}}
+    config = {"base": base, "shortcut": shortcut, "dose": dose, "seed": seed}
+    matcher = compact_matched if info(base).get("matched") == "compact" else size_matched
+    rows = []
+    for index in indices:
+        image, label = test_set[index]
+        image = image.cpu()
+        height, width = image.shape[-2:]
+        mask = test_set.mask(index)
+        object_values = test_set.object_map(index)
+        maps = {"shortcut": mask.astype(np.float64), "object": object_values,
+                "object_matched": matcher(object_values, int(mask.sum())),
+                "placebo": placebo_map(test_set, index, label), "random": random_map(test_set, index, label)}
+        noise = torch.Generator().manual_seed(road_noise_seed(name, index))
+        batch = [image]
+        for metric in ROAD_METRICS:
+            for which in ROAD_MAPS:
+                order = _ranking(maps[which], rngs[which])
+                for q in ROAD_GRID[1:]:
+                    removed = np.zeros(height * width, dtype=bool)
+                    removed[removed_pixels(order, q, metric)] = True
+                    batch.append(noisy_linear_impute(image, removed.reshape(height, width), ROAD_NOISE, noise))
+        with torch.no_grad():
+            probs = torch.exp(model(torch.stack(batch).to(DEVICE)))[:, label].cpu().numpy()
+        row = dict(config, index=index, label=label)
+        points = len(ROAD_GRID) - 1
+        for k, (metric, which) in enumerate(itertools.product(ROAD_METRICS, ROAD_MAPS)):
+            row[f"{metric}_{which}"] = road_auc([probs[0], *probs[1 + k * points:1 + (k + 1) * points]])
+        rows.append(row)
+    return rows
+
+
+def road(args):
+    """Exact ROAD for every registered model with a checkpoint (model set
+    'all': no pilots, no unregistered models) of --bases/--shortcuts, or only
+    the --selection-only configurations, or only the --models names. Cached in
+    per_model/<name>_road.csv (skipped if present unless --force). --time-only
+    scores and discards: it appends the wall time to road_timing.csv and never
+    writes _road.csv."""
+    cache = OUT / "per_model"
+    cache.mkdir(parents=True, exist_ok=True)
+    candidates = {}
+    for path in sorted(MODEL_DIR.glob("*_metrics.json")):
+        run = json.loads(path.read_text())
+        config = (run["base"], run["shortcut"], run["dose"], run["seed"])
+        if (MODEL_DIR / f"{model_name(*config)}.pt").exists():
+            candidates[model_name(*config)] = (config, run)
+    if getattr(args, "models", None):
+        missing = [n for n in args.models if n not in candidates]
+        excluded = [n for n in args.models if n in candidates and not in_model_set(candidates[n][1], "all")]
+        if missing or excluded:
+            raise SystemExit("road --models: " + "; ".join(
+                text for text in (f"no checkpoint for {', '.join(missing)}" if missing else "",
+                                  f"pilot or unregistered (not scored with ROAD): {', '.join(excluded)}"
+                                  if excluded else "") if text))
+        configs = [candidates[n][0] for n in args.models]
+    else:
+        configs = [config for config, run in candidates.values() if in_model_set(run, "all")
+                   and config[0] in args.bases and config[1] in args.shortcuts]
+        if getattr(args, "selection_only", False):
+            selected = {model_name(*c) for c in configurations(args)}
+            configs = [c for c in configs if model_name(*c) in selected]
+    time_only = getattr(args, "time_only", False)
+    device = f"cuda ({torch.cuda.get_device_name(DEVICE)})" if DEVICE.type == "cuda" else DEVICE.type
+    for config in configs:
+        name = model_name(*config)
+        path = cache / f"{name}_road.csv"
+        if path.exists() and not args.force and not time_only:
+            continue
+        images = ROAD_IMAGES[config[0]]
+        start = time.perf_counter()
+        rows = road_one(*config, images)
+        minutes = (time.perf_counter() - start) / 60
+        if time_only:
+            timing = OUT / "road_timing.csv"
+            pd.DataFrame([{"model": name, "images": images, "minutes": round(minutes, 2), "device": device}]).to_csv(
+                timing, mode="a", header=not timing.exists(), index=False)
+            print(f"road timing {name}: {images} images, {minutes:.2f} min (scores discarded)", flush=True)
+            continue
+        tmp = path.with_name(path.name + ".tmp")
+        pd.DataFrame(rows).to_csv(tmp, index=False)
+        tmp.replace(path)  # written whole: an interrupted run leaves no partial _road.csv
+        print(f"road {name} ({images} images, {minutes:.1f} min)", flush=True)
+
+
 def combine(args):
     """Check the selected configurations are evaluated, then merge EVERY cached
     model (so evaluating cifar10 separately keeps the MNIST/PneumoniaMNIST results)."""
@@ -605,6 +735,36 @@ A2_DESIGN = {"cifar10_resnet18": (("patch",), A2_CIFAR_DOSE_SETS["below 50"], (4
              "pet_resnet18_pretrained": (("patch",), A2_SD1_DOSE_SETS["below 60"], (42, 1, 2))}
 A2_PILOT_DESIGN = {"pet_resnet18_pretrained": (("patch",), [0.0, -0.5], (7,))}
 
+# Amendment A3, SD4 (docs/PREDICTIONS_amendments.md): watermark on
+# pet_resnet18_pretrained. Dose rule keyed by the dose-0 pilot's r_c (%), and
+# the stopping rule on the +0.25 pilot's r_c.
+A3_SD4_DOSE_SETS = {"60 or above": [-0.5, -0.4, -0.3, -0.2, -0.1, 0.0],
+                    "below 60": [-0.5, -0.2, 0.0, 0.1, 0.25, 0.4]}
+A3_STOP_RC = 20
+A3_PILOT_DESIGN = {"pet_resnet18_pretrained": (("watermark",), [0.0, 0.25], (7,))}
+# Set to the A3_SD4_DOSE_SETS key by the dated SD4 completion note (roadmap
+# T4.3). Stays None if SD4 stops; until then no confirmatory SD4 model is
+# registered.
+A3_SD4_RULE = None
+
+
+def a3_dose_set(pilot_rc):
+    """Final SD4 doses given the dose-0 pilot's r_c (%): "60 or above" includes 60."""
+    return list(A3_SD4_DOSE_SETS["60 or above" if pilot_rc >= 60 else "below 60"])
+
+
+def a3_sd4_stopped(rc):
+    """A3 stopping rule: SD4 stops if the +0.25 pilot's r_c (%) is below 20."""
+    return rc < A3_STOP_RC
+
+
+def a3_design():
+    """The confirmatory SD4 design (6 doses x seeds 42, 1, 2), or {} while
+    A3_SD4_RULE is None."""
+    if A3_SD4_RULE is None:
+        return {}
+    return {"pet_resnet18_pretrained": (("watermark",), A3_SD4_DOSE_SETS[A3_SD4_RULE], (42, 1, 2))}
+
 
 def _in_design(design, base, shortcut, dose, seed):
     if base not in design:
@@ -614,12 +774,20 @@ def _in_design(design, base, shortcut, dose, seed):
 
 
 def model_set_of(row):
-    """'A2_pilot' for the SD1 pilot models (pet_resnet18_pretrained, doses 0 and
-    -0.5, seed 7), 'A2' for the models added by amendment A2 at the final doses
-    of its completion notes (A2_DESIGN), 'A1' for a model added by amendment A1,
-    'original' for the designs before A1 (ORIGINAL_DESIGN), and 'unregistered'
-    for anything else (e.g. Pet dose -0.05, which needs a new amendment)."""
+    """'A3_pilot' for the SD4 watermark pilots (pet_resnet18_pretrained, doses 0
+    and +0.25, seed 7), 'A3' for the confirmatory SD4 models once the completion
+    note sets A3_SD4_RULE (a3_design), 'A2_pilot' for the SD1 pilot models
+    (pet_resnet18_pretrained, doses 0 and -0.5, seed 7), 'A2' for the models
+    added by amendment A2 at the final doses of its completion notes
+    (A2_DESIGN), 'A1' for a model added by amendment A1, 'original' for the
+    designs before A1 (ORIGINAL_DESIGN), and 'unregistered' for anything else
+    (e.g. Pet dose -0.05, which needs a new amendment). The A3 sets hold
+    watermark models only, so patch models keep their sets."""
     base, shortcut, dose, seed = row["base"], row["shortcut"], float(row["dose"]), int(row["seed"])
+    if _in_design(A3_PILOT_DESIGN, base, shortcut, dose, seed):
+        return "A3_pilot"
+    if _in_design(a3_design(), base, shortcut, dose, seed):
+        return "A3"
     if _in_design(A2_PILOT_DESIGN, base, shortcut, dose, seed):
         return "A2_pilot"
     if _in_design(A2_DESIGN, base, shortcut, dose, seed):
@@ -638,12 +806,12 @@ def model_set_of(row):
 
 def in_model_set(run, model_set):
     """Whether a model (metrics JSON or models.csv row) belongs to a model set:
-    'all' = every registered model except the SD1 pilots, 'pre_a2' = original +
-    A1 (the 234 models before amendment A2), otherwise the exact model_set_of
-    value. Unregistered models belong to no set."""
+    'all' = every registered model except the SD1 and SD4 pilots, 'pre_a2' =
+    original + A1 (the 234 models before amendment A2), otherwise the exact
+    model_set_of value. Unregistered models belong to no set."""
     kind = model_set_of(run)
     if model_set == "all":
-        return kind not in ("A2_pilot", "unregistered")
+        return kind not in ("A2_pilot", "A3_pilot", "unregistered")
     if model_set == "pre_a2":
         return kind in ("original", "A1")
     return kind == model_set
@@ -1292,6 +1460,121 @@ def audit_lines(audit, resp, reps):
     return lines
 
 
+ROAD_TITLES = {name: title for name, (title, _) in ROAD_METRICS.items()}
+
+
+def road_analysis(oracle, models, reps, out):
+    """SD3 (amendment A3): the corrected analysis restricted to the pooled
+    models with exact ROAD scores, with road_morf and road_lerf added to the
+    four existing metrics, all six on the same first-N images. Writes
+    road_models.csv, preference_road.csv, responsiveness_corrected_road.csv and
+    overdetection_road.csv to `out` and returns the lines of the summary.md
+    section; returns [] and writes nothing when no pooled model has ROAD scores.
+    The P10-P13 verdicts are not made here."""
+    keys = ["base", "shortcut", "dose", "seed"]
+    cache = OUT / "per_model"
+    names = [model_name(*k) for k in models[keys].itertuples(index=False)]
+    has = [(cache / f"{n}_road.csv").exists() for n in names]
+    if not any(has):
+        return []
+    scores = pd.concat([pd.read_csv(cache / f"{n}_road.csv") for n, h in zip(names, has) if h], ignore_index=True)
+    merged = scores.merge(oracle, on=keys + ["index", "label"], how="left", indicator=True)
+    unmatched = merged[merged["_merge"] != "both"]
+    if len(unmatched):
+        raise ValueError(f"{len(unmatched)} ROAD rows have no oracle row, e.g. "
+                         f"{model_name(*unmatched[keys].iloc[0])} image {unmatched['index'].iloc[0]}")
+    merged = merged.drop(columns="_merge")
+    road_models = models[has].reset_index(drop=True).merge(
+        scores.groupby(keys).size().rename("images").reset_index(), on=keys)
+    metrics = list(FAITHFULNESS_METRICS) + list(ROAD_METRICS)
+    titles = {**METRIC_TITLES, **ROAD_TITLES}
+    settings = dose_analysis.build_settings(merged, None, road_models, reps, BOOTSTRAP_SEED, TIE_TOLERANCE)
+    resp = dose_analysis.responsiveness_corrected(settings, COMPARISONS, titles, metrics=metrics)
+    over = dose_analysis.overdetection(settings, COMPARISONS, titles, metrics=metrics)
+    prefs = []
+    for first, second, label in dose_analysis._available(settings, COMPARISONS):
+        for s in settings:
+            frame = s.models[keys + ["reliance_corrected"]]
+            for metric in metrics:
+                c = s.comparison(first, second, metric)
+                prefs.append(frame.assign(comparison=label, metric=titles[metric], pref=c["pref"],
+                                          ties=c["ties"].mean(axis=1)))
+    pref = pd.concat(prefs, ignore_index=True)[["comparison"] + keys + ["reliance_corrected", "metric", "pref",
+                                                                       "ties"]]
+
+    road_models[keys + ["model_set", "reliance_corrected", "images"]].to_csv(out / "road_models.csv", index=False)
+    pref.round(4).to_csv(out / "preference_road.csv", index=False)
+    resp.to_csv(out / "responsiveness_corrected_road.csv", index=False)
+    over.to_csv(out / "overdetection_road.csv", index=False)
+
+    setting = lambda f: f.base + " / " + f.shortcut  # noqa: E731
+    pooled = models.groupby(["base", "shortcut"]).size().rename("pooled_models")
+    included = road_models.groupby(["base", "shortcut"]).agg(
+        road_models=("seed", "size"), images=("images", "first"),
+        rc_min=("reliance_corrected", "min"), rc_max=("reliance_corrected", "max"))
+    included = included.join(pooled).reset_index()
+    included["setting"] = setting(included)
+    grid = ", ".join(f"{q:g}" for q in ROAD_GRID)
+    lines = [
+        "## Exact ROAD (SD3, amendment A3)", "",
+        "New files (the tables above are unchanged): `road_models.csv`, `preference_road.csv`, "
+        "`responsiveness_corrected_road.csv`, `overdetection_road.csv`; per-image scores in "
+        "`per_model/<name>_road.csv` (`dose_response.py road`).", "",
+        "- Operator: Noisy Linear Imputation ported from the reference code of Rong et al. (ICML 2022) in "
+        "`xai/road.py`: each removed pixel is the weighted mean of its in-image 8 neighbours (1/6 edge, 1/12 "
+        f"diagonal), solved jointly per image, step and channel; Gaussian noise (sd {ROAD_NOISE}) on the imputed "
+        "pixels only, not clipped, from a CPU generator seeded per model and image.",
+        "- Orders: MoRF (`road_morf`) removes the share q of pixels ranked highest (low area is better), LeRF "
+        "(`road_lerf`) the share q ranked lowest (high area is better); both remove int(n × q) pixels. Ties are "
+        "broken by `_ranking` with the generator seeds of the existing scoring.",
+        f"- Grid: q = {grid}; score = trapezoid area over q ∈ [0, 0.9] divided by 0.9.",
+        "- Images: the first N of each model's 100 scoring images (N per setting below). The four existing "
+        "metrics are recomputed here on the same N images, so the tables in this section compare all six "
+        "metrics on the same images; the 100-image values of the existing metrics are in the tables above.",
+        f"- Rules as above: preference with ties within {TIE_TOLERANCE:g} counted as half, decisions on r_c, "
+        f"Clopper–Pearson intervals, margin FPR, r_c bands, switch rules, two-level bootstrap ({reps} "
+        f"replicates, seed {BOOTSTRAP_SEED}).", "",
+        "### Models included per setting", "",
+        "pooled_models: models of the setting in this analysis; road_models: those with ROAD scores "
+        "(the others are not scored yet).", "",
+        markdown(included[["setting", "pooled_models", "road_models", "images", "rc_min", "rc_max"]].round(2)), ""]
+
+    shown = resp[resp.comparison == "shortcut vs full object"].copy()
+    shown["setting"] = setting(shown)
+    shown["rho_rc [95% CI]"] = _ci_text(shown, "rho_rc")
+    shown["pref_low [CI]"] = _ci_text(shown, "pref_low")
+    shown["pref_high [CI]"] = _ci_text(shown, "pref_high")
+    shown["switch_iso_rc [CI]"] = _ci_text(shown, "switch_iso_rc", "switch_iso_rc_ci_low", "switch_iso_rc_ci_high", 1)
+    lines += ["### Responsiveness on r_c, shortcut vs full object (six metrics; all comparisons in "
+              "responsiveness_corrected_road.csv)", "",
+              markdown(_p_text(shown, ["p_rho_rc", "p_bh"])[
+                  ["setting", "metric", "models", "rho_rc [95% CI]", "p_rho_rc", "p_bh", "pref_low [CI]",
+                   "pref_high [CI]", "fpr", "balanced_accuracy", "switch_iso_rc [CI]", "switch_status"]]), ""]
+
+    if len(over):
+        shown = over.copy()
+        shown["setting"] = setting(shown)
+        for k in ("so", "ro", "sr"):
+            shown[f"{k.upper()} low [CI]"] = _ci_text(shown, f"pref_{k}_low")
+        shown["excess_low [CI]"] = _ci_text(shown, "excess_low")
+        shown["fpr [CP]"] = [f"{t} ({k}/{n})" for t, k, n in zip(
+            _ci_text(shown, "fpr", "fpr_cp_low", "fpr_cp_high", 2), shown.k_fpr, shown.n_below)]
+        shown["fpr_margin [CP]"] = [f"{t} ({k}/{n})" for t, k, n in zip(
+            _ci_text(shown, "fpr_margin", "fpr_margin_cp_low", "fpr_margin_cp_high", 2), shown.k_fpr_margin,
+            shown.n_below)]
+        shown["fpr r_c ≤ 10 (n)"] = [f"{'–' if pd.isna(v) else f'{v:.2f}'} ({n})"
+                                     for v, n in zip(shown.fpr_rc_le10, shown.n_rc_le10)]
+        shown["fpr 10 < r_c ≤ 50 (n)"] = [f"{'–' if pd.isna(v) else f'{v:.2f}'} ({n})"
+                                          for v, n in zip(shown.fpr_rc_10_50, shown.n_rc_10_50)]
+        lines += ["### Over-detection at the lowest dose and rates (six metrics; overdetection_road.csv)", "",
+                  "S–O = shortcut vs full object, R–O = random vs full object, S–R = shortcut vs random, at the "
+                  "lowest dose; fpr = share of models with r_c ≤ 50 whose S–O preference > 0.5.", "",
+                  markdown(shown[["setting", "metric", "SO low [CI]", "RO low [CI]", "SR low [CI]",
+                                  "excess_low [CI]", "fpr [CP]", "fpr_margin [CP]", "fpr r_c ≤ 10 (n)",
+                                  "fpr 10 < r_c ≤ 50 (n)"]]), ""]
+    return lines
+
+
 def analyze(args=None):
     """Legacy tables (unchanged computation) plus the corrected analysis.
 
@@ -1324,6 +1607,7 @@ def analyze(args=None):
         pooled = [m and n in scored for m, n in zip(member, names)]
         not_pooled = models[[not p and s != "unregistered" for p, s in zip(pooled, models.model_set)]]
         not_pooled = not_pooled.assign(status=["SD1 pilot (never pooled)" if s == "A2_pilot"
+                                               else "SD4 pilot (never pooled)" if s == "A3_pilot"
                                                else "not scored yet" for s in not_pooled.model_set])
         keep = {n for n, p in zip(names, pooled) if p}
         if scored - keep:  # scored but unregistered (or a scored SD1 pilot): drop its scores
@@ -1405,11 +1689,21 @@ def analyze(args=None):
     if not_pooled is not None and len(not_pooled):
         columns = keys + ["model_set", "status", "reliance", "test_accuracy", "test_accuracy_no_shortcut",
                           "chance_floor", "reliance_corrected", "training_minutes"]
-        text += "\n\n" + "\n".join([
-            "## Amendment A2 models not pooled (pilots.csv)", "",
-            "SD1 pilots are never pooled. A2 models without score files (the CIFAR-10 ResNet-18 pilot until "
-            "session 2) are not pooled until they are scored. Neither kind is in models.csv or any table above.",
-            "", markdown(not_pooled[columns].round(2)), ""])
+        if (not_pooled.model_set == "A3_pilot").any():  # SD4 pilots present (amendment A3)
+            heading = "## Amendment A2 and A3 models not pooled (pilots.csv)"
+            sentence = ("SD1 and SD4 pilots are never pooled. Models without score files (the CIFAR-10 ResNet-18 "
+                        "pilot until session 2, confirmatory models before scoring) are not pooled until they are "
+                        "scored. None of these is in models.csv or any table above.")
+        else:
+            heading = "## Amendment A2 models not pooled (pilots.csv)"
+            sentence = ("SD1 pilots are never pooled. A2 models without score files (the CIFAR-10 ResNet-18 pilot "
+                        "until session 2) are not pooled until they are scored. Neither kind is in models.csv or "
+                        "any table above.")
+        text += "\n\n" + "\n".join([heading, "", sentence, "", markdown(not_pooled[columns].round(2)), ""])
+    if model_set == "all":  # SD3: appended last, only once ROAD scores exist
+        road_lines = road_analysis(oracle, models, reps, out)
+        if road_lines:
+            text += "\n\n" + "\n".join(road_lines)
     (out / "summary.md").write_text(text, encoding="utf-8")
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(errors="replace")  # e.g. a cp1252 Windows console
@@ -1428,9 +1722,10 @@ def keep_awake():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("step", choices=["train", "evaluate", "placebo", "behaviour", "analyze", "all"])
+    parser.add_argument("step", choices=["train", "evaluate", "placebo", "behaviour", "analyze", "all", "road"])
     parser.add_argument("--bases", nargs="+", default=DEFAULT_BASES, choices=list(BASES))
-    parser.add_argument("--shortcuts", nargs="+", default=list(SHORTCUT_TYPES), choices=list(SHORTCUT_TYPES))
+    parser.add_argument("--shortcuts", nargs="+", default=list(SHORTCUT_TYPES),
+                        choices=list(SHORTCUT_TYPES) + list(A3_SHORTCUT_TYPES))
     parser.add_argument("--doses", nargs="+", type=float, default=DOSES)
     parser.add_argument("--seeds", nargs="+", type=int, default=SEEDS)
     parser.add_argument("--samples", type=int, default=100, help="test images per model")
@@ -1442,10 +1737,20 @@ def main():
     parser.add_argument("--reps", type=int, default=BOOTSTRAP_REPS,
                         help="analyze: two-level bootstrap replicates of the corrected analysis")
     parser.add_argument("--selection-only", action="store_true",
-                        help="behaviour: only the models selected by --bases/--shortcuts/--doses/--seeds")
+                        help="behaviour, road: only the models selected by --bases/--shortcuts/--doses/--seeds")
+    parser.add_argument("--models", nargs="+", metavar="NAME",
+                        help="road: only these models (names as in checkpoint/dose; pilots and unregistered "
+                             "models are refused); --bases/--shortcuts are then ignored")
+    parser.add_argument("--time-only", action="store_true",
+                        help="road: time each model, append to road_timing.csv and discard the scores")
     args = parser.parse_args()
     for base in args.bases:
         info(base)  # validates the name
+    if "watermark" in args.shortcuts:
+        other = [b for b in args.bases if b not in WATERMARK_BASES]
+        if other:
+            parser.error(f"--shortcuts watermark is used only with --bases {' '.join(WATERMARK_BASES)} "
+                         f"(amendment A3), not {' '.join(other)}")
     keep_awake()
     if args.step in ("train", "all"):
         train(args)
@@ -1455,6 +1760,8 @@ def main():
         placebo(args)
     if args.step == "behaviour":  # not part of "all"
         behaviour(args)
+    if args.step == "road":  # exact ROAD (A3, SD3); not part of "all"
+        road(args)
     if args.step in ("analyze", "all"):
         analyze(args)
 

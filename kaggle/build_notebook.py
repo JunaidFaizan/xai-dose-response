@@ -3,6 +3,10 @@
     kaggle/dose_response_pet.ipynb        Oxford-IIIT Pet (cat vs dog) with ResNet-18
     kaggle/dose_response_a2_session1.ipynb  amendment A2: SD2 pilot, Pet dose -0.15, SD1 pilot
     kaggle/dose_response_a2_session2.ipynb  amendment A2: final SD2 CIFAR-10 and SD1 doses
+    kaggle/dose_response_a3_session3.ipynb  amendment A3: SD4 watermark pilot + ROAD timing
+    kaggle/dose_response_a3_session4.ipynb  amendment A3: SD4 confirmatory + ROAD on the GPU models
+    kaggle/dose_response_a3_session4a.ipynb amendment A3, split: SD4 confirmatory + its ROAD
+    kaggle/dose_response_a3_session4b.ipynb amendment A3, split: ROAD on the GPU patch models
 """
 import json
 from pathlib import Path
@@ -309,3 +313,226 @@ write("dose_response_pet.ipynb",
       cells_for(PET_INTRO, PET_SELECTION, "pet_resnet18_", "pet_results.zip", PET_DATA_CHECK))
 write("dose_response_a2_session1.ipynb", A2_SESSION1)
 write("dose_response_a2_session2.ipynb", A2_SESSION2)
+
+
+# ------------------------------------------------ amendment A3 (SD3 ROAD, SD4 watermark)
+
+A3_ZENODO = "10.5281/zenodo.24416017"
+SD4_PILOT = "--bases pet_resnet18_pretrained --shortcuts watermark --doses 0 0.25 --seeds 7"
+# One Pet model of each Pet-sized network, for the A3 timing gate (scores discarded).
+ROAD_TIMING_MODELS = ["pet_resnet18_patch_dose-050_seed42", "pet_resnet18_pretrained_patch_dose+000_seed42"]
+ROAD_GPU_BASES = ["cifar10_resnet18", "pet_resnet18", "pet_resnet18_pretrained"]
+
+A3_SETUP = SETUP.replace("-Dataset a2", "-Dataset a3")
+
+A3_SESSION3_INTRO = f"""# {TITLE}
+
+## Amendment A3, session 3: SD4 watermark pilot and the ROAD timing gate
+
+Pre-registered in `docs/PREDICTIONS_amendments.md` (A3) and `docs/PREDICTIONS_sd3_sd4.md`
+(P10–P13), timestamped on Zenodo ({A3_ZENODO}).
+
+- Cell 3: SD4 pilot, ImageNet-pretrained ResNet-18 on Pet with the watermark
+  shortcut, doses 0 and +0.25, seed 7 (training only). A3 lets only the pilots'
+  reliance and accuracies be read before the dated SD4 completion note.
+- Cell 4: ROAD timing on one `pet_resnet18` and one `pet_resnet18_pretrained`
+  model (`road --time-only`): only the wall time is kept, the scores are discarded.
+- Cell 5: `a3_pilot_report.json` (reliance, accuracies, chance floor, r_c,
+  the A3 dose set, the stopping rule, the ROAD times and the 15-minute gate).
+- Cell 6: `a3_session3_results.zip` in the notebook's Output.
+
+Before running: **Settings → Accelerator → GPU T4 x2**, and **Internet on**
+(Captum and the ImageNet weights). Then **Save Version → Save & Run All (Commit)**."""
+
+TIMING_CHECK = "\nfor name in " + repr(tuple(ROAD_TIMING_MODELS)) + """:
+    for suffix in ('.pt', '_metrics.json'):
+        assert os.path.exists(f'checkpoint/dose/{name}{suffix}'), (
+            f'checkpoint/dose/{name}{suffix} missing: rebuild the bundle with -Dataset a3.')
+print('ROAD timing checkpoints found')"""
+
+A3_PILOT_REPORT = """# 5. Pilot report (a3_pilot_report.json): reliance, accuracies, chance floor, r_c,
+#    the A3 dose set (dose-0 pilot), the stopping rule (+0.25 pilot) and the ROAD timing gate
+import csv, json
+sys.path.insert(0, WORK)
+import dose_response
+from xai.data import num_classes
+from xai.stats import chance_floor, corrected_reliance
+BASE = 'pet_resnet18_pretrained'
+pilots, rc = [], {}
+for dose in (0.0, 0.25):
+    name = dose_response.model_name(BASE, 'watermark', dose, 7)
+    m = json.load(open(f'checkpoint/dose/{name}_metrics.json'))
+    floor = float(chance_floor(m['test_accuracy_no_shortcut'], num_classes(BASE)))
+    rc[dose] = float(corrected_reliance(m['reliance'], floor))
+    entry = {'model': name, 'reliance': m['reliance'], 'test_accuracy': m['test_accuracy'],
+             'test_accuracy_no_shortcut': m['test_accuracy_no_shortcut'],
+             'test_accuracy_conflicting': m['test_accuracy_conflicting'], 'chance_floor': round(floor, 2),
+             'reliance_corrected': round(rc[dose], 2), 'training_minutes': m['training_minutes']}
+    pilots.append(entry)
+    print(entry)
+with open('results/dose_response/road_timing.csv', newline='') as f:
+    timing = [dict(row, minutes=float(row['minutes']), images=int(row['images']),
+                   timing_gate_exceeded=float(row['minutes']) > 15) for row in csv.DictReader(f)]
+report = {'pilots': pilots,
+          'a3_sd4_rule': '60 or above' if rc[0.0] >= 60 else 'below 60',
+          'a3_dose_set': dose_response.a3_dose_set(rc[0.0]),
+          'sd4_stopped': dose_response.a3_sd4_stopped(rc[0.25]),
+          'road_timing': timing}
+print({k: v for k, v in report.items() if k != 'pilots'})
+json.dump(report, open('a3_pilot_report.json', 'w'), indent=2)"""
+
+SESSION3_ZIP = """# 6. Pack the results to download
+import zipfile
+out = '/kaggle/working/a3_session3_results.zip'
+patterns = ['checkpoint/dose/pet_resnet18_pretrained_watermark_*', 'a3_pilot_report.json',
+            'results/dose_response/road_timing.csv']
+files = sorted({f for p in patterns for f in glob.glob(p)})
+with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
+    for f in files:
+        z.write(f, f)  # keeps checkpoint/... and results/... paths
+print(len(files), 'files ->', out)
+shutil.rmtree(WORK)  # keep only the zip in the Output"""
+
+A3_SESSION3 = [
+    ("markdown", A3_SESSION3_INTRO),
+    ("code", COPY_PROJECT),
+    ("code", A3_SETUP + TIMING_CHECK + WEIGHTS_DOWNLOAD),
+    ("code", f"""# 3. SD4 pilot: watermark, doses 0 and +0.25, seed 7 (training only; not scored before the A3 note)
+!python -u -W ignore dose_response.py train {SD4_PILOT}"""),
+    ("code", f"""# 4. ROAD timing gate: one Pet model of each network, scores discarded (road_timing.csv)
+!python -u -W ignore dose_response.py road --time-only --models {' '.join(ROAD_TIMING_MODELS)}"""),
+    ("code", A3_PILOT_REPORT),
+    ("code", SESSION3_ZIP),
+]
+
+A3_SESSION4_PARTS = {
+    "4": "SD4 confirmatory set and ROAD on the GPU models",
+    "4a": "SD4 confirmatory set and its ROAD scores (split part a)",
+    "4b": "ROAD on the GPU patch models (split part b)",
+}
+
+
+def a3_session4(variant):
+    """Cells of session 4 ('4'), or of its split parts '4a' (SD4) and '4b' (ROAD of the
+    69 cifar10_resnet18, pet_resnet18 and pet_resnet18_pretrained patch models)."""
+    sd4, gpu_road = variant in ("4", "4a"), variant in ("4", "4b")
+    zip_name = f"a3_session{variant}_results.zip"
+    steps = []
+    if sd4:
+        steps.append("trains and scores the 18 SD4 confirmatory models (metrics, oracle maps, "
+                     "controls, behaviour labels, exact ROAD)")
+    if gpu_road:
+        steps.append("scores the 69 registered `cifar10_resnet18`, `pet_resnet18` and "
+                     "`pet_resnet18_pretrained` patch models with exact ROAD")
+    inputs = ["the A3 bundle dataset (code and data)"]
+    if gpu_road:
+        inputs.append("the A3 models dataset (`xai_a3models_bundle.zip`: the 69 checkpoints)")
+    inputs.append("to resume, the Output of an earlier run of this notebook "
+                  "(`a3_session4*_results.zip`): finished models and ROAD files are skipped")
+    intro = f"""# {TITLE}
+
+## Amendment A3, session {variant}: {A3_SESSION4_PARTS[variant]}
+
+Pre-registered in `docs/PREDICTIONS_amendments.md` (A3) and `docs/PREDICTIONS_sd3_sd4.md`
+(P10–P13), timestamped on Zenodo ({A3_ZENODO}). This notebook {' and '.join(steps)}.
+""" + ("""
+Run only after the dated SD4 completion note (roadmap T4.3) is committed and uploaded
+to Zenodo, and `A3_SD4_RULE` in `dose_response.py` is set from it (rebuild the bundle).
+Fill `SD4_DOSES` in the parameters cell with the note's final doses.
+""" if sd4 else "") + """
+**+ Add Input**: """ + "; ".join(inputs) + """.
+
+Before running: **Settings → Accelerator → GPU T4 x2**, and **Internet on**.
+Then **Save Version → Save & Run All (Commit)**. The results are packed into
+`""" + zip_name + "` in the notebook's Output."
+    cells = [("markdown", intro)]
+    if sd4:
+        cells.append(("code", """# Parameters: the final SD4 doses of the dated SD4 completion note (T4.3,
+# docs/PREDICTIONS_amendments.md): one of the two A3_SD4_DOSE_SETS lists.
+SD4_DOSES = []
+SEEDS = [42, 1, 2]  # confirmatory seeds; seed 7 is the SD4 pilot seed and is never used here
+assert SD4_DOSES, 'Fill SD4_DOSES from the SD4 completion note first.'
+assert 7 not in SEEDS, 'Seed 7 is reserved for the SD4 pilots.'"""))
+    resume = """
+# Resume: unpack an attached earlier Output of this notebook, then copy every attached
+# checkpoint and per-model file not yet present (Kaggle may show zips unpacked).
+import zipfile
+for archive in glob.glob('/kaggle/input/**/a3_session4*_results.zip', recursive=True):
+    with zipfile.ZipFile(archive) as z:
+        z.extractall(WORK)
+    print('extracted', archive)
+for folder in ('checkpoint/dose', 'results/dose_response/per_model'):
+    os.makedirs(folder, exist_ok=True)
+    copied = 0
+    for f in glob.glob(f'/kaggle/input/**/{folder}/*', recursive=True):
+        target = os.path.join(folder, os.path.basename(f))
+        if os.path.isfile(f) and not os.path.exists(target):
+            shutil.copy(f, target)
+            copied += 1
+    print(copied, 'files copied into', folder)
+sys.path.insert(0, WORK)
+import dose_response"""
+    if sd4:
+        resume += """
+SD4 = [('pet_resnet18_pretrained', 'watermark', float(d), s) for d in SD4_DOSES for s in SEEDS]
+assert any(list(map(float, SD4_DOSES)) == list(doses) for doses in dose_response.A3_SD4_DOSE_SETS.values()), (
+    'SD4_DOSES must be one of the A3 dose sets: ' + str(dose_response.A3_SD4_DOSE_SETS))
+wrong = [dose_response.model_name(*c) for c in SD4
+         if dose_response.model_set_of(dict(zip(('base', 'shortcut', 'dose', 'seed'), c))) != 'A3']
+assert not wrong, ('not in model set A3 (set A3_SD4_RULE in dose_response.py from the completion note '
+                   'and rebuild the bundle): ' + ', '.join(wrong))
+print(len(SD4), 'SD4 models, model set A3')"""
+    if gpu_road:
+        resume += f"""
+ROAD_GPU_BASES = {ROAD_GPU_BASES!r}
+ROAD_GPU = sorted({{dose_response.model_name(b, 'patch', d, s)
+                   for design in (dose_response.ORIGINAL_DESIGN, dose_response.A2_DESIGN)
+                   for b in ROAD_GPU_BASES if b in design for d in design[b][1] for s in design[b][2]}})
+assert len(ROAD_GPU) == 69, len(ROAD_GPU)
+missing = [n for n in ROAD_GPU if not all(os.path.exists(f'checkpoint/dose/{{n}}{{s}}') for s in ('.pt', '_metrics.json'))]
+assert not missing, (f'{{len(missing)}} ROAD checkpoints missing, e.g. {{missing[0]}}: attach the A3 models dataset '
+                     '(make_bundle.ps1 -Dataset a3models).')
+print('all 69 ROAD GPU models found')"""
+    cells.append(("code", COPY_PROJECT + "\n" + resume))
+    cells.append(("code", A3_SETUP + (WEIGHTS_DOWNLOAD if sd4 else "")))
+    run = """def run(*args):
+    subprocess.run([sys.executable, '-u', '-W', 'ignore', 'dose_response.py', *args], check=True)
+"""
+    number = 3
+    if sd4:
+        cells.append(("code", f"""# {number}. SD4 confirmatory: train, score, controls, behaviour labels and exact ROAD.
+#    Re-running skips finished models and files.
+{run}
+selection = ['--bases', 'pet_resnet18_pretrained', '--shortcuts', 'watermark', '--doses', *map(str, SD4_DOSES),
+             '--seeds', *map(str, SEEDS)]
+run('train', *selection)
+run('evaluate', *selection)
+run('placebo', *selection)
+run('behaviour', '--selection-only', *selection)
+run('road', '--selection-only', *selection)"""))
+        number += 1
+    if gpu_road:
+        helper = "" if sd4 else run  # session 4 defines run() in the SD4 cell
+        cells.append(("code", f"""# {number}. Exact ROAD of the registered GPU patch models (pilots are not scored).
+#    Resumable: a model whose per_model/<name>_road.csv exists is skipped.
+{helper}run('road', '--bases', *ROAD_GPU_BASES, '--shortcuts', 'patch')"""))
+        number += 1
+    names = "[dose_response.model_name(*c) for c in SD4]" if sd4 else "[]"
+    cells.append(("code", f"""# {number}. Pack the results to download: the SD4 checkpoints and per-model files, and
+#    every per_model/*_road.csv (the attached GPU checkpoints are not repacked)
+names = {names}
+files = sorted({{f for n in names for f in glob.glob(f'checkpoint/dose/{{n}}.pt')
+                 + glob.glob(f'checkpoint/dose/{{n}}_metrics.json') + glob.glob(f'results/dose_response/per_model/{{n}}_*.csv')}}
+               | set(glob.glob('results/dose_response/per_model/*_road.csv')))
+out = '/kaggle/working/{zip_name}'
+with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
+    for f in files:
+        z.write(f, f)  # keeps checkpoint/... and results/... paths
+print(len(files), 'files ->', out)
+shutil.rmtree(WORK)  # keep only the zip in the Output"""))
+    return cells
+
+
+write("dose_response_a3_session3.ipynb", A3_SESSION3)
+for variant in ("4", "4a", "4b"):
+    write(f"dose_response_a3_session{variant}.ipynb", a3_session4(variant))

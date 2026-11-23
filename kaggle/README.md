@@ -178,6 +178,85 @@ Session 1 measured values (`docs/kaggle_runs/a2_session1_pilot_report.json`, Pet
 - **Session 1** took 2 h 05 min (estimate was 2.0–2.3 h).
 - **Session 2** ≈ 4.3–6.2 h (above). Both stay under Kaggle's 12-hour limit per run.
 
+## Amendment A3: session 3 (SD4 pilot + ROAD timing)
+
+Pre-registered in `docs/PREDICTIONS_amendments.md` (A3) with the predictions P10–P13 in `docs/PREDICTIONS_sd3_sd4.md`, timestamped on Zenodo ([10.5281/zenodo.24416017](https://doi.org/10.5281/zenodo.24416017)). Session 3 trains the two SD4 pilots (ImageNet-pretrained ResNet-18 on Pet with the watermark shortcut, doses 0 and +0.25, seed 7) and times exact ROAD on one `pet_resnet18` and one `pet_resnet18_pretrained` model (the A3 timing gate). The pilots are not scored, and the timing scores are discarded.
+
+1. Build the bundle on the laptop (code, `data\pet128\*.npz`, the CIFAR-10 data and the two timing checkpoints `pet_resnet18_patch_dose-050_seed42` and `pet_resnet18_pretrained_patch_dose+000_seed42`):
+
+   ```powershell
+   pwsh -File kaggle\make_bundle.ps1 -Dataset a3
+   ```
+
+   This creates `kaggle\xai_a3_bundle.zip` (about 540 MB, not tracked by git). `-DataDir` and `-CheckpointDir` read the data and checkpoints from another folder if needed.
+2. On Kaggle, upload it as a new **Private** dataset, for example `xai-a3-bundle`.
+3. **Create → New Notebook → File → Import Notebook** → `kaggle\dose_response_a3_session3.ipynb`; **+ Add Input** → `xai-a3-bundle`.
+4. **Settings → Accelerator → GPU T4 x2**, **Settings → Internet → On**. Run cells 1–2 once: cell 2 must print a GPU name, "Pet and CIFAR-10 data found", "ROAD timing checkpoints found" and "ImageNet ResNet-18 weights ready".
+5. **Save Version → Save & Run All (Commit) → Save**.
+6. When it finishes, download `a3_session3_results.zip` from **Output** and unzip it into the project folder:
+
+   ```powershell
+   Expand-Archive $HOME\Downloads\a3_session3_results.zip -DestinationPath . -Force
+   ```
+
+7. Read `a3_pilot_report.json`: per pilot the reliance, accuracies, chance floor and r_c; `a3_sd4_rule` and `a3_dose_set` (from the dose-0 pilot's r_c: 60 or above → −0.5, −0.4, −0.3, −0.2, −0.1, 0; below 60 → −0.5, −0.2, 0, +0.1, +0.25, +0.4); `sd4_stopped` (the +0.25 pilot's r_c is below 20); and `road_timing` (minutes per model, `timing_gate_exceeded` = more than 15 minutes).
+
+**SD4 completion note (roadmap T4.3), before session 4.** Copy the report values into a dated completion note under A3 in `docs/PREDICTIONS_amendments.md` (both pilots' reliance, accuracies, chance floor and r_c, the final SD4 doses, the ROAD timing and the resulting N for the Pet-sized settings). In the same commit:
+
+- set `A3_SD4_RULE` in `dose_response.py` to the rule key of the note (`"60 or above"` or `"below 60"`). If `sd4_stopped` is true, SD4 stops: leave `A3_SD4_RULE = None` and run only session 4b;
+- only if the timing gate applies (a Pet model took more than 15 minutes), set `ROAD_PET_IMAGES = 25` in `dose_response.py`.
+
+Upload the note as a new version of the Zenodo record before any confirmatory SD4 model is trained, then rebuild `xai_a3_bundle.zip` and upload it as a new version of the dataset.
+
+## Amendment A3: session 4 (SD4 confirmatory + ROAD on the GPU models)
+
+Session 4 trains and scores the 18 SD4 confirmatory models (6 final doses × seeds 42, 1, 2: metrics, oracle maps, controls, behaviour labels and exact ROAD), and scores the 69 registered `cifar10_resnet18`, `pet_resnet18` and `pet_resnet18_pretrained` patch models with exact ROAD (the A2 SD1 pilots are not scored).
+
+1. Build the models bundle on the laptop (the `.pt` and `_metrics.json` files of the 69 models, about 2.7 GB):
+
+   ```powershell
+   pwsh -File kaggle\make_bundle.ps1 -Dataset a3models
+   ```
+
+   Upload `kaggle\xai_a3models_bundle.zip` as a new **Private** dataset, for example `xai-a3-models`.
+2. **Choose one notebook or the split.** With t_pet and t_cifar the ROAD minutes per Pet and CIFAR-10 ResNet-18 model (t_pet from `road_timing` in `a3_pilot_report.json`, the larger of the two Pet models; t_cifar from the laptop timing below, which is an upper bound for the GPU), and the SD4 scoring time per model (at most 9.3 min, A2 estimate):
+   - session 4a (SD4) ≈ 18 × (1.4 + scoring) + 18 × t_pet minutes;
+   - session 4b (ROAD of the GPU models) ≈ 30 × t_cifar + 39 × t_pet minutes.
+
+   Use the single notebook `kaggle\dose_response_a3_session4.ipynb` only if 4a + 4b is under 11 h; otherwise run `kaggle\dose_response_a3_session4a.ipynb` and `kaggle\dose_response_a3_session4b.ipynb` as two sessions. If SD4 stopped, run only 4b.
+3. **Import Notebook** → the chosen notebook. **+ Add Input** → `xai-a3-bundle` (the version with `A3_SD4_RULE` set) and, for 4 and 4b, `xai-a3-models`.
+4. For 4 and 4a, fill `SD4_DOSES` in the parameters cell with the completion note's final doses. The notebook stops if the list is empty, is not one of the two A3 dose sets, includes seed 7, or if any SD4 model is not in model set `A3` (then `A3_SD4_RULE` is not set in the bundle).
+5. **Settings → Accelerator → GPU T4 x2**, **Settings → Internet → On**, then **Save Version → Save & Run All (Commit) → Save**.
+6. **Resume after a time-out.** Every step skips finished models and files. Attach the Output of the stopped run (**+ Add Input → Your Work → Notebooks**): cell 1 unpacks `a3_session4*_results.zip` or copies the unpacked files, then run again.
+7. When it finishes, download `a3_session4_results.zip` (or `a3_session4a_results.zip` and `a3_session4b_results.zip`), unzip into the project folder and re-run the analyses:
+
+   ```powershell
+   Expand-Archive $HOME\Downloads\a3_session4_results.zip -DestinationPath . -Force
+   .\.venv\Scripts\python.exe -W ignore dose_response.py behaviour
+   .\.venv\Scripts\python.exe -W ignore dose_response.py analyze
+   .\.venv\Scripts\python.exe -W ignore dose_response.py analyze --model-set original
+   .\.venv\Scripts\python.exe -W ignore dose_response.py analyze --model-set pre_a2
+   ```
+
+   ROAD appears only in `per_model\*_road.csv`, the new `*_road.csv` tables, `road_models.csv` and the last section of `summary.md` (model set `all`).
+
+## Laptop ROAD (T3.2 timing first, then T3.3)
+
+You run these in your own terminal (CPU). First the timing gate (T3.2): one Pet model and one CIFAR-10 ResNet-18 model; only the wall time is kept, in `results\dose_response\road_timing.csv`:
+
+```powershell
+.\.venv\Scripts\python.exe -W ignore dose_response.py road --time-only --models pet_resnet18_patch_dose-050_seed42 cifar10_resnet18_patch_dose-080_seed42
+```
+
+Then, after the Zenodo A3 upload (T2.2) and the timing note if one is needed, the laptop scoring (T3.3). Each model is cached in `per_model\<name>_road.csv`, so a stopped run resumes:
+
+```powershell
+.\.venv\Scripts\python.exe -W ignore dose_response.py road --bases mnist pneumonia_mnist --shortcuts patch texture
+.\.venv\Scripts\python.exe -W ignore dose_response.py road --bases cifar10 --shortcuts patch
+```
+
+Then re-run the three `analyze` commands above.
+
 ## If something goes wrong
 
 - **"Project files not found"**: the dataset isn't attached. Use **+ Add Input** again.

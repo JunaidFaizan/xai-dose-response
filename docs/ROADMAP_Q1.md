@@ -58,10 +58,10 @@ Update the row when a task changes state. States: `todo`, `in progress`, `done (
 | T1.5 | Integrate S2 and laptop results; judge P5–P9; update paper | Agent | T1.3, T1.4 | done (77b9b4b) |
 | T2.1 | Amendment A3 + `docs/PREDICTIONS_sd3_sd4.md` (P10–P13) | Agent | — | done (976da10; first d5c8655, revised a079fe1) |
 | T2.2 | Zenodo new version with A3 | Author | T2.1 | todo |
-| T3.1 | SD3 code: ROAD fill (noisy linear imputation, MoRF and LeRF) | Agent | T2.1 | todo |
+| T3.1 | SD3 code: ROAD fill (noisy linear imputation, MoRF and LeRF) | Agent | T2.1 | done (branch sd3-sd4-code, 0cea0bd, final bcdf441; not merged) |
 | T3.2 | SD3 timing test on 1 Pet model and 1 CIFAR ResNet-18 model (CPU, laptop) | Author | T3.1 | todo |
 | T3.3 | SD3 laptop scoring: MNIST, PneumoniaMNIST, CIFAR small CNN | Author | T2.2, T3.2 | todo |
-| T4.1 | SD4 code: content-coded watermark shortcut on `pet_resnet18_pretrained` | Agent | T2.1 | todo |
+| T4.1 | SD4 code: content-coded watermark shortcut on `pet_resnet18_pretrained` | Agent | T2.1 | done (branch sd3-sd4-code, bcfa3c2, final bcdf441; not merged) |
 | T4.2 | **Kaggle S3:** SD4 pilot (2 models) + SD3 Kaggle timing check | Author | T2.2, T3.1, T4.1 | todo |
 | T4.3 | SD4 completion note (final doses) + Zenodo new version | Agent writes, author uploads | T4.2 | todo |
 | T4.4 | **Kaggle S4:** SD4 confirmatory (18 models) + SD3 scoring of the GPU models | Author | T4.3, T3.2 | todo |

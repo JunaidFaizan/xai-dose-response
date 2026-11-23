@@ -99,7 +99,7 @@ from scipy.stats import spearmanr
 
 from . import stats
 from .explain import METHODS
-from .metrics import FAITHFULNESS_METRICS
+from .metrics import FAITHFULNESS_METRICS, ROAD_METRICS
 
 KEYS = ["base", "shortcut", "dose", "seed"]
 # Comparisons whose ideal curve crosses 0.5 at 50% reliance: switch points
@@ -117,6 +117,13 @@ BAND_LABELS = ["<20", "20-40", "40-60", "60-80", ">=80"]
 BAND_CENTRES = [10, 30, 50, 70, 90]
 CHUNK = 250
 NAN = float("nan")
+
+
+def _higher(metric):
+    """Whether a higher AUC is better (existing metrics, then exact ROAD)."""
+    if metric in FAITHFULNESS_METRICS:
+        return FAITHFULNESS_METRICS[metric][3]
+    return ROAD_METRICS[metric][1]
 
 
 def _ci(values):
@@ -242,7 +249,7 @@ class Setting:
         """Cached per-image wins/gaps, model preferences and their bootstrap."""
         key = (first, second, metric)
         if key not in self._cache:
-            higher = FAITHFULNESS_METRICS[metric][3]
+            higher = _higher(metric)
             a, b = self.matrix(f"{metric}_{first}"), self.matrix(f"{metric}_{second}")
             wins = stats.win_scores(a, b, higher, self.tie)
             gaps = stats.auc_gap(a, b, higher)
@@ -345,12 +352,13 @@ def _switch_columns(s, c, label):
             "switch_interp_rc": _first_crossing(levels.rc, levels.p)}
 
 
-def responsiveness_corrected(settings, comparisons, metric_titles):
-    """PRIMARY metric table: one row per comparison x setting x metric."""
+def responsiveness_corrected(settings, comparisons, metric_titles, metrics=None):
+    """PRIMARY metric table: one row per comparison x setting x metric
+    (metrics: default the four existing ones)."""
     rows = []
     for first, second, label in _available(settings, comparisons):
         for s in settings:
-            for metric in FAITHFULNESS_METRICS:
+            for metric in (metrics or FAITHFULNESS_METRICS):
                 c = s.comparison(first, second, metric)
                 pref = c["pref"]
                 rho_rc, p_rc = _spearman(s.rc, pref)
@@ -1044,15 +1052,16 @@ def _rate_cp(says, mask, prefix):
             f"{prefix}_cp_low": low, f"{prefix}_cp_high": high}
 
 
-def overdetection(settings, comparisons, metric_titles):
+def overdetection(settings, comparisons, metric_titles, metrics=None):
     """N3: what the low-reliance over-detection (shortcut vs full object) is
-    made of, and its rates with intervals, a margin rule and r_c bands."""
+    made of, and its rates with intervals, a margin rule and r_c bands
+    (metrics: default the four existing ones)."""
     maps = {label: (first, second) for first, second, label in _available(settings, comparisons)}
     if not all(label in maps for label in OVERDETECTION_MAPS.values()):
         return pd.DataFrame()
     rows = []
     for s in settings:
-        for metric in FAITHFULNESS_METRICS:
+        for metric in (metrics or FAITHFULNESS_METRICS):
             d = _overdetection_models(s, maps, metric)
             boots = {k: d["c"][k]["boot"] for k in OVERDETECTION_MAPS}
             row = {"comparison": "shortcut vs full object", "base": s.base, "shortcut": s.shortcut,

@@ -18,9 +18,13 @@ desktop.ini
 kaggle/xai_dose_bundle.zip
 kaggle/xai_pet_bundle.zip
 kaggle/xai_a2_bundle.zip
+kaggle/xai_a3_bundle.zip
+kaggle/xai_a3models_bundle.zip
 # Pilot report unzipped from a Kaggle A2 session; the committed record is
 # docs/kaggle_runs/a2_session1_pilot_report.json
 /a2_pilot_report.json
+# Pilot report unzipped from Kaggle A3 session 3 (SD4 pilot + ROAD timing)
+/a3_pilot_report.json
 
 # Scratch files from AI workflow runs (plans, reviews, backups)
 .agents/
