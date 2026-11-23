@@ -1,0 +1,5 @@
+model,images,minutes,device
+pet_resnet18_patch_dose-050_seed42,50,5.56,cpu
+cifar10_resnet18_patch_dose-080_seed42,50,0.37,cpu
+pet_resnet18_patch_dose-050_seed42,50,5.43,cpu
+cifar10_resnet18_patch_dose-080_seed42,50,0.45,cpu
