@@ -6,7 +6,9 @@ Created 2026-11-17. This file is the single source of truth for the remaining wo
 Every agent and workflow must read it before starting, work only on the task it was
 given, and update the status table (Section 2) when it finishes.
 
-Deferred and skipped submission items are tracked in `docs/submission/DEFERRED.md` (markers, rows D01 and up).\n\nTarget: Neurocomputing (Elsevier, Q1), about 8/10 readiness with SD1–SD4 done
+Deferred and skipped submission items are tracked in `docs/submission/DEFERRED.md` (markers, rows D01 and up).
+
+Target: Neurocomputing (Elsevier, Q1), about 8/10 readiness with SD1–SD4 done
 (`docs/audit2/00_combined_audit2.md`, consensus projection).
 
 ---
