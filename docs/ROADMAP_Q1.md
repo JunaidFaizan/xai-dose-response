@@ -6,7 +6,7 @@ Created 2026-11-17. This file is the single source of truth for the remaining wo
 Every agent and workflow must read it before starting, work only on the task it was
 given, and update the status table (Section 2) when it finishes.
 
-Target: Neurocomputing (Elsevier, Q1), about 8/10 readiness with SD1–SD4 done
+Deferred and skipped submission items are tracked in `docs/submission/DEFERRED.md` (markers, rows D01 and up).\n\nTarget: Neurocomputing (Elsevier, Q1), about 8/10 readiness with SD1–SD4 done
 (`docs/audit2/00_combined_audit2.md`, consensus projection).
 
 ---
@@ -66,8 +66,8 @@ Update the row when a task changes state. States: `todo`, `in progress`, `done (
 | T4.3 | SD4 completion note (final doses) + Zenodo new version | Agent writes, author uploads | T4.2 | todo |
 | T4.4 | **Kaggle S4:** SD4 confirmatory (18 models) + SD3 scoring of the GPU models | Author | T4.3, T3.2 | todo |
 | T5.1 | Integrate SD3 and SD4; judge P10–P13; update paper | Agent | T3.3, T4.4 | todo |
-| T6.1 | M7: submission build of the paper | Agent | T1.5 (can start earlier, finalised after T5.1) | todo |
-| T6.2 | M8: cover letter, highlights, placeholders, data-availability text | Agent | T6.1 | todo |
+| T6.1 | M7: submission build of the paper | Agent | T1.5 (can start earlier, finalised after T5.1) | done, offline part (4eeeb6e); pending: see `docs/submission/DEFERRED.md` |
+| T6.2 | M8: cover letter, highlights, placeholders, data-availability text | Agent | T6.1 | done, offline parts (4eeeb6e); pending: see `docs/submission/DEFERRED.md` |
 | T6.3 | Zenodo release of code + results + checkpoints (data-availability DOI) | Author | T5.1 | todo |
 | T6.4 | Browser check of the Neurocomputing guide for authors (fee route, limits, style) | Author | — | todo |
 | T6.5 | Final read-through, make repo public, submit | Author | all | todo |
