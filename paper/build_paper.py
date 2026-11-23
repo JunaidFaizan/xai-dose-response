@@ -48,7 +48,24 @@ DR = ROOT / "results" / "dose_response"
 AN = ROOT / "results" / "analysis"
 EX = ROOT / "results" / "explanations"
 FIG_OUT = PAPER / "figures"
-OUTPUT = PAPER / "paper_draft.docx"
+# Modes: default = the guide-review draft (unchanged); --submission = journal version (main text
+# plus a separate supplementary document); --final = submission build that fails while any [[...]] marker remains.
+FINAL = "--final" in sys.argv
+SUBMISSION = FINAL or "--submission" in sys.argv
+OUTPUT = PAPER / ("paper_submission.docx" if SUBMISSION else "paper_draft.docx")
+SUPP_OUTPUT = PAPER / "supplementary_submission.docx"
+HIGHLIGHTS_OUTPUT = PAPER / "highlights_submission.txt"
+SUPP_ORDER = ["prereg", "matched", "pairs", "legacy", "sets"]  # Supplementary Tables S1..S5
+
+
+def S(draft, submission):
+    """Text that differs between the guide-review draft and the journal submission."""
+    return submission if SUBMISSION else draft
+
+
+def tref(key, number):
+    """Reference to a table that is in the main text in the draft and in the supplement in the submission."""
+    return f"Supplementary Table S{SUPP_ORDER.index(key) + 1}" if SUBMISSION else f"Table {number}"
 
 TITLE = ("A Dose-Response Evaluation of Explanation Metrics under Controlled Shortcut "
          "Reliance in CNN Image Classifiers")
@@ -480,7 +497,7 @@ def cite(*keys):
 # ------------------------------------------------------------------ figures
 
 
-def rearrange_panels(source, target, panels, columns=4):
+def rearrange_panels(source, target, panels, columns=4, order=None):
     """The analyze figures put one panel per setting in a single very wide row,
     which is unreadable at page width. Cut the panels at the widest white gaps and
     lay them out in a grid below the original title. Pixels are only moved, not
@@ -521,6 +538,8 @@ def rearrange_panels(source, target, panels, columns=4):
     if all(f is not None for f in frames):
         strip = pieces[0].crop((0, 0, frames[0], pieces[0].height))
         pieces = [p.crop((f, 0, p.width, p.height)) for p, f in zip(pieces, frames)]
+    if order is not None:  # new position i shows the panel that was at index order[i]
+        pieces = [pieces[i] for i in order]
     title = image.crop((0, 0, a.shape[1], title_end))
     t_ink = np.flatnonzero((np.asarray(title) < 245).any(axis=2).any(axis=0))
     title = title.crop((max(t_ink.min() - 10, 0), 0, t_ink.max() + 10, title.height))
@@ -586,13 +605,20 @@ def preference_figure(comparison, target, ylabel, show_behaviour=True):
 
 # ------------------------------------------------------------------ document helpers
 
+# The analyze figures list the settings alphabetically; the submission puts them in the order of Table 2
+# (natural images first, SD1 last).
+_ALPHA = sorted(N_SETTING)
+PANEL_ORDER = ([_ALPHA.index((b, s)) for b, s, *_ in SETTINGS] + [_ALPHA.index(SD1_KEY)]) if SUBMISSION else None
+
 doc = Document()
-COUNTERS = {"fig": 0, "table": 0}
+SUPP = Document() if SUBMISSION else None
+COUNTERS = {"fig": 0, "table": 0, "stable": 0}
 
 
-def setup():
+def setup(doc=None, header_text=None):
     """Single-column Elsevier-style manuscript: A4, 2.5 cm margins, Times New Roman
     12 pt body text with 1.5 line spacing (tables and captions single-spaced)."""
+    doc = globals()["doc"] if doc is None else doc
     section = doc.sections[0]
     section.page_height, section.page_width = Cm(29.7), Cm(21.0)
     for side in ("left_margin", "right_margin"):
@@ -614,16 +640,20 @@ def setup():
         style.font.color.rgb = RGBColor(0, 0, 0)
         style.paragraph_format.space_before = Pt(12 if level == 1 else 8)
         style.paragraph_format.space_after = Pt(4)
-    header = section.header.paragraphs[0]
-    header.text = DRAFT_NOTICE
-    header.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    header.runs[0].font.size = Pt(8)
-    header.runs[0].font.color.rgb = RGBColor(0xC0, 0, 0)
+    header_text = DRAFT_NOTICE if header_text is None and not SUBMISSION else header_text
+    if header_text:
+        header = section.header.paragraphs[0]
+        header.text = header_text
+        header.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        header.runs[0].font.size = Pt(8)
+        header.runs[0].font.color.rgb = RGBColor(0xC0, 0, 0)
 
 
 def add_runs(p, text, bold=False, italic=False, size=None):
     """Text with **bold** and _italic_ spans."""
     import re
+    if SUBMISSION:  # repository paths are not journal text; the file names stay (data availability)
+        text = text.replace("results/dose_response/", "").replace("results/analysis/", "")
     # Italic spans must not touch a word character or a slash, so underscores in
     # file names (results/dose_response/...) stay literal.
     for index, part in enumerate(re.split(r"(\*\*[^*]+\*\*|(?<![\w/])_[^_/]+_(?!\w))", text)):
@@ -688,14 +718,17 @@ def shade(cell, color="D9D9D9"):
     props.append(fill)
 
 
-def table(caption, header, body, widths=None, note=None, size=8, header_rows=None):
-    """A numbered table: caption above (Elsevier style), optional note below."""
-    COUNTERS["table"] += 1
+def table(caption, header, body, widths=None, note=None, size=8, header_rows=None, supp=False):
+    """A numbered table: caption above (Elsevier style), optional note below. In the submission build a
+    table with supp=True goes to the supplementary document as Table S<n>."""
+    doc = SUPP if (SUBMISSION and supp) else globals()["doc"]
+    key = "stable" if (SUBMISSION and supp) else "table"
+    COUNTERS[key] += 1
     c = doc.add_paragraph()
     c.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     c.paragraph_format.keep_with_next = True
     c.paragraph_format.line_spacing = 1.0
-    r = c.add_run(f"Table {COUNTERS['table']}. ")
+    r = c.add_run(f"Table {'S' if key == 'stable' else ''}{COUNTERS[key]}. ")
     r.bold = True
     r.font.size = Pt(9)
     add_runs(c, caption, size=9)
@@ -727,7 +760,7 @@ def table(caption, header, body, widths=None, note=None, size=8, header_rows=Non
         add_runs(n, note, size=8)
     else:
         doc.add_paragraph()
-    return COUNTERS["table"]
+    return COUNTERS[key]
 
 
 # ------------------------------------------------------------------ table builders
@@ -761,15 +794,18 @@ def table_positioning():
          "Size-matched, placebo and random oracle maps that show the confounds as reliance varies; real masks on Pet"],
         ["Pre-registration",
          "In our searches we did not find an XAI-evaluation benchmark that pre-registers its predictions",
-         "Pre-registered Pet predictions and a dated amendment, with commit hashes"],
+         S("Pre-registered Pet predictions and a dated amendment, with commit hashes",
+           "Pre-registered predictions with dated amendments, time-stamped on Zenodo")],
     ]
     return table(
-        "Positioning. What prior work already provides and what this study adds (after the audit's "
-        "positioning table, docs/audit/02_literature_novelty.md \u00a72)",
+        S("Positioning. What prior work already provides and what this study adds (after the audit's "
+          "positioning table, docs/audit/02_literature_novelty.md \u00a72)",
+          "Positioning. What prior work already provides and what this study adds"),
         ["Ingredient", "Prior work that already has it", "What this study adds"],
         body, widths=[3.2, 7.0, 5.8], size=8,
         note="The protocol is new as a combination; its individual pieces are not. BAM and SMERF already "
-             "controlled what a model relies on, to evaluate attribution methods.")
+             "controlled what a model relies on, to evaluate attribution methods."
+             + S("", " [[SD3_POSITIONING]]"))
 
 
 def table_reliance():
@@ -801,7 +837,7 @@ def table_reliance():
              "without shortcut)/(C \u2212 1); it is not clipped and can be slightly negative.")
 
 
-def table_main(comparison, caption):
+def table_main(comparison, caption, supp=False):
     body = []
     for base, shortcut, label, short in SETTINGS:
         for i, metric in enumerate(METRICS):
@@ -824,7 +860,7 @@ def table_main(comparison, caption):
         ["Setting", "Metric", f"\u03c1 with {RC} [BCa 95% CI]", "Preference, lowest dose [crossed CI] \u2192 highest",
          "Median AUC gap, lowest dose", "Over-detection FPR (n models)", "Balanced accuracy",
          f"Switch, {RC} % [crossed CI]"],
-        body, widths=[2.0, 2.2, 2.4, 2.9, 1.5, 1.6, 1.4, 2.6], size=7.5,
+        body, widths=[2.0, 2.2, 2.4, 2.9, 1.5, 1.6, 1.4, 2.6], size=7.5, supp=supp,
         note=f"Sources: results/dose_response/responsiveness_corrected.csv (estimates, p_bh, FPR, balanced "
              f"accuracy) and intervals_crossed.csv (intervals), comparison \u201c{comparison}\u201d. Crossed CI: "
              "2000 bootstrap replicates that resample models within dose and draw one set of images per replicate "
@@ -840,21 +876,39 @@ def table_main(comparison, caption):
              "the lowest reliance reached.")
 
 
-def table_prereg():
+def prereg_headline(r):
+    """Rows of the abridged submission table: every P1 and P4 row, the P2 contrast and the Deletion (black)
+    rows of P3 (the only rows that fail)."""
+    return (r.prediction in ("P1", "P4") or r.statistic == "preference contrast at lowest dose"
+            or (r.prediction == "P3" and r.metric_or_method == "Deletion (black)"))
+
+
+def table_prereg(full=True):
     body = []
     for r in PET.itertuples():
+        if not full and not prereg_headline(r):
+            continue
         body.append([r.prediction, r.comparison, r.metric_or_method, r.statistic,
                      f"{f3(r.estimate)} {ci(r.ci_low, r.ci_high, f3)}",
                      "\u2013" if pd.isna(r.rho_rc) else f3(r.rho_rc), r.threshold, r.original_verdict])
+    if not full:
+        assert 10 <= len(body) <= 12, len(body)
     return table(
         "Pre-registered Pet predictions P1\u2013P4 with their original verdicts. The intervals and the "
-        f"\u03c1 on {RC} were computed later and are additional information",
+        f"\u03c1 on {RC} were computed later and are additional information"
+        + ("" if full else " (abridged; the full table is Supplementary Table S1)"),
         ["Pred.", "Comparison", "Metric or method", "Statistic", "Estimate [two-level 95% CI]",
          f"\u03c1 on {RC}", "Threshold", "Original verdict"],
-        body, widths=[1.0, 2.4, 2.4, 2.4, 2.6, 1.2, 1.8, 2.6], size=7,
-        note="Source: results/dose_response/pre_a2_models/pet_preregistered.csv (the 18 original Pet models; "
-             "amendment A2 commits to judging P1\u2013P4 on these only); the verdict strings are copied from the "
-             "Outcome table of docs/PREDICTIONS_pet.md. Verdicts were judged on point estimates, as "
+        body, widths=[1.0, 2.4, 2.4, 2.4, 2.6, 1.2, 1.8, 2.6], size=7, supp=full and SUBMISSION,
+        note=S("Source: results/dose_response/pre_a2_models/pet_preregistered.csv (the 18 original Pet models; "
+               "amendment A2 commits to judging P1\u2013P4 on these only); the verdict strings are copied from the "
+               "Outcome table of docs/PREDICTIONS_pet.md. ",
+               "Source: pet_preregistered.csv (the 18 original Pet models; a later amendment commits to judging "
+               "P1\u2013P4 on these only); the verdict strings are those recorded in the pre-registration. ")
+             + ("" if full else "Rows shown: every P1 and P4 row, the P2 contrast and the Deletion (black) rows of "
+                "P3, which are the rows that decide the one failed prediction; the other rows are in "
+                "Supplementary Table S1. ")
+             + "Verdicts were judged on point estimates, as "
              "pre-registered; the pre-registration did not say whether a point estimate or an interval decides.")
 
 
@@ -1002,7 +1056,7 @@ def table_pairs():
         f"{n_tested} pairs tested)",
         ["Comparison", "Setting", "Metric A", "Metric B", f"\u0394\u03c1 on {RC} (A \u2212 B) [CI]", "p_bh", "p_holm",
          "\u0394 preference, lowest dose [CI]"],
-        body, widths=[2.6, 1.9, 2.0, 2.0, 2.8, 1.1, 1.1, 2.8], size=7,
+        body, widths=[2.6, 1.9, 2.0, 2.0, 2.8, 1.1, 1.1, 2.8], size=7, supp=True,
         note="Source: results/dose_response/metric_pairs.csv. Paired two-level bootstrap (the same resamples "
              "for both metrics); two-sided bootstrap p, adjusted within each comparison family (BH and Holm; "
              "the families also contain the SD1 pairs, which are not listed here).")
@@ -1082,10 +1136,11 @@ def table_legacy():
                          f"{point} {ci(r.switch_ci_low, r.switch_ci_high, f1)}"])
     return table(
         "Legacy analysis (shortcut vs full object): raw reliance, seed-only bootstrap, unbalanced decision "
-        "accuracy and the first-crossing switch rule, kept for comparison with earlier drafts",
+        "accuracy and the first-crossing switch rule, kept for comparison with "
+        + S("earlier drafts", "the primary analysis"),
         ["Setting", "Metric", "\u03c1 with raw R [seed-only CI]", "p (unadjusted)", "Decision accuracy (unbalanced)",
          "Switch, raw R % [CI]"],
-        body, widths=[2.2, 2.4, 3.2, 2.0, 2.4, 3.2], size=7.5,
+        body, widths=[2.2, 2.4, 3.2, 2.0, 2.4, 3.2], size=7.5, supp=True,
         note="Source: results/dose_response/responsiveness.csv (legacy). These intervals resample only the 2\u20136 "
              "seeds per dose with the images fixed, so they are too narrow; the decision accuracy is "
              "unbalanced; the switch is the first crossing of the per-dose means. Superseded by Tables in "
@@ -1108,7 +1163,7 @@ def table_sets():
         f"Model-set check promised by amendment A1 (shortcut vs full object, mechanism settings): the "
         f"{N_ORIGINAL} original models \u2192 the models including the {N_A1} A1 models",
         ["Setting", "Metric", f"\u03c1 on {RC}", "Over-detection FPR", "Balanced accuracy", f"Switch, {RC} %"],
-        body, widths=[2.2, 2.4, 2.6, 2.4, 2.6, 3.8], size=7.5,
+        body, widths=[2.2, 2.4, 2.6, 2.4, 2.6, 3.8], size=7.5, supp=True,
         note="Sources: results/dose_response/original_models/responsiveness_corrected.csv and "
              "results/dose_response/responsiveness_corrected.csv (analysis of all models; the mechanism "
              "settings received no A2 model, so these rows equal those with the A1 models only). Pet and "
@@ -1146,7 +1201,8 @@ def table_a2_outcomes(verdicts, over, full, matched, edge, bh4, p8a_n, p8b_n, p9
                "paired bootstrap interval of the difference above 0", p9_text, verdicts["P9"]],
     ]
     return table(
-        "Pre-registered predictions P5\u2013P9 of amendment A2 (docs/PREDICTIONS_pretrained.md) with their "
+        "Pre-registered predictions P5\u2013P9 of amendment A2" + S(" (docs/PREDICTIONS_pretrained.md)", "")
+        + " with their "
         "verdicts. P5\u2013P8: the SD1 models; P9: the three SD2 settings with their A2 models",
         ["Pred.", "Test as pre-registered", "Result", "Verdict"],
         body, widths=[1.0, 5.0, 8.4, 1.6], size=7,
@@ -1234,8 +1290,176 @@ def word_count(text):
 # ------------------------------------------------------------------ the paper
 
 
+class use_doc:
+    """Write the helpers' output into another document for the length of a with-block."""
+
+    def __init__(self, target):
+        self.target = target
+
+    def __enter__(self):
+        self.old = globals()["doc"]
+        globals()["doc"] = self.target
+
+    def __exit__(self, *exc):
+        globals()["doc"] = self.old
+
+
+# Every [[...]] marker that the submission build may still contain. They are listed, with what replaces
+# them, in docs/submission/DEFERRED.md; `--final` fails while any marker remains in the paper or in
+# docs/submission/*.md. A marker that is not declared here fails every submission build.
+DECLARED_MARKERS = {
+    "[[AUTHOR: e-mail]]", "[[AUTHOR: funding statement]]", "[[AUTHOR: competing interests]]",
+    "[[AUTHOR: confirm AI-use statement per Elsevier policy]]", "[[AUTHOR: acknowledgements]]",
+    "[[ZENODO_RELEASE_DOI]]", "[[SD3_METHODS]]", "[[SD4_METHODS]]", "[[SD3_RESULTS]]", "[[SD4_RESULTS]]",
+    "[[SD3_SD4_LIMITATIONS]]", "[[SD3_SD4_CONCLUSION]]", "[[SD3_POSITIONING]]", "[[SD3_SD4_SUPPLEMENT]]",
+}
+
+
+def declarations():
+    if SUBMISSION:
+        heading("CRediT authorship contribution statement")
+        para("**Md Junaid Faizan Shaikh:** Conceptualization, Methodology, Software, Investigation, Formal "
+             "analysis, Data curation, Visualization, Writing \u2013 original draft, Writing \u2013 review & "
+             "editing. Sole author.")
+        heading("Declaration of competing interest")
+        para("[[AUTHOR: competing interests]]")
+        heading("Funding")
+        para("[[AUTHOR: funding statement]]")
+        heading("Data availability")
+        para("The code, the per-model result files, the analysis outputs and the trained checkpoints are archived "
+             "on Zenodo (DOI [[ZENODO_RELEASE_DOI]]). The pre-registration files are archived in the Zenodo record "
+             "10.5281/zenodo.24285531 (concept DOI). MNIST, CIFAR-10, PneumoniaMNIST and Oxford-IIIT Pet are "
+             "publicly available.")
+        heading("Acknowledgements")
+        para("[[AUTHOR: acknowledgements]]")
+        heading("Declaration of generative AI and AI-assisted technologies in the manuscript preparation process")
+        para("During the preparation of this work the author used AI assistants for code development and for "
+             "drafting the text. After using these tools, the author reviewed and edited the content as needed and "
+             "takes full responsibility for the content of the publication. "
+             "[[AUTHOR: confirm AI-use statement per Elsevier policy]]")
+        return
+    heading("CRediT authorship contribution statement")
+    para("**Md Junaid Faizan Shaikh:** Conceptualization, Methodology, Software, Investigation, Formal analysis, "
+         "Visualization, Writing \u2013 original draft, Writing \u2013 review & editing. [Guide Name]: Supervision "
+         "[to be confirmed].")
+    heading("Declaration of competing interest")
+    para("The author declares no known competing financial interests or personal relationships that could have "
+         "appeared to influence the work reported in this paper.")
+    heading("Data availability")
+    para("[Placeholder: link to the public code repository with result files and checkpoints.] MNIST, CIFAR-10, "
+         "PneumoniaMNIST and Oxford-IIIT Pet are publicly available.")
+    heading("Declaration of generative AI and AI-assisted technologies in the writing process")
+    para("During the preparation of this work the author used AI assistants for code development and for "
+         "drafting the text. After using these tools, the author reviewed and edited the content as needed and "
+         "takes full responsibility for the content of the publication.")
+    heading("Funding")
+    para("This research did not receive any specific grant from funding agencies in the public, commercial, or "
+         "not-for-profit sectors.")
+    heading("Acknowledgements")
+    para("The author thanks [Guide Name] for guidance and feedback on this work.")
+
+
+def appendices_bc():
+    heading(S("Appendix B. Legacy analysis", "Legacy analysis (Table S4)"))
+    para(S("Earlier drafts used raw reliance, a bootstrap over seeds only, an unbalanced decision accuracy and a "
+           "first-crossing switch rule. These values are kept for comparison and are superseded by Section 5.",
+           "The first analysis of the models used raw reliance, a bootstrap over seeds only, an unbalanced decision "
+           "accuracy and a first-crossing switch rule. These values are kept for comparison and are superseded by "
+           "Section 5 of the main text."))
+    table_legacy()
+
+    # ---- Appendix C
+    heading(S("Appendix C. Original and amended model sets", "Original and amended model sets (Table S5)"))
+    para(f"Amendment A1 committed to reporting both the {N_ORIGINAL} original models "
+         + S("(results/dose_response/original_models/)", "(analysed separately)") + " "
+         f"and the {N_ORIGINAL + N_A1} models that include its {N_A1} added MNIST and "
+         "PneumoniaMNIST models. The added models strengthen the rank correlations slightly and weaken the "
+         "decision-level results: over-detection rises and the switch points move. Amendment A2 makes the same "
+         f"commitment for its {N_A2} models: the {N_ORIGINAL + N_A1} models without them are analysed "
+         + S("in results/dose_response/pre_a2_models/", "separately") + f", and the analysis of all {N_MODELS} models adds the {N_A2_SD2} "
+         f"SD2 models to their settings and the {N_SD1} SD1 models as a separate setting. A2 added no MNIST or "
+         "PneumoniaMNIST model, so the table below compares the original models with the models including A1; "
+         "the A2 changes on the natural images are in Sections 5.4 and 5.10" + S("", " of the main text") + ".")
+    table_sets()
+    if SUBMISSION:
+        para("[[SD3_SD4_SUPPLEMENT]]")
+
+
+def doc_text(d):
+    """All text of a python-docx document: paragraphs and table cells."""
+    parts = [p.text for p in d.paragraphs]
+    for t in d.tables:
+        for r in t.rows:
+            parts.extend(c.text for c in r.cells)
+    return "\n".join(parts)
+
+
+# Words that must not appear in the journal text (internal revision history and repository paths). "original
+# draft" is a CRediT role name and is allowed.
+FORBIDDEN = [r"audit", r"reviewer", r"(?<!original )\bdrafts?\b", r"docs/", r"guide review", r"\bguide\b",
+             r"commit(ted)? [0-9a-f]{7}\b", r"UNVERIFIED", r"not for submission"]
+MARKER = r"\[\[[^\]]+\]\]"
+
+
+def submission_checks(main, supp, final=False):
+    """Format checks of the submission build; `final` also fails while any [[marker]] remains."""
+    import re
+    texts = {"main text": doc_text(main), "supplementary": doc_text(supp)}
+    for name, text in texts.items():
+        assert TITLE in text, f"{name}: the official title must appear exactly"
+        for pattern in FORBIDDEN:
+            hit = re.search(pattern, text, flags=re.IGNORECASE)
+            assert not hit, f"{name}: forbidden text {hit.group(0)!r} near {text[max(hit.start() - 60, 0):hit.end() + 60]!r}"
+    old_title = re.compile(r"Do XAI Metrics Notice|Do Explanation Metrics Catch|Ground-Truth Evaluation of XAI Metrics")
+    assert not any(old_title.search(t) for t in texts.values()), "an earlier title appears"
+    # cross-references: every cited table or figure number exists
+    main_text = texts["main text"]
+    n_tables, n_figs, n_supp = COUNTERS["table"], COUNTERS["fig"], COUNTERS["stable"]
+    assert n_supp == len(SUPP_ORDER), (n_supp, SUPP_ORDER)
+    plain = re.sub(r"Supplementary Table S\d+", "", main_text)
+    for n in {int(x) for x in re.findall(r"\bTable (\d+)\b", plain)}:
+        assert 1 <= n <= n_tables, f"Table {n} is cited but the main text has {n_tables} tables"
+    for n in {int(x) for x in re.findall(r"\bFig\. (\d+)\b", main_text)}:
+        assert 1 <= n <= n_figs, f"Fig. {n} is cited but the main text has {n_figs} figures"
+    for text in texts.values():
+        for n in {int(x) for x in re.findall(r"Table S(\d+)", text)}:
+            assert 1 <= n <= n_supp, f"Table S{n} is cited but the supplement has {n_supp} tables"
+    # a table that moved to the supplement is no longer cited as a main-text table
+    for caption_number in range(1, n_tables + 1):
+        assert re.search(rf"^Table {caption_number}\. ", main_text, flags=re.M), f"Table {caption_number} has no caption"
+    # markers: only the declared ones; --final: none at all, in the paper and in docs/submission
+    found = {m for t in texts.values() for m in re.findall(MARKER, t)}
+    undeclared = found - DECLARED_MARKERS
+    assert not undeclared, f"undeclared markers: {sorted(undeclared)}"
+    if final:
+        remaining = {f"paper: {m}" for m in found}
+        folder = ROOT / "docs" / "submission"
+        for md in sorted(folder.glob("*.md")) if folder.exists() else []:
+            if md.name in ("DEFERRED.md", "submission_checklist.md"):
+                continue
+            remaining |= {f"{md.name}: {m}" for m in re.findall(MARKER, md.read_text(encoding="utf8"))}
+        if remaining:
+            raise SystemExit("--final: unfinished markers remain:\n  " + "\n  ".join(sorted(remaining)))
+    print(f"submission checks passed: {len(found)} declared markers remain, {n_tables} tables, {n_figs} figures, "
+          f"{n_supp} supplementary tables")
+
+
 def build():
     setup()
+    if SUBMISSION:
+        setup(SUPP, header_text="Supplementary Material")
+        with use_doc(SUPP):
+            t = doc.add_paragraph()
+            t.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            run = t.add_run("Supplementary Material to: " + TITLE)
+            run.bold, run.font.size = True, Pt(14)
+            para("Md Junaid Faizan Shaikh", bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, after=0)
+            para("This document holds material that supports the main text: the full table of the pre-registered "
+                 "Pet predictions P1\u2013P4 (Table S1; abridged in the main text), the responsiveness of the metrics "
+                 "against the size-matched object map (Table S2), the paired metric-versus-metric differences "
+                 "(Table S3), the legacy analysis (Table S4) and the check on the original model set (Table S5). "
+                 "Section and figure numbers refer to the main text. All numbers are generated from the result "
+                 "files by the analysis code.")
     figs = {
         "full": preference_figure(FULL, FIG_OUT / "fig_rc_full_object.png", "Preference for shortcut map"),
         "matched": preference_figure(MATCHED, FIG_OUT / "fig_rc_size_matched.png", "Preference for shortcut map"),
@@ -1246,8 +1470,10 @@ def build():
         "p_random": preference_figure(P_RANDOM, FIG_OUT / "fig_rc_placebo_vs_random.png",
                                       "Preference for placebo map", show_behaviour=False),
         # the analyze figures have one panel per setting in models.csv, SD1 included
-        "behaviour": rearrange_panels(DR / "behaviour_auroc.png", FIG_OUT / "fig_behaviour_auroc.png", len(N_SETTING)),
-        "methods": rearrange_panels(DR / "method_dose_response.png", FIG_OUT / "fig_methods.png", len(N_SETTING)),
+        "behaviour": rearrange_panels(DR / "behaviour_auroc.png", FIG_OUT / S("fig_behaviour_auroc.png",
+                                      "fig_behaviour_auroc_submission.png"), len(N_SETTING), order=PANEL_ORDER),
+        "methods": rearrange_panels(DR / "method_dose_response.png", FIG_OUT / S("fig_methods.png",
+                                    "fig_methods_submission.png"), len(N_SETTING), order=PANEL_ORDER),
     }
 
     # ---- numbers used throughout (all from the CSVs)
@@ -1488,14 +1714,15 @@ def build():
     sd1_pet = {m: row(FULL, "pet_resnet18", "patch", m) for m in METRICS}
 
     # ---- front matter
-    notice = para(DRAFT_NOTICE, bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, size=12)
-    notice.runs[0].font.color.rgb = RGBColor(0xC0, 0, 0)
-    para("Provisional target journal: Neurocomputing (Elsevier), Q1 in Artificial Intelligence, SJR 1.47 according "
-         "to the SCImago widget recorded in docs/audit/00_combined_audit.md \u00a77. The free (subscription, no "
-         "article processing charge) route is UNVERIFIED and must be confirmed by the author in a normal browser "
-         "before submission. Layout: single-column Elsevier-style draft (A4, Times New Roman 12 pt, 1.5 line "
-         "spacing); an elsarticle LaTeX version was not prepared. All numbers are generated from the project's "
-         "result files by paper/build_paper.py.", italic=True, align=WD_ALIGN_PARAGRAPH.CENTER, size=9, spacing=1.0)
+    if not SUBMISSION:
+        notice = para(DRAFT_NOTICE, bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, size=12)
+        notice.runs[0].font.color.rgb = RGBColor(0xC0, 0, 0)
+        para("Provisional target journal: Neurocomputing (Elsevier), Q1 in Artificial Intelligence, SJR 1.47 according "
+             "to the SCImago widget recorded in docs/audit/00_combined_audit.md \u00a77. The free (subscription, no "
+             "article processing charge) route is UNVERIFIED and must be confirmed by the author in a normal browser "
+             "before submission. Layout: single-column Elsevier-style draft (A4, Times New Roman 12 pt, 1.5 line "
+             "spacing); an elsarticle LaTeX version was not prepared. All numbers are generated from the project's "
+             "result files by paper/build_paper.py.", italic=True, align=WD_ALIGN_PARAGRAPH.CENTER, size=9, spacing=1.0)
     t = doc.add_paragraph()
     t.alignment = WD_ALIGN_PARAGRAPH.CENTER
     t.paragraph_format.space_before = Pt(12)
@@ -1504,32 +1731,45 @@ def build():
     para("Md Junaid Faizan Shaikh", bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, after=0)
     para("Department of Computer Science and Engineering, Khaja Bandanawaz University, Kalaburagi, India",
          align=WD_ALIGN_PARAGRAPH.CENTER, size=10, after=0)
-    para("E-mail: [email]", align=WD_ALIGN_PARAGRAPH.CENTER, size=10)
+    para(S("E-mail: [email]", "E-mail: [[AUTHOR: e-mail]]  \u00b7  ORCID: 0009-0002-6565-1835"),
+         align=WD_ALIGN_PARAGRAPH.CENTER, size=10)
 
+    n_word = {1: "one", 2: "two", 3: "three", 4: "four"}
+    pet_ident = [m for m in METRICS if m not in pet_no_switch]
+    pet_abs_tail = ""
+    if pet_edge:
+        pet_abs_tail += f" ({n_word[len(pet_edge)]} at the lowest-reliance edge)"
+    if SUBMISSION and pet_no_switch:
+        assert len(pet_no_switch) == 1, "abstract wording covers exactly one metric without a switch"
+        pet_abs_tail += f"; {pet_no_switch[0]} prefers the shortcut map from the lowest reliance"
     abstract = (
-        "Deletion and insertion curves decide which explanations count as faithful, "
-        "but whether they track a model's reliance is rarely tested. We trained "
+        S("Deletion and insertion curves decide which explanations count as faithful, "
+          "but whether they track a model's reliance is rarely tested. ",
+          "Whether deletion and insertion metrics track a model's reliance is rarely tested. ") + "We trained "
         f"{N_MODELS} CNNs in which a signed training dose sets the measured reliance on an injected class-coded "
         "shortcut, on Oxford-IIIT Pet with object masks, CIFAR-10, MNIST and "
-        "PneumoniaMNIST, and scored fixed oracle explanations with four metrics. The metrics respond to "
+        "PneumoniaMNIST, and scored " + S("fixed ", "") + "oracle explanations with four metrics. The metrics respond to "
         "reliance: preference for the shortcut map over the object map rises with chance-corrected reliance "
         f"in {n_full_sig} of {n_full} cells (\u03c1 = {span(full_sig.rho_rc)}). They are not calibrated to it. Among models with chance-corrected reliance at most 50%, "
         f"black and blur deletion prefer the shortcut map for {pct_span(pet_bb_fpr)} of Pet models "
-        f"({pct_span(pet_bb_margin)} with a per-model margin) and, against a centred "
-        f"Gaussian object prior, {pct_span(cifar_bb_fpr)} of CIFAR-10 models. On Pet the metrics switch at "
-        f"{span(pet_switch, f1)}% chance-corrected reliance, while the models follow the "
+        f"({pct_span(pet_bb_margin)} with a " + S("per-model ", "") + "margin) and, against a centred "
+        f"Gaussian object prior, {pct_span(cifar_bb_fpr)} of CIFAR-10 models. " + S("On Pet the metrics switch at ",
+                                     f"On Pet {n_word[len(pet_ident)]} metrics switch at ") +
+        f"{span(pet_switch, f1)}% chance-corrected reliance{S('', pet_abs_tail)}, while the models follow the "
         "shortcut on half the images at "
-        f"{switch_text(pet_bsw, note=f'{span(pet_label_sw, f1)}% across behavioural labels')}. Against per-image "
-        f"behavioural labels the class-stratified AUROC is {span(pooled_nat)} "
-        f"on natural images, but within a model only {span(within_nat)}. Their verdicts depend on "
+        f"{switch_text(pet_bsw, note=f'{span(pet_label_sw, f1)}% across behavioural labels')}. Against " + S("per-image ", "") +
+        f"behavioural labels the {S('class-stratified', 'stratified')} AUROC is {span(pooled_nat)} "
+        f"on natural images, but within a model only {span(within_nat)}. {S('Their verdicts', 'Verdicts')} depend on "
         "explanation size and form: a size-matched object map moves the MNIST switch points from "
         f"{span(mp_full.switch_iso_rc, f1)}% to {span(mp_matched.switch_iso_rc, f1)}%, and on CIFAR-10 black "
         "deletion prefers a random ordering over a centred object map "
         f"{pct_span([ro[(b, 'Deletion (black)')].pref_low for b, *_ in NATURAL[1:]])} "
-        "of the time at low reliance. A pre-registered test on Pet confirmed three of four "
+        "of the time at low reliance. " + S("A pre-registered test on Pet confirmed three of four "
         "predictions; black deletion failed the form-matched control. A second, on an ImageNet-pretrained "
-        "network and gap-filled settings, confirmed four of five.")
-    assert word_count(abstract) <= 250, word_count(abstract)
+        "network and gap-filled settings, confirmed four of five.",
+        "Pre-registered tests confirmed three of four predictions on Pet (black deletion failed a form-matched "
+        "control) and four of five on an ImageNet-pretrained network with gap-filled settings."))
+    assert word_count(abstract) <= 250, (word_count(abstract), abstract)
     p = para("")
     add_runs(p, "**Abstract** " + abstract)
     highlights = [
@@ -1540,9 +1780,12 @@ def build():
         "Pre-registered Pet test: three of four predictions held; black deletion failed",
     ]
     assert all(len(h) <= 85 for h in highlights), [len(h) for h in highlights]
-    para("**Highlights** (at most 85 characters each, following the usual Elsevier rule; confirm in the "
-         "Neurocomputing Guide for Authors)", after=0)
-    bullets(highlights)
+    if not SUBMISSION:
+        para("**Highlights** (at most 85 characters each, following the usual Elsevier rule; confirm in the "
+             "Neurocomputing Guide for Authors)", after=0)
+        bullets(highlights)
+    else:
+        HIGHLIGHTS_OUTPUT.write_text("\n".join(highlights) + "\n", encoding="utf8")
     para("**Keywords** Explainable AI \u00b7 Faithfulness metrics \u00b7 Deletion and insertion \u00b7 "
          "Shortcut learning \u00b7 Meta-evaluation \u00b7 Pre-registration")
 
@@ -1594,12 +1837,17 @@ def build():
     ])
     para("Section 2 positions the work, Sections 3 and 4 describe the protocol and setup, Section 5 reports the "
          "results (natural images first), and Sections 6\u20138 discuss them, state the limitations and conclude. "
-         "Appendix A holds a supporting study of the model-randomisation sanity check, Appendix B the legacy "
-         "analysis of earlier drafts, and Appendix C the check on the original model set.")
+         + S("Appendix A holds a supporting study of the model-randomisation sanity check, Appendix B the legacy "
+             "analysis of earlier drafts, and Appendix C the check on the original model set.",
+             "Appendix A holds a supporting study of the model-randomisation sanity check. The Supplementary "
+             "Material holds the full pre-registered outcome table, the size-matched responsiveness table, the "
+             "paired metric comparisons, the legacy analysis and the check on the original model set."))
 
     # ---- 2 Related work
     heading("2. Related work")
-    para(f"The literature audit behind this section searched {SEARCH_AUDIT}; every cited page was re-opened on "
+    para(S(f"The literature audit behind this section searched {SEARCH_AUDIT}; ",
+           "The literature search behind this section covered 2019 to October 2026; ")
+         + f"every cited page was re-opened on "
          f"{SEARCH_RECHECK}, when a further search found no study of graded reliance as ground truth for "
          f"faithfulness metrics. Table {COUNTERS['table'] + 1} summarises the positioning.")
     heading("2.1. Controlled reliance and ground-truth benchmarks", 2)
@@ -1722,12 +1970,12 @@ def build():
          "object map an ideal metric gives a preference near 0 at low reliance and near 1 at high reliance.")
     para("Preference is scored on aligned images, while reliance is measured on conflicting images, so the "
          "assumption that a metric should switch at 50% reliance is not derived. We therefore label each "
-         "scored image from forward passes only. The primary label (after the audit's reviewer 05) is 1 if the "
+         "scored image from forward passes only. The primary label" + S(" (after the audit's reviewer 05)", "") + " is 1 if the "
          "model predicts the shortcut's class when the same image's shortcut is moved to a wrong class's "
          "position and does not predict that class when the shortcut is removed; it is 0 if the moved shortcut "
          "does not win; images that the model already assigns to the shortcut's class without any shortcut are "
          "left undetermined, which removes the same error floor as the chance correction. A check label "
-         "(reviewer 03) marks an image as shortcut-dominant when removing the shortcut lowers the true-class "
+         + S("(reviewer 03) ", "") + "marks an image as shortcut-dominant when removing the shortcut lowers the true-class "
          "probability more than replacing the image by one of another class that carries the same shortcut. "
          "Each metric's AUC gap is then scored against the label by an AUROC computed within each true class "
          "and averaged (class-stratified), because on the binary tasks the label and the gap both depend on "
@@ -1779,6 +2027,20 @@ def build():
          "(window and stride 4 and 2 at 28 and 32 px, 16 and 8 on Pet). For each method we compute the share of "
          "positive attribution on the shortcut pixels (relevance mass accuracy " + cite("arras") + ").")
 
+    if SUBMISSION:
+        heading("3.9. Pre-registered extensions: exact ROAD and a watermark shortcut", 2)
+        para("Two further tests were pre-registered in amendment A3 (Zenodo version 3, 10.5281/zenodo.24416017) "
+             "before any model or score for them existed. **SD3** scores the same oracle and control maps with the "
+             "Noisy Linear Imputation operator of ROAD " + cite("rong") + ", in two removal orders: most relevant "
+             "first (MoRF, a lower area is better) and least relevant first (LeRF, a higher area is better). The "
+             "removed shares of the pixels are 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7 and 0.9, and the scoring images are "
+             "the first 100 (28 and 32 px small CNNs) or 50 (CIFAR-10 ResNet-18, Pet, SD1 and SD4) of the existing "
+             "scoring images. [[SD3_METHODS]]")
+        para("**SD4** replaces the patch of SD1 by a semi-transparent watermark in one image corner, whose stroke "
+             "arrangement codes the class, on the ImageNet-pretrained Pet ResNet-18, with 18 confirmatory models "
+             "(six doses, three seeds). The doses follow a pilot rule fixed in A3 before the pilot. "
+             "[[SD4_METHODS]]")
+
     # ---- 4 Setup
     heading("4. Experimental setup")
     para("**Datasets.** Oxford-IIIT Pet " + cite("pets") + " as a cat-versus-dog task at 128\u00d7128 with the "
@@ -1802,11 +2064,11 @@ def build():
          + "; ".join(f"{BASE_NAMES[b]} {', '.join(str(s) for s in SEEDS[b])}" for b in
                      ["pet_resnet18", "cifar10_resnet18", "cifar10", "mnist", "pneumonia_mnist",
                       "pet_resnet18_pretrained"])
-         + f". {N_ORIGINAL} models existed before amendment A1 (docs/PREDICTIONS_amendments.md, commit 8738b32, "
+         + f". {N_ORIGINAL} models existed before amendment A1 (" + S("docs/PREDICTIONS_amendments.md, commit 8738b32, ", "") + ""
          f"committed before any of its models was trained); A1 added {N_A1} MNIST and PneumoniaMNIST models at "
          "new doses near the steep part of the dose-response curve, with six seeds at the two steepest MNIST "
          "doses, to fill reliance gaps. A1 made no predictions about the metrics, and both model sets are "
-         "reported (Appendix C).")
+         "reported (" + S("Appendix C", tref("sets", 0)) + ").")
     pilot_text = "; ".join(
         f"{BASE_NAMES.get(p.base, p.base)} dose {f2(p.dose)}, seed {int(p.seed)} ({RC} {f1(p.reliance_corrected)}%, "
         + ("an SD1 pilot" if p.model_set == "A2_pilot" else "one of the SD2 models, not scored yet") + ")"
@@ -1816,8 +2078,8 @@ def build():
                                                 key=[42, 1, 2].index))
 
     sd1_doses = ", ".join(("+" if d > 0 else "") + f"{d:g}" for d in DOSES[SD1[0]]).replace("-", MINUS)
-    para("**Amendment A2.** A second dated amendment (docs/PREDICTIONS_amendments.md, A2, with predictions "
-         "P5\u2013P9 in docs/PREDICTIONS_pretrained.md; Zenodo record 10.5281/zenodo.24285532) adds natural-image "
+    para("**Amendment A2.** A second dated amendment (" + S("docs/PREDICTIONS_amendments.md, ", "") + "A2, with predictions "
+         "P5\u2013P9" + S(" in docs/PREDICTIONS_pretrained.md; ", "; ") + "Zenodo record 10.5281/zenodo.24285532) adds natural-image "
          "doses inside the reliance gaps (SD2) and an ImageNet-pretrained ResNet-18 on Pet (SD1). Pilots fixed "
          "the final doses under the amendment's rules (completion notes A2-C1 and A2-C2, 2026-11-17, Zenodo "
          "10.5281/zenodo.24333540). SD2 adds "
@@ -1827,7 +2089,7 @@ def build():
          f"and the small CNN ({A2_COUNTS['cifar10']} models, seeds {a2_seeds('cifar10')}). "
          "The CIFAR-10 ResNet-18 pilot (dose \u22120.05, seed 42) is one of these models, as A2 specifies. The SD2 "
          "models are pooled with the existing models of their setting, and results without any A2 model are "
-         f"written to results/dose_response/pre_a2_models/ ({N_ORIGINAL + N_A1} models). SD1 has {N_SD1} "
+         + S("written to results/dose_response/pre_a2_models/ (", "analysed separately (") + f"{N_ORIGINAL + N_A1} models). SD1 has {N_SD1} "
          f"confirmatory models (doses {sd1_doses}, seeds {a2_seeds(SD1[0])}), the ImageNet-pretrained ResNet-18 with the "
          "standard ImageNet stem, fine-tuned for "
          f"{EPOCHS[SD1[0]]} epochs with Adam (learning rate 10\u207b\u2074, batch size 128) on the same Pet data, "
@@ -1841,6 +2103,17 @@ def build():
     para("**Evaluation.** Every model is scored on 100 aligned test images, the same images for every model of a "
          "setting. Reliance and accuracy use the full test set. Re-evaluating a cached model reproduces its "
          "stored scores exactly.")
+    if SUBMISSION:
+        para("**Pre-registration.** The Pet predictions P1\u2013P4 were committed to the project repository before any "
+             "Pet model was trained. Amendment A1 (gap-filling MNIST and PneumoniaMNIST models) was committed "
+             "before its models were trained. Amendment A2 and the predictions P5\u2013P9 were deposited on Zenodo "
+             "as version 1 of the record (DOI 10.5281/zenodo.24285532, 2026-11-16) before any confirmatory SD1 or "
+             "SD2 model was trained; the two SD1 pilot models had been trained shortly before the upload, and only "
+             "their reliance and accuracy were read, a deviation recorded in the amendment. The completion notes with "
+             "the final SD1 and SD2 doses are version 2 (10.5281/zenodo.24333540, 2026-11-18). Amendment A3 and the "
+             "predictions P10\u2013P13 for exact ROAD and the watermark shortcut are version 3 "
+             "(10.5281/zenodo.24416017, 2026-11-21), uploaded before any SD3 or SD4 model or score was produced. The "
+             "concept DOI of the record is 10.5281/zenodo.24285531.")
 
     # ---- 5 Results
     heading("5. Results")
@@ -1854,8 +2127,9 @@ def build():
          f"{f1(pet_g.reliance_corrected.min())}%). The same "
          f"holds on PneumoniaMNIST: the lowest per-dose mean raw reliance is {f1(pneu_low['patch'].reliance)}% "
          f"(patch) and {f1(pneu_low['texture'].reliance)}% (texture), which is {RC} = "
-         f"{f1(pneu_low['patch'].reliance_corrected)}% and {f1(pneu_low['texture'].reliance_corrected)}%. Earlier "
-         "drafts reported \u201cabout 15%, not 0\u201d here; that 15% is the error floor. Near _d_ = 0 reliance "
+         f"{f1(pneu_low['patch'].reliance_corrected)}% and {f1(pneu_low['texture'].reliance_corrected)}%. " + S("Earlier "
+         "drafts reported \u201cabout 15%, not 0\u201d here; that 15% is the error floor. ",
+         "A raw reliance of about 15% at the lowest dose is the error floor, not use of the shortcut. ") + "Near _d_ = 0 reliance "
          "varies strongly between seeds, so every analysis uses measured reliance, not the dose.")
     table_reliance()
 
@@ -1864,7 +2138,7 @@ def build():
     t_full = COUNTERS["table"] + 1
     para(f"Fig. {f_full} and Table {t_full} give the main comparison, the shortcut map against the full object "
          f"map. Over all settings, preference rises with {RC} in {n_full_sig} of {n_full} cells (\u03c1 = "
-         f"{span(full.rho_rc)}); the exception is "
+         f"{span(S(full.rho_rc, full_sig.rho_rc))}); the exception is "
          + "; ".join(f"{r.metric} on {LABEL[(r.base, r.shortcut)]} (\u03c1 = {f2(r.rho_rc)}, p_bh = "
                      f"{format_p(r.p_bh)})" for r in full_weak.itertuples())
          + f". On the natural images \u03c1 = {span(full_nat.rho_rc)}.")
@@ -1908,7 +2182,7 @@ def build():
          f"of the time with the small CNN and {pct_span(ro_bb['cifar10_resnet18'])} with ResNet-18, against "
          f"{pct_span(ro_ii['cifar10'] + ro_ii['cifar10_resnet18'])} for inpainting deletion and insertion. With "
          f"the real Pet masks the bias is smaller ({pct_span(ro_bb['pet_resnet18'])} against "
-         f"{pct_span(ro_ii['pet_resnet18'])}), which supports the earlier hypothesis that the Gaussian object map "
+         f"{pct_span(ro_ii['pet_resnet18'])}), which supports the " + S("earlier ", "") + "hypothesis that the Gaussian object map "
          "inflated it on CIFAR-10. On Pet, black and blur deletion do not rank the real object mask above random "
          f"pixels (random-vs-object preference {span(pet_ro_bb)}); inpainting deletion and insertion do, but "
          f"only weakly ({span(pet_ro_ii)}).")
@@ -1958,13 +2232,13 @@ def build():
 
     heading("5.3. Pre-registered test on Oxford-IIIT Pet", 2)
     t_pre = COUNTERS["table"] + 1
-    para("The Pet predictions were committed before any Pet model was trained (commit a962b6c), followed by the "
-         "Pet code (20694f2), a documented dose change after the first model and before any metric result "
-         "(d823737), and the results with the recorded verdicts (1e29918). P1 predicted \u03c1 > 0.8 between "
+    para("The Pet predictions were committed before any Pet model was trained" + S(" (commit a962b6c)", "") + ", followed by the "
+         "Pet code" + S(" (20694f2)", "") + ", a documented dose change after the first model and before any metric result "
+         + S("(d823737), ", "") + "and the results with the recorded verdicts" + S(" (1e29918)", "") + ". P1 predicted \u03c1 > 0.8 between "
          "reliance and the shortcut-vs-object preference for all four metrics; P2 a larger random-over-object "
          "preference for black and blur deletion than for inpainting and insertion at the lowest dose; P3 "
          "starting values within 0.5 \u00b1 0.15 and \u03c1 > 0.8 in the form-matched comparisons; P4 \u03c1 > 0.8 "
-         f"for the shortcut mass of Integrated Gradients and Occlusion. Table {t_pre} lists the outcomes, on the "
+         f"for the shortcut mass of Integrated Gradients and Occlusion. Table {t_pre} lists the outcomes" + S("", " (the full table is Supplementary Table S1)") + ", on the "
          f"18 original Pet models only, as amendment A2 commits (the {N_A2_PET} A2 Pet models are not used here). "
          "P1, P2 "
          "and P4 hold and P3 fails for black deletion (\u03c1 = "
@@ -1978,7 +2252,11 @@ def build():
             "the bias-corrected interval stays above the 0.8 threshold.")
          + " The P2 contrast, "
          f"{f3(p2_contrast.estimate)} {ci(p2_contrast.ci_low, p2_contrast.ci_high, f3)}, excludes zero.")
-    table_prereg()
+    if SUBMISSION:
+        table_prereg(full=False)
+        table_prereg(full=True)  # Supplementary Table S1
+    else:
+        table_prereg()
 
     heading("5.4. Per-image behavioural ground truth", 2)
     t_beh = COUNTERS["table"] + 1
@@ -2010,14 +2288,14 @@ def build():
          + "; ".join(f"{switch_text(bsw[(b, s)])} on {short}" for b, s, _, short in SETTINGS)
          + ". On CIFAR-10 it is identified and bracketed with the amendment-A2 models at doses "
          f"{', '.join(f2(d) for d in A2_CIFAR_DOSES)} ({A2_COUNTS['cifar10_resnet18']} ResNet-18 and "
-         f"{A2_COUNTS['cifar10']} CNN models). Without them (results/dose_response/pre_a2_models/) the crossing "
+         f"{A2_COUNTS['cifar10']} CNN models). Without them" + S(" (results/dose_response/pre_a2_models/)", "") + " the crossing "
          "fell in a reliance gap without models and was only known to lie above the last model below the gap: "
          + " and ".join(f"{switch_text(r)} on {SHORT[(r.base, r.shortcut)]}" for r in cifar_pre_a2)
          + ". On Pet it is identified and, with the "
          f"{N_A2_PET} amendment-A2 models at dose {f2(A2_PET_DOSES[0])}, also bracketed: the nearest models lie "
          f"{f1(pet_bsw.distance_below)} points below ({RC} {f1(pet_below)}, an A2 model) and "
-         f"{f1(pet_bsw.distance_above)} points above. Without the A2 models (the {N_ORIGINAL + N_A1} models, "
-         f"results/dose_response/pre_a2_models/) it was {switch_text(pet_pre_a2)}. The A2 models at this dose "
+         f"{f1(pet_bsw.distance_above)} points above. Without the A2 models (the {N_ORIGINAL + N_A1} models" + S(", "
+         f"results/dose_response/pre_a2_models/", "") + f") it was {switch_text(pet_pre_a2)}. The A2 models at this dose "
          f"reach {RC} {span(pet_a2_rc, f1)}: two seeds lie below the switch and one above it, so the seed "
          "spread at this dose is wide. The two check "
          "labels are still not bracketed on Pet. The assumed 50% is close to "
@@ -2054,16 +2332,19 @@ def build():
     table_labels()
     figure(figs["behaviour"],
            f"Class-stratified AUROC of each metric's per-image AUC gap against the behavioural label, within {RC} "
-           "bands (shortcut vs full object). Panels rearranged from results/dose_response/behaviour_auroc.png "
-           "(alphabetical setting order; the pet_resnet18_pretrained panel is the separate SD1 setting, "
-           "Section 5.10)")
+           + S("bands (shortcut vs full object). Panels rearranged from results/dose_response/behaviour_auroc.png "
+             "(alphabetical setting order; the pet_resnet18_pretrained panel is the separate SD1 setting, "
+             "Section 5.10)",
+             "bands (shortcut vs full object). Panels are in the order of Table 2. Titles give the dataset or "
+             "network and the shortcut: pet_resnet18 is the ResNet-18 trained from scratch on Pet, cifar10 the "
+             "small CNN, and pet_resnet18_pretrained the separate SD1 setting (Section 5.10)"))
 
     heading("5.5. Mechanism settings: size and switch identification", 2)
     f_matched = COUNTERS["fig"] + 1
     t_matched = COUNTERS["table"] + 1
     mp_low_full, mp_low_matched = mp_full.pref_low, mp_matched.pref_low
     para("The full object map marks far more pixels than the shortcut map. Replacing it by a size-matched object "
-         f"map (Fig. {f_matched}, Table {t_matched}) raises the MNIST patch preference for the shortcut at the "
+         f"map (Fig. {f_matched}, {tref('matched', t_matched)}) raises the MNIST patch preference for the shortcut at the "
          f"lowest dose from {span(mp_low_full, f3)} to {span(mp_low_matched, f3)}, moves the switch from "
          f"{span(mp_full.switch_iso_rc, f1)}% to {span(mp_matched.switch_iso_rc, f1)}% {RC}, and raises the "
          f"over-detection rate from {span(mp_full.fpr)} to {span(mp_matched.fpr)}. The metrics still respond "
@@ -2072,13 +2353,16 @@ def build():
          f"under this control (\u03c1 = {f2(pt_black_m.rho_rc)}, p_bh = {format_p(pt_black_m.p_bh)}).")
     para("Before amendment A1, the original MNIST patch models left a gap in raw reliance from "
          f"{f1(gap_orig[0])}% to {f1(gap_orig[1])}%, and the switches against the full object map "
-         f"({span(mp_orig.switch_iso_rc, f1)}% {RC}) lay inside it, so earlier drafts' statement that black and "
-         "blur deletion switch \u201cclearly before 50%\u201d was not supported. With the A1 models the widest "
+         f"({span(mp_orig.switch_iso_rc, f1)}% {RC}) lay inside it, so " + S("earlier drafts' statement that black and "
+         "blur deletion switch \u201cclearly before 50%\u201d was not supported",
+         "the original models could not show that black and blur deletion switch \u201cclearly before 50%\u201d")
+         + ". With the A1 models the widest "
          f"gap between 5% and 95% raw reliance is {f1(gap_all[0])}% to {f1(gap_all[1])}%, every switch has a "
-         f"model within {f1(mp_full.nearest_model_distance.max())} points, and the switches are "
+         f"model within {S(f1(mp_full.nearest_model_distance.max()) + ' points', 'about 1 point' if abs(mp_full.nearest_model_distance.max() - 1) < 0.1 else f1(mp_full.nearest_model_distance.max()) + ' points')}, and the switches are "
          f"{span(mp_full.switch_iso_rc, f1)}% {RC} (4-parameter logistic {span(mp_full.switch_4pl_rc, f1)}%), "
          f"against a behavioural switch of {f1(beh_switch[('mnist', 'patch')])}%. The added models moved the "
-         "switches up and closer together, and raised the over-detection rate; Appendix C lists both model sets.")
+         "switches up and closer together, and raised the over-detection rate; " + S("Appendix C", tref("sets", 0))
+         + " lists both model sets.")
 
     def cell(r):
         return f"{r.metric} on {SHORT[(r.base, r.shortcut)]}"
@@ -2115,7 +2399,7 @@ def build():
     figure(figs["matched"],
            f"Preference for the shortcut map over the size-matched object map against {RC}. Layout as in Fig. "
            f"{f_full}. Data: results/dose_response/preference.csv")
-    table_main(MATCHED, f"Metric responsiveness on {RC}, shortcut map vs size-matched object map")
+    table_main(MATCHED, f"Metric responsiveness on {RC}, shortcut map vs size-matched object map", supp=True)
     para("The diffuse texture shows the form dependence from the other side. On MNIST texture, insertion "
          f"switches only at {f1(mt_ins.switch_iso_rc)}% {RC} and reaches a preference of only "
          f"{f2(mt_ins.pref_high)} at the highest dose. Against a random ordering, which has the same scattered "
@@ -2133,7 +2417,8 @@ def build():
          f"{span(sf_low)} at the lowest dose and rises to "
          + "; ".join(f"{span(rows([S_RANDOM, S_PLACEBO], [s]).pref_high)} ({s[3]})" for s in sf_patch_settings)
          + " at the highest dose. The rise is smallest on PneumoniaMNIST patch and for black deletion on Pet, so "
-         "\u201crises to 0.93\u20130.99 for every metric\u201d in earlier drafts was too general. The placebo "
+         + S("\u201crises to 0.93\u20130.99 for every metric\u201d in earlier drafts was too general. ",
+             "the rise is not the same for every metric. ") + "The placebo "
          f"behaves like a random ordering for the deletion variants (Fig. {f_pr}): placebo vs random stays at "
          f"{span(list(pr_del.pref_low) + list(pr_del.pref_high))} at the lowest and highest dose in every setting. "
          "Insertion is the exception: its placebo-over-random preference rises with reliance on MNIST (\u03c1 = "
@@ -2155,7 +2440,7 @@ def build():
          "variants missed in " + ", ".join(f"{n_ - ok_} of {n_} cases ({m})" for m, (ok_, n_, _) in robust.items()
                                             if ok_ < n_) + ". Against the full object map alone, black, blur and "
          f"inpainting deletion are positive and significant in all {N_SETTINGS} settings. A paired test does "
-         f"not make inpainting the best variant (Table {t_pairs}): {n_pairs_sig} of {len(main_only(PAIRS))} metric pairs "
+         f"not make inpainting the best variant ({tref('pairs', t_pairs)}): {n_pairs_sig} of {len(main_only(PAIRS))} metric pairs "
          f"differ at p_bh < 0.05, and on PneumoniaMNIST texture black deletion has the higher \u03c1 against "
          f"the full object map (black \u2212 inpaint \u0394\u03c1 = {f3(pt_pairs['Deletion (inpaint)'].delta_rho_rc)} "
          f"{ci(pt_pairs['Deletion (inpaint)'].delta_rho_rc_ci_low, pt_pairs['Deletion (inpaint)'].delta_rho_rc_ci_high, f3)}, "
@@ -2179,9 +2464,12 @@ def build():
          f"(\u03c1 = {f2(pt_meth['Grad-CAM'].rho_rc)}). Grad-CAM places the least attribution on the patch at the "
          f"highest dose in {gc_lowest} of the {len(sf_patch_settings)} patch settings.")
     figure(figs["methods"],
-           "Share of positive attribution that each explanation method places on the shortcut pixels, against raw "
-           "reliance. Panels rearranged from results/dose_response/method_dose_response.png (alphabetical setting "
-           "order; the pet_resnet18_pretrained panel is the separate SD1 setting, whose Grad-CAM maps are 4\u00d74)")
+           S("Share of positive attribution that each explanation method places on the shortcut pixels, against raw "
+             "reliance. Panels rearranged from results/dose_response/method_dose_response.png (alphabetical setting "
+             "order; the pet_resnet18_pretrained panel is the separate SD1 setting, whose Grad-CAM maps are 4\u00d74)",
+             "Share of positive attribution that each explanation method places on the shortcut pixels, against raw "
+             "reliance. Panels are in the order of Table 2; titles are as in Fig. 3, and pet_resnet18_pretrained is "
+             "the separate SD1 setting, whose Grad-CAM maps are 4\u00d74"))
     table_methods()
 
     heading("5.9. Reliance and object competence", 2)
@@ -2215,7 +2503,7 @@ def build():
     sd1_beh = {m: brow(FULL, *SD1_KEY, m) for m in METRICS}
     sd1_levels = levels(*SD1_KEY)
     sd1_dose0 = sd1_levels[sd1_levels.dose == 0].iloc[0]
-    para("Amendment A2 and its predictions P5\u2013P9 (docs/PREDICTIONS_pretrained.md) were committed and "
+    para("Amendment A2 and its predictions P5\u2013P9" + S(" (docs/PREDICTIONS_pretrained.md)", "") + " were committed and "
          "timestamped on Zenodo before any SD1 or SD2 model was trained; the verdicts below apply the "
          f"pre-registered rules literally, to point estimates, and are summarised in Table {t_a2}. P5\u2013P8 use "
          f"the {N_SD1} SD1 models, an ImageNet-pretrained ResNet-18 fine-tuned on Pet with the same patch "
@@ -2289,6 +2577,21 @@ def build():
     table_sd1(sd1_bh4)
     table_p9(p9_rows, bsw)
 
+    if SUBMISSION:
+        heading("5.11. Exact ROAD (SD3: pre-registered predictions P10 and P11)", 2)
+        para("Predictions P10 and P11 were registered in amendment A3 before any SD3 score existed. P10: in each of "
+             "the four natural-image settings, at its lowest-dose models, the mean preference for a random map over "
+             "the object map is lower under ROAD (MoRF) than under black deletion, on the same images. P11: on the "
+             "Pet ResNet-18 from scratch, the over-detection rate of ROAD in the shortcut-versus-object comparison "
+             "is lower than that of black deletion, on the same models and images. ROAD LeRF is reported next to "
+             "ROAD MoRF and decides no verdict. [[SD3_RESULTS]]")
+        heading("5.12. Watermark shortcut (SD4: pre-registered predictions P12 and P13)", 2)
+        para(f"Predictions P12 and P13 were registered in amendment A3 before any SD4 model existed. P12: Spearman "
+             f"\u03c1 between {RC} and the shortcut-versus-object preference is above 0.8 for at least three of the "
+             "four existing metrics over the 18 confirmatory SD4 models. P13: the over-detection rate of black "
+             f"deletion and of blur deletion exceeds 0.5 among the SD4 models with {RC} \u2264 50. "
+             "[[SD4_RESULTS]]")
+
     # ---- 6 Discussion
     heading("6. Discussion")
     para("**Responsive but not calibrated.** Every metric ranks models by reliance, but a ranking is not a "
@@ -2357,9 +2660,15 @@ def build():
         "The behavioural switch and the per-image AUROCs depend on which behavioural label is used; all three "
         "labels are reported.",
         "The switch-identification window (\u00b110 points), the causal behavioural label and the class-stratified "
-        "AUROC were chosen after the audit and after the original-set results had been inspected. The amendment-A1 "
+        "AUROC were chosen " + S("after the audit and ", "") + "after the original-set results had been inspected. The amendment-A1 "
         "models had been trained by then, but they entered no analysis until these choices were committed.",
-    ])
+    ] + ([
+        "The tests of the class-stratified AUROC against 0.5 are one-sided (H1: AUROC > 0.5). A metric that ranks "
+        "the images the wrong way round, as the PneumoniaMNIST patch metrics do above 60% reliance, is therefore "
+        "not tested in that direction; such cases are read from the AUROC and its interval (Section 5.4).",
+        "Exact ROAD (SD3) and the watermark shortcut (SD4) are pre-registered (amendment A3, predictions "
+        "P10\u2013P13) but their results are pending and are not part of this version. " "[[SD3_SD4_LIMITATIONS]]",
+    ] if SUBMISSION else []))
 
     # ---- 8 Conclusion
     heading("8. Conclusion")
@@ -2376,28 +2685,10 @@ def build():
          "metrics. Metrics should be validated at several measured reliance "
          "levels, against behavioural ground truth and with size- and form-matched controls, before they are "
          "used to rank explanation methods. Future work should test other metric families, other pretrained "
-         "backbones and realistic shortcuts.")
+         "backbones and realistic shortcuts." + S("", " [[SD3_SD4_CONCLUSION]]"))
 
-    # ---- Declarations
-    heading("CRediT authorship contribution statement")
-    para("**Md Junaid Faizan Shaikh:** Conceptualization, Methodology, Software, Investigation, Formal analysis, "
-         "Visualization, Writing \u2013 original draft, Writing \u2013 review & editing. [Guide Name]: Supervision "
-         "[to be confirmed].")
-    heading("Declaration of competing interest")
-    para("The author declares no known competing financial interests or personal relationships that could have "
-         "appeared to influence the work reported in this paper.")
-    heading("Data availability")
-    para("[Placeholder: link to the public code repository with result files and checkpoints.] MNIST, CIFAR-10, "
-         "PneumoniaMNIST and Oxford-IIIT Pet are publicly available.")
-    heading("Declaration of generative AI and AI-assisted technologies in the writing process")
-    para("During the preparation of this work the author used AI assistants for code development and for "
-         "drafting the text. After using these tools, the author reviewed and edited the content as needed and "
-         "takes full responsibility for the content of the publication.")
-    heading("Funding")
-    para("This research did not receive any specific grant from funding agencies in the public, commercial, or "
-         "not-for-profit sectors.")
-    heading("Acknowledgements")
-    para("The author thanks [Guide Name] for guidance and feedback on this work.")
+    if not SUBMISSION:
+        declarations()
 
     # ---- Appendix A
     heading("Appendix A. Supporting study: the sanity check against ground truth")
@@ -2428,30 +2719,19 @@ def build():
            "\u03c1 between metric scores and ground-truth localisation. Source: results/analysis/gt_agreement.png",
            width=Inches(6.0))
 
-    # ---- Appendix B
-    heading("Appendix B. Legacy analysis")
-    para("Earlier drafts used raw reliance, a bootstrap over seeds only, an unbalanced decision accuracy and a "
-         "first-crossing switch rule. These values are kept for comparison and are superseded by Section 5.")
-    table_legacy()
-
-    # ---- Appendix C
-    heading("Appendix C. Original and amended model sets")
-    para(f"Amendment A1 committed to reporting both the {N_ORIGINAL} original models (results/dose_response/"
-         f"original_models/) and the {N_ORIGINAL + N_A1} models that include its {N_A1} added MNIST and "
-         "PneumoniaMNIST models. The added models strengthen the rank correlations slightly and weaken the "
-         "decision-level results: over-detection rises and the switch points move. Amendment A2 makes the same "
-         f"commitment for its {N_A2} models: the {N_ORIGINAL + N_A1} models without them are analysed in "
-         f"results/dose_response/pre_a2_models/, and the analysis of all {N_MODELS} models adds the {N_A2_SD2} "
-         f"SD2 models to their settings and the {N_SD1} SD1 models as a separate setting. A2 added no MNIST or "
-         "PneumoniaMNIST model, so the table below compares the original models with the models including A1; "
-         "the A2 changes on the natural images are in Sections 5.4 and 5.10.")
-    table_sets()
+    if SUBMISSION:
+        declarations()
+        with use_doc(SUPP):
+            appendices_bc()
+    else:
+        appendices_bc()
 
     # ---- References
     heading("References")
-    para("[Note for the guide: each entry was checked against the paper's own page (arXiv, proceedings, journal "
-         "or PubMed Central) on " + SEARCH_RECHECK + "; entries without authors are cited by title. Page numbers "
-         "and final venues must be checked before submission.]", italic=True, size=9, spacing=1.0)
+    if not SUBMISSION:
+        para("[Note for the guide: each entry was checked against the paper's own page (arXiv, proceedings, journal "
+             "or PubMed Central) on " + SEARCH_RECHECK + "; entries without authors are cited by title. Page numbers "
+             "and final venues must be checked before submission.]", italic=True, size=9, spacing=1.0)
     for i, key in enumerate(CITED, 1):
         p = doc.add_paragraph()
         p.paragraph_format.left_indent = Cm(0.8)
@@ -2462,7 +2742,10 @@ def build():
         run.font.size = Pt(9.5)
     unused = [k for k in REFERENCES if k not in CITED]
     assert not unused, f"references listed but never cited: {unused}"
-
+    if SUBMISSION:
+        submission_checks(doc, SUPP, final=FINAL)
+        SUPP.save(SUPP_OUTPUT)
+        print(f"wrote {SUPP_OUTPUT} ({COUNTERS['stable']} supplementary tables) and {HIGHLIGHTS_OUTPUT}")
     doc.save(OUTPUT)
     print(f"wrote {OUTPUT} ({COUNTERS['fig']} figures, {COUNTERS['table']} tables, {len(CITED)} references, "
           f"{N_MODELS} models, abstract {word_count(abstract)} words)")
