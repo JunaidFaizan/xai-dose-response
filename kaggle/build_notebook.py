@@ -336,7 +336,8 @@ Pre-registered in `docs/PREDICTIONS_amendments.md` (A3) and `docs/PREDICTIONS_sd
   shortcut, doses 0 and +0.25, seed 7 (training only). A3 lets only the pilots'
   reliance and accuracies be read before the dated SD4 completion note.
 - Cell 4: ROAD timing on one `pet_resnet18` and one `pet_resnet18_pretrained`
-  model (`road --time-only`): only the wall time is kept, the scores are discarded.
+  model (`road --time-only`): only the wall time is kept, in
+  `road_timing_kaggle_s3.csv`; the scores are discarded.
 - Cell 5: `a3_pilot_report.json` (reliance, accuracies, chance floor, r_c,
   the A3 dose set, the stopping rule, the ROAD times and the 15-minute gate).
 - Cell 6: `a3_session3_results.zip` in the notebook's Output.
@@ -370,7 +371,7 @@ for dose in (0.0, 0.25):
              'reliance_corrected': round(rc[dose], 2), 'training_minutes': m['training_minutes']}
     pilots.append(entry)
     print(entry)
-with open('results/dose_response/road_timing.csv', newline='') as f:
+with open('results/dose_response/road_timing_kaggle_s3.csv', newline='') as f:
     timing = [dict(row, minutes=float(row['minutes']), images=int(row['images']),
                    timing_gate_exceeded=float(row['minutes']) > 15) for row in csv.DictReader(f)]
 report = {'pilots': pilots,
@@ -385,7 +386,7 @@ SESSION3_ZIP = """# 6. Pack the results to download
 import zipfile
 out = '/kaggle/working/a3_session3_results.zip'
 patterns = ['checkpoint/dose/pet_resnet18_pretrained_watermark_*', 'a3_pilot_report.json',
-            'results/dose_response/road_timing.csv']
+            'results/dose_response/road_timing_kaggle_s3.csv']
 files = sorted({f for p in patterns for f in glob.glob(p)})
 with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
     for f in files:
@@ -399,8 +400,15 @@ A3_SESSION3 = [
     ("code", A3_SETUP + TIMING_CHECK + WEIGHTS_DOWNLOAD),
     ("code", f"""# 3. SD4 pilot: watermark, doses 0 and +0.25, seed 7 (training only; not scored before the A3 note)
 !python -u -W ignore dose_response.py train {SD4_PILOT}"""),
-    ("code", f"""# 4. ROAD timing gate: one Pet model of each network, scores discarded (road_timing.csv)
-!python -u -W ignore dose_response.py road --time-only --models {' '.join(ROAD_TIMING_MODELS)}"""),
+    ("code", f"""# 4. ROAD timing gate: one Pet model of each network, scores discarded.
+#    dose_response.py appends to road_timing.csv; this session's times are moved to
+#    road_timing_kaggle_s3.csv so they never overwrite the laptop timing (road_timing.csv).
+import os
+timing_file = 'results/dose_response/road_timing.csv'
+if os.path.exists(timing_file):
+    os.remove(timing_file)  # only this session's times are kept
+!python -u -W ignore dose_response.py road --time-only --models {' '.join(ROAD_TIMING_MODELS)}
+os.replace(timing_file, 'results/dose_response/road_timing_kaggle_s3.csv')"""),
     ("code", A3_PILOT_REPORT),
     ("code", SESSION3_ZIP),
 ]

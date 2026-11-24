@@ -199,6 +199,8 @@ Pre-registered in `docs/PREDICTIONS_amendments.md` (A3) with the predictions P10
    Expand-Archive $HOME\Downloads\a3_session3_results.zip -DestinationPath . -Force
    ```
 
+   The Kaggle ROAD times are in `results\dose_response\road_timing_kaggle_s3.csv`. The archive does not contain `road_timing.csv`, so the laptop timing is not overwritten.
+
 7. Read `a3_pilot_report.json`: per pilot the reliance, accuracies, chance floor and r_c; `a3_sd4_rule` and `a3_dose_set` (from the dose-0 pilot's r_c: 60 or above → −0.5, −0.4, −0.3, −0.2, −0.1, 0; below 60 → −0.5, −0.2, 0, +0.1, +0.25, +0.4); `sd4_stopped` (the +0.25 pilot's r_c is below 20); and `road_timing` (minutes per model, `timing_gate_exceeded` = more than 15 minutes).
 
 **SD4 completion note (roadmap T4.3), before session 4.** Copy the report values into a dated completion note under A3 in `docs/PREDICTIONS_amendments.md` (both pilots' reliance, accuracies, chance floor and r_c, the final SD4 doses, the ROAD timing and the resulting N for the Pet-sized settings). In the same commit:
@@ -219,11 +221,15 @@ Session 4 trains and scores the 18 SD4 confirmatory models (6 final doses × see
    ```
 
    Upload `kaggle\xai_a3models_bundle.zip` as a new **Private** dataset, for example `xai-a3-models`.
-2. **Choose one notebook or the split.** With t_pet and t_cifar the ROAD minutes per Pet and CIFAR-10 ResNet-18 model (t_pet from `road_timing` in `a3_pilot_report.json`, the larger of the two Pet models; t_cifar from the laptop timing below, which is an upper bound for the GPU), and the SD4 scoring time per model (at most 9.3 min, A2 estimate):
+2. **Choose one notebook or the split.** With t_pet and t_cifar the ROAD minutes per Pet and CIFAR-10 ResNet-18 model, and the SD4 scoring time per model (at most 9.3 min, A2 estimate):
    - session 4a (SD4) ≈ 18 × (1.4 + scoring) + 18 × t_pet minutes;
    - session 4b (ROAD of the GPU models) ≈ 30 × t_cifar + 39 × t_pet minutes.
 
-   Use the single notebook `kaggle\dose_response_a3_session4.ipynb` only if 4a + 4b is under 11 h; otherwise run `kaggle\dose_response_a3_session4a.ipynb` and `kaggle\dose_response_a3_session4b.ipynb` as two sessions. If SD4 stopped, run only 4b.
+   Measured values (session 3, 2026-11-24, note A3-C1): t_pet = 2.51 min for `pet_resnet18` and 2.28 min for `pet_resnet18_pretrained` on a Kaggle T4 (50 images); the same `pet_resnet18` model took 5.4–5.6 min on the author's laptop CPU, so the Kaggle GPU was faster for Pet. t_cifar has no GPU measurement; the laptop CPU gave 0.37–0.45 min per CIFAR-10 ResNet-18 model (about 0.4). The laptop CPU time is not used as a bound for Kaggle; the GPU may be slower or faster for CIFAR.
+
+   Estimate with t_pet = 2.5 and t_cifar = 0.4: 4a ≈ 18 × (1.4 + 9.3 + 2.5) = 238 min (about 4.0 h); 4b ≈ 39 × 2.5 + 30 × 0.4 = 110 min (about 1.8 h); total about 348 min, **about 5.8 h**. A single notebook fits under 11 h with a margin of about 5 h, even if the SD4 scoring and ROAD times were 1.5 times the estimate (about 8.7 h).
+
+   Use the single notebook `kaggle\dose_response_a3_session4.ipynb` if 4a + 4b is under 11 h (as estimated). Fallback: run `kaggle\dose_response_a3_session4a.ipynb` and `kaggle\dose_response_a3_session4b.ipynb` as two sessions. If SD4 stopped, run only 4b. If 4b alone would exceed 11 h (not expected), run it in two sessions split by base: let the first session time out or stop it after one or two bases, then start 4b again with the first Output attached (step 6). Every ROAD file is cached per model, so the second session scores only the models still missing.
 3. **Import Notebook** → the chosen notebook. **+ Add Input** → `xai-a3-bundle` (the version with `A3_SD4_RULE` set) and, for 4 and 4b, `xai-a3-models`.
 4. For 4 and 4a, fill `SD4_DOSES` in the parameters cell with the completion note's final doses. The notebook stops if the list is empty, is not one of the two A3 dose sets, includes seed 7, or if any SD4 model is not in model set `A3` (then `A3_SD4_RULE` is not set in the bundle).
 5. **Settings → Accelerator → GPU T4 x2**, **Settings → Internet → On**, then **Save Version → Save & Run All (Commit) → Save**.
