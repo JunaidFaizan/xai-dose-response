@@ -478,6 +478,8 @@ for folder in ('checkpoint/dose', 'results/dose_response/per_model'):
             shutil.copy(f, target)
             copied += 1
     print(copied, 'files copied into', folder)
+# Captum must be installed before dose_response is imported (xai.explain imports it).
+subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', 'captum==0.9.0'], check=True)
 sys.path.insert(0, WORK)
 import dose_response"""
     if sd4:
