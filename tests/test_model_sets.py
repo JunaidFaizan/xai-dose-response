@@ -64,15 +64,24 @@ class ModelSetTest(unittest.TestCase):
             self.assertFalse(in_model_set(case, "all"))
             self.assertTrue(in_model_set(case, "A3_pilot"))
 
-    def test_sd4_confirmatory_unregistered_until_the_completion_note(self):
-        self.assertIsNone(dose_response.A3_SD4_RULE)
-        self.assertEqual(dose_response.a3_design(), {})
-        for doses in dose_response.A3_SD4_DOSE_SETS.values():
-            for dose in doses:
-                for seed in (42, 1, 2):
-                    case = run("pet_resnet18_pretrained", dose, seed, shortcut="watermark")
-                    self.assertEqual(model_set_of(case), "unregistered")
-                    self.assertFalse(in_model_set(case, "all"))
+    def test_sd4_confirmatory_models_after_completion_note_a3_c1(self):
+        """Note A3-C1 (2026-11-24): dose-0 pilot r_c 0.84 -> rule "below 60"."""
+        self.assertEqual(dose_response.A3_SD4_RULE, "below 60")
+        doses = [-0.5, -0.2, 0.0, 0.1, 0.25, 0.4]
+        self.assertEqual(dose_response.a3_dose_set(0.84), doses)
+        models = [(d, s) for d in doses for s in (42, 1, 2)]
+        self.assertEqual(len(models), 18)
+        for dose, seed in models:
+            case = run("pet_resnet18_pretrained", dose, seed, shortcut="watermark")
+            self.assertEqual(model_set_of(case), "A3")
+            self.assertTrue(in_model_set(case, "all"))
+        for dose in (-0.4, -0.3, -0.1):  # doses of the other rule
+            self.assertEqual(model_set_of(run("pet_resnet18_pretrained", dose, 42, shortcut="watermark")),
+                             "unregistered")
+        for dose in doses:  # seed 7 only at the pilot doses
+            expected = "A3_pilot" if dose in (0.0, 0.25) else "unregistered"
+            self.assertEqual(model_set_of(run("pet_resnet18_pretrained", dose, 7, shortcut="watermark")),
+                             expected)
 
     def test_sd4_confirmatory_after_the_completion_note(self):
         every = sorted({d for doses in dose_response.A3_SD4_DOSE_SETS.values() for d in doses})

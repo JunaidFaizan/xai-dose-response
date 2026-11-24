@@ -1,4 +1,4 @@
-"""Dose-response meta-evaluation: do XAI metrics notice how much a model relies on a shortcut?
+"""A Dose-Response Evaluation of Explanation Metrics under Controlled Shortcut Reliance in CNN Image Classifiers
 
 Usage:
     python dose_response.py all              # train, evaluate, analyze (about 2 hours on a CPU)
@@ -742,10 +742,10 @@ A3_SD4_DOSE_SETS = {"60 or above": [-0.5, -0.4, -0.3, -0.2, -0.1, 0.0],
                     "below 60": [-0.5, -0.2, 0.0, 0.1, 0.25, 0.4]}
 A3_STOP_RC = 20
 A3_PILOT_DESIGN = {"pet_resnet18_pretrained": (("watermark",), [0.0, 0.25], (7,))}
-# Set to the A3_SD4_DOSE_SETS key by the dated SD4 completion note (roadmap
-# T4.3). Stays None if SD4 stops; until then no confirmatory SD4 model is
-# registered.
-A3_SD4_RULE = None
+# Set to the A3_SD4_DOSE_SETS key by the dated SD4 completion note A3-C1
+# (2026-11-24, roadmap T4.3): the dose-0 pilot's r_c was 0.84, below 60. It
+# would have stayed None if SD4 had stopped.
+A3_SD4_RULE = "below 60"
 
 
 def a3_dose_set(pilot_rc):
