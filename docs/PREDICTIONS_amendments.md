@@ -550,3 +550,54 @@ before those models are trained.
   the shortcut's shape, contrast (semi-transparent white, α = 0.4) and
   within-corner layout, and it keeps one shared corner. It is not a purely
   content-coded shortcut, and the paper describes it in these terms.
+
+### Completion note A3-C1 (2026-11-24): SD4 pilot outcome, final doses, ROAD timing
+
+Recorded on 2026-11-24 after Kaggle session 3 (GPU: Tesla T4). The values are
+copied from the pilot run's report file `a3_pilot_report.json` (kept in
+`docs/kaggle_runs/a3_session3_pilot_report.json`). No metric, oracle, method,
+control, behaviour or ROAD score of any SD4 model has been computed; only the
+training-time reliance and accuracies below were read. Earlier text of A3 is
+unchanged.
+
+**SD4 pilots** (seed 7, pilots only, excluded from every test and never
+pooled with the confirmatory models):
+
+| Model | Reliance | Test acc. | Acc. without shortcut | Acc. conflicting | Chance floor | r_c | Training (min) |
+|---|---|---|---|---|---|---|---|
+| `pet_resnet18_pretrained_watermark_dose+000_seed7` | 3.68 | 97.9 | 97.14 | 96.32 | 2.86 | 0.84 | 1.38 |
+| `pet_resnet18_pretrained_watermark_dose+025_seed7` | 97.93 | 99.13 | 69.36 | 2.07 | 30.64 | 97.02 | 1.29 |
+
+**Dose rule.** The dose-0 pilot has r_c 0.84, which is below 60, so the rule
+key is "below 60" and the final SD4 doses are −0.5, −0.2, 0, +0.1, +0.25,
++0.4. There is no deviation from the rule.
+
+**Stopping rule.** Not triggered: the +0.25 pilot has r_c 97.02, which is
+above 20. The watermark is learned, and SD4 continues.
+
+**Confirmatory set.** 6 doses × seeds 42, 1, 2 = 18 models. Seed 7 is not
+part of it. The two pilots are reported as pilots.
+
+**Observation.** The dose-0 pilot has a low r_c and the +0.25 pilot a high
+one. This is the same pattern as the SD1 pilots (A2 completion note). It is
+recorded as an observation only. It adds no claim and changes no prediction.
+
+**ROAD timing gate (T3.2, T4.2).** Wall time of ROAD scoring on 50 images
+per model, scores discarded:
+
+| Model | Device | Minutes |
+|---|---|---|
+| `pet_resnet18_patch_dose-050_seed42` | Kaggle, Tesla T4 | 2.51 |
+| `pet_resnet18_pretrained_patch_dose+000_seed42` | Kaggle, Tesla T4 | 2.28 |
+| `pet_resnet18_patch_dose-050_seed42` | author's laptop, CPU | 5.56, 5.43 (two runs) |
+| `cifar10_resnet18_patch_dose-080_seed42` | author's laptop, CPU | 0.37, 0.45 (two runs) |
+
+Both Kaggle times are far below the 15-minute gate, so the gate is not
+exceeded. N stays 50 for `pet_resnet18`, SD1 and SD4 (`ROAD_PET_IMAGES` = 50);
+the other settings are unchanged. The files are
+`results/dose_response/road_timing_kaggle_s3.csv` and
+`results/dose_response/road_timing.csv` (laptop; copy
+`road_timing_laptop.csv`).
+
+**Zenodo.** Third-party timestamp: [[ZENODO_V4_DOI]] — the author uploads
+this file as Zenodo version 4 before any confirmatory SD4 model is trained.
