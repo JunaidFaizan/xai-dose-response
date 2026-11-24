@@ -446,21 +446,21 @@ Pre-registered in `docs/PREDICTIONS_amendments.md` (A3) and `docs/PREDICTIONS_sd
 """ + ("""
 Run only after the dated SD4 completion note (roadmap T4.3) is committed and uploaded
 to Zenodo, and `A3_SD4_RULE` in `dose_response.py` is set from it (rebuild the bundle).
-Fill `SD4_DOSES` in the parameters cell with the note's final doses.
+The doses come from `A3_SD4_RULE` automatically; the parameters cell needs no edit.
 """ if sd4 else "") + """
 **+ Add Input**: """ + "; ".join(inputs) + """.
 
-Before running: **Settings → Accelerator → GPU T4 x2**, and **Internet on**.
-Then **Save Version → Save & Run All (Commit)**. The results are packed into
-`""" + zip_name + "` in the notebook's Output."
+Before running anything: **Settings → Accelerator → GPU T4 x2**, and **Internet on**
+(changing these restarts the session, so set them first). To check, run the cells from
+the top down to the GPU check; then **Save Version → Save & Run All (Commit)**. The
+results are packed into `""" + zip_name + "` in the notebook's Output."
     cells = [("markdown", intro)]
     if sd4:
-        cells.append(("code", """# Parameters: the final SD4 doses of the dated SD4 completion note (T4.3,
-# docs/PREDICTIONS_amendments.md): one of the two A3_SD4_DOSE_SETS lists.
-SD4_DOSES = []
-SEEDS = [42, 1, 2]  # confirmatory seeds; seed 7 is the SD4 pilot seed and is never used here
-assert SD4_DOSES, 'Fill SD4_DOSES from the SD4 completion note first.'
-assert 7 not in SEEDS, 'Seed 7 is reserved for the SD4 pilots.'"""))
+        cells.append(("code", """# Parameters. Nothing to edit: the SD4 doses are taken from the dated completion note A3-C1
+# through A3_SD4_RULE in dose_response.py (the next cell checks them). The next cell also
+# works if this one was not run, for example after Kaggle restarted the session.
+SD4_DOSES = None  # None = the dose set of A3_SD4_RULE
+SEEDS = [42, 1, 2]  # confirmatory seeds; seed 7 is the SD4 pilot seed and is never used here"""))
     resume = """
 # Resume: unpack an attached earlier Output of this notebook, then copy every attached
 # checkpoint and per-model file not yet present (Kaggle may show zips unpacked).
@@ -484,6 +484,12 @@ sys.path.insert(0, WORK)
 import dose_response"""
     if sd4:
         resume += """
+SEEDS = globals().get('SEEDS') or [42, 1, 2]
+assert 7 not in SEEDS, 'Seed 7 is reserved for the SD4 pilots.'
+assert dose_response.A3_SD4_RULE in dose_response.A3_SD4_DOSE_SETS, (
+    'A3_SD4_RULE is not set in this bundle: upload the bundle rebuilt after the completion note.')
+SD4_DOSES = globals().get('SD4_DOSES') or list(dose_response.A3_SD4_DOSE_SETS[dose_response.A3_SD4_RULE])
+print('A3_SD4_RULE', repr(dose_response.A3_SD4_RULE), '-> SD4_DOSES', SD4_DOSES, '| SEEDS', SEEDS)
 SD4 = [('pet_resnet18_pretrained', 'watermark', float(d), s) for d in SD4_DOSES for s in SEEDS]
 assert any(list(map(float, SD4_DOSES)) == list(doses) for doses in dose_response.A3_SD4_DOSE_SETS.values()), (
     'SD4_DOSES must be one of the A3 dose sets: ' + str(dose_response.A3_SD4_DOSE_SETS))
