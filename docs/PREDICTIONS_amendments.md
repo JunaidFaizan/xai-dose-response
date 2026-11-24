@@ -599,5 +599,11 @@ the other settings are unchanged. The files are
 `results/dose_response/road_timing.csv` (laptop; copy
 `road_timing_laptop.csv`).
 
-**Zenodo.** Third-party timestamp: [[ZENODO_V4_DOI]] — the author uploads
-this file as Zenodo version 4 before any confirmatory SD4 model is trained.
+**Zenodo.** Third-party timestamp: Zenodo version 4, DOI
+[10.5281/zenodo.24495658](https://doi.org/10.5281/zenodo.24495658), published
+2026-11-24 10:07 UTC, before any confirmatory SD4 model was trained. The
+archived copy of this file is the one committed in `dcb6f91` (MD5
+579e5891b4976a30167209e6be9db9cf), in which this paragraph still held the
+placeholder `[[ZENODO_V4_DOI]]`. This paragraph was filled in afterwards,
+and nothing else in the file was changed. `docs/PREDICTIONS_sd3_sd4.md` was
+uploaded unchanged (MD5 7f112b09272eaca88cf17be8de0aff62).
