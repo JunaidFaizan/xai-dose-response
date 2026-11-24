@@ -59,13 +59,13 @@ Update the row when a task changes state. States: `todo`, `in progress`, `done (
 | T1.4 | Laptop: CIFAR small CNN SD2, 8 models (4 doses × seeds 42, 1) | Author | T1.1 | done (76ba200) |
 | T1.5 | Integrate S2 and laptop results; judge P5–P9; update paper | Agent | T1.3, T1.4 | done (77b9b4b) |
 | T2.1 | Amendment A3 + `docs/PREDICTIONS_sd3_sd4.md` (P10–P13) | Agent | — | done (976da10; first d5c8655, revised a079fe1) |
-| T2.2 | Zenodo new version with A3 | Author | T2.1 | todo |
+| T2.2 | Zenodo new version with A3 | Author | T2.1 | done (10.5281/zenodo.24416017) |
 | T3.1 | SD3 code: ROAD fill (noisy linear imputation, MoRF and LeRF) | Agent | T2.1 | done (branch sd3-sd4-code, 0cea0bd, final bcdf441; not merged) |
-| T3.2 | SD3 timing test on 1 Pet model and 1 CIFAR ResNet-18 model (CPU, laptop) | Author | T3.1 | todo |
-| T3.3 | SD3 laptop scoring: MNIST, PneumoniaMNIST, CIFAR small CNN | Author | T2.2, T3.2 | todo |
+| T3.2 | SD3 timing test on 1 Pet model and 1 CIFAR ResNet-18 model (CPU, laptop) | Author | T3.1 | done (laptop timing in 19d4d9d; Pet 5.4-5.6 min, CIFAR ResNet-18 0.4 min) |
+| T3.3 | SD3 laptop scoring: MNIST, PneumoniaMNIST, CIFAR small CNN | Author | T2.2, T3.2 | done (19d4d9d) |
 | T4.1 | SD4 code: content-coded watermark shortcut on `pet_resnet18_pretrained` | Agent | T2.1 | done (branch sd3-sd4-code, bcfa3c2, final bcdf441; not merged) |
-| T4.2 | **Kaggle S3:** SD4 pilot (2 models) + SD3 Kaggle timing check | Author | T2.2, T3.1, T4.1 | todo |
-| T4.3 | SD4 completion note (final doses) + Zenodo new version | Agent writes, author uploads | T4.2 | todo |
+| T4.2 | **Kaggle S3:** SD4 pilot (2 models) + SD3 Kaggle timing check | Author | T2.2, T3.1, T4.1 | done (session 3, 2026-11-24; results in 6d75115) |
+| T4.3 | SD4 completion note (final doses) + Zenodo new version | Agent writes, author uploads | T4.2 | done (note A3-C1, 6d75115; code b8403e1); pending: author uploads Zenodo v4 before S4 |
 | T4.4 | **Kaggle S4:** SD4 confirmatory (18 models) + SD3 scoring of the GPU models | Author | T4.3, T3.2 | todo |
 | T5.1 | Integrate SD3 and SD4; judge P10–P13; update paper | Agent | T3.3, T4.4 | todo |
 | T6.1 | M7: submission build of the paper | Agent | T1.5 (can start earlier, finalised after T5.1) | done, offline part (4eeeb6e); pending: see `docs/submission/DEFERRED.md` |
