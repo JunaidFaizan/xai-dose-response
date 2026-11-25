@@ -65,7 +65,7 @@ Update the row when a task changes state. States: `todo`, `in progress`, `done (
 | T3.3 | SD3 laptop scoring: MNIST, PneumoniaMNIST, CIFAR small CNN | Author | T2.2, T3.2 | done (19d4d9d) |
 | T4.1 | SD4 code: content-coded watermark shortcut on `pet_resnet18_pretrained` | Agent | T2.1 | done (branch sd3-sd4-code, bcfa3c2, final bcdf441; not merged) |
 | T4.2 | **Kaggle S3:** SD4 pilot (2 models) + SD3 Kaggle timing check | Author | T2.2, T3.1, T4.1 | done (session 3, 2026-11-24; results in 6d75115) |
-| T4.3 | SD4 completion note (final doses) + Zenodo new version | Agent writes, author uploads | T4.2 | done (note A3-C1, 6d75115; code b8403e1); pending: author uploads Zenodo v4 before S4 |
+| T4.3 | SD4 completion note (final doses) + Zenodo new version | Agent writes, author uploads | T4.2 | done (note A3-C1, 6d75115; code b8403e1); Zenodo v4 published 10.5281/zenodo.24495658 (edd81e9) |
 | T4.4 | **Kaggle S4:** SD4 confirmatory (18 models) + SD3 scoring of the GPU models | Author | T4.3, T3.2 | done (session 4, 2026-11-25; results in b43fbf9) |
 | T5.1 | Integrate SD3 and SD4; judge P10–P13; update paper | Agent | T3.3, T4.4 | done (b43fbf9, 05055ab, 91fdb55, 0b8b723; docs in the T5.1 docs commit) |
 | T6.1 | M7: submission build of the paper | Agent | T1.5 (can start earlier, finalised after T5.1) | done, offline part (4eeeb6e); pending: see `docs/submission/DEFERRED.md` |
