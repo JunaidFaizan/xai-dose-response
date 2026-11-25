@@ -18,7 +18,7 @@ cover letter.
 | Keywords | Explainable AI; Faithfulness metrics; Perturbation metrics; Shortcut learning; Meta-evaluation; Pre-registration; Deep learning; Image classification |
 | Language | English |
 | Related identifiers | 10.5281/zenodo.24285532 (is supplemented by); 10.5281/zenodo.24333540 (is supplemented by); 10.5281/zenodo.24416017 (is supplemented by); 10.5281/zenodo.24495658 (is supplemented by); 10.5281/zenodo.24285531, the concept DOI of the pre-registration record (references); https://github.com/JunaidFaizan/xai-dose-response (is supplement to, URL); the journal article DOI after acceptance (is supplement to) |
-| Files | `xai-dose-response_code_<sha>.zip`, `xai-dose-response_results_<sha>.zip`, `xai-dose-response_checkpoints_part1ofN.zip` ... `partNofN.zip`, `MANIFEST.md`, `README.md` |
+| Files | `xai-dose-response_code_0e128c4.zip`, `xai-dose-response_results_0e128c4.zip`, `xai-dose-response_checkpoints_part1ofN.zip` ... `partNofN.zip`, `MANIFEST.md`, `README.md` |
 | Funding | none (self-funded; the paper states no specific grant) |
 
 Description (paste):
@@ -35,7 +35,7 @@ Description (paste):
 
 Upload steps for the author:
 
-1. Run `.venv\Scripts\python.exe paper\make_release_package.py` after the last commit (it rewrites `release/zenodo/`).
+1. The package was built with `.venv\Scripts\python.exe paper\make_release_package.py 0e128c4` (code zip from commit `0e128c4`; it rewrites `release/zenodo/`). Rebuild only if you change the code again.
 2. On zenodo.org choose New upload, add all files from `release/zenodo/` (about 6 files plus the checkpoint parts,
    far below the 100 file and 50 GB limits).
 3. Paste the fields above, check the SHA-256 values of the files against `MANIFEST.md`, publish.
