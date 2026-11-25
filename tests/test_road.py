@@ -158,7 +158,7 @@ class RoadAnalysisTest(unittest.TestCase):
         lines = dose_response.road_analysis(self.oracle, self.models, 20, out)
         self.assertEqual(lines[0], "## Exact ROAD (SD3, amendment A3)")
         files = {"road_models.csv", "preference_road.csv", "responsiveness_corrected_road.csv",
-                 "overdetection_road.csv"}
+                 "overdetection_road.csv", "road_p10.csv", "road_p11.csv"}
         self.assertEqual({p.name for p in out.iterdir()}, files)
         road_models = pd.read_csv(out / "road_models.csv")
         self.assertEqual(len(road_models), len(self.models))

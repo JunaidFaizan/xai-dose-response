@@ -1663,3 +1663,33 @@ S–O = shortcut vs full object, R–O = random vs full object, S–R = shortcut
 | pneumonia_mnist / texture | Insertion (blur) | 0.640 [0.560, 0.723] | 0.582 [0.497, 0.663] | 0.527 [0.465, 0.588] | 0.058 [-0.005, 0.118] | 1.00 [0.81, 1.00] (18/18) | 0.94 [0.73, 1.00] (17/18) | 1.00 (6) | 1.00 (12) |
 | pneumonia_mnist / texture | ROAD (MoRF) | 0.458 [0.378, 0.553] | 0.450 [0.355, 0.550] | 0.547 [0.487, 0.607] | 0.008 [-0.057, 0.070] | 0.89 [0.65, 0.99] (16/18) | 0.72 [0.47, 0.90] (13/18) | 0.67 (6) | 1.00 (12) |
 | pneumonia_mnist / texture | ROAD (LeRF) | 0.782 [0.703, 0.857] | 0.758 [0.705, 0.808] | 0.505 [0.443, 0.562] | 0.023 [-0.040, 0.093] | 1.00 [0.81, 1.00] (18/18) | 1.00 [0.81, 1.00] (18/18) | 1.00 (6) | 1.00 (12) |
+
+### P10: Deletion (black) − ROAD in preference(random over full object) at the lowest dose (road_p10.csv)
+
+Same images; paired image bootstrap (2000 replicates, seed 0, models fixed). ROAD MoRF decides the verdict; LeRF is secondary. pref_ro_black_100: the 100-image value (decides nothing).
+
+| road_metric | role | setting | models | images | pref_ro_black | pref_ro_road | difference [95% CI] | pref_ro_black_100 | verdict | reason |
+|---|---|---|---|---|---|---|---|---|---|---|
+| ROAD (MoRF) | primary | cifar10 / patch | 2.000 | 100.000 | 0.815 | 0.275 | 0.540 [0.465, 0.610] | 0.815 | holds |  |
+| ROAD (MoRF) | primary | cifar10_resnet18 / patch | 3.000 | 50.000 | 0.747 | 0.133 | 0.613 [0.527, 0.693] | 0.723 | holds |  |
+| ROAD (MoRF) | primary | pet_resnet18 / patch | 3.000 | 50.000 | 0.533 | 0.337 | 0.197 [0.107, 0.283] | 0.528 | holds |  |
+| ROAD (MoRF) | primary | pet_resnet18_pretrained / patch | 3.000 | 50.000 | 0.500 | 0.180 | 0.320 [0.247, 0.400] | 0.530 | holds |  |
+| ROAD (MoRF) | primary | overall | – | – | – | – | – | – | holds | 4 of 4 settings testable; 4 hold, 0 refuted |
+| ROAD (LeRF) | secondary (no verdict) | cifar10 / patch | 2.000 | 100.000 | 0.815 | 0.385 | 0.430 [0.335, 0.520] | 0.815 | holds |  |
+| ROAD (LeRF) | secondary (no verdict) | cifar10_resnet18 / patch | 3.000 | 50.000 | 0.747 | 0.460 | 0.287 [0.193, 0.377] | 0.723 | holds |  |
+| ROAD (LeRF) | secondary (no verdict) | pet_resnet18 / patch | 3.000 | 50.000 | 0.533 | 0.320 | 0.213 [0.117, 0.310] | 0.528 | holds |  |
+| ROAD (LeRF) | secondary (no verdict) | pet_resnet18_pretrained / patch | 3.000 | 50.000 | 0.500 | 0.103 | 0.397 [0.307, 0.487] | 0.530 | holds |  |
+| ROAD (LeRF) | secondary (no verdict) | overall | – | – | – | – | – | – | holds | 4 of 4 settings testable; 4 hold, 0 refuted |
+
+### P11: over-detection (S over O, r_c ≤ 50) of Deletion (black) and ROAD (road_p11.csv)
+
+Point values decide (pet_resnet18, ROAD MoRF); the sign test on the discordant models is reported only. SD1, SD4 and LeRF are secondary.
+
+| road_metric | role | base | shortcut | n_below | fpr_black | k_black | fpr_road | k_road | difference | discordant_black_only | discordant_road_only | p_sign_two_sided | verdict |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| ROAD (MoRF) | primary | pet_resnet18 | patch | 14 | 0.714 | 10 | 0.643 | 9 | 0.071 | 1 | 0 | 1.000 | holds |
+| ROAD (LeRF) | secondary (no verdict) | pet_resnet18 | patch | 14 | 0.714 | 10 | 0.714 | 10 | 0.000 | 0 | 0 | – | refuted |
+| ROAD (MoRF) | secondary (no verdict) | pet_resnet18_pretrained | patch | 9 | 0.667 | 6 | 0.333 | 3 | 0.333 | 3 | 0 | 0.250 | holds |
+| ROAD (LeRF) | secondary (no verdict) | pet_resnet18_pretrained | patch | 9 | 0.667 | 6 | 0.333 | 3 | 0.333 | 3 | 0 | 0.250 | holds |
+| ROAD (MoRF) | secondary (no verdict) | pet_resnet18_pretrained | watermark | 9 | 0.778 | 7 | 0.000 | 0 | 0.778 | 7 | 0 | 0.016 | holds |
+| ROAD (LeRF) | secondary (no verdict) | pet_resnet18_pretrained | watermark | 9 | 0.778 | 7 | 0.000 | 0 | 0.778 | 7 | 0 | 0.016 | holds |

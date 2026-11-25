@@ -1224,3 +1224,139 @@ def behaviour_power(settings, behaviour):
                              "median_hanley_mcneil_se": float(np.nanmedian(se)),
                              "models_with_both_labels": int(np.sum(~np.isnan(se)))})
     return pd.DataFrame(rows)
+
+
+# ------------------------------------------------------------ SD3 predictions P10, P11 (amendment A3)
+
+# docs/PREDICTIONS_sd3_sd4.md: the natural-image settings of P10, each with its
+# registered lowest dose and seeds ("lowest-dose models of a setting").
+P10_LOWEST = {("cifar10", "patch"): (-0.8, (42, 1)), ("cifar10_resnet18", "patch"): (-0.8, (42, 1, 2)),
+              ("pet_resnet18", "patch"): (-0.5, (42, 1, 2)), ("pet_resnet18_pretrained", "patch"): (-0.5, (42, 1, 2))}
+P10_FLOOR = 0.05  # not testable if the Deletion (black) R-O preference is at most this
+# P11 on pet_resnet18 (decides the verdict); the SD1 and SD4 repeats are secondary.
+P11_SETTINGS = (("pet_resnet18", "patch"), ("pet_resnet18_pretrained", "patch"), ("pet_resnet18_pretrained", "watermark"))
+ROAD_ROLES = {"road_morf": "primary", "road_lerf": "secondary (no verdict)"}
+
+
+def paired_image_bootstrap(a, b, reps, seed):
+    """P10 paired image bootstrap of mean(a) - mean(b) for (models x images)
+    per-image win matrices of two metrics on the same images. Per replicate,
+    the images of each model are resampled with replacement (models fixed) and
+    the same resampled images are used for both metrics; the value is the
+    mean over models of the per-model difference in preference. Returns
+    (point, replicates); picks from np.random.default_rng(seed)."""
+    d = np.asarray(a, dtype=float) - np.asarray(b, dtype=float)
+    picks = np.random.default_rng(seed).integers(0, d.shape[1], size=(reps,) + d.shape)
+    boot = d[np.arange(d.shape[0])[None, :, None], picks].mean(axis=2).mean(axis=1)
+    return float(d.mean(axis=1).mean()), boot
+
+
+def _p10_verdict(difference, low):
+    if difference <= 0:
+        return "refuted"
+    return "holds" if low > 0 else "not confirmed"
+
+
+def road_p10(settings, metric_titles, reps, seed, full_settings=None):
+    """P10 per natural-image setting and overall, for ROAD MoRF (primary) and
+    LeRF (secondary): difference Deletion (black) - ROAD in mean preference
+    (random over full object) at the registered lowest-dose models, on the same
+    images, with the paired image-bootstrap 95% interval (reps, seed; the
+    picks restart from `seed` for every setting and order). full_settings
+    (optional): the 100-image Settings, for the reported 100-image value."""
+    by_key = {(s.base, s.shortcut): s for s in settings}
+    full = {(s.base, s.shortcut): s for s in (full_settings or [])}
+    rows = []
+    for metric, role in ROAD_ROLES.items():
+        verdicts = []
+        for key, (dose, seeds) in P10_LOWEST.items():
+            row = {"prediction": "P10", "road_metric": metric_titles[metric], "role": role, "base": key[0],
+                   "shortcut": key[1], "dose_low": dose, "seeds": ", ".join(str(x) for x in seeds)}
+            s = by_key.get(key)
+            low = [] if s is None else np.flatnonzero(np.isclose(s.dose, dose))
+            if s is None or not len(low):
+                row.update(verdict="not testable", reason="no ROAD scores at the lowest-dose models")
+                rows.append(row)
+                verdicts.append(row["verdict"])
+                continue
+            found = [int(x) for x in s.models.seed.iloc[low]]
+            note = ("" if sorted(found) == sorted(seeds) and np.isclose(s.dose.min(), dose) else
+                    f"lowest-dose models with ROAD scores: seeds {', '.join(map(str, found))} at dose {dose:g} "
+                    f"(registered {row['seeds']}; lowest dose with ROAD scores {s.dose.min():g})")
+            black = s.comparison("random", "object", "deletion_zero")["wins"][low]
+            road = s.comparison("random", "object", metric)["wins"][low]
+            difference, boot = paired_image_bootstrap(black, road, reps, seed)
+            ci_low, ci_high = _ci(boot)
+            row.update(models=len(low), images=s.n_images, pref_ro_black=float(black.mean(axis=1).mean()),
+                       pref_ro_road=float(road.mean(axis=1).mean()), difference=difference,
+                       ci_low=ci_low, ci_high=ci_high)
+            if key in full:
+                f = full[key]
+                row["pref_ro_black_100"] = float(
+                    f.comparison("random", "object", "deletion_zero")["wins"][np.isclose(f.dose, dose)].mean())
+                row["images_100"] = f.n_images
+            if row["pref_ro_black"] <= P10_FLOOR:
+                row.update(verdict="not testable",
+                           reason=f"Deletion (black) preference at most {P10_FLOOR:g} (floor)")
+            else:
+                row.update(verdict=_p10_verdict(difference, ci_low), reason=note)
+            rows.append(row)
+            verdicts.append(row["verdict"])
+        testable = [v for v in verdicts if v != "not testable"]
+        if len(testable) < 3:
+            overall = "not testable"
+        elif "refuted" in testable:
+            overall = "refuted"
+        elif all(v == "holds" for v in testable):
+            overall = "holds"
+        else:
+            overall = "not confirmed"
+        rows.append({"prediction": "P10", "road_metric": metric_titles[metric], "role": role, "base": "overall",
+                     "shortcut": "", "models": NAN, "verdict": overall,
+                     "reason": f"{len(testable)} of {len(P10_LOWEST)} settings testable; "
+                               f"{sum(v == 'holds' for v in testable)} hold, "
+                               f"{sum(v == 'refuted' for v in testable)} refuted"})
+    return pd.DataFrame(rows)
+
+
+def road_p11(settings, metric_titles):
+    """P11 (pet_resnet18, ROAD MoRF, decides the verdict) and its secondary
+    repeats (ROAD LeRF; SD1 and SD4): over-detection rate (S over O preference
+    > 0.5 among models with r_c <= 50) of Deletion (black) and of ROAD on the
+    same models and images, each with its Clopper-Pearson 95% interval, the
+    difference FPR(black) - FPR(ROAD), the discordant models and an exact
+    two-sided sign test on them (reported, no decision)."""
+    from scipy.stats import binomtest
+    by_key = {(s.base, s.shortcut): s for s in settings}
+    rows = []
+    for key in P11_SETTINGS:
+        s = by_key.get(key)
+        for metric, role in ROAD_ROLES.items():
+            role = role if key == P11_SETTINGS[0] else "secondary (no verdict)"
+            row = {"prediction": "P11", "road_metric": metric_titles[metric], "role": role, "base": key[0],
+                   "shortcut": key[1]}
+            if s is None:
+                row.update(verdict="not testable", reason="no ROAD scores")
+                rows.append(row)
+                continue
+            below = s.rc <= 50
+            black = s.comparison("shortcut", "object", "deletion_zero")["pref"] > 0.5
+            road = s.comparison("shortcut", "object", metric)["pref"] > 0.5
+            rb, rr = _rate_cp(black, below, "fpr_black"), _rate_cp(road, below, "fpr_road")
+            only_black, only_road = int((black & ~road & below).sum()), int((road & ~black & below).sum())
+            discordant = only_black + only_road
+            row.update(models=s.n_models, images=s.n_images, n_below=int(below.sum()),
+                       fpr_black=rb["fpr_black"], k_black=rb["k_fpr_black"], fpr_black_cp_low=rb["fpr_black_cp_low"],
+                       fpr_black_cp_high=rb["fpr_black_cp_high"], fpr_road=rr["fpr_road"], k_road=rr["k_fpr_road"],
+                       fpr_road_cp_low=rr["fpr_road_cp_low"], fpr_road_cp_high=rr["fpr_road_cp_high"],
+                       difference=rb["fpr_black"] - rr["fpr_road"] if below.any() else NAN,
+                       discordant_black_only=only_black, discordant_road_only=only_road,
+                       p_sign_two_sided=float(binomtest(only_black, discordant, 0.5).pvalue) if discordant else NAN)
+            if not below.any():
+                row.update(verdict="not testable", reason="no model with r_c <= 50")
+            elif rb["k_fpr_black"] == 0:
+                row.update(verdict="not testable", reason="FPR(black) is 0")
+            else:
+                row.update(verdict="holds" if rr["fpr_road"] < rb["fpr_black"] else "refuted", reason="")
+            rows.append(row)
+    return pd.DataFrame(rows)

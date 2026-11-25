@@ -115,7 +115,8 @@ Output
         dose_response.py road; amendment A3, SD3), road_timing.csv (--time-only),
         and from analyze (model set all, only when ROAD scores exist):
         road_models.csv, preference_road.csv, responsiveness_corrected_road.csv,
-        overdetection_road.csv and an appended "Exact ROAD" section of summary.md
+        overdetection_road.csv, road_p10.csv and road_p11.csv (P10 and P11 of
+        docs/PREDICTIONS_sd3_sd4.md) and an appended "Exact ROAD" section of summary.md
     analyze --model-set original writes the same files for the 192 models
     from before amendment A1 to results/dose_response/original_models/, and
     analyze --model-set pre_a2 the 234 models from before amendment A2 to
@@ -1470,7 +1471,8 @@ def road_analysis(oracle, models, reps, out):
     road_models.csv, preference_road.csv, responsiveness_corrected_road.csv and
     overdetection_road.csv to `out` and returns the lines of the summary.md
     section; returns [] and writes nothing when no pooled model has ROAD scores.
-    The P10-P13 verdicts are not made here."""
+    Also writes road_p10.csv and road_p11.csv (P10 and P11 with their
+    pre-registered rules); P12 and P13 are read from the main tables."""
     keys = ["base", "shortcut", "dose", "seed"]
     cache = OUT / "per_model"
     names = [model_name(*k) for k in models[keys].itertuples(index=False)]
@@ -1502,10 +1504,21 @@ def road_analysis(oracle, models, reps, out):
     pref = pd.concat(prefs, ignore_index=True)[["comparison"] + keys + ["reliance_corrected", "metric", "pref",
                                                                        "ties"]]
 
+    # P10 and P11 (docs/PREDICTIONS_sd3_sd4.md), on the same first-N images; the
+    # 100-image Deletion (black) value of P10 is reported next to it and decides nothing.
+    p10_keys = pd.DataFrame(list(dose_analysis.P10_LOWEST), columns=["base", "shortcut"])
+    p10_models = models.merge(p10_keys, on=["base", "shortcut"])
+    full_settings = dose_analysis.build_settings(oracle.merge(p10_keys, on=["base", "shortcut"]), None,
+                                                 p10_models, 1, BOOTSTRAP_SEED, TIE_TOLERANCE)
+    p10 = dose_analysis.road_p10(settings, titles, reps, BOOTSTRAP_SEED, full_settings)
+    p11 = dose_analysis.road_p11(settings, titles)
+
     road_models[keys + ["model_set", "reliance_corrected", "images"]].to_csv(out / "road_models.csv", index=False)
     pref.round(4).to_csv(out / "preference_road.csv", index=False)
     resp.to_csv(out / "responsiveness_corrected_road.csv", index=False)
     over.to_csv(out / "overdetection_road.csv", index=False)
+    p10.to_csv(out / "road_p10.csv", index=False)
+    p11.to_csv(out / "road_p11.csv", index=False)
 
     setting = lambda f: f.base + " / " + f.shortcut  # noqa: E731
     pooled = models.groupby(["base", "shortcut"]).size().rename("pooled_models")
@@ -1572,6 +1585,25 @@ def road_analysis(oracle, models, reps, out):
                   markdown(shown[["setting", "metric", "SO low [CI]", "RO low [CI]", "SR low [CI]",
                                   "excess_low [CI]", "fpr [CP]", "fpr_margin [CP]", "fpr r_c ≤ 10 (n)",
                                   "fpr 10 < r_c ≤ 50 (n)"]]), ""]
+
+    shown = p10.copy()
+    shown["setting"] = [b if b == "overall" else f"{b} / {s}" for b, s in zip(shown.base, shown.shortcut)]
+    shown["difference [95% CI]"] = [
+        "–" if pd.isna(d) else f"{d:.3f} [{lo:.3f}, {hi:.3f}]"
+        for d, lo, hi in zip(shown["difference"], shown["ci_low"], shown["ci_high"])]
+    lines += ["### P10: Deletion (black) − ROAD in preference(random over full object) at the lowest dose "
+              "(road_p10.csv)", "",
+              f"Same images; paired image bootstrap ({reps} replicates, seed {BOOTSTRAP_SEED}, models fixed). "
+              "ROAD MoRF decides the verdict; LeRF is secondary. pref_ro_black_100: the 100-image value "
+              "(decides nothing).", "",
+              markdown(shown[["road_metric", "role", "setting", "models", "images", "pref_ro_black", "pref_ro_road",
+                              "difference [95% CI]", "pref_ro_black_100", "verdict", "reason"]].round(3)), ""]
+    lines += ["### P11: over-detection (S over O, r_c ≤ 50) of Deletion (black) and ROAD (road_p11.csv)", "",
+              "Point values decide (pet_resnet18, ROAD MoRF); the sign test on the discordant models is reported "
+              "only. SD1, SD4 and LeRF are secondary.", "",
+              markdown(p11[["road_metric", "role", "base", "shortcut", "n_below", "fpr_black", "k_black", "fpr_road",
+                            "k_road", "difference", "discordant_black_only", "discordant_road_only",
+                            "p_sign_two_sided", "verdict"]].round(3)), ""]
     return lines
 
 
