@@ -2,7 +2,7 @@
 
 ## Cover letter (draft, to be finished by the author)
 
-[[AUTHOR: date]]
+[[AUTHOR: date of submission]]
 
 To the Editor-in-Chief, *Neurocomputing* (Elsevier)
 
@@ -45,26 +45,21 @@ for only 2 of 9 low-reliance models, so P13 was refuted.
 **Why *Neurocomputing*.** The paper is about neural networks: it studies how the faithfulness metrics used to
 explain trained CNN image classifiers respond to controlled shortcut reliance in 293 trained networks, and it
 gives a controlled test bed for these metrics. It is an empirical study with a new, pre-registered protocol and
-not a combination of existing algorithms. [[AUTHOR: optional: add your own reasons for the journal fit after
-reading the aims and scope, or delete this marker]]
+not a combination of existing algorithms.
 
 **Authorship and declarations.** The manuscript has a single author, Md Junaid Faizan Shaikh (Khaja
 Bandanawaz University; ORCID 0009-0002-6565-1835). It is not under consideration elsewhere
-[[AUTHOR: confirm]], and the data, code and checkpoints are archived on Zenodo
-([[ZENODO_RELEASE_DOI]]). Competing interests: [[AUTHOR: competing interests statement]]. Funding:
-[[AUTHOR: funding statement]]. Use of AI tools in preparing the manuscript is declared in the
+and the data, code and checkpoints are archived on Zenodo
+([[ZENODO_RELEASE_DOI]]). Competing interests: the author declares that he has no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper. Funding: This research did not receive any specific grant from funding agencies in the public, commercial, or not-for-profit sectors. Use of AI tools in preparing the manuscript is declared in the
 manuscript as the journal's policy requires.
 
 **Keywords:** Explainable AI; Faithfulness metrics; Perturbation metrics; Shortcut learning; Meta-evaluation;
 Pre-registration (the same list as in the manuscript).
 
-**Suggested reviewers** are listed in the submission form (see `suggested_reviewers.md`).
-
 Sincerely,
 
 Md Junaid Faizan Shaikh
-Khaja Bandanawaz University, [[AUTHOR: postal address]]
-[[AUTHOR: e-mail]]
+Department of Computer Science and Engineering, Khaja Bandanawaz University, Administrative Building, Khaja Bandanawaz University Campus, Rauza-i Buzurg, Kalaburagi, Karnataka 585104, India
+junaid.faizan.codes@gmail.com
 
-[[AUTHOR: optional line, delete if not wanted: I do not yet have an institutional e-mail address from my university
-and use a personal e-mail address for this submission and for correspondence.]]
+The author does not have an institutional e-mail address at present and uses a personal address for correspondence.

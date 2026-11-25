@@ -1749,9 +1749,6 @@ class use_doc:
 # them, in docs/submission/DEFERRED.md; `--final` fails while any marker remains in the paper or in
 # docs/submission/*.md. A marker that is not declared here fails every submission build.
 DECLARED_MARKERS = {
-    "[[AUTHOR: e-mail]]", "[[AUTHOR: funding statement]]", "[[AUTHOR: competing interests]]",
-    "[[AUTHOR: confirm AI-use statement per Elsevier policy]]", "[[AUTHOR: acknowledgements]]",
-    "[[AUTHOR: postal address]]",
     "[[ZENODO_RELEASE_DOI]]",
 }
 
@@ -1761,20 +1758,25 @@ def declarations():
         # order before the reference list: acknowledgements, AI declaration, CRediT, competing interest, funding,
         # data availability (nothing of this is on the title page)
         heading("Acknowledgements")
-        para("[[AUTHOR: acknowledgements]]")
+        para("The author thanks Dr. Raafiya Gulmaher, Assistant Professor, Department of Computer Science and "
+             "Engineering, Khaja Bandanawaz University, for serving as the guide of the author's M.Tech project.")
         heading("Declaration of generative AI and AI-assisted technologies in the manuscript preparation process")
-        para("During the preparation of this work the author used AI assistants for code development and for "
-             "drafting the text. After using these tools, the author reviewed and edited the content as needed and "
-             "takes full responsibility for the content of the publication. "
-             "[[AUTHOR: confirm AI-use statement per Elsevier policy]]")
+        para("During the preparation of this work the author used the Kiro AI coding assistant, with Anthropic's "
+             "Claude models and other large language models available in Kiro, to help write and run the analysis "
+             "code, to help draft and edit the manuscript text, tables and supplementary material, and to help "
+             "search for and check literature. After using these tools, the author reviewed and edited the content "
+             "as needed, checked the reported numbers against the result files and every reference against its "
+             "source, and takes full responsibility for the content of the published article.")
         heading("CRediT authorship contribution statement")
         para("**Md Junaid Faizan Shaikh:** Conceptualization, Methodology, Software, Investigation, Formal "
              "analysis, Data curation, Visualization, Writing \u2013 original draft, Writing \u2013 review & "
              "editing. Sole author.")
         heading("Declaration of competing interest")
-        para("[[AUTHOR: competing interests]]")
+        para("The author declares that he has no known competing financial interests or personal relationships "
+             "that could have appeared to influence the work reported in this paper.")
         heading("Funding")
-        para("[[AUTHOR: funding statement]]")
+        para("This research did not receive any specific grant from funding agencies in the public, commercial, "
+             "or not-for-profit sectors.")
         heading("Data availability")
         para("The research data and code are deposited in the Zenodo repository " + cite("code") + " (DOI "
              "[[ZENODO_RELEASE_DOI]]): the code, the per-model result files, the analysis tables and the trained "
@@ -1851,7 +1853,8 @@ def doc_text(d):
 
 # Words that must not appear in the journal text (internal revision history and repository paths). "original
 # draft" is a CRediT role name and is allowed.
-FORBIDDEN = [r"audit", r"reviewer", r"(?<!original )\bdrafts?\b", r"docs/", r"guide review", r"\bguide\b",
+FORBIDDEN = [r"audit", r"reviewer", r"(?<!original )(?<!help )\bdrafts?\b", r"docs/", r"guide review",
+             r"(?<!serving as the )\bguide\b",
              r"commit(ted)? [0-9a-f]{7}\b", r"UNVERIFIED", r"not for submission"]
 MARKER = r"\[\[[^\]]+\]\]"
 
@@ -2254,9 +2257,10 @@ def build():
             a.add_run(mark).font.superscript = True
         b = para("", align=WD_ALIGN_PARAGRAPH.CENTER, size=10, after=0)
         b.add_run("a").font.superscript = True
-        b.add_run(" Department of Computer Science and Engineering, Khaja Bandanawaz University, "
-                  "[[AUTHOR: postal address]]").font.size = Pt(10)
-        para("* Corresponding author. E-mail: [[AUTHOR: e-mail]]  \u00b7  ORCID: 0009-0002-6565-1835",
+        b.add_run(" Department of Computer Science and Engineering, Khaja Bandanawaz University, Administrative "
+                  "Building, Khaja Bandanawaz University Campus, Rauza-i Buzurg, Kalaburagi, Karnataka 585104, "
+                  "India").font.size = Pt(10)
+        para("* Corresponding author. E-mail: junaid.faizan.codes@gmail.com  \u00b7  ORCID: 0009-0002-6565-1835",
              align=WD_ALIGN_PARAGRAPH.CENTER, size=10)
     else:
         para("Md Junaid Faizan Shaikh", bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, after=0)

@@ -38,11 +38,10 @@ def main():
     d.add_paragraph("Author: Md Junaid Faizan Shaikh")
     d.add_paragraph("Convenience draft. The file that is uploaded at submission must be generated with the journal's "
                     "declarations tool (Elsevier); copy the author's choice below into it.").runs[0].italic = True
-    d.add_paragraph("\u2610 The author declares that he has no known competing financial interests or personal "
+    d.add_paragraph("\u2612 The author declares that he has no known competing financial interests or personal "
                     "relationships that could have appeared to influence the work reported in this paper.")
     d.add_paragraph("\u2610 The author declares the following financial interests/personal relationships which may be "
                     "considered as potential competing interests:")
-    d.add_paragraph("[[AUTHOR: competing interests]]")
     d.save(OUT / "declaration_of_competing_interests.docx")
 
     d = new_document()
@@ -51,9 +50,9 @@ def main():
                     "passport-type photograph of the author as a separate file (figure) placed next to it. "
                     "Keep the text in the third person.").runs[0].italic = True
     d.add_paragraph("Md Junaid Faizan Shaikh is an M.Tech student in the Department of Computer Science and "
-                    "Engineering at Khaja Bandanawaz University. [[AUTHOR: degree year, research interests, "
-                    "previous positions or publications, at most 100 words in total]]")
-    d.add_paragraph("Photograph: [[AUTHOR: attach passport-type photograph as a separate file]]")
+                    "Engineering at Khaja Bandanawaz University. <degree year, research interests, previous positions "
+                    "or publications, at most 100 words in total>")
+    d.add_paragraph("Photograph: <attach passport-type photograph as a separate file>")
     d.save(OUT / "author_biography_TEMPLATE.docx")
     print("wrote highlights.docx, declaration_of_competing_interests.docx, author_biography_TEMPLATE.docx")
 

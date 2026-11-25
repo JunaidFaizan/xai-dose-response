@@ -52,7 +52,7 @@ class SubmissionBuild(unittest.TestCase):
     def test_title_exact_and_no_internal_references(self):
         for text in (self.main, self.supp):
             self.assertIn(TITLE, text)
-            for pattern in (r"audit", r"reviewer", r"(?<!original )\bdrafts?\b", r"docs/", r"earlier draft"):
+            for pattern in (r"audit", r"reviewer", r"(?<!original )(?<!help )\bdrafts?\b", r"docs/", r"earlier draft"):
                 self.assertIsNone(re.search(pattern, text, flags=re.I), pattern)
 
     def test_only_declared_markers_and_all_listed_in_deferred(self):
@@ -126,7 +126,18 @@ class SubmissionBuild(unittest.TestCase):
                       "process", self.main)
         self.assertRegex(self.main, r"(?m)^Table A\.1\. ")
         self.assertRegex(self.main, r"(?m)^Fig\. A\.1\. ")
-        self.assertIn("[[AUTHOR: postal address]]", self.main)
+        head = self.main[:1500]
+        self.assertIn("Rauza-i Buzurg, Kalaburagi, Karnataka 585104, India", head)
+        self.assertEqual(self.main.count("junaid.faizan.codes@gmail.com"), 1)
+        self.assertIn("junaid.faizan.codes@gmail.com", head)
+        self.assertNotIn("Supervision", self.main)
+        self.assertIn("Sole author.", self.main)
+        positions = [self.main.rfind("\n" + h + "\n") for h in ("Acknowledgements", "Declaration of generative AI and "
+                     "AI-assisted technologies in the manuscript preparation process")]
+        self.assertTrue(0 < positions[0] < positions[1] < self.main.rfind("\nReferences\n"), positions)
+        self.assertIn("The author thanks Dr. Raafiya Gulmaher, Assistant Professor, Department of Computer Science "
+                      "and Engineering, Khaja Bandanawaz University, for serving as the guide of the author's M.Tech "
+                      "project.", self.main)
 
     def test_figure_files(self):
         from PIL import Image

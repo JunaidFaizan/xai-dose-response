@@ -19,7 +19,7 @@ cover letter.
 | Language | English |
 | Related identifiers | 10.5281/zenodo.24285532 (is supplemented by); 10.5281/zenodo.24333540 (is supplemented by); 10.5281/zenodo.24416017 (is supplemented by); 10.5281/zenodo.24495658 (is supplemented by); 10.5281/zenodo.24285531, the concept DOI of the pre-registration record (references); https://github.com/JunaidFaizan/xai-dose-response (is supplement to, URL); the journal article DOI after acceptance (is supplement to) |
 | Files | `xai-dose-response_code_<sha>.zip`, `xai-dose-response_results_<sha>.zip`, `xai-dose-response_checkpoints_part1ofN.zip` ... `partNofN.zip`, `MANIFEST.md`, `README.md` |
-| Funding | none stated; fill only if the author declares funding |
+| Funding | none (self-funded; the paper states no specific grant) |
 
 Description (paste):
 
