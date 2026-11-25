@@ -1,3 +1,5 @@
 base,shortcut,dose,swap_fraction,shortcut_noise,seed,epochs,best_val_accuracy,test_accuracy,test_accuracy_no_shortcut,test_accuracy_conflicting,reliance,training_minutes,classes,chance_floor,reliance_corrected,model_set,status
 pet_resnet18_pretrained,patch,0.0,0.0,-0.0,7,15,99.8,99.81,93.98,63.94,36.06,1.38,2,6.019999999999996,31.96424771227921,A2_pilot,SD1 pilot (never pooled)
 pet_resnet18_pretrained,patch,-0.5,0.0,0.5,7,15,97.4,97.19,97.22,97.44,2.56,1.38,2,2.780000000000001,-0.22629088664883878,A2_pilot,SD1 pilot (never pooled)
+pet_resnet18_pretrained,watermark,0.0,0.0,-0.0,7,15,98.0,97.9,97.14,96.32,3.68,1.38,2,2.8599999999999994,0.8441424747786707,A3_pilot,SD4 pilot (never pooled)
+pet_resnet18_pretrained,watermark,0.25,0.25,0.0,7,15,99.0,99.13,69.36,2.07,97.93,1.29,2,30.64,97.01557093425608,A3_pilot,SD4 pilot (never pooled)

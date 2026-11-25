@@ -29,6 +29,11 @@ pet_resnet18_pretrained,patch,Integrated Gradients,0.92,0.0,0.008,0.175
 pet_resnet18_pretrained,patch,Occlusion,0.967,0.0,0.002,0.457
 pet_resnet18_pretrained,patch,Saliency,0.979,0.0,0.003,0.024
 pet_resnet18_pretrained,patch,SmoothGrad,0.965,0.0,0.005,0.059
+pet_resnet18_pretrained,watermark,Grad-CAM,0.891,0.0,0.004,0.012
+pet_resnet18_pretrained,watermark,Integrated Gradients,0.893,0.0,0.004,0.14
+pet_resnet18_pretrained,watermark,Occlusion,0.923,0.0,0.001,0.229
+pet_resnet18_pretrained,watermark,Saliency,0.908,0.0,0.002,0.018
+pet_resnet18_pretrained,watermark,SmoothGrad,0.961,0.0,0.003,0.039
 pneumonia_mnist,patch,Grad-CAM,0.808,0.0,0.022,0.166
 pneumonia_mnist,patch,Integrated Gradients,0.945,0.0,0.003,0.391
 pneumonia_mnist,patch,Occlusion,0.928,0.0,0.0,0.362

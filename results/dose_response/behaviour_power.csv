@@ -17,6 +17,9 @@ pet_resnet18,patch,shortcut_dominant,21,19.0,8.0,0.07395214135918764,21
 pet_resnet18_pretrained,patch,follows_shortcut_causal,18,1.0,1.0,0.23217544827744677,14
 pet_resnet18_pretrained,patch,follows_shortcut,18,4.0,1.0,0.1480486500369989,18
 pet_resnet18_pretrained,patch,shortcut_dominant,18,4.0,4.0,0.1480486500369989,15
+pet_resnet18_pretrained,watermark,follows_shortcut_causal,18,1.5,2.0,0.13520195964731102,11
+pet_resnet18_pretrained,watermark,follows_shortcut,18,5.0,2.0,0.13311385444653773,18
+pet_resnet18_pretrained,watermark,shortcut_dominant,18,2.5,2.5,0.10693777819740366,12
 pneumonia_mnist,patch,follows_shortcut_causal,42,6.5,10.0,0.08308042430294216,31
 pneumonia_mnist,patch,follows_shortcut,42,18.5,5.5,0.07324043564944635,36
 pneumonia_mnist,patch,shortcut_dominant,42,34.5,3.0,0.06044060828308754,41

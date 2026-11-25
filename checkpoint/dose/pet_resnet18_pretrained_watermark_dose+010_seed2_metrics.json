@@ -1,0 +1,15 @@
+{
+  "base": "pet_resnet18_pretrained",
+  "shortcut": "watermark",
+  "dose": 0.1,
+  "swap_fraction": 0.1,
+  "shortcut_noise": 0.0,
+  "seed": 2,
+  "epochs": 15,
+  "best_val_accuracy": 99.6,
+  "test_accuracy": 99.54,
+  "test_accuracy_no_shortcut": 76.59,
+  "test_accuracy_conflicting": 6.65,
+  "reliance": 93.35,
+  "training_minutes": 1.32
+}

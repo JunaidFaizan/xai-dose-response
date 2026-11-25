@@ -23,14 +23,18 @@ pet_resnet18_pretrained,patch,Deletion (black),0.878,0.0,18,0.556,0.001,,0.502,0
 pet_resnet18_pretrained,patch,Deletion (blur),0.867,0.0,18,0.722,0.001,3.524,0.447,0.92,2-99%,3.165,5.435,1.0,0.791,0.972,shortcut vs full object
 pet_resnet18_pretrained,patch,Deletion (inpaint),0.954,0.0,18,0.833,0.001,14.13,0.235,0.97,2-99%,12.307,16.353,1.0,0.934,0.982,shortcut vs full object
 pet_resnet18_pretrained,patch,Insertion (blur),0.918,0.0,18,0.778,0.001,9.566,0.2,0.987,2-99%,4.035,13.726,1.0,0.883,0.965,shortcut vs full object
-pneumonia_mnist,patch,Deletion (black),0.689,0.0,42,0.738,0.003,24.217,0.377,0.613,15-100%,14.288,26.266,1.0,0.578,0.806,shortcut vs full object
-pneumonia_mnist,patch,Deletion (blur),0.555,0.0,42,0.714,0.087,19.02,0.453,0.575,15-100%,17.3,20.63,1.0,0.418,0.666,shortcut vs full object
-pneumonia_mnist,patch,Deletion (inpaint),0.709,0.0,42,0.857,0.006,31.792,0.147,0.562,15-100%,28.766,50.459,1.0,0.577,0.828,shortcut vs full object
-pneumonia_mnist,patch,Insertion (blur),0.461,0.002,42,0.667,0.098,16.796,0.497,0.713,15-100%,14.77,19.39,0.858,0.308,0.614,shortcut vs full object
-pneumonia_mnist,texture,Deletion (black),0.856,0.0,42,0.738,0.011,28.364,0.328,0.935,18-100%,21.64,32.241,1.0,0.776,0.924,shortcut vs full object
-pneumonia_mnist,texture,Deletion (blur),0.581,0.0,42,0.595,0.04,,0.572,1.0,18-100%,,,0.0,0.408,0.734,shortcut vs full object
-pneumonia_mnist,texture,Deletion (inpaint),0.558,0.0,42,0.619,0.033,19.248,0.45,0.933,18-100%,18.591,20.096,0.75,0.359,0.718,shortcut vs full object
-pneumonia_mnist,texture,Insertion (blur),0.267,0.087,42,0.595,0.06,,0.64,0.947,18-100%,,,0.0,0.061,0.475,shortcut vs full object
+pet_resnet18_pretrained,watermark,Deletion (black),0.863,0.0,18,0.5,0.0,,0.537,0.987,3-98%,,,0.0,0.781,0.944,shortcut vs full object
+pet_resnet18_pretrained,watermark,Deletion (blur),0.867,0.0,18,0.889,0.0,3.262,0.443,0.983,3-98%,3.032,3.466,1.0,0.797,0.956,shortcut vs full object
+pet_resnet18_pretrained,watermark,Deletion (inpaint),0.828,0.0,18,1.0,0.001,29.686,0.273,0.973,3-98%,20.373,36.555,1.0,0.748,0.918,shortcut vs full object
+pet_resnet18_pretrained,watermark,Insertion (blur),0.857,0.0,18,1.0,0.0,29.82,0.117,0.997,3-98%,13.629,42.016,1.0,0.773,0.94,shortcut vs full object
+pneumonia_mnist,patch,Deletion (black),0.689,0.0,42,0.738,0.003,24.217,0.377,0.613,15-100%,14.291,26.266,1.0,0.574,0.807,shortcut vs full object
+pneumonia_mnist,patch,Deletion (blur),0.555,0.0,42,0.714,0.087,19.02,0.453,0.575,15-100%,17.637,20.68,1.0,0.418,0.666,shortcut vs full object
+pneumonia_mnist,patch,Deletion (inpaint),0.709,0.0,42,0.857,0.006,31.792,0.147,0.562,15-100%,28.813,50.459,1.0,0.577,0.831,shortcut vs full object
+pneumonia_mnist,patch,Insertion (blur),0.461,0.002,42,0.667,0.098,16.796,0.497,0.713,15-100%,14.703,19.39,0.858,0.307,0.613,shortcut vs full object
+pneumonia_mnist,texture,Deletion (black),0.856,0.0,42,0.738,0.011,28.364,0.328,0.935,18-100%,21.64,32.252,1.0,0.78,0.924,shortcut vs full object
+pneumonia_mnist,texture,Deletion (blur),0.581,0.0,42,0.595,0.04,,0.572,1.0,18-100%,,,0.0,0.414,0.745,shortcut vs full object
+pneumonia_mnist,texture,Deletion (inpaint),0.558,0.0,42,0.619,0.033,19.248,0.45,0.933,18-100%,18.591,20.096,0.748,0.355,0.714,shortcut vs full object
+pneumonia_mnist,texture,Insertion (blur),0.267,0.087,42,0.595,0.06,,0.64,0.947,18-100%,,,0.0,0.066,0.476,shortcut vs full object
 cifar10,patch,Deletion (black),0.828,0.0,20,0.55,0.003,4.331,0.485,0.96,4-96%,4.281,4.913,0.746,0.732,0.89,shortcut vs size-matched object
 cifar10,patch,Deletion (blur),0.746,0.0,20,0.5,0.0,,0.59,0.97,4-96%,,,0.0,0.588,0.922,shortcut vs size-matched object
 cifar10,patch,Deletion (inpaint),0.68,0.001,20,0.5,0.001,,0.602,0.975,4-96%,,,0.0,0.484,0.879,shortcut vs size-matched object
@@ -55,14 +59,18 @@ pet_resnet18_pretrained,patch,Deletion (black),0.634,0.005,18,0.667,0.003,3.6,0.
 pet_resnet18_pretrained,patch,Deletion (blur),0.667,0.002,18,0.667,0.002,3.499,0.44,0.752,2-99%,2.675,7.681,0.963,0.528,0.838,shortcut vs size-matched object
 pet_resnet18_pretrained,patch,Deletion (inpaint),0.917,0.0,18,0.611,0.001,2.576,0.487,0.987,2-99%,2.45,3.05,0.742,0.825,0.984,shortcut vs size-matched object
 pet_resnet18_pretrained,patch,Insertion (blur),0.821,0.0,18,0.556,0.001,,0.557,0.993,2-99%,,,0.038,0.755,0.921,shortcut vs size-matched object
-pneumonia_mnist,patch,Deletion (black),0.834,0.0,42,0.667,0.037,,0.503,0.788,15-100%,14.134,20.273,0.674,0.756,0.9,shortcut vs size-matched object
-pneumonia_mnist,patch,Deletion (blur),0.607,0.0,42,0.643,0.122,,0.512,0.72,15-100%,12.82,17.916,0.564,0.409,0.77,shortcut vs size-matched object
-pneumonia_mnist,patch,Deletion (inpaint),0.626,0.0,42,0.619,0.098,14.934,0.498,0.733,15-100%,14.236,16.021,0.602,0.452,0.77,shortcut vs size-matched object
-pneumonia_mnist,patch,Insertion (blur),0.743,0.0,42,0.667,0.126,,0.502,0.712,15-100%,13.14,18.722,0.59,0.655,0.826,shortcut vs size-matched object
-pneumonia_mnist,texture,Deletion (black),0.023,0.885,42,0.643,0.011,,0.545,0.523,18-100%,16.977,99.892,0.515,-0.214,0.279,shortcut vs size-matched object
-pneumonia_mnist,texture,Deletion (blur),0.379,0.013,42,0.595,0.056,,0.553,0.898,18-100%,,,0.0,0.206,0.562,shortcut vs size-matched object
-pneumonia_mnist,texture,Deletion (inpaint),0.604,0.0,42,0.667,0.038,18.737,0.478,0.93,18-100%,17.027,20.823,1.0,0.433,0.742,shortcut vs size-matched object
-pneumonia_mnist,texture,Insertion (blur),0.483,0.001,42,0.595,0.061,,0.543,0.918,18-100%,,,0.0,0.315,0.642,shortcut vs size-matched object
+pet_resnet18_pretrained,watermark,Deletion (black),0.852,0.0,18,0.833,0.0,2.847,0.503,0.807,3-98%,2.32,14.994,0.942,0.763,0.919,shortcut vs size-matched object
+pet_resnet18_pretrained,watermark,Deletion (blur),0.867,0.0,18,0.667,0.002,,0.505,0.98,3-98%,,,0.484,0.769,0.958,shortcut vs size-matched object
+pet_resnet18_pretrained,watermark,Deletion (inpaint),0.811,0.0,18,0.556,0.003,,0.537,0.977,3-98%,,,0.044,0.753,0.908,shortcut vs size-matched object
+pet_resnet18_pretrained,watermark,Insertion (blur),0.82,0.0,18,0.556,0.0,,0.557,0.997,3-98%,,,0.03,0.751,0.905,shortcut vs size-matched object
+pneumonia_mnist,patch,Deletion (black),0.834,0.0,42,0.667,0.037,,0.503,0.788,15-100%,14.089,19.525,0.661,0.757,0.901,shortcut vs size-matched object
+pneumonia_mnist,patch,Deletion (blur),0.607,0.0,42,0.643,0.122,,0.512,0.72,15-100%,12.82,17.916,0.567,0.408,0.778,shortcut vs size-matched object
+pneumonia_mnist,patch,Deletion (inpaint),0.626,0.0,42,0.619,0.098,14.934,0.498,0.733,15-100%,14.235,16.05,0.619,0.468,0.779,shortcut vs size-matched object
+pneumonia_mnist,patch,Insertion (blur),0.743,0.0,42,0.667,0.126,,0.502,0.712,15-100%,13.14,18.862,0.599,0.652,0.822,shortcut vs size-matched object
+pneumonia_mnist,texture,Deletion (black),0.023,0.885,42,0.643,0.011,,0.545,0.523,18-100%,16.881,99.893,0.502,-0.228,0.271,shortcut vs size-matched object
+pneumonia_mnist,texture,Deletion (blur),0.379,0.013,42,0.595,0.056,,0.553,0.898,18-100%,,,0.0,0.196,0.569,shortcut vs size-matched object
+pneumonia_mnist,texture,Deletion (inpaint),0.604,0.0,42,0.667,0.038,18.737,0.478,0.93,18-100%,17.027,20.903,1.0,0.432,0.748,shortcut vs size-matched object
+pneumonia_mnist,texture,Insertion (blur),0.483,0.001,42,0.595,0.061,,0.543,0.918,18-100%,,,0.0,0.32,0.64,shortcut vs size-matched object
 cifar10,patch,Deletion (black),0.709,0.0,20,0.5,0.007,,0.815,0.948,4-96%,,,0.0,0.602,0.835,placebo vs full object
 cifar10,patch,Deletion (blur),0.872,0.0,20,0.5,0.01,,0.715,0.93,4-96%,,,0.0,0.84,0.918,placebo vs full object
 cifar10,patch,Deletion (inpaint),0.985,0.0,20,0.85,0.006,28.138,0.22,0.94,4-96%,22.489,32.459,1.0,0.97,0.995,placebo vs full object
@@ -87,14 +95,18 @@ pet_resnet18_pretrained,patch,Deletion (black),0.868,0.0,18,0.556,0.001,,0.525,0
 pet_resnet18_pretrained,patch,Deletion (blur),0.884,0.0,18,0.722,0.0,3.732,0.44,0.94,2-99%,3.265,6.319,1.0,0.814,0.981,placebo vs full object
 pet_resnet18_pretrained,patch,Deletion (inpaint),0.962,0.0,18,0.944,0.013,38.761,0.257,0.643,2-99%,23.924,60.004,1.0,0.925,0.992,placebo vs full object
 pet_resnet18_pretrained,patch,Insertion (blur),0.871,0.0,18,0.667,0.001,98.905,0.17,0.533,2-99%,98.279,99.121,0.84,0.767,0.951,placebo vs full object
-pneumonia_mnist,patch,Deletion (black),0.728,0.0,42,0.786,0.003,31.616,0.36,0.588,15-100%,13.912,52.083,1.0,0.58,0.868,placebo vs full object
-pneumonia_mnist,patch,Deletion (blur),0.732,0.0,42,0.738,0.099,22.515,0.427,0.582,15-100%,19.23,24.2,1.0,0.674,0.79,placebo vs full object
-pneumonia_mnist,patch,Deletion (inpaint),0.798,0.0,42,0.81,0.02,60.392,0.148,0.53,15-100%,51.807,68.781,1.0,0.717,0.87,placebo vs full object
-pneumonia_mnist,patch,Insertion (blur),0.581,0.0,42,0.643,0.097,16.923,0.462,0.688,15-100%,15.307,18.047,0.93,0.444,0.728,placebo vs full object
-pneumonia_mnist,texture,Deletion (black),0.809,0.0,42,0.929,0.019,40.365,0.208,0.935,18-100%,36.557,48.429,1.0,0.733,0.881,placebo vs full object
-pneumonia_mnist,texture,Deletion (blur),0.727,0.0,42,0.595,0.065,,0.548,1.0,18-100%,,,0.0,0.629,0.829,placebo vs full object
-pneumonia_mnist,texture,Deletion (inpaint),0.164,0.298,42,0.452,0.039,28.34,0.393,0.583,18-100%,20.162,32.57,1.0,-0.096,0.373,placebo vs full object
-pneumonia_mnist,texture,Insertion (blur),0.109,0.491,42,0.619,0.043,,0.563,0.757,18-100%,,,0.15,-0.141,0.382,placebo vs full object
+pet_resnet18_pretrained,watermark,Deletion (black),0.758,0.0,18,0.5,0.001,,0.548,0.877,3-98%,,,0.0,0.703,0.804,placebo vs full object
+pet_resnet18_pretrained,watermark,Deletion (blur),0.79,0.0,18,1.0,0.003,13.512,0.413,0.798,3-98%,5.896,17.728,1.0,0.704,0.902,placebo vs full object
+pet_resnet18_pretrained,watermark,Deletion (inpaint),0.762,0.0,18,0.778,0.022,92.887,0.24,0.518,3-98%,81.608,97.892,0.948,0.648,0.879,placebo vs full object
+pet_resnet18_pretrained,watermark,Insertion (blur),0.834,0.0,18,1.0,0.002,67.59,0.123,0.707,3-98%,63.24,71.561,1.0,0.74,0.927,placebo vs full object
+pneumonia_mnist,patch,Deletion (black),0.728,0.0,42,0.786,0.003,31.616,0.36,0.588,15-100%,13.913,53.069,1.0,0.578,0.873,placebo vs full object
+pneumonia_mnist,patch,Deletion (blur),0.732,0.0,42,0.738,0.099,22.515,0.427,0.582,15-100%,19.23,24.315,1.0,0.675,0.787,placebo vs full object
+pneumonia_mnist,patch,Deletion (inpaint),0.798,0.0,42,0.81,0.02,60.392,0.148,0.53,15-100%,51.739,68.294,1.0,0.71,0.874,placebo vs full object
+pneumonia_mnist,patch,Insertion (blur),0.581,0.0,42,0.643,0.097,16.923,0.462,0.688,15-100%,15.361,18.047,0.918,0.444,0.726,placebo vs full object
+pneumonia_mnist,texture,Deletion (black),0.809,0.0,42,0.929,0.019,40.365,0.208,0.935,18-100%,36.583,52.974,1.0,0.728,0.881,placebo vs full object
+pneumonia_mnist,texture,Deletion (blur),0.727,0.0,42,0.595,0.065,,0.548,1.0,18-100%,,,0.0,0.626,0.829,placebo vs full object
+pneumonia_mnist,texture,Deletion (inpaint),0.164,0.298,42,0.452,0.039,28.34,0.393,0.583,18-100%,20.212,32.604,1.0,-0.087,0.371,placebo vs full object
+pneumonia_mnist,texture,Insertion (blur),0.109,0.491,42,0.619,0.043,,0.563,0.757,18-100%,,,0.154,-0.153,0.371,placebo vs full object
 cifar10,patch,Deletion (black),0.666,0.001,20,0.5,0.002,,0.53,0.955,4-96%,,,0.0,0.476,0.826,shortcut vs placebo
 cifar10,patch,Deletion (blur),0.798,0.0,20,0.5,0.002,,0.535,0.965,4-96%,,,0.0,0.712,0.883,shortcut vs placebo
 cifar10,patch,Deletion (inpaint),0.813,0.0,20,0.5,0.0,,0.625,0.985,4-96%,,,0.0,0.734,0.882,shortcut vs placebo
@@ -119,14 +131,18 @@ pet_resnet18_pretrained,patch,Deletion (black),0.643,0.004,18,0.722,0.001,98.937
 pet_resnet18_pretrained,patch,Deletion (blur),0.26,0.298,18,0.556,0.001,,0.513,0.627,2-99%,,,0.399,-0.131,0.596,shortcut vs placebo
 pet_resnet18_pretrained,patch,Deletion (inpaint),0.965,0.0,18,0.556,0.004,,0.522,1.0,2-99%,,,0.156,0.963,0.983,shortcut vs placebo
 pet_resnet18_pretrained,patch,Insertion (blur),0.828,0.0,18,0.5,0.001,,0.615,1.0,2-99%,,,0.0,0.826,0.843,shortcut vs placebo
-pneumonia_mnist,patch,Deletion (black),0.765,0.0,42,0.619,0.041,,0.528,0.758,15-100%,,,0.368,0.687,0.844,shortcut vs placebo
-pneumonia_mnist,patch,Deletion (blur),0.638,0.0,42,0.643,0.121,,0.517,0.783,15-100%,,,0.292,0.486,0.784,shortcut vs placebo
-pneumonia_mnist,patch,Deletion (inpaint),0.54,0.0,42,0.619,0.098,,0.518,0.773,15-100%,,,0.416,0.304,0.724,shortcut vs placebo
-pneumonia_mnist,patch,Insertion (blur),0.757,0.0,42,0.667,0.136,15.79,0.487,0.785,15-100%,13.702,19.333,0.883,0.668,0.848,shortcut vs placebo
-pneumonia_mnist,texture,Deletion (black),-0.594,0.0,42,0.476,0.014,99.947,0.827,0.453,18-100%,99.357,100.0,1.0,-0.725,-0.442,shortcut vs placebo
-pneumonia_mnist,texture,Deletion (blur),0.387,0.011,42,0.595,0.057,,0.577,0.843,18-100%,,,0.0,0.195,0.565,shortcut vs placebo
-pneumonia_mnist,texture,Deletion (inpaint),0.68,0.0,42,0.595,0.045,,0.55,0.963,18-100%,,,0.0,0.531,0.805,shortcut vs placebo
-pneumonia_mnist,texture,Insertion (blur),0.601,0.0,42,0.595,0.066,,0.558,0.95,18-100%,,,0.0,0.451,0.731,shortcut vs placebo
+pet_resnet18_pretrained,watermark,Deletion (black),0.811,0.0,18,0.889,0.0,2.719,0.523,0.86,3-98%,2.522,49.708,1.0,0.742,0.901,shortcut vs placebo
+pet_resnet18_pretrained,watermark,Deletion (blur),0.925,0.0,18,0.5,0.002,,0.542,0.99,3-98%,,,0.0,0.86,0.976,shortcut vs placebo
+pet_resnet18_pretrained,watermark,Deletion (inpaint),0.908,0.0,18,0.5,0.002,,0.533,0.983,3-98%,,,0.0,0.833,0.965,shortcut vs placebo
+pet_resnet18_pretrained,watermark,Insertion (blur),0.859,0.0,18,0.5,0.002,,0.585,1.0,3-98%,,,0.0,0.802,0.925,shortcut vs placebo
+pneumonia_mnist,patch,Deletion (black),0.765,0.0,42,0.619,0.041,,0.528,0.758,15-100%,,,0.373,0.693,0.847,shortcut vs placebo
+pneumonia_mnist,patch,Deletion (blur),0.638,0.0,42,0.643,0.121,,0.517,0.783,15-100%,,,0.3,0.488,0.777,shortcut vs placebo
+pneumonia_mnist,patch,Deletion (inpaint),0.54,0.0,42,0.619,0.098,,0.518,0.773,15-100%,,,0.402,0.33,0.725,shortcut vs placebo
+pneumonia_mnist,patch,Insertion (blur),0.757,0.0,42,0.667,0.136,15.79,0.487,0.785,15-100%,13.702,19.628,0.871,0.66,0.843,shortcut vs placebo
+pneumonia_mnist,texture,Deletion (black),-0.594,0.0,42,0.476,0.014,99.947,0.827,0.453,18-100%,99.363,100.0,1.0,-0.723,-0.449,shortcut vs placebo
+pneumonia_mnist,texture,Deletion (blur),0.387,0.011,42,0.595,0.057,,0.577,0.843,18-100%,,,0.0,0.194,0.578,shortcut vs placebo
+pneumonia_mnist,texture,Deletion (inpaint),0.68,0.0,42,0.595,0.045,,0.55,0.963,18-100%,,,0.0,0.54,0.802,shortcut vs placebo
+pneumonia_mnist,texture,Insertion (blur),0.601,0.0,42,0.595,0.066,,0.558,0.95,18-100%,,,0.0,0.447,0.742,shortcut vs placebo
 cifar10,patch,Deletion (black),0.758,0.0,20,0.5,0.004,,0.815,0.96,4-96%,,,0.0,0.645,0.884,random vs full object
 cifar10,patch,Deletion (blur),0.855,0.0,20,0.5,0.012,,0.75,0.912,4-96%,,,0.0,0.805,0.924,random vs full object
 cifar10,patch,Deletion (inpaint),0.989,0.0,20,0.85,0.004,25.188,0.225,0.955,4-96%,22.321,29.118,1.0,0.978,0.998,random vs full object
@@ -151,14 +167,18 @@ pet_resnet18_pretrained,patch,Deletion (black),0.867,0.0,18,0.5,0.001,,0.53,0.96
 pet_resnet18_pretrained,patch,Deletion (blur),0.859,0.0,18,0.722,0.001,4.122,0.437,0.917,2-99%,3.365,8.322,1.0,0.778,0.96,random vs full object
 pet_resnet18_pretrained,patch,Deletion (inpaint),0.963,0.0,18,0.944,0.009,30.925,0.28,0.75,2-99%,22.416,39.251,1.0,0.948,0.987,random vs full object
 pet_resnet18_pretrained,patch,Insertion (blur),0.923,0.0,18,0.778,0.002,98.027,0.153,0.628,2-99%,97.773,98.8,1.0,0.873,0.984,random vs full object
-pneumonia_mnist,patch,Deletion (black),0.7,0.0,42,0.786,0.002,27.38,0.363,0.61,15-100%,14.1,50.96,1.0,0.552,0.83,random vs full object
-pneumonia_mnist,patch,Deletion (blur),0.666,0.0,42,0.714,0.1,21.905,0.443,0.567,15-100%,13.957,23.397,1.0,0.597,0.728,random vs full object
-pneumonia_mnist,patch,Deletion (inpaint),0.793,0.0,42,0.905,0.014,59.353,0.163,0.55,15-100%,48.501,66.524,1.0,0.72,0.862,random vs full object
-pneumonia_mnist,patch,Insertion (blur),0.56,0.0,42,0.643,0.098,15.555,0.497,0.695,15-100%,14.435,18.211,0.761,0.42,0.709,random vs full object
-pneumonia_mnist,texture,Deletion (black),0.832,0.0,42,0.881,0.015,36.588,0.273,0.947,18-100%,33.804,43.131,1.0,0.747,0.909,random vs full object
-pneumonia_mnist,texture,Deletion (blur),0.704,0.0,42,0.595,0.062,,0.567,1.0,18-100%,,,0.0,0.603,0.81,random vs full object
-pneumonia_mnist,texture,Deletion (inpaint),0.241,0.124,42,0.476,0.045,25.152,0.43,0.633,18-100%,19.763,74.65,0.999,-0.014,0.448,random vs full object
-pneumonia_mnist,texture,Insertion (blur),0.049,0.759,42,0.595,0.046,,0.582,0.767,18-100%,,,0.0,-0.183,0.302,random vs full object
+pet_resnet18_pretrained,watermark,Deletion (black),0.834,0.0,18,0.5,0.0,,0.57,0.943,3-98%,,,0.0,0.743,0.931,random vs full object
+pet_resnet18_pretrained,watermark,Deletion (blur),0.749,0.0,18,0.944,0.002,7.104,0.437,0.877,3-98%,3.036,13.616,1.0,0.669,0.879,random vs full object
+pet_resnet18_pretrained,watermark,Deletion (inpaint),0.704,0.001,18,0.944,0.012,69.885,0.27,0.552,3-98%,61.318,81.526,1.0,0.603,0.825,random vs full object
+pet_resnet18_pretrained,watermark,Insertion (blur),0.888,0.0,18,1.0,0.0,52.7,0.11,0.88,3-98%,48.438,58.216,1.0,0.817,0.962,random vs full object
+pneumonia_mnist,patch,Deletion (black),0.7,0.0,42,0.786,0.002,27.38,0.363,0.61,15-100%,14.102,50.96,1.0,0.557,0.835,random vs full object
+pneumonia_mnist,patch,Deletion (blur),0.666,0.0,42,0.714,0.1,21.905,0.443,0.567,15-100%,13.762,24.223,1.0,0.598,0.729,random vs full object
+pneumonia_mnist,patch,Deletion (inpaint),0.793,0.0,42,0.905,0.014,59.353,0.163,0.55,15-100%,47.153,66.024,1.0,0.719,0.863,random vs full object
+pneumonia_mnist,patch,Insertion (blur),0.56,0.0,42,0.643,0.098,15.555,0.497,0.695,15-100%,14.192,18.211,0.765,0.421,0.701,random vs full object
+pneumonia_mnist,texture,Deletion (black),0.832,0.0,42,0.881,0.015,36.588,0.273,0.947,18-100%,33.804,43.131,1.0,0.751,0.908,random vs full object
+pneumonia_mnist,texture,Deletion (blur),0.704,0.0,42,0.595,0.062,,0.567,1.0,18-100%,,,0.0,0.607,0.806,random vs full object
+pneumonia_mnist,texture,Deletion (inpaint),0.241,0.124,42,0.476,0.045,25.152,0.43,0.633,18-100%,19.763,76.496,0.999,-0.027,0.443,random vs full object
+pneumonia_mnist,texture,Insertion (blur),0.049,0.759,42,0.595,0.046,,0.582,0.767,18-100%,,,0.0,-0.179,0.299,random vs full object
 cifar10,patch,Deletion (black),-0.235,0.319,20,0.45,0.004,4.872,0.522,0.48,4-96%,4.599,44.235,0.953,-0.549,0.052,placebo vs random
 cifar10,patch,Deletion (blur),-0.206,0.383,20,0.45,0.006,11.265,0.492,0.462,4-96%,9.57,12.988,1.0,-0.427,0.042,placebo vs random
 cifar10,patch,Deletion (inpaint),0.653,0.002,20,0.6,0.004,90.814,0.455,0.522,4-96%,69.6,96.62,1.0,0.504,0.826,placebo vs random
@@ -183,14 +203,18 @@ pet_resnet18_pretrained,patch,Deletion (black),0.664,0.003,18,0.556,0.002,,0.537
 pet_resnet18_pretrained,patch,Deletion (blur),0.772,0.0,18,0.778,0.002,7.924,0.437,0.667,2-99%,4.575,13.533,1.0,0.561,0.932,placebo vs random
 pet_resnet18_pretrained,patch,Deletion (inpaint),-0.366,0.135,18,0.444,0.014,,0.448,0.395,2-99%,,,0.032,-0.802,0.092,placebo vs random
 pet_resnet18_pretrained,patch,Insertion (blur),-0.774,0.0,18,0.389,0.001,2.796,0.51,0.305,2-99%,2.629,3.611,0.746,-0.9,-0.681,placebo vs random
-pneumonia_mnist,patch,Deletion (black),0.153,0.335,42,0.452,0.034,,0.457,0.48,15-100%,13.958,99.778,0.714,-0.158,0.45,placebo vs random
-pneumonia_mnist,patch,Deletion (blur),0.297,0.056,42,0.476,0.143,,0.44,0.405,15-100%,,,0.441,0.077,0.469,placebo vs random
-pneumonia_mnist,patch,Deletion (inpaint),-0.324,0.036,42,0.429,0.113,16.23,0.47,0.395,15-100%,13.641,99.327,0.698,-0.568,-0.077,placebo vs random
-pneumonia_mnist,patch,Insertion (blur),0.133,0.401,42,0.524,0.139,94.085,0.44,0.425,15-100%,15.774,98.186,0.967,-0.116,0.353,placebo vs random
-pneumonia_mnist,texture,Deletion (black),0.739,0.0,42,0.714,0.017,98.793,0.365,0.498,18-100%,47.614,99.253,1.0,0.625,0.829,placebo vs random
-pneumonia_mnist,texture,Deletion (blur),-0.162,0.306,42,0.31,0.079,,0.473,0.437,18-100%,26.49,49.654,0.736,-0.386,0.081,placebo vs random
-pneumonia_mnist,texture,Deletion (inpaint),-0.272,0.081,42,0.5,0.054,98.895,0.477,0.473,18-100%,33.715,98.979,0.953,-0.511,0.009,placebo vs random
-pneumonia_mnist,texture,Insertion (blur),-0.481,0.001,42,0.405,0.087,,0.438,0.373,18-100%,,,0.169,-0.638,-0.262,placebo vs random
+pet_resnet18_pretrained,watermark,Deletion (black),-0.205,0.415,18,0.5,0.001,3.332,0.47,0.413,3-98%,2.466,75.497,0.93,-0.598,0.26,placebo vs random
+pet_resnet18_pretrained,watermark,Deletion (blur),-0.398,0.102,18,0.5,0.004,,0.458,0.442,3-98%,,,0.348,-0.619,-0.039,placebo vs random
+pet_resnet18_pretrained,watermark,Deletion (inpaint),-0.344,0.162,18,0.389,0.031,,0.49,0.463,3-98%,2.507,98.28,0.626,-0.73,0.154,placebo vs random
+pet_resnet18_pretrained,watermark,Insertion (blur),-0.868,0.0,18,0.333,0.003,2.807,0.525,0.338,3-98%,2.668,3.354,0.975,-0.956,-0.769,placebo vs random
+pneumonia_mnist,patch,Deletion (black),0.153,0.335,42,0.452,0.034,,0.457,0.48,15-100%,13.958,99.807,0.716,-0.168,0.454,placebo vs random
+pneumonia_mnist,patch,Deletion (blur),0.297,0.056,42,0.476,0.143,,0.44,0.405,15-100%,,,0.449,0.088,0.474,placebo vs random
+pneumonia_mnist,patch,Deletion (inpaint),-0.324,0.036,42,0.429,0.113,16.23,0.47,0.395,15-100%,13.703,99.328,0.688,-0.565,-0.084,placebo vs random
+pneumonia_mnist,patch,Insertion (blur),0.133,0.401,42,0.524,0.139,94.085,0.44,0.425,15-100%,15.646,98.503,0.97,-0.104,0.358,placebo vs random
+pneumonia_mnist,texture,Deletion (black),0.739,0.0,42,0.714,0.017,98.793,0.365,0.498,18-100%,47.726,99.253,1.0,0.622,0.831,placebo vs random
+pneumonia_mnist,texture,Deletion (blur),-0.162,0.306,42,0.31,0.079,,0.473,0.437,18-100%,26.49,49.654,0.74,-0.391,0.072,placebo vs random
+pneumonia_mnist,texture,Deletion (inpaint),-0.272,0.081,42,0.5,0.054,98.895,0.477,0.473,18-100%,33.783,98.895,0.953,-0.519,0.014,placebo vs random
+pneumonia_mnist,texture,Insertion (blur),-0.481,0.001,42,0.405,0.087,,0.438,0.373,18-100%,,,0.186,-0.651,-0.25,placebo vs random
 cifar10,patch,Deletion (black),0.767,0.0,20,0.6,0.004,5.765,0.478,0.955,4-96%,4.937,8.344,0.82,0.652,0.884,shortcut vs random
 cifar10,patch,Deletion (blur),0.778,0.0,20,0.5,0.001,,0.562,0.975,4-96%,,,0.0,0.595,0.93,shortcut vs random
 cifar10,patch,Deletion (inpaint),0.902,0.0,20,0.5,0.0,,0.617,0.99,4-96%,,,0.0,0.839,0.958,shortcut vs random
@@ -215,11 +239,15 @@ pet_resnet18_pretrained,patch,Deletion (black),0.863,0.0,18,0.778,0.001,4.523,0.
 pet_resnet18_pretrained,patch,Deletion (blur),0.647,0.004,18,0.556,0.002,,0.518,0.763,2-99%,,,0.247,0.479,0.824,shortcut vs random
 pet_resnet18_pretrained,patch,Deletion (inpaint),0.916,0.0,18,0.611,0.001,2.636,0.478,0.993,2-99%,2.459,2.894,0.968,0.892,0.964,shortcut vs random
 pet_resnet18_pretrained,patch,Insertion (blur),0.843,0.0,18,0.5,0.0,,0.637,0.997,2-99%,,,0.0,0.771,0.94,shortcut vs random
-pneumonia_mnist,patch,Deletion (black),0.624,0.0,42,0.643,0.039,15.001,0.495,0.727,15-100%,14.236,18.503,0.772,0.477,0.763,shortcut vs random
-pneumonia_mnist,patch,Deletion (blur),0.673,0.0,42,0.619,0.127,,0.527,0.747,15-100%,,,0.07,0.549,0.789,shortcut vs random
-pneumonia_mnist,patch,Deletion (inpaint),0.664,0.0,42,0.667,0.103,,0.505,0.737,15-100%,13.27,16.895,0.513,0.512,0.785,shortcut vs random
-pneumonia_mnist,patch,Insertion (blur),0.746,0.0,42,0.714,0.135,19.02,0.438,0.753,15-100%,15.174,21.219,1.0,0.632,0.853,shortcut vs random
-pneumonia_mnist,texture,Deletion (black),-0.488,0.001,42,0.524,0.012,99.947,0.693,0.427,18-100%,99.318,100.0,1.0,-0.657,-0.3,shortcut vs random
-pneumonia_mnist,texture,Deletion (blur),0.326,0.035,42,0.619,0.055,,0.528,0.845,18-100%,,,0.16,0.113,0.522,shortcut vs random
-pneumonia_mnist,texture,Deletion (inpaint),0.649,0.0,42,0.595,0.045,,0.532,0.938,18-100%,,,0.0,0.508,0.778,shortcut vs random
-pneumonia_mnist,texture,Insertion (blur),0.627,0.0,42,0.619,0.067,,0.527,0.95,18-100%,,,0.03,0.495,0.752,shortcut vs random
+pet_resnet18_pretrained,watermark,Deletion (black),0.784,0.0,18,1.0,0.003,39.129,0.45,0.788,3-98%,30.923,45.954,1.0,0.742,0.824,shortcut vs random
+pet_resnet18_pretrained,watermark,Deletion (blur),0.799,0.0,18,0.5,0.001,,0.532,0.967,3-98%,,,0.0,0.702,0.909,shortcut vs random
+pet_resnet18_pretrained,watermark,Deletion (inpaint),0.809,0.0,18,0.556,0.006,,0.52,0.987,3-98%,,,0.034,0.741,0.912,shortcut vs random
+pet_resnet18_pretrained,watermark,Insertion (blur),0.838,0.0,18,0.5,0.002,,0.598,0.997,3-98%,,,0.0,0.767,0.933,shortcut vs random
+pneumonia_mnist,patch,Deletion (black),0.624,0.0,42,0.643,0.039,15.001,0.495,0.727,15-100%,14.236,18.503,0.782,0.477,0.763,shortcut vs random
+pneumonia_mnist,patch,Deletion (blur),0.673,0.0,42,0.619,0.127,,0.527,0.747,15-100%,,,0.074,0.558,0.793,shortcut vs random
+pneumonia_mnist,patch,Deletion (inpaint),0.664,0.0,42,0.667,0.103,,0.505,0.737,15-100%,,,0.497,0.518,0.79,shortcut vs random
+pneumonia_mnist,patch,Insertion (blur),0.746,0.0,42,0.714,0.135,19.02,0.438,0.753,15-100%,14.699,21.306,1.0,0.62,0.85,shortcut vs random
+pneumonia_mnist,texture,Deletion (black),-0.488,0.001,42,0.524,0.012,99.947,0.693,0.427,18-100%,99.318,100.0,1.0,-0.656,-0.306,shortcut vs random
+pneumonia_mnist,texture,Deletion (blur),0.326,0.035,42,0.619,0.055,,0.528,0.845,18-100%,,,0.153,0.116,0.536,shortcut vs random
+pneumonia_mnist,texture,Deletion (inpaint),0.649,0.0,42,0.595,0.045,,0.532,0.938,18-100%,,,0.0,0.506,0.774,shortcut vs random
+pneumonia_mnist,texture,Insertion (blur),0.627,0.0,42,0.619,0.067,,0.527,0.95,18-100%,,,0.036,0.497,0.753,shortcut vs random
