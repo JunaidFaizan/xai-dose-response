@@ -63,8 +63,9 @@ class SubmissionBuild(unittest.TestCase):
         deferred = (SUBMISSION_DOCS / "DEFERRED.md").read_text(encoding="utf8")
         for marker in declared:
             self.assertIn(marker, deferred, marker)
-        self.assertIn("[[SD3_RESULTS]]", found)
-        self.assertIn("[[SD4_RESULTS]]", found)
+        # T5.1 replaced every SD3/SD4 marker; only author and Zenodo-release markers remain
+        self.assertFalse([m for m in found if m.startswith("[[SD")], found)
+        self.assertTrue(all(m.startswith("[[AUTHOR:") or m == "[[ZENODO_RELEASE_DOI]]" for m in found), found)
 
     def test_final_fails_while_markers_remain_and_writes_nothing(self):
         before = (sha(PAPER / "paper_submission.docx"), sha(PAPER / "supplementary_submission.docx"))
@@ -79,7 +80,7 @@ class SubmissionBuild(unittest.TestCase):
         main_tables = [int(n) for n in re.findall(r"^Table (\d+)\. ", self.main, flags=re.M)]
         self.assertEqual(main_tables, list(range(1, len(main_tables) + 1)))
         supp_tables = [int(n) for n in re.findall(r"^Table S(\d+)\. ", self.supp, flags=re.M)]
-        self.assertEqual(supp_tables, [1, 2, 3, 4, 5])
+        self.assertEqual(supp_tables, [1, 2, 3, 4, 5, 6, 7])
         plain = re.sub(r"Supplementary Table S\d+", "", self.main)
         for n in {int(x) for x in re.findall(r"\bTable (\d+)\b", plain)}:
             self.assertLessEqual(n, len(main_tables))
@@ -96,7 +97,8 @@ class SubmissionBuild(unittest.TestCase):
         self.assertEqual(references_of(PAPER / "paper_submission.docx"), references_of(PAPER / "paper_draft.docx"))
 
     def test_preregistration_dois_in_main_text(self):
-        for doi in ("10.5281/zenodo.24285532", "10.5281/zenodo.24333540", "10.5281/zenodo.24416017"):
+        for doi in ("10.5281/zenodo.24285532", "10.5281/zenodo.24333540", "10.5281/zenodo.24416017",
+                    "10.5281/zenodo.24495658"):
             self.assertIn(doi, self.main)
         self.assertIn("[[ZENODO_RELEASE_DOI]]", self.main)
 
@@ -130,7 +132,8 @@ class SubmissionDocs(unittest.TestCase):
 
     def test_cover_letter_names_all_zenodo_versions(self):
         text = (SUBMISSION_DOCS / "cover_letter.md").read_text(encoding="utf8")
-        for doi in ("10.5281/zenodo.24285532", "10.5281/zenodo.24333540", "10.5281/zenodo.24416017"):
+        for doi in ("10.5281/zenodo.24285532", "10.5281/zenodo.24333540", "10.5281/zenodo.24416017",
+                    "10.5281/zenodo.24495658"):
             self.assertIn(doi, text)
 
 

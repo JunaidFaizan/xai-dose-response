@@ -14,7 +14,7 @@ example Full length article]] in *Neurocomputing*.
 
 **What the paper does.** Deletion and insertion metrics decide which explanations of an image
 classifier are called faithful, but they are rarely tested against a known model reliance. I train
-275 CNNs in which a signed training dose sets how strongly the model relies on an injected,
+293 CNNs in which a signed training dose sets how strongly the model relies on an injected,
 class-coded shortcut, measure that reliance on held-out conflicting images with a chance correction,
 and score fixed oracle explanations with four metrics. The data are Oxford-IIIT Pet (with object
 masks), CIFAR-10, MNIST and PneumoniaMNIST. The metrics respond to reliance but are not calibrated
@@ -31,10 +31,17 @@ Further predictions are pre-registered and time-stamped on Zenodo:
 - version 3, amendment A3 with predictions P10–P13 (exact ROAD and a watermark shortcut), uploaded
   before any SD3 or SD4 model or score existed: https://doi.org/10.5281/zenodo.24416017
 
+- version 4, completion note A3-C1 with the SD4 pilot outcome, the final SD4 doses and the ROAD
+  timing, uploaded before any confirmatory SD4 model was trained:
+  https://doi.org/10.5281/zenodo.24495658
+
 The concept DOI of the record is https://doi.org/10.5281/zenodo.24285531. The manuscript reports the
-outcome of every registered prediction, including the ones that failed.
-[[SD3_SD4_COVER_LETTER: one or two sentences on the SD3 and SD4 outcomes and the Zenodo version 4 DOI,
-after the results exist]]
+outcome of every registered prediction, including the ones that failed. Of the four A3 predictions,
+three held and one was refuted. Exact ROAD ranked the object map above random pixels more often than
+black deletion in all four natural-image settings (P10), and it over-detected the shortcut slightly
+less often on Pet (9 against 10 of 14 low-reliance models, P11). On the watermark shortcut the four
+metrics tracked reliance (Spearman ρ 0.82–0.90, P12), but blur deletion over-detected the watermark
+for only 2 of 9 low-reliance models, so P13 was refuted.
 
 **Why *Neurocomputing*.** The work concerns the evaluation of explanations for neural-network image
 classifiers and gives a controlled test bed for it. [[AUTHOR: add one sentence on fit with the scope

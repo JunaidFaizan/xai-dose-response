@@ -7,8 +7,8 @@ Tick items when done. Items with a row number are in `DEFERRED.md`.
 **Before submission (author)**
 
 - [ ] Browser check of the Neurocomputing guide for authors: fee route, abstract limit, highlights, length, reference style (D12)
-- [ ] Kaggle S3 and S4 finished, SD3 and SD4 integrated in the paper (D01 to D10)
-- [ ] Zenodo version 4 (SD4 completion note) uploaded (D05)
+- [x] Kaggle S3 and S4 finished, SD3 and SD4 integrated in the paper (D01 to D10; T5.1, 2026-11-25)
+- [x] Zenodo version 4 (SD4 completion note) uploaded (D05; 10.5281/zenodo.24495658)
 - [ ] Zenodo release of code, results and checkpoints, DOI in the paper (D13)
 - [ ] E-mail, funding, competing interests, acknowledgements, AI-use statement filled in the paper and in `docs/submission/*.md` (D14 to D18)
 - [ ] Suggested reviewers: names, affiliations, e-mails, conflicts checked (D27)

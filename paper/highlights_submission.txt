@@ -1,5 +1,5 @@
-275 CNNs with measured, chance-corrected shortcut reliance test four metrics
-Black and blur deletion over-detect shortcuts on natural images
+293 CNNs with measured, chance-corrected shortcut reliance test four metrics
+Black and blur deletion over-detect patch shortcuts on natural images
 Per-image behavioural labels replace the assumed 50% switch point
 Explanation size and form change which map the metrics prefer
-Pre-registered Pet test: three of four predictions held; black deletion failed
+Pre-registered tests: 10 of 13 predictions held, including exact ROAD and a watermark

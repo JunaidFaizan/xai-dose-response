@@ -103,6 +103,15 @@ CALIB = pd.read_csv(DR / "behaviour_calibration.csv")
 CONF_RC = pd.read_csv(DR / "confound_rc.csv")
 CORRECT = pd.read_csv(DR / "correct_only.csv")
 POWER = pd.read_csv(DR / "behaviour_power.csv")
+# amendment A3 (SD3 exact ROAD; SD4 watermark): new files of analyze (model set all); submission only
+if SUBMISSION:
+    ROAD_RESP = pd.read_csv(DR / "responsiveness_corrected_road.csv")
+    ROAD_OVER = pd.read_csv(DR / "overdetection_road.csv")
+    ROAD_MODELS = pd.read_csv(DR / "road_models.csv")
+    ROAD_P10 = pd.read_csv(DR / "road_p10.csv")
+    ROAD_P11 = pd.read_csv(DR / "road_p11.csv")
+    ROAD_TIMING = pd.read_csv(DR / "road_timing_kaggle_s3.csv")
+ROAD = ["ROAD (MoRF)", "ROAD (LeRF)"]
 KENDALL = pd.read_csv(AN / "kendall_exact.csv")
 GT_TAU = pd.read_csv(AN / "gt_agreement.csv")
 GT_INSTANCE = pd.read_csv(AN / "gt_instance.csv")
@@ -138,8 +147,16 @@ MECHANISM = SETTINGS[3:]
 SD1 = ("pet_resnet18_pretrained", "patch", "Oxford-IIIT Pet, patch (ImageNet-pretrained ResNet-18, SD1)",
        "Pet pretrained (SD1)")
 SD1_KEY = SD1[:2]
-LABEL = {(b, s): label for b, s, label, _ in SETTINGS + [SD1]}
-SHORT = {(b, s): short for b, s, _, short in SETTINGS + [SD1]}
+# Amendment A3, SD4: the watermark shortcut on the SD1 network, a further separate setting (Section 5.12),
+# never pooled with SD1. The guide-review draft predates A3 and keeps the models without SD4.
+SD4 = ("pet_resnet18_pretrained", "watermark", "Oxford-IIIT Pet, watermark (ImageNet-pretrained ResNet-18, SD4)",
+       "Pet watermark (SD4)")
+SD4_KEY = SD4[:2]
+MODELS_ALL = MODELS
+if not SUBMISSION:
+    MODELS = MODELS[[(b, s) != SD4_KEY for b, s in zip(MODELS.base, MODELS.shortcut)]].reset_index(drop=True)
+LABEL = {(b, s): label for b, s, label, _ in SETTINGS + [SD1, SD4]}
+SHORT = {(b, s): short for b, s, _, short in SETTINGS + [SD1, SD4]}
 NETS = {"mnist": "Small CNN", "pneumonia_mnist": "Small CNN", "cifar10": "CIFAR CNN (0.77M)",
         "cifar10_resnet18": "ResNet-18 (11.2M)", "pet_resnet18": "ResNet-18 (11.2M)",
         "pet_resnet18_pretrained": "ImageNet-pretrained ResNet-18 (11.2M)"}
@@ -151,13 +168,13 @@ S_RANDOM, S_PLACEBO = "shortcut vs random", "shortcut vs placebo"
 R_OBJECT, P_OBJECT, P_RANDOM = "random vs full object", "placebo vs full object", "placebo vs random"
 SHORTCUT_COMPARISONS = [FULL, MATCHED, S_PLACEBO, S_RANDOM]
 
-assert set(zip(MODELS.base, MODELS.shortcut)) == {(b, s) for b, s, _, _ in SETTINGS + [SD1]}, \
-    "SETTINGS and SD1 must cover every (base, shortcut) in models.csv"
+assert set(zip(MODELS.base, MODELS.shortcut)) == {(b, s) for b, s, _, _ in SETTINGS + [SD1] + [SD4] * SUBMISSION}, \
+    "SETTINGS, SD1 and SD4 must cover every (base, shortcut) in models.csv"
 
 
 def main_only(df):
-    """Rows of the seven main settings (drops the separate SD1 setting)."""
-    return df[[(b, s) != SD1_KEY for b, s in zip(df.base, df.shortcut)]]
+    """Rows of the seven main settings (drops the separate SD1 and SD4 settings)."""
+    return df[[(b, s) not in (SD1_KEY, SD4_KEY) for b, s in zip(df.base, df.shortcut)]]
 
 
 def _one(df, **keys):
@@ -361,7 +378,11 @@ N_A1 = int((MODELS.model_set == "A1").sum())
 # Amendment A2 models pooled so far (scored ones only; dose_response.py analyze
 # lists the pilots and unscored A2 models in pilots.csv, not in models.csv).
 N_A2 = int((MODELS.model_set == "A2").sum())
-assert N_ORIGINAL + N_A1 + N_A2 == N_MODELS, set(MODELS.model_set)
+N_A3 = int((MODELS.model_set == "A3").sum())  # the SD4 confirmatory models (submission only)
+assert N_ORIGINAL + N_A1 + N_A2 + N_A3 == N_MODELS, set(MODELS.model_set)
+SD4_MODELS = MODELS[MODELS.model_set == "A3"]
+N_SD4 = len(SD4_MODELS)
+assert N_SD4 == (18 if SUBMISSION else 0) and set(zip(SD4_MODELS.base, SD4_MODELS.shortcut)) <= {SD4_KEY}
 A2_MODELS = MODELS[MODELS.model_set == "A2"]
 A2_COUNTS = A2_MODELS.groupby("base").size().to_dict()
 # The text below describes the complete A2 design: 23 SD2 models and 18 SD1 confirmatory models.
@@ -370,7 +391,7 @@ assert A2_COUNTS == {"pet_resnet18": 3, "cifar10_resnet18": 12, "cifar10": 8, "p
 A2_SD2 = A2_MODELS[A2_MODELS.base != SD1[0]]
 N_A2_SD2 = len(A2_SD2)
 N_SD1 = A2_COUNTS[SD1[0]]
-N_MAIN = N_MODELS - N_SD1  # models of the seven main settings
+N_MAIN = N_MODELS - N_SD1 - N_SD4  # models of the seven main settings
 A2_PET = A2_MODELS[A2_MODELS.base == "pet_resnet18"]
 N_A2_PET = len(A2_PET)
 A2_PET_DOSES = sorted(A2_PET.dose.unique())
@@ -546,7 +567,7 @@ def rearrange_panels(source, target, panels, columns=4, order=None):
     cell_w, cell_h = max(p.width for p in pieces), max(p.height for p in pieces)
     strip_w = strip.width if strip is not None else 0
     width = max(strip_w + columns * cell_w, title.width)
-    grid_rows = int(np.ceil(panels / columns))
+    grid_rows = int(np.ceil(len(pieces) / columns))
     canvas = Image.new("RGB", (width, title.height + grid_rows * cell_h + 10), "white")
     canvas.paste(title, ((width - title.width) // 2, 0))
     for r in range(grid_rows):
@@ -606,9 +627,11 @@ def preference_figure(comparison, target, ylabel, show_behaviour=True):
 # ------------------------------------------------------------------ document helpers
 
 # The analyze figures list the settings alphabetically; the submission puts them in the order of Table 2
-# (natural images first, SD1 last).
-_ALPHA = sorted(N_SETTING)
-PANEL_ORDER = ([_ALPHA.index((b, s)) for b, s, *_ in SETTINGS] + [_ALPHA.index(SD1_KEY)]) if SUBMISSION else None
+# (natural images first, SD1 and SD4 last).
+_ALPHA = sorted(set(zip(MODELS_ALL.base, MODELS_ALL.shortcut)))  # panels of the analyze figures (SD4 included)
+N_PANELS = len(_ALPHA)
+PANEL_ORDER = ([_ALPHA.index((b, s)) for b, s, *_ in SETTINGS] + [_ALPHA.index(SD1_KEY), _ALPHA.index(SD4_KEY)]
+               if SUBMISSION else [i for i, k in enumerate(_ALPHA) if k != SD4_KEY])  # the draft has no SD4
 
 doc = Document()
 SUPP = Document() if SUBMISSION else None
@@ -805,17 +828,20 @@ def table_positioning():
         body, widths=[3.2, 7.0, 5.8], size=8,
         note="The protocol is new as a combination; its individual pieces are not. BAM and SMERF already "
              "controlled what a model relies on, to evaluate attribution methods."
-             + S("", " [[SD3_POSITIONING]]"))
+             + (S("", " Exact ROAD was also scored with the same oracle maps (Section 5.11): it "
+                  "ranks the object map above random pixels more often than black deletion on natural images, but "
+                  f"still over-detects the shortcut for {int(A3N['p11_main'].k_road)} of "
+                  f"{int(A3N['p11_main'].n_below)} low-reliance Pet models.") if SUBMISSION else ""))
 
 
 def table_reliance():
     body = []
-    for base, shortcut, label, _ in SETTINGS + [SD1]:
+    for base, shortcut, label, _ in SETTINGS + [SD1] + [SD4] * SUBMISSION:
         g, lv = group(base, shortcut), levels(base, shortcut)
         lowest, highest = lv.loc[lv.reliance.idxmin()], lv.loc[lv.reliance.idxmax()]
-        a1, a2 = int((g.model_set == "A1").sum()), int((g.model_set == "A2").sum())
+        a1, a2, a3 = (int((g.model_set == k).sum()) for k in ("A1", "A2", "A3"))
         count = (f"{len(g)} ({lv.dose.nunique()} doses)" + (f", incl. {a1} A1" if a1 else "")
-                 + (f", incl. {a2} A2" if a2 else ""))
+                 + (f", incl. {a2} A2" if a2 else "") + (f", incl. {a3} A3" if a3 else ""))
         body.append([
             label, NETS[base], count,
             f"{f2(lv.dose.min())} to {f2(lv.dose.max())}",
@@ -830,9 +856,11 @@ def table_reliance():
          "Accuracy without shortcut (%), low \u2192 high reliance"],
         body, widths=[3.4, 2.2, 2.4, 1.8, 1.8, 1.8, 2.6],
         note=f"Source: results/dose_response/models.csv ({N_MODELS} models: {N_ORIGINAL} original, {N_A1} "
-             f"from amendment A1 and {N_A2} from amendment A2, of which {N_SD1} form the separate SD1 setting in "
-             f"the last row; the A2 pilots are not included, see "
-             f"results/dose_response/pilots.csv). R: percentage of conflicting test images whose prediction follows the "
+             + S(f"from amendment A1 and {N_A2} from amendment A2, of which {N_SD1} form the separate SD1 setting in "
+                 f"the last row; the A2 pilots are not included, see ",
+                 f"from amendment A1, {N_A2} from amendment A2, of which {N_SD1} form the separate SD1 setting, and "
+                 f"{N_A3} from amendment A3, the separate SD4 setting in the last row; the pilots are not included, see ")
+             + f"results/dose_response/pilots.csv). R: percentage of conflicting test images whose prediction follows the "
              f"shortcut. {RC} = 100 (R \u2212 f)/(100 \u2212 f) with chance floor f = (100 \u2212 accuracy "
              "without shortcut)/(C \u2212 1); it is not clipped and can be slightly negative.")
 
@@ -1103,7 +1131,10 @@ def table_confound():
              "Spearman: Pearson correlation of rank residuals after a linear fit on the accuracy rank; p from "
              "a t distribution with n \u2212 3 degrees of freedom, adjusted by Benjamini\u2013Hochberg over the "
              f"{len(CONF_RC)} tests of confound_rc.csv (the {len(main_only(CONF_RC))} of the table and the "
-             f"{len(CONF_RC) - len(main_only(CONF_RC))} SD1 tests of Section 5.10).")
+             + S(f"{len(CONF_RC) - len(main_only(CONF_RC))} SD1 tests of Section 5.10).",
+                 f"{int(((CONF_RC.base == SD1_KEY[0]) & (CONF_RC.shortcut == SD1_KEY[1])).sum())} SD1 and "
+                 f"{int(((CONF_RC.base == SD4_KEY[0]) & (CONF_RC.shortcut == SD4_KEY[1])).sum())} SD4 tests of "
+                 "Sections 5.10 and 5.12)."))
 
 
 def table_kendall():
@@ -1268,6 +1299,313 @@ def table_p9(p9_rows, bsw):
              "lowest-reliance edge.")
 
 
+# ------------------------------------------------------------------ amendment A3 (SD3, SD4; submission only)
+
+P10_KEYS = [("pet_resnet18", "patch"), ("cifar10_resnet18", "patch"), ("cifar10", "patch"), SD1_KEY]
+SD4_DOSES = [-0.5, -0.2, 0.0, 0.1, 0.25, 0.4]  # completion note A3-C1 (rule "below 60")
+A3N = {}
+
+
+def _road(table, base, shortcut, metric, comparison=None):
+    sel = table[(table.base == base) & (table.shortcut == shortcut) & (table.metric == metric)]
+    if comparison is not None:
+        sel = sel[sel.comparison == comparison]
+    assert len(sel) == 1, (base, shortcut, metric, comparison, len(sel))
+    return sel.iloc[0]
+
+
+def a3_numbers():
+    """P10-P13 of amendment A3 applied literally to the result files (road_p10.csv and road_p11.csv
+    for P10 and P11; responsiveness_corrected.csv and overdetection.csv for P12 and P13), with the
+    guards for the statements in the text."""
+    n = A3N
+    # SD3: every pooled model has exact ROAD scores, on the A3 image counts (the timing gate was not reached)
+    assert len(ROAD_MODELS) == N_MODELS and not len(ROAD_MODELS.merge(PILOTS[_KEYS], on=_KEYS))
+    images = ROAD_MODELS.groupby(["base", "shortcut"]).images.agg(["min", "max"])
+    assert (images["min"] == images["max"]).all()
+    n["images"] = images["min"].to_dict()
+    assert n["images"] == {k: 100 if k[0] in ("mnist", "pneumonia_mnist", "cifar10") else 50 for k in n["images"]}
+    assert len(ROAD_TIMING) == 2 and (ROAD_TIMING.minutes < 15).all() and (ROAD_TIMING.images == 50).all()
+    n["timing"] = list(ROAD_TIMING.minutes)
+    # P10 (ROAD MoRF decides; LeRF secondary) and P11
+    p10 = {(m, b, s): r for m, b, s, r in zip(ROAD_P10.road_metric, ROAD_P10.base, ROAD_P10.shortcut.fillna(""),
+                                               ROAD_P10.itertuples())}
+    n["p10"] = {m: [p10[(m, b, s)] for b, s in P10_KEYS] for m in ROAD}
+    n["p10_overall"] = {m: p10[(m, "overall", "")].verdict for m in ROAD}
+    for m in ROAD:
+        for r in n["p10"][m]:
+            black, road = (_road(ROAD_OVER, r.base, r.shortcut, x) for x in ("Deletion (black)", m))
+            assert np.isclose(r.dose_low, black.dose_low) and int(r.models) == int(black.models_low)
+            assert np.isclose(r.pref_ro_black, black.pref_ro_low) and np.isclose(r.pref_ro_road, road.pref_ro_low)
+            assert r.pref_ro_black > 0.05 and r.verdict == "holds" and r.ci_low > 0
+    assert n["p10_overall"] == {"ROAD (MoRF)": "holds", "ROAD (LeRF)": "holds"}, n["p10_overall"]
+    p11 = {(m, b, s): r for m, b, s, r in zip(ROAD_P11.road_metric, ROAD_P11.base, ROAD_P11.shortcut,
+                                               ROAD_P11.itertuples())}
+    n["p11_keys"] = [("pet_resnet18", "patch"), SD1_KEY, SD4_KEY]
+    n["p11"] = {(m, k): p11[(m, *k)] for m in ROAD for k in n["p11_keys"]}
+    for (m, k), r in n["p11"].items():
+        black, road = (_road(ROAD_OVER, *k, x) for x in ("Deletion (black)", m))
+        assert (r.k_black, r.k_road, r.n_below) == (black.k_fpr, road.k_fpr, black.n_below), (m, k)
+    p11_main = n["p11"][("ROAD (MoRF)", ("pet_resnet18", "patch"))]
+    assert p11_main.role == "primary" and p11_main.n_below > 0 and p11_main.k_black > 0
+    n["p11_main"] = p11_main
+    # SD4: pilots, doses, testability (A3 stopping rule and the two-models-above-50 rule)
+    g = group(*SD4_KEY)
+    assert sorted(g.dose.unique()) == SD4_DOSES and sorted(g.seed.unique()) == [1, 2, 42] and len(g) == 18
+    pil = PILOTS[PILOTS.model_set == "A3_pilot"].set_index("dose")
+    assert sorted(pil.index) == [0.0, 0.25] and (pil.seed == 7).all()
+    assert pil.loc[0.0].reliance_corrected < 60, "A3 dose rule key 'below 60'"
+    n["stopped"] = bool(pil.loc[0.25].reliance_corrected < 20)
+    n["pilots"] = pil
+    n["sd4"] = g
+    n["above"] = int((g.reliance_corrected > 50).sum())
+    n["gap"] = largest_gap(g.reliance_corrected, lo=-5, hi=105)
+    assert np.isclose(n["gap"][0], g[g.dose == 0].reliance_corrected.max()) and np.isclose(
+        n["gap"][1], g[g.dose == 0.1].reliance_corrected.min()), "text: the SD4 gap lies between doses 0 and +0.1"
+    testable = not n["stopped"] and n["above"] >= 2
+    n["full"] = {m: row(FULL, *SD4_KEY, m) for m in METRICS}
+    n["over"] = {m: orow(*SD4_KEY, m) for m in METRICS}
+    n["p12_n"] = sum(r.rho_rc > 0.8 for r in n["full"].values())
+    p12 = ("holds" if n["p12_n"] >= 3 else "refuted") if testable else "not testable"
+    assert n["over"][METRICS[0]].n_below > 0
+    p13 = ("holds" if all(n["over"][m].fpr > 0.5 for m in BB) else "refuted") if not n["stopped"] else "not testable"
+    n["verdicts"] = {"P10": n["p10_overall"]["ROAD (MoRF)"], "P11": p11_main.verdict, "P12": p12, "P13": p13}
+    # the text below states this pattern; rebuild the wording if a verdict changes
+    assert n["verdicts"] == {"P10": "holds", "P11": "holds", "P12": "holds", "P13": "refuted"}, n["verdicts"]
+    assert n["p12_n"] == 4 and n["over"]["Deletion (black)"].fpr == 1 and n["over"]["Deletion (blur)"].fpr < 0.5
+    n["bsw"] = {lab: swrow(*SD4_KEY, lab) for lab in BEHAVIOUR_LABELS}
+    assert all(r.status.startswith("not identified") for r in n["bsw"].values())
+    assert n["gap"][0] < n["bsw"][PRIMARY_LABEL].behavioural_switch_rc < n["gap"][1]
+    n["beh"] = {m: brow(FULL, *SD4_KEY, m) for m in METRICS}
+    n["conf"] = {m: ccrow(*SD4_KEY, m) for m in METRICS}
+    n["matched"] = {m: row(MATCHED, *SD4_KEY, m) for m in METRICS}
+    n["road_sd4"] = {m: (_road(ROAD_RESP, *SD4_KEY, m, FULL), _road(ROAD_OVER, *SD4_KEY, m)) for m in ROAD}
+    n["held"] = [p for p, v in n["verdicts"].items() if v == "holds"]
+    return n
+
+
+def table_a3_sd3():
+    n = A3N
+    body = []
+    for i, (b, s) in enumerate(P10_KEYS):
+        r, lerf = n["p10"]["ROAD (MoRF)"][i], n["p10"]["ROAD (LeRF)"][i]
+        body.append(["P10" if i == 0 else "", SHORT[(b, s)], f"{int(r.models)} ({int(r.images)})",
+                     f2(r.pref_ro_black), f2(r.pref_ro_road),
+                     f"{f2(r.difference)} {ci(r.ci_low, r.ci_high)}", r.verdict,
+                     f"{f2(lerf.pref_ro_road)}; {f2(lerf.difference)} {ci(lerf.ci_low, lerf.ci_high)}"])
+
+    def fpr(k, n_, lo, hi):
+        return f"{f2(k / n_)} {ci(lo, hi)} ({int(k)}/{int(n_)})"
+
+    for i, key in enumerate(n["p11_keys"]):
+        r, lerf = n["p11"][("ROAD (MoRF)", key)], n["p11"][("ROAD (LeRF)", key)]
+        body.append(["P11" if i == 0 else "", SHORT[key] + ("" if i == 0 else " (secondary)"),
+                     f"{int(r.n_below)} ({int(r.images)})",
+                     fpr(r.k_black, r.n_below, r.fpr_black_cp_low, r.fpr_black_cp_high),
+                     fpr(r.k_road, r.n_below, r.fpr_road_cp_low, r.fpr_road_cp_high),
+                     f"{f2(r.difference)}; discordant {int(r.discordant_black_only)}/{int(r.discordant_road_only)}, "
+                     f"sign test {p_text(r.p_sign_two_sided)}",
+                     r.verdict if i == 0 else "\u2013",
+                     fpr(lerf.k_road, lerf.n_below, lerf.fpr_road_cp_low, lerf.fpr_road_cp_high)])
+    return table(
+        "Exact ROAD (SD3): pre-registered predictions P10 and P11, on the same images for both metrics",
+        ["Pred.", "Setting", "Models (images)", "Deletion (black)", "ROAD (MoRF)",
+         "Difference black \u2212 ROAD [95% CI]", "Verdict", "ROAD (LeRF), secondary"],
+        body, widths=[1.0, 2.6, 1.5, 2.3, 2.3, 3.0, 1.2, 2.6], size=7,
+        note="Sources: results/dose_response/road_p10.csv and road_p11.csv. P10 rows: mean preference for the random "
+             "map over the full object map at the setting's lowest-dose models; difference with its paired image "
+             "bootstrap interval (2000 replicates, seed 0; images resampled within each model, the same "
+             "images for both metrics); LeRF column: ROAD (LeRF) preference; difference [CI]. P11 rows: "
+             f"over-detection rate in the shortcut-versus-object comparison among the models with {RC} \u2264 50 "
+             "(Models column: their number), with Clopper\u2013Pearson 95% intervals; discordant: models on which "
+             "only black deletion / only ROAD over-detects, with an exact two-sided sign test (reported, not "
+             "deciding). Verdicts are judged on the pre-registered rules, ROAD (MoRF) only; the LeRF columns and "
+             "the SD1 and SD4 rows of P11 are secondary outcomes without a verdict.")
+
+
+def table_sd4():
+    body = []
+    for key in (SD4_KEY, SD1_KEY):
+        for i, metric in enumerate(METRICS):
+            r, o, b = row(FULL, *key, metric), orow(*key, metric), brow(FULL, *key, metric)
+            body.append([
+                SHORT[key] if i == 0 else "", metric,
+                f"{f2(r.rho_rc)} {ci(r.rho_rc_ci_low, r.rho_rc_ci_high)}",
+                f"{f2(r.pref_low)} \u2192 {f2(r.pref_high)}",
+                f"{f2(o.fpr)} {ci(o.fpr_cp_low, o.fpr_cp_high)} ({int(o.k_fpr)}/{int(o.n_below)})",
+                f"{f2(o.fpr_margin)} ({int(o.k_fpr_margin)}/{int(o.n_below)})",
+                f"{f2(o.pref_so_low)} / {f2(o.pref_ro_low)} / {f2(o.pref_sr_low)}",
+                f"{f2(b.auroc_pooled_strat)} / {f2(b.median_model_auroc_strat)}",
+                fmt_switch(r),
+            ])
+    return table(
+        "SD4 (watermark shortcut) next to SD1 (patch shortcut) on the same ImageNet-pretrained ResNet-18 "
+        "(exploratory comparison; the two settings are not pooled)",
+        ["Setting", "Metric", f"\u03c1 with {RC}, S vs O [two-level CI]",
+         "S\u2013O preference, lowest \u2192 highest dose", "FPR [CP 95% CI] (k/n)", "Margin FPR (k/n)",
+         "S\u2013O / R\u2013O / S\u2013R, lowest dose", "Behavioural AUROC, pooled / within model",
+         f"Switch S vs O, {RC} %"],
+        body, widths=[1.8, 1.9, 2.1, 1.8, 2.2, 1.3, 2.0, 1.8, 1.6], size=6.5,
+        note="Sources: results/dose_response/responsiveness_corrected.csv, overdetection.csv and "
+             "behaviour_summary.csv (class-stratified AUROC, primary label). P12 uses the \u03c1 column of SD4 and "
+             "P13 the FPR column of black and blur deletion of SD4, both on the 100 scoring images. Switch marks "
+             "as in the main responsiveness table of Section 5.2.")
+
+
+def table_supp_road():
+    body = []
+    for key in [k[:2] for k in SETTINGS] + [SD1_KEY, SD4_KEY]:
+        for i, metric in enumerate(METRICS + ROAD):
+            r, o = _road(ROAD_RESP, *key, metric, FULL), _road(ROAD_OVER, *key, metric)
+            body.append([
+                f"{SHORT[key]} ({A3N['images'][key]})" if i == 0 else "", metric,
+                f"{f2(r.rho_rc)}{sig(r)} {ci(r.rho_rc_ci_low, r.rho_rc_ci_high)}",
+                f"{f2(r.pref_low)} \u2192 {f2(r.pref_high)}",
+                f"{f2(o.fpr)} ({int(o.k_fpr)}/{int(o.n_below)})",
+                f"{f2(o.fpr_margin)} ({int(o.k_fpr_margin)}/{int(o.n_below)})",
+                f2(o.pref_ro_low), fmt_switch(r),
+            ])
+    return table(
+        "Exact ROAD next to the four existing metrics, shortcut vs full object, all settings, on the ROAD "
+        "images (number per model in brackets)",
+        ["Setting (images)", "Metric", f"\u03c1 with {RC} [two-level CI]", "Preference, lowest \u2192 highest dose",
+         "FPR (k/n)", "Margin FPR (k/n)", "R\u2013O, lowest dose", f"Switch, {RC} %"],
+        body, widths=[2.6, 2.2, 2.4, 2.0, 1.6, 1.6, 1.4, 2.2], size=6.5, supp=True,
+        note="Sources: results/dose_response/responsiveness_corrected_road.csv and overdetection_road.csv. The four "
+             "existing metrics are recomputed on the same first N images as ROAD, so their values can differ from "
+             "the main tables (100 images). \u2020: not significant after Benjamini\u2013Hochberg within the "
+             "comparison over the nine settings and six metrics of this analysis. Switch marks as in the main "
+             "responsiveness table.")
+
+
+def table_supp_sd4_models():
+    body = []
+    rows_ = [(r, "confirmatory") for r in A3N["sd4"].sort_values(["dose", "seed"]).itertuples()]
+    rows_ += [(r, "pilot (excluded)") for r in PILOTS[PILOTS.model_set == "A3_pilot"].sort_values("dose").itertuples()]
+    for r, role in rows_:
+        body.append([f2(r.dose), str(int(r.seed)), role, f1(r.reliance), f1(r.chance_floor),
+                     f1(r.reliance_corrected), f1(r.test_accuracy), f1(r.test_accuracy_no_shortcut),
+                     f1(r.test_accuracy_conflicting)])
+    return table(
+        "SD4 models: reliance and accuracies per model (watermark shortcut, ImageNet-pretrained ResNet-18)",
+        ["Dose", "Seed", "Role", "R (%)", "Chance floor (%)", f"{RC} (%)", "Test accuracy (%)",
+         "Accuracy without shortcut (%)", "Accuracy, conflicting (%)"],
+        body, widths=[1.2, 1.0, 2.4, 1.3, 1.6, 1.3, 1.6, 2.0, 2.0], size=7, supp=True,
+        note="Sources: results/dose_response/models.csv and pilots.csv. The seed-7 pilots fixed the doses under the "
+             "A3 rule and are excluded from every analysis.")
+
+
+def sd3_results(n):
+    """Section 5.11 text and table (P10, P11 and the secondary ROAD outcomes)."""
+    v = n["verdicts"]
+    morf, lerf = n["p10"]["ROAD (MoRF)"], n["p10"]["ROAD (LeRF)"]
+    names = [SHORT[k] for k in P10_KEYS]
+    p11, p11_lerf = n["p11_main"], n["p11"][("ROAD (LeRF)", ("pet_resnet18", "patch"))]
+    sd1_11, sd4_11 = n["p11"][("ROAD (MoRF)", SD1_KEY)], n["p11"][("ROAD (MoRF)", SD4_KEY)]
+    assert (p11.discordant_black_only, p11.discordant_road_only) == (1, 0) and p11.k_road == p11.k_black - 1
+    assert p11_lerf.k_road == p11_lerf.k_black, "text: LeRF over-detects as often as black on Pet"
+    assert p11.fpr_road > 0.5, "text: ROAD still over-detects for most low-reliance Pet models"
+    t = COUNTERS["table"] + 1
+    para(f"**ROAD lowers the random-map bias (P10 {v['P10']}).** At the lowest-dose models black deletion "
+         f"prefers a random map over the full object map on {span([r.pref_ro_black for r in morf])} of the images "
+         f"and ROAD (MoRF) on {span([r.pref_ro_road for r in morf])}. The difference black \u2212 ROAD is "
+         + "; ".join(f"{f2(r.difference)} {ci(r.ci_low, r.ci_high)} on {s} ({int(r.models)} models, "
+                     f"{int(r.images)} images each)" for r, s in zip(morf, names))
+         + ". Every interval lies above 0, so P10 holds in all four settings, and all four are testable. ROAD "
+         f"(LeRF) lowers the preference too, by {span([r.difference for r in lerf])}, with every interval above 0 "
+         "(secondary).")
+    para(f"**ROAD over-detects slightly less than black deletion on Pet (P11 {v['P11']}).** Among the "
+         f"{int(p11.n_below)} Pet models with {RC} \u2264 50, ROAD (MoRF) prefers the shortcut map for "
+         f"{int(p11.k_road)} ({f2(p11.fpr_road)} {ci(p11.fpr_road_cp_low, p11.fpr_road_cp_high)}) and black "
+         f"deletion for {int(p11.k_black)} ({f2(p11.fpr_black)} {ci(p11.fpr_black_cp_low, p11.fpr_black_cp_high)}). "
+         "The prediction holds on the point values, as the rule specifies, but by one model: one model "
+         "over-detects only under black deletion and none only under ROAD (exact sign test "
+         f"{p_text(p11.p_sign_two_sided)}), the intervals overlap almost completely, and ROAD still "
+         "over-detects for most low-reliance Pet models. ROAD (LeRF) over-detects for "
+         f"{int(p11_lerf.k_road)} of {int(p11_lerf.n_below)}, as often as black deletion. In the secondary repeats "
+         f"ROAD (MoRF) over-detects for {int(sd1_11.k_road)} of {int(sd1_11.n_below)} SD1 models (black deletion "
+         f"{int(sd1_11.k_black)}) and for {int(sd4_11.k_road)} of {int(sd4_11.n_below)} SD4 models (black deletion "
+         f"{int(sd4_11.k_black)}), on the same 50 images.")
+    road_rho = {m: [_road(ROAD_RESP, *k[:2], m, FULL).rho_rc for k in SETTINGS + [SD1, SD4]] for m in ROAD}
+    nat = {m: [_road(ROAD_OVER, *k, m).fpr for k in P10_KEYS] for m in ROAD}
+    lerf_mech = [_road(ROAD_OVER, b, "patch", "ROAD (LeRF)") for b in ("mnist", "pneumonia_mnist")]
+    assert all(o.fpr == 1 for o in lerf_mech), "text: LeRF over-detects every low-reliance mechanism patch model"
+    morf_rows = [_road(ROAD_RESP, *k[:2], "ROAD (MoRF)", FULL) for k in SETTINGS + [SD1, SD4]]
+    assert all(r.rho_rc > 0 and r.p_bh < 0.05 for r in morf_rows), "text: MoRF rises in every setting"
+    para(f"**Other comparisons (secondary).** Supplementary Table S{len(SUPP_ORDER) + 1} lists ROAD next to the "
+         "four existing metrics for every setting, recomputed on the same images. Against the full object map "
+         "the preference of ROAD (MoRF) rises significantly with reliance in all nine settings (\u03c1 = "
+         f"{span(road_rho['ROAD (MoRF)'])}), and its over-detection rate on the four natural-image settings is "
+         + ", ".join(f"{f2(x)} ({s})" for x, s in zip(nat["ROAD (MoRF)"], names))
+         + ". ROAD (LeRF) behaves differently on the mechanism settings: it prefers the shortcut map for every "
+         f"low-reliance model on MNIST patch ({int(lerf_mech[0].n_below)} models) and PneumoniaMNIST patch "
+         f"({int(lerf_mech[1].n_below)}), and its \u03c1 spans {span(road_rho['ROAD (LeRF)'])}.")
+    table_a3_sd3()
+    assert COUNTERS["table"] == t
+
+
+def sd4_results(n):
+    """Section 5.12 text and table (P12, P13 and the secondary SD4 outcomes)."""
+    v, g, full, over = n["verdicts"], n["sd4"], n["full"], n["over"]
+    bb = [over[m] for m in BB]
+    sd1_over = {m: orow(*SD1_KEY, m) for m in METRICS}
+    below = g[g.reliance_corrected <= 50]
+    assert (below.reliance_corrected <= 10).all() and over[METRICS[0]].n_rc_le10 == len(below)
+    assert all(over[m].k_fpr == 0 for m in II), "text: inpainting and insertion over-detect for none"
+    assert full["Deletion (black)"].rho_rc_ci_low < 0.8
+    sd1_k = {m: int(orow(*SD1_KEY, m).k_fpr) for m in BB}
+    assert sd1_k["Deletion (blur)"] > over["Deletion (blur)"].k_fpr and abs(
+        sd1_k["Deletion (black)"] - over["Deletion (black)"].k_fpr) <= 1, "text: more often / about as often"
+    bsw = n["bsw"][PRIMARY_LABEL]
+    t = COUNTERS["table"] + 1
+    para(f"The {len(g)} SD4 models reach {RC} from {f1(g.reliance_corrected.min())}% to "
+         f"{f1(g.reliance_corrected.max())}%. The doses \u22120.5 to 0 give at most {f1(n['gap'][0])}% and every "
+         f"model at +0.1 reaches at least {f1(n['gap'][1])}%, so {len(below)} models lie at {RC} \u2264 50 (all of "
+         f"them at {RC} \u2264 10) and {n['above']} above; as on SD1, reliance jumps between two adjacent doses. "
+         "The stopping rule was not triggered and more than two models lie above 50%, so P12 and P13 are "
+         f"testable. Table {t} sets SD4 next to SD1 and Supplementary Table S{len(SUPP_ORDER) + 2} lists the models.")
+    para(f"**The metrics respond to watermark reliance (P12 {v['P12']}).** Spearman \u03c1 between {RC} and the "
+         "shortcut-versus-object preference is "
+         + ", ".join(f"{f2(full[m].rho_rc)} {ci(full[m].rho_rc_ci_low, full[m].rho_rc_ci_high)} ({m})"
+                     for m in METRICS)
+         + f" on the 100 scoring images, above 0.8 for {n['p12_n']} of 4. The decision uses the point estimate, as "
+         "pre-registered; the two-level interval of black deletion reaches "
+         f"{f2(full['Deletion (black)'].rho_rc_ci_low)}. With no model between {f1(n['gap'][0])}% and "
+         f"{f1(n['gap'][1])}%, \u03c1 here mostly measures how well the metrics separate the low-reliance from "
+         "the high-reliance models.")
+    para(f"**Blur deletion does not over-detect the watermark (P13 {v['P13']}).** Among the {len(below)} models "
+         f"with {RC} \u2264 50, black deletion prefers the shortcut map for {int(bb[0].k_fpr)} ({f2(bb[0].fpr)} "
+         f"{ci(bb[0].fpr_cp_low, bb[0].fpr_cp_high)}), but blur deletion only for {int(bb[1].k_fpr)} "
+         f"({f2(bb[1].fpr)} {ci(bb[1].fpr_cp_low, bb[1].fpr_cp_high)}), so the rate of blur deletion is not "
+         f"above 0.5. With a per-model margin the two rates are {f2(bb[0].fpr_margin)} and {f2(bb[1].fpr_margin)}, "
+         "and inpainting and insertion over-detect for none of the models. At the lowest dose black deletion "
+         f"prefers a random map over the object map on {f2(bb[0].pref_ro_low)} of the images and the shortcut map "
+         f"over a random map on {f2(bb[0].pref_sr_low)}, so, as with the patch, its over-detection comes from the "
+         "object map rather than from the watermark. On SD1 the same network over-detected the patch more often "
+         f"under blur deletion ({int(sd1_over['Deletion (blur)'].k_fpr)} of {int(sd1_over['Deletion (blur)'].n_below)}"
+         f") and about as often under black deletion ({int(sd1_over['Deletion (black)'].k_fpr)} of "
+         f"{int(sd1_over['Deletion (black)'].n_below)}).")
+    beh, conf = n["beh"], n["conf"]
+    road = n["road_sd4"]
+    assert all(o.k_fpr == 0 for _, o in road.values()), "text: ROAD over-detects for none of the SD4 models"
+    para(f"**Secondary outcomes (no verdict).** The SD4 behavioural switch is not identified: the isotonic crossing "
+         f"lies at {f1(bsw.behavioural_switch_rc)}%, but no model lies between {RC} {f1(n['gap'][0])}% and "
+         f"{f1(n['gap'][1])}% (the same holds under both check labels). Against the primary label the "
+         f"class-stratified pooled AUROC is {span([r.auroc_pooled_strat for r in beh.values()])} and the "
+         f"within-model median {span([r.median_model_auroc_strat for r in beh.values()])}; "
+         f"{pct(bsw.undetermined_rate_mean)} of the images are undetermined on average (up to "
+         f"{pct(bsw.undetermined_rate_max)}). Reliance and object competence are collinear (\u03c1({RC}, acc) = "
+         f"{f2(conf[METRICS[0]].rho_rc_competence)}); the partial \u03c1 of preference with {RC} given competence "
+         "is " + ", ".join(f"{f2(conf[m].partial_rc_given_acc)} ({m})" for m in METRICS) + ". Exact ROAD on the "
+         f"SD4 models (50 images) gives \u03c1 = {f2(road['ROAD (MoRF)'][0].rho_rc)} (MoRF) and "
+         f"{f2(road['ROAD (LeRF)'][0].rho_rc)} (LeRF), and in neither order does it over-detect for any of the "
+         f"{int(road['ROAD (MoRF)'][1].n_below)} low-reliance models. The comparison "
+         "with SD1 is exploratory: SD4 changes the shortcut's shape, contrast and position within the corner at "
+         "once.")
+    table_sd4()
+    assert COUNTERS["table"] == t
+
+
 # ------------------------------------------------------------------ helpers for the text
 
 
@@ -1310,8 +1648,7 @@ class use_doc:
 DECLARED_MARKERS = {
     "[[AUTHOR: e-mail]]", "[[AUTHOR: funding statement]]", "[[AUTHOR: competing interests]]",
     "[[AUTHOR: confirm AI-use statement per Elsevier policy]]", "[[AUTHOR: acknowledgements]]",
-    "[[ZENODO_RELEASE_DOI]]", "[[SD3_METHODS]]", "[[SD4_METHODS]]", "[[SD3_RESULTS]]", "[[SD4_RESULTS]]",
-    "[[SD3_SD4_LIMITATIONS]]", "[[SD3_SD4_CONCLUSION]]", "[[SD3_POSITIONING]]", "[[SD3_SD4_SUPPLEMENT]]",
+    "[[ZENODO_RELEASE_DOI]]",
 }
 
 
@@ -1377,12 +1714,20 @@ def appendices_bc():
          "decision-level results: over-detection rises and the switch points move. Amendment A2 makes the same "
          f"commitment for its {N_A2} models: the {N_ORIGINAL + N_A1} models without them are analysed "
          + S("in results/dose_response/pre_a2_models/", "separately") + f", and the analysis of all {N_MODELS} models adds the {N_A2_SD2} "
-         f"SD2 models to their settings and the {N_SD1} SD1 models as a separate setting. A2 added no MNIST or "
+         f"SD2 models to their settings and the {N_SD1} SD1 models as a separate setting"
+         + S("", f", and the {N_SD4} SD4 models of amendment A3 as another") + ". A2 added no MNIST or "
          "PneumoniaMNIST model, so the table below compares the original models with the models including A1; "
          "the A2 changes on the natural images are in Sections 5.4 and 5.10" + S("", " of the main text") + ".")
     table_sets()
     if SUBMISSION:
-        para("[[SD3_SD4_SUPPLEMENT]]")
+        heading("Exact ROAD and the watermark shortcut (Tables S6 and S7)")
+        para("Amendment A3 adds exact ROAD (SD3, Section 5.11 of the main text) and the watermark shortcut (SD4, "
+             f"Section 5.12). Table S6 lists ROAD (MoRF and LeRF) next to the four existing metrics for every "
+             f"setting in the shortcut-versus-object comparison, all on the ROAD images; the other comparisons are "
+             "in responsiveness_corrected_road.csv and overdetection_road.csv. Table S7 lists the SD4 models and "
+             "pilots.")
+        table_supp_road()
+        table_supp_sd4_models()
 
 
 def doc_text(d):
@@ -1415,7 +1760,7 @@ def submission_checks(main, supp, final=False):
     # cross-references: every cited table or figure number exists
     main_text = texts["main text"]
     n_tables, n_figs, n_supp = COUNTERS["table"], COUNTERS["fig"], COUNTERS["stable"]
-    assert n_supp == len(SUPP_ORDER), (n_supp, SUPP_ORDER)
+    assert n_supp == len(SUPP_ORDER) + 2, (n_supp, SUPP_ORDER)  # + S6 and S7 (amendment A3)
     plain = re.sub(r"Supplementary Table S\d+", "", main_text)
     for n in {int(x) for x in re.findall(r"\bTable (\d+)\b", plain)}:
         assert 1 <= n <= n_tables, f"Table {n} is cited but the main text has {n_tables} tables"
@@ -1457,7 +1802,8 @@ def build():
             para("This document holds material that supports the main text: the full table of the pre-registered "
                  "Pet predictions P1\u2013P4 (Table S1; abridged in the main text), the responsiveness of the metrics "
                  "against the size-matched object map (Table S2), the paired metric-versus-metric differences "
-                 "(Table S3), the legacy analysis (Table S4) and the check on the original model set (Table S5). "
+                 "(Table S3), the legacy analysis (Table S4), the check on the original model set (Table S5), exact "
+                 "ROAD next to the existing metrics (Table S6) and the models of the watermark setting (Table S7). "
                  "Section and figure numbers refer to the main text. All numbers are generated from the result "
                  "files by the analysis code.")
     figs = {
@@ -1469,11 +1815,11 @@ def build():
                                       "Preference for random map", show_behaviour=False),
         "p_random": preference_figure(P_RANDOM, FIG_OUT / "fig_rc_placebo_vs_random.png",
                                       "Preference for placebo map", show_behaviour=False),
-        # the analyze figures have one panel per setting in models.csv, SD1 included
+        # the analyze figures have one panel per setting in models.csv, SD1 and SD4 included
         "behaviour": rearrange_panels(DR / "behaviour_auroc.png", FIG_OUT / S("fig_behaviour_auroc.png",
-                                      "fig_behaviour_auroc_submission.png"), len(N_SETTING), order=PANEL_ORDER),
+                                      "fig_behaviour_auroc_submission.png"), N_PANELS, order=PANEL_ORDER),
         "methods": rearrange_panels(DR / "method_dose_response.png", FIG_OUT / S("fig_methods.png",
-                                    "fig_methods_submission.png"), len(N_SETTING), order=PANEL_ORDER),
+                                    "fig_methods_submission.png"), N_PANELS, order=PANEL_ORDER),
     }
 
     # ---- numbers used throughout (all from the CSVs)
@@ -1712,6 +2058,8 @@ def build():
     assert held == ["P5", "P6", "P7", "P9"] and failed == ["P8"], p_verdicts
     assert p8a_n == 4 and p8b_n == 1, (p8a_n, p8b_n)
     sd1_pet = {m: row(FULL, "pet_resnet18", "patch", m) for m in METRICS}
+    # ---- amendment A3: P10-P13 exactly as written in docs/PREDICTIONS_sd3_sd4.md (submission only)
+    a3 = a3_numbers() if SUBMISSION else None
 
     # ---- front matter
     if not SUBMISSION:
@@ -1736,9 +2084,7 @@ def build():
 
     n_word = {1: "one", 2: "two", 3: "three", 4: "four"}
     pet_ident = [m for m in METRICS if m not in pet_no_switch]
-    pet_abs_tail = ""
-    if pet_edge:
-        pet_abs_tail += f" ({n_word[len(pet_edge)]} at the lowest-reliance edge)"
+    pet_abs_tail = ""  # submission only; the lowest-reliance-edge note was cut for the A3 sentence (250 words)
     if SUBMISSION and pet_no_switch:
         assert len(pet_no_switch) == 1, "abstract wording covers exactly one metric without a switch"
         pet_abs_tail += f"; {pet_no_switch[0]} prefers the shortcut map from the lowest reliance"
@@ -1750,14 +2096,16 @@ def build():
         "shortcut, on Oxford-IIIT Pet with object masks, CIFAR-10, MNIST and "
         "PneumoniaMNIST, and scored " + S("fixed ", "") + "oracle explanations with four metrics. The metrics respond to "
         "reliance: preference for the shortcut map over the object map rises with chance-corrected reliance "
-        f"in {n_full_sig} of {n_full} cells (\u03c1 = {span(full_sig.rho_rc)}). They are not calibrated to it. Among models with chance-corrected reliance at most 50%, "
+        f"in {n_full_sig} of {n_full} cells (\u03c1 = {span(full_sig.rho_rc)}). They are not calibrated to it. Among models with chance-corrected reliance "
+        + S("at most", "\u2264") + " 50%, "
         f"black and blur deletion prefer the shortcut map for {pct_span(pet_bb_fpr)} of Pet models "
         f"({pct_span(pet_bb_margin)} with a " + S("per-model ", "") + "margin) and, against a centred "
         f"Gaussian object prior, {pct_span(cifar_bb_fpr)} of CIFAR-10 models. " + S("On Pet the metrics switch at ",
                                      f"On Pet {n_word[len(pet_ident)]} metrics switch at ") +
-        f"{span(pet_switch, f1)}% chance-corrected reliance{S('', pet_abs_tail)}, while the models follow the "
-        "shortcut on half the images at "
-        f"{switch_text(pet_bsw, note=f'{span(pet_label_sw, f1)}% across behavioural labels')}. Against " + S("per-image ", "") +
+        f"{span(pet_switch, f1)}%{S(' chance-corrected reliance', '')}{S('', pet_abs_tail)}, while the models "
+        f"follow {S('the shortcut', 'it')} on half the images at "
+        f"{switch_text(pet_bsw, note=S(f'{span(pet_label_sw, f1)}% across behavioural labels', None))}. Against "
+        + S("per-image ", "") +
         f"behavioural labels the {S('class-stratified', 'stratified')} AUROC is {span(pooled_nat)} "
         f"on natural images, but within a model only {span(within_nat)}. {S('Their verdicts', 'Verdicts')} depend on "
         "explanation size and form: a size-matched object map moves the MNIST switch points from "
@@ -1767,17 +2115,22 @@ def build():
         "of the time at low reliance. " + S("A pre-registered test on Pet confirmed three of four "
         "predictions; black deletion failed the form-matched control. A second, on an ImageNet-pretrained "
         "network and gap-filled settings, confirmed four of five.",
-        "Pre-registered tests confirmed three of four predictions on Pet (black deletion failed a form-matched "
-        "control) and four of five on an ImageNet-pretrained network with gap-filled settings."))
+        "Pre-registered tests confirmed three of four Pet predictions (black deletion failed a form-matched "
+        "control), four of five on an ImageNet-pretrained network with gap-filled settings, and "
+        f"{n_word[len(a3['held'])] if a3 else ''} of four on exact ROAD and a watermark, which blur deletion did "
+        "not over-detect."))
     assert word_count(abstract) <= 250, (word_count(abstract), abstract)
     p = para("")
     add_runs(p, "**Abstract** " + abstract)
     highlights = [
         f"{N_MODELS} CNNs with measured, chance-corrected shortcut reliance test four metrics",
-        "Black and blur deletion over-detect shortcuts on natural images",
+        S("Black and blur deletion over-detect shortcuts on natural images",
+          "Black and blur deletion over-detect patch shortcuts on natural images"),  # P13: not the watermark
         "Per-image behavioural labels replace the assumed 50% switch point",
         "Explanation size and form change which map the metrics prefer",
-        "Pre-registered Pet test: three of four predictions held; black deletion failed",
+        S("Pre-registered Pet test: three of four predictions held; black deletion failed",
+          f"Pre-registered tests: {3 + len(held) + len(a3['held']) if a3 else ''} of 13 predictions held, "
+          "including exact ROAD and a watermark"),
     ]
     assert all(len(h) <= 85 for h in highlights), [len(h) for h in highlights]
     if not SUBMISSION:
@@ -2014,7 +2367,11 @@ def build():
         "other tables give two-level intervals.",
         "**Multiplicity**: Benjamini\u2013Hochberg within each family (each comparison, the methods, the metric "
         "pairs, each behavioural label), and Holm over the union of the headline tests; the families of the "
-        "analysis of all models also contain the SD1 setting. Correlation p-values "
+        "analysis of all models also contain the SD1 setting" + S(". ", " and the SD4 setting (amendment A3). The "
+        "exact-ROAD analysis (Section 5.11) has its own families: Benjamini\u2013Hochberg within each comparison "
+        "over its nine settings and six metrics, and over all its rows for the excess preference. The "
+        "pre-registered verdicts on P10\u2013P13 use their own point-value and interval rules, which include no "
+        "multiplicity adjustment. ") + "Correlation p-values "
         "use Spearman's t approximation; p-values below 0.001 are printed as p < 0.001.",
         "**Effect size**: the median per-image AUC gap at the lowest and the highest dose.",
     ])
@@ -2035,11 +2392,39 @@ def build():
              "first (MoRF, a lower area is better) and least relevant first (LeRF, a higher area is better). The "
              "removed shares of the pixels are 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.7 and 0.9, and the scoring images are "
              "the first 100 (28 and 32 px small CNNs) or 50 (CIFAR-10 ResNet-18, Pet, SD1 and SD4) of the existing "
-             "scoring images. [[SD3_METHODS]]")
+             "scoring images. "
+             "Each removed pixel is imputed as the weighted mean of its eight neighbours (weight 1/6 for the edge "
+             "and 1/12 for the diagonal neighbours), solved jointly for all removed pixels of an image, step and "
+             "channel, and Gaussian noise with standard deviation 0.01 is added to the imputed pixels; the "
+             "operator is ported from the reference implementation of Rong et al. "
+             "(https://github.com/tleemann/road_evaluation, MIT licence, whose copyright notice is kept in the "
+             "code). The score is the area under the probability-of-label curve over the removed shares divided "
+             "by 0.9; ties in the binary maps are broken as for the four existing metrics, and the noise is "
+             "seeded per model and image, so the scores are deterministic. Every one of the "
+             f"{len(ROAD_MODELS)} pooled models was scored (the pilots were not). The pre-registered timing gate, "
+             "which would have cut the Pet-sized settings to 25 images if one Pet model took more than 15 minutes, "
+             f"was not reached: ROAD on 50 images took {span(a3['timing'], f2)} minutes per Pet model on a Kaggle "
+             "T4 GPU, so those settings kept 50 images. When ROAD is compared with an existing metric, the existing "
+             "metric is recomputed from its stored per-image scores on the same images.")
+        sd4_pil = a3["pilots"]
         para("**SD4** replaces the patch of SD1 by a semi-transparent watermark in one image corner, whose stroke "
              "arrangement codes the class, on the ImageNet-pretrained Pet ResNet-18, with 18 confirmatory models "
              "(six doses, three seeds). The doses follow a pilot rule fixed in A3 before the pilot. "
-             "[[SD4_METHODS]]")
+             "Both marks are white with opacity 0.4 and lie in the same 24\u00d712-pixel box in the bottom-right "
+             "corner: two vertical 4-pixel bars for cats and two horizontal 4-pixel bars for dogs, 96 stroke pixels "
+             "each. The strokes of the two marks occupy disjoint pixels, so the class is coded by the stroke "
+             "arrangement and also by which pixels in the corner are brightened: the shortcut is partly "
+             "position-coded within the corner, not purely content-coded. Compared with SD1, SD4 changes the "
+             "shortcut's shape, contrast and layout within one shared corner; the network, training and metrics "
+             "are those of SD1. The shortcut oracle is the stroke mask of the shown mark, the placebo the other "
+             "class's stroke mask in the same box, the object oracle the pet mask without the shown strokes, and "
+             "the size-matched map the 96 object pixels nearest the mask centroid. Two seed-7 pilots at doses 0 and +0.25 "
+             f"reached {RC} {f2(sd4_pil.loc[0.0].reliance_corrected)}% and "
+             f"{f2(sd4_pil.loc[0.25].reliance_corrected)}%. The dose-0 pilot was below 60%, so the A3 rule set the "
+             "doses to " + ", ".join(("+" if d > 0 else "") + f"{d:g}" for d in SD4_DOSES).replace("-", MINUS)
+             + "; the stopping rule (+0.25 pilot below 20%) was not triggered. The completion note recording this "
+             "was archived on Zenodo before any confirmatory SD4 model was trained (Section 4). The pilots are "
+             "excluded from every analysis.")
 
     # ---- 4 Setup
     heading("4. Experimental setup")
@@ -2058,8 +2443,9 @@ def build():
          f"The ResNet-18 models were trained on a free Kaggle T4 GPU (about {MINUTES['cifar10_resnet18']:.0f} "
          f"minutes per CIFAR model and {MINUTES['pet_resnet18']:.0f} per Pet model); all others on a laptop CPU.")
     counts = "; ".join(f"{BASE_NAMES[b]} {N_BASE[b]}" for b in ["pet_resnet18", "cifar10_resnet18", "cifar10",
-                                                                 "mnist", "pneumonia_mnist",
-                                                                 "pet_resnet18_pretrained"])
+                                                                 "mnist", "pneumonia_mnist"])
+    counts += "; " + S(f"{BASE_NAMES[SD1[0]]} {N_BASE[SD1[0]]}",
+                       f"{BASE_NAMES[SD1[0]]} {N_SD1} with the patch (SD1) and {N_SD4} with the watermark (SD4)")
     para(f"**Models.** {N_MODELS} models in total ({counts}). Seeds: "
          + "; ".join(f"{BASE_NAMES[b]} {', '.join(str(s) for s in SEEDS[b])}" for b in
                      ["pet_resnet18", "cifar10_resnet18", "cifar10", "mnist", "pneumonia_mnist",
@@ -2069,15 +2455,19 @@ def build():
          "new doses near the steep part of the dose-response curve, with six seeds at the two steepest MNIST "
          "doses, to fill reliance gaps. A1 made no predictions about the metrics, and both model sets are "
          "reported (" + S("Appendix C", tref("sets", 0)) + ").")
+    # pilots.csv lists only never-pooled pilots: the SD1 pilots (A2) and the SD4 pilots (A3); every A2 model,
+    # the CIFAR-10 ResNet-18 pilot included, is scored and pooled.
+    assert set(PILOTS.model_set) <= {"A2_pilot", "A3_pilot"}, set(PILOTS.model_set)
     pilot_text = "; ".join(
         f"{BASE_NAMES.get(p.base, p.base)} dose {f2(p.dose)}, seed {int(p.seed)} ({RC} {f1(p.reliance_corrected)}%, "
-        + ("an SD1 pilot" if p.model_set == "A2_pilot" else "one of the SD2 models, not scored yet") + ")"
-        for p in PILOTS.itertuples())
+        "an SD1 pilot)" for p in PILOTS[PILOTS.model_set == "A2_pilot"].itertuples())
+    sd4_pilots = PILOTS[PILOTS.model_set == "A3_pilot"].sort_values("dose")
     def a2_seeds(base):
         return ", ".join(str(s) for s in sorted(A2_MODELS[A2_MODELS.base == base].seed.unique(),
                                                 key=[42, 1, 2].index))
 
-    sd1_doses = ", ".join(("+" if d > 0 else "") + f"{d:g}" for d in DOSES[SD1[0]]).replace("-", MINUS)
+    sd1_doses = ", ".join(("+" if d > 0 else "") + f"{d:g}" for d in sorted(group(*SD1_KEY).dose.unique())
+                          ).replace("-", MINUS)
     para("**Amendment A2.** A second dated amendment (" + S("docs/PREDICTIONS_amendments.md, ", "") + "A2, with predictions "
          "P5\u2013P9" + S(" in docs/PREDICTIONS_pretrained.md; ", "; ") + "Zenodo record 10.5281/zenodo.24285532) adds natural-image "
          "doses inside the reliance gaps (SD2) and an ImageNet-pretrained ResNet-18 on Pet (SD1). Pilots fixed "
@@ -2095,7 +2485,9 @@ def build():
          f"{EPOCHS[SD1[0]]} epochs with Adam (learning rate 10\u207b\u2074, batch size 128) on the same Pet data, "
          "shortcut, oracle maps and metrics. SD1 is a separate setting: it is never pooled with the Pet "
          "ResNet-18 from scratch, and it is reported in Section 5.10 only. The pilots are listed separately and "
-         f"are not pooled (results/dose_response/pilots.csv): {pilot_text}. The SD1 Grad-CAM maps are coarser "
+         f"are not pooled (results/dose_response/pilots.csv): {pilot_text}"
+         + S("", f", and the {len(sd4_pilots)} SD4 pilots of amendment A3 (Section 3.9)")
+         + ". The SD1 Grad-CAM maps are coarser "
          "than those of the Pet ResNet-18 from scratch: "
          "with the standard ImageNet stem the last residual stage is 4\u00d74 at 128\u00d7128, against 16\u00d716 "
          "with the CIFAR-style stem, so method-level comparisons between the two mix pretraining with map "
@@ -2113,6 +2505,8 @@ def build():
              "the final SD1 and SD2 doses are version 2 (10.5281/zenodo.24333540, 2026-11-18). Amendment A3 and the "
              "predictions P10\u2013P13 for exact ROAD and the watermark shortcut are version 3 "
              "(10.5281/zenodo.24416017, 2026-11-21), uploaded before any SD3 or SD4 model or score was produced. The "
+             "completion note A3-C1 with the SD4 pilot outcome, the final SD4 doses and the ROAD timing is version "
+             "4 (10.5281/zenodo.24495658, 2026-11-24), uploaded before any confirmatory SD4 model was trained. The "
              "concept DOI of the record is 10.5281/zenodo.24285531.")
 
     # ---- 5 Results
@@ -2337,7 +2731,8 @@ def build():
              "Section 5.10)",
              "bands (shortcut vs full object). Panels are in the order of Table 2. Titles give the dataset or "
              "network and the shortcut: pet_resnet18 is the ResNet-18 trained from scratch on Pet, cifar10 the "
-             "small CNN, and pet_resnet18_pretrained the separate SD1 setting (Section 5.10)"))
+             "small CNN, and pet_resnet18_pretrained the separate SD1 (patch, Section 5.10) and SD4 (watermark, "
+             "Section 5.12) settings"))
 
     heading("5.5. Mechanism settings: size and switch identification", 2)
     f_matched = COUNTERS["fig"] + 1
@@ -2468,8 +2863,9 @@ def build():
              "reliance. Panels rearranged from results/dose_response/method_dose_response.png (alphabetical setting "
              "order; the pet_resnet18_pretrained panel is the separate SD1 setting, whose Grad-CAM maps are 4\u00d74)",
              "Share of positive attribution that each explanation method places on the shortcut pixels, against raw "
-             "reliance. Panels are in the order of Table 2; titles are as in Fig. 3, and pet_resnet18_pretrained is "
-             "the separate SD1 setting, whose Grad-CAM maps are 4\u00d74"))
+             "reliance. Panels are in the order of Table 2; titles are as in Fig. 3, and the two "
+             "pet_resnet18_pretrained panels are the separate SD1 (patch) and SD4 (watermark) settings, whose "
+             "Grad-CAM maps are 4\u00d74"))
     table_methods()
 
     heading("5.9. Reliance and object competence", 2)
@@ -2584,13 +2980,14 @@ def build():
              "the object map is lower under ROAD (MoRF) than under black deletion, on the same images. P11: on the "
              "Pet ResNet-18 from scratch, the over-detection rate of ROAD in the shortcut-versus-object comparison "
              "is lower than that of black deletion, on the same models and images. ROAD LeRF is reported next to "
-             "ROAD MoRF and decides no verdict. [[SD3_RESULTS]]")
+             f"ROAD MoRF and decides no verdict. Table {COUNTERS['table'] + 1} gives the numbers that decide both.")
+        sd3_results(a3)
         heading("5.12. Watermark shortcut (SD4: pre-registered predictions P12 and P13)", 2)
         para(f"Predictions P12 and P13 were registered in amendment A3 before any SD4 model existed. P12: Spearman "
              f"\u03c1 between {RC} and the shortcut-versus-object preference is above 0.8 for at least three of the "
              "four existing metrics over the 18 confirmatory SD4 models. P13: the over-detection rate of black "
-             f"deletion and of blur deletion exceeds 0.5 among the SD4 models with {RC} \u2264 50. "
-             "[[SD4_RESULTS]]")
+             f"deletion and of blur deletion exceeds 0.5 among the SD4 models with {RC} \u2264 50.")
+        sd4_results(a3)
 
     # ---- 6 Discussion
     heading("6. Discussion")
@@ -2637,7 +3034,7 @@ def build():
     bullets([
         "All metrics come from one family (ordered pixel removal or insertion with three fills). Other families "
         "such as faithfulness correlation or region perturbation were not tested, and the inpainting variant "
-        "is inspired by ROAD but is not ROAD.",
+        "is inspired by ROAD but is not ROAD" + S(".", "; exact ROAD is tested separately (Section 5.11)."),
         "The networks of the main study are trained from scratch; the Pet ResNet-18 uses a CIFAR-style stem at "
         f"128\u00d7128. The only pretrained network is the ImageNet ResNet-18 of SD1 ({N_SD1} models, one "
         "dataset and one shortcut), and no transformer backbone was tested.",
@@ -2666,8 +3063,14 @@ def build():
         "The tests of the class-stratified AUROC against 0.5 are one-sided (H1: AUROC > 0.5). A metric that ranks "
         "the images the wrong way round, as the PneumoniaMNIST patch metrics do above 60% reliance, is therefore "
         "not tested in that direction; such cases are read from the AUROC and its interval (Section 5.4).",
-        "Exact ROAD (SD3) and the watermark shortcut (SD4) are pre-registered (amendment A3, predictions "
-        "P10\u2013P13) but their results are pending and are not part of this version. " "[[SD3_SD4_LIMITATIONS]]",
+        "Exact ROAD (SD3) was run with one imputation noise level and one removal grid, on 50 of the 100 images "
+        "for the ResNet-18 settings, and its LeRF grid differs from the reference implementation's. The P11 "
+        "verdict rests on one model of "
+        f"{int(A3N['p11_main'].n_below)}, with overlapping intervals.",
+        f"The watermark of SD4 is partly position-coded within the corner, so SD4 is not a purely content-coded "
+        f"shortcut, and it changes the shape, contrast and layout of the shortcut at once. Its reliance jumps "
+        f"from {RC} {f1(A3N['gap'][0])}% to {f1(A3N['gap'][1])}% between adjacent doses, so its behavioural switch "
+        "is not identified and its \u03c1 values mostly reflect two groups of models.",
     ] if SUBMISSION else []))
 
     # ---- 8 Conclusion
@@ -2685,7 +3088,15 @@ def build():
          "metrics. Metrics should be validated at several measured reliance "
          "levels, against behavioural ground truth and with size- and form-matched controls, before they are "
          "used to rank explanation methods. Future work should test other metric families, other pretrained "
-         "backbones and realistic shortcuts." + S("", " [[SD3_SD4_CONCLUSION]]"))
+         "backbones and realistic shortcuts." + (S("", (
+             f" A third pre-registered amendment confirmed {n_word[len(a3['held'])]} of four predictions: exact ROAD "
+             "ranked the object map above random pixels more often than black deletion in all four natural-image "
+             "settings and over-detected slightly less on Pet, and the four metrics tracked reliance on a watermark "
+             "shortcut; the prediction that blur deletion over-detects the watermark was refuted "
+             f"({int(a3['over']['Deletion (blur)'].k_fpr)} of {int(a3['over']['Deletion (blur)'].n_below)} "
+             "low-reliance models), while black deletion over-detected it for "
+             f"{int(a3['over']['Deletion (black)'].k_fpr)} of {int(a3['over']['Deletion (black)'].n_below)}."))
+             if SUBMISSION else ""))
 
     if not SUBMISSION:
         declarations()
