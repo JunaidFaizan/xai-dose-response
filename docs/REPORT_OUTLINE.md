@@ -32,7 +32,7 @@ A chapter-by-chapter plan for the M.Tech report (about 55–65 pages). The thesi
   2. Measure reliance on conflicting images and correct it for chance
   3. Score fixed oracle maps (shortcut, object, size-matched, placebo, random) with four deletion/insertion metrics
   4. Label each scored image by forward passes (does the model follow the shortcut here?) and test the metrics against these labels
-  5. Repeat on Oxford-IIIT Pet (real masks, pre-registered), CIFAR-10 (two networks), MNIST and PneumoniaMNIST; 275 models (including the separate pre-registered ImageNet-pretrained Pet setting SD1, 18 models)
+  5. Repeat on Oxford-IIIT Pet (real masks, pre-registered), CIFAR-10 (two networks), MNIST and PneumoniaMNIST; 293 models (including the separate pre-registered ImageNet-pretrained Pet settings SD1, patch, and SD4, watermark, 18 models each); exact ROAD on every model (SD3)
   6. Run five explanation methods on every model; supporting sanity-check study; interactive dashboard
 - Contributions (the 4 in `PAPER_OUTLINE.md`)
 - Where the project came from: it extends the B.Tech digit recognition app
@@ -63,7 +63,7 @@ A chapter-by-chapter plan for the M.Tech report (about 55–65 pages). The thesi
 - **3.6 Dose-response design:** the signed dose, measured reliance, chance correction r_c = 100 (R − f)/(100 − f) with f = (100 − accuracy without shortcut)/(C − 1), oracle maps and their limits (PneumoniaMNIST object map is an intensity ranking; CIFAR-10 uses a Gaussian prior; blur leaves 20–25% of the patch; size-matched tie order)
 - **3.7 Per-image behavioural labels:** the moved-shortcut and removed-shortcut forward passes (primary) and the Δ_S > Δ_O check; class-stratified AUROC
 - **3.8 Statistics:** two-level bootstrap (seeds within dose, images within model), Benjamini–Hochberg families and Holm for headline claims, isotonic switch with 4PL check and the ±10-point identification rule, over-detection rate and balanced accuracy, median AUC gap, paired metric tests, exact Kendall null for five methods; seed stability
-- **3.9 Pre-registration:** `docs/PREDICTIONS_pet.md` (P1–P4) and `docs/PREDICTIONS_amendments.md` (A1), with commit hashes
+- **3.9 Pre-registration:** `docs/PREDICTIONS_pet.md` (P1–P4) and `docs/PREDICTIONS_amendments.md` (A1, A2, A3), with commit hashes; `docs/PREDICTIONS_pretrained.md` (P5–P9) and `docs/PREDICTIONS_sd3_sd4.md` (P10–P13: exact ROAD and the watermark shortcut; P10–P12 hold, P13 refuted), with the Zenodo versions
 
 ## Chapter 4: Implementation (6–8 pages)
 
@@ -77,6 +77,7 @@ A chapter-by-chapter plan for the M.Tech report (about 55–65 pages). The thesi
 Use the tables and figures of `paper/paper_draft.docx` (natural images first; the pre-registered Pet test; the behavioural test; mechanism settings; controls; paired metric tests; methods; reliance vs competence), plus these, which don't fit in the paper:
 - The full `responsiveness_corrected.csv` for all 7 comparisons, and `effect_sizes.csv`
 - The original-set check (`results/dose_response/original_models/`)
+- Exact ROAD next to the existing metrics for every comparison (`*_road.csv`, `road_p10.csv`, `road_p11.csv`) and the SD4 watermark setting (Sections 5.11 and 5.12 of `paper/paper_submission.docx`)
 - Per-dataset perturbation curves (`results/metrics/<dataset>/perturbation_curves.png`)
 - Per-dataset sanity curves and examples (`sanity_curve.png`, `sanity_examples.png`)
 - Explanation grids for all five datasets (`results/explanations/`)

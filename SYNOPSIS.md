@@ -72,7 +72,7 @@ The individual pieces are not new. BAM [22] and SMERF [23] already controlled wh
 
 **Models**
 - A custom CNN with four convolutional layers for 28×28 images; for CIFAR-10, a larger CNN with batch normalisation (0.77M parameters) and a standard ResNet-18 (11.2M parameters)
-- 275 trained models in total: 192 original (MNIST and PneumoniaMNIST 144, CIFAR-10 small CNN 12, CIFAR-10 ResNet-18 18, Pet ResNet-18 18), 42 from the pre-registered amendment A1 (extra MNIST and PneumoniaMNIST doses and seeds to fill reliance gaps) and 41 from amendment A2: 23 SD2 models in the natural-image reliance gaps (Pet ResNet-18 at dose −0.15, 3; CIFAR-10 ResNet-18, 12; CIFAR-10 small CNN, 8) and 18 ImageNet-pretrained Pet ResNet-18 models (SD1), analysed as a separate setting. The two SD1 pilots are reported separately
+- 293 trained models in total: 192 original (MNIST and PneumoniaMNIST 144, CIFAR-10 small CNN 12, CIFAR-10 ResNet-18 18, Pet ResNet-18 18), 42 from the pre-registered amendment A1 (extra MNIST and PneumoniaMNIST doses and seeds to fill reliance gaps) and 41 from amendment A2: 23 SD2 models in the natural-image reliance gaps (Pet ResNet-18 at dose −0.15, 3; CIFAR-10 ResNet-18, 12; CIFAR-10 small CNN, 8) and 18 ImageNet-pretrained Pet ResNet-18 models (SD1), analysed as a separate setting; and 18 from amendment A3 (SD4: the same pretrained network with a watermark shortcut, another separate setting). The SD1 and SD4 pilots are reported separately
 - The ResNet-18 models were trained on a free Kaggle GPU (NVIDIA T4); everything else on a laptop CPU
 
 **Oracle explanations** (scored by every metric)
@@ -108,7 +108,7 @@ The individual pieces are not new. BAM [22] and SMERF [23] already controlled wh
 
 ## Preliminary Findings
 
-All 275 models have been trained and evaluated, including the placebo, random-map and per-image behavioural controls (numbers from `results/dose_response/*_corrected.csv` and `behaviour_summary.csv`):
+All 293 models have been trained and evaluated, including the placebo, random-map and per-image behavioural controls (numbers from `results/dose_response/*_corrected.csv` and `behaviour_summary.csv`):
 
 1. **The metrics respond to reliance.** Preference for the shortcut map rises with chance-corrected reliance in 27 of 28 metric–setting cells (ρ = 0.49–0.98 in those cells; natural images 0.83–0.98).
 2. **Black and blur deletion over-detect on natural images.** Among models with chance-corrected reliance r_c ≤ 50%, black and blur deletion still prefer the shortcut map for 79–93% of Pet models (50–64% if each model's own 95% interval must exceed 0.5) and, against a centred Gaussian object prior, 100% of CIFAR-10 models (94–100% with that margin). Much of this comes from the object map: at the lowest dose the metrics prefer the shortcut map over the object map about as often as a random pixel ordering (within 0.07), and on Pet black and blur deletion do not rank the real object mask above random pixels. The shortcut's excess preference over random still rises with r_c for all four Pet metrics (ρ = 0.47–0.81).
@@ -119,7 +119,7 @@ All 275 models have been trained and evaluated, including the placebo, random-ma
 7. **Same-form comparisons mostly behave correctly,** but the rise depends on the setting: the preference over a random or placebo map reaches 0.76–1.00 on Pet, 0.91–1.00 on CIFAR-10, 0.93–0.96 on MNIST patch and only 0.73–0.79 on PneumoniaMNIST patch. On diffuse textures, some metrics move the wrong way.
 8. **No variant is best everywhere.** Inpainting deletion responds in all 28 shortcut-map comparisons, but a paired test shows black deletion better than inpainting on PneumoniaMNIST texture.
 9. **Explanation methods differ:** Integrated Gradients follows the shortcut in every setting. Saliency and SmoothGrad move away from the diffuse shortcut on MNIST texture, but towards it on PneumoniaMNIST texture; Grad-CAM's change on MNIST texture is negligible (shortcut mass 0.100 → 0.098).
-10. **Pre-registered Pet test:** P1, P2 and P4 hold; P3 fails for black deletion. **Pre-registered amendment A2 (P5–P9):** on the ImageNet-pretrained Pet network black and blur deletion still over-detect (0.89 and 0.56 of the low-reliance models; P5 holds), inpainting and insertion less (P6 holds), the size-matched switches lie at the lowest-reliance edge (P7 holds), and the metrics respond (ρ = 0.86–0.97) but the excess shortcut preference rises significantly only for inpainting deletion (P8 fails). With the gap-filling A2 models every identified natural-image metric switch lies below the behavioural switch (P9 holds).
+10. **Pre-registered Pet test:** P1, P2 and P4 hold; P3 fails for black deletion. **Pre-registered amendment A2 (P5–P9):** on the ImageNet-pretrained Pet network black and blur deletion still over-detect (0.89 and 0.56 of the low-reliance models; P5 holds), inpainting and insertion less (P6 holds), the size-matched switches lie at the lowest-reliance edge (P7 holds), and the metrics respond (ρ = 0.86–0.97) but the excess shortcut preference rises significantly only for inpainting deletion (P8 fails). With the gap-filling A2 models every identified natural-image metric switch lies below the behavioural switch (P9 holds). **Pre-registered amendment A3 (P10–P13):** exact ROAD prefers a random map over the object map less often than black deletion in all four natural-image settings (P10 holds) and over-detects slightly less on Pet (9 against 10 of 14 low-reliance models; P11 holds); on a watermark shortcut the metrics respond (ρ = 0.82–0.90; P12 holds), but blur deletion over-detects it for only 2 of 9 low-reliance models (P13 refuted).
 11. **Supporting study:** the model-randomization sanity check is not shown to agree with the ground truth (mean Kendall τ = −0.20, exact p = 0.84; 0.07, p = 0.44); with five methods only τ ≥ 0.8 is significant for a single seed.
 
 ## Tools and Technologies
@@ -141,7 +141,7 @@ All tools are free and open source. Experiments run on a laptop CPU, except the 
 - A dose-response protocol for testing XAI evaluation metrics against a controlled, measured change in model behaviour
 - Evidence of when common metrics can and cannot be trusted, on natural, medical and colour images
 - Controls for explanation size and shape that other evaluation studies can reuse
-- 275 trained models, result tables and figures, with code for full reproduction
+- 293 trained models, result tables and figures, with code for full reproduction
 - An interactive explainability dashboard
 - A research paper for a Q1 journal (provisional target: Neurocomputing), and the M.Tech thesis
 

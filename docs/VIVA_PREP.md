@@ -4,7 +4,7 @@ Project title: A Dose-Response Evaluation of Explanation Metrics under Controlle
 
 ## One-minute pitch
 
-> Explanation methods are judged with metrics such as deletion and insertion curves, but the metrics themselves are rarely checked, because the true explanation is normally unknown. I control the truth: a training dose sets how much each model relies on an injected shortcut, and I measure that reliance on conflicting images and correct it for chance. I trained 275 models, on Oxford-IIIT Pet with real masks (from scratch and, as a separate pre-registered setting, ImageNet-pretrained), CIFAR-10 with two networks, MNIST and chest X-rays. Then I scored fixed shortcut and object explanations with four metrics. The metrics respond to reliance, but they are not calibrated to it. On natural images, black and blur deletion report the shortcut for at least half of the Pet models and nearly all CIFAR-10 models that barely use it. Their verdicts also change with the size and form of the explanations being compared. A pre-registered test on Pet confirmed three of four predictions, and black deletion failed the form-matched control. A pre-registered amendment confirmed four of five more: the over-detection persists on the pretrained network, and the metrics switch before behaviour once the reliance gaps are filled; only the rise of the excess shortcut preference failed.
+> Explanation methods are judged with metrics such as deletion and insertion curves, but the metrics themselves are rarely checked, because the true explanation is normally unknown. I control the truth: a training dose sets how much each model relies on an injected shortcut, and I measure that reliance on conflicting images and correct it for chance. I trained 293 models, on Oxford-IIIT Pet with real masks (from scratch and, as separate pre-registered settings, ImageNet-pretrained with the patch or with a watermark), CIFAR-10 with two networks, MNIST and chest X-rays. Then I scored fixed shortcut and object explanations with four metrics. The metrics respond to reliance, but they are not calibrated to it. On natural images, black and blur deletion report the shortcut for at least half of the Pet models and nearly all CIFAR-10 models that barely use it. Their verdicts also change with the size and form of the explanations being compared. A pre-registered test on Pet confirmed three of four predictions, and black deletion failed the form-matched control. A pre-registered amendment confirmed four of five more: the over-detection persists on the pretrained network, and the metrics switch before behaviour once the reliance gaps are filled; only the rise of the excess shortcut preference failed. A third amendment confirmed three of four: exact ROAD lowers the random-map bias of black deletion and over-detects slightly less on Pet, and the metrics track watermark reliance, but blur deletion did not over-detect the watermark.
 ## Demo script (about 3 minutes)
 
 1. Start `python app.py` and open http://127.0.0.1:5000/. Test it the day before.
@@ -61,7 +61,7 @@ The replacement value is a known confound (ROAD, Rong et al., 2022). My results 
 I checked the model's confidence on fully blurred images. With σ = 2 an MNIST model still had 63% confidence, so the blur still showed the digit. With σ = 4 confidence falls to about chance level, so blurred pixels carry little information.
 
 **Is the inpainting the same as ROAD?**
-No. It's inspired by ROAD: neighbour averaging plus noise instead of ROAD's exact noisy linear imputation. I state this as a limitation.
+No. It's inspired by ROAD: neighbour averaging plus noise instead of ROAD's exact noisy linear imputation. That is why amendment A3 added exact ROAD (ported from the reference code, MIT licence) on every model: it prefers a random map over the object map less often than black deletion in all four natural-image settings (P10 holds), but on Pet it still over-detects for 9 of 14 low-reliance models, against 10 for black deletion (P11 holds by one model).
 
 **Why only 5 methods? Isn't Kendall τ coarse?**
 Yes, with 5 methods τ moves in steps of 0.2. That's why I also report per-image Spearman correlations over about 3,000 (image, method) pairs, and repeat everything over 3 seeds.
@@ -90,7 +90,7 @@ Preference is scored on aligned images, while reliance is measured on conflictin
 The isotonic switch counts as identified only if a model lies within ±10 reliance points of it. Before amendment A1 there was no MNIST patch model between 23% and 45% raw reliance, so the early switches were interpolated across a gap. A1 added models there, and the nearest model is now about 1 point away. The switches moved to 38.7–39.3% r_c.
 
 **Isn't reliance just the inverse of object accuracy?**
-Largely, yes. Spearman(r_c, accuracy without the shortcut) is −0.95 or lower in 3 of the 7 settings. They are least collinear on PneumoniaMNIST (−0.78 and −0.82). The CIFAR small CNN was at −0.64 before its amendment-A2 models filled its reliance gap and is now at −0.92; there the partial correlation of preference with r_c, given accuracy, stays at 0.59–0.84, significant for all four metrics. After Benjamini–Hochberg over the 32 tests (including SD1), 19 of the 28 partial correlations of the main settings remain significant. I report this as a limitation.
+Largely, yes. Spearman(r_c, accuracy without the shortcut) is −0.95 or lower in 3 of the 7 settings. They are least collinear on PneumoniaMNIST (−0.78 and −0.82). The CIFAR small CNN was at −0.64 before its amendment-A2 models filled its reliance gap and is now at −0.92; there the partial correlation of preference with r_c, given accuracy, stays at 0.59–0.84, significant for all four metrics. After Benjamini–Hochberg over the 36 tests (including SD1 and SD4), 19 of the 28 partial correlations of the main settings remain significant. I report this as a limitation.
 
 **Why does the pooled AUROC look good but the within-model AUROC weak?**
 Pooled over all models, high-reliance models have both more followed images and larger AUC gaps. Most of the signal therefore separates models, not images within one model. Within a model, the median AUROC on natural images is 0.50–0.78.
@@ -99,7 +99,7 @@ Pooled over all models, high-reliance models have both more followed images and 
 P1, P2 and P4 held. P3 failed for black deletion (ρ = 0.75 against random, 0.73 against placebo). Verdicts were judged on point estimates, as registered. The later two-level interval for P1 black deletion, [0.58, 0.93], reaches below the threshold, and I report it as added information without changing the verdict. Of the amendment-A2 predictions, P5, P6, P7 and P9 held and P8 failed: on the pretrained network all four metrics respond (ρ = 0.86–0.97), but the excess preference over a random ordering rises significantly only for inpainting deletion (1 of 4, 3 required). The SD1 over-detection of blur deletion (5 of 9 models) has a Clopper–Pearson interval of 0.21–0.86, so P5 rests on a point estimate.
 
 **Is inpainting deletion the best metric?**
-Not shown. It is the only variant that responds significantly in all 28 shortcut-map comparisons. But a paired test finds black deletion better than inpainting on PneumoniaMNIST texture (Δρ = 0.293 [0.162, 0.530], Holm p = 0.024). Black and blur deletion carry the largest form bias on natural images.
+Not shown. It is the only variant that responds significantly in all 28 shortcut-map comparisons. But a paired test finds black deletion better than inpainting on PneumoniaMNIST texture (Δρ = 0.293 [0.162, 0.530], Holm p = 0.027). Black and blur deletion carry the largest form bias on natural images.
 
 **How many tests, and how did you correct?**
 Benjamini–Hochberg within each family (each comparison, the methods, the metric pairs, each behavioural label), plus Holm over the headline tests. p-values below 0.001 are printed as p < 0.001.
@@ -112,7 +112,8 @@ The provisional target is Neurocomputing (Elsevier, Q1), because it fits empiric
 - Reliance and object competence are collinear in most settings
 - The PneumoniaMNIST "object" map is an intensity ranking; the CIFAR-10 object map is a Gaussian prior; blur fill leaves 20–25% of the patch intensity
 - 3 seeds and 5 methods
-- The ROAD-inspired inpainting approximation
+- The ROAD-inspired inpainting approximation (exact ROAD is tested separately, on 50 images per model for the ResNet-18 settings and with one noise level and grid)
+- The SD4 watermark is partly position-coded within the corner, and SD4, like SD1, has a reliance gap (no model between r_c 1.1% and 91.3%)
 - The blur strength was chosen by a simple check
 - The dashboard's 0.5 "passes/fails" cut-off is only a visual guide
 

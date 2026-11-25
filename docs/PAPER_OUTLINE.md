@@ -1,6 +1,6 @@
 # Paper Outline
 
-The plan behind `paper/paper_draft.docx`, which `paper/build_paper.py` builds from the result files. Do not copy numbers from this outline into the paper by hand: the builder reads them from `results/dose_response/*.csv`. The numbers quoted here are from the current 275-model run (234 pre-A2 models plus the 41 A2 models: 23 SD2 models pooled with their settings and the 18 SD1 models as a separate setting).
+The plan behind `paper/paper_draft.docx`, which `paper/build_paper.py` builds from the result files. Do not copy numbers from this outline into the paper by hand: the builder reads them from `results/dose_response/*.csv`. The numbers quoted here are from the current 293-model run (234 pre-A2 models, the 41 A2 models: 23 SD2 models pooled with their settings and the 18 SD1 models as a separate setting, and the 18 A3 SD4 watermark models as another separate setting). The guide-review draft keeps the 275 models without SD4; the journal build (`--submission`) has all 293 and the A3 sections 3.9, 5.11 and 5.12.
 
 ## Title
 
@@ -22,10 +22,10 @@ When a model's reliance on a shortcut increases in controlled steps, do faithful
 
 ## Contributions
 
-1. **A dose-response protocol for testing faithfulness metrics.** A signed training dose sets each model's reliance on an injected shortcut (275 models). Reliance is measured on conflicting test images and chance-corrected (r_c). Per-image behavioural labels come from forward passes. Fixed oracle maps keep the test independent of any attribution method.
+1. **A dose-response protocol for testing faithfulness metrics.** A signed training dose sets each model's reliance on an injected shortcut (293 models). Reliance is measured on conflicting test images and chance-corrected (r_c). Per-image behavioural labels come from forward passes. Fixed oracle maps keep the test independent of any attribution method.
 2. **Responsiveness without calibration.** Preference rises with r_c in 27 of 28 metric–setting cells. But black and blur deletion over-detect on natural images: they prefer the shortcut map for 79–93% of the low-reliance Pet models (50–64% with a per-model margin) and, against a centred Gaussian object prior, 100% of the low-reliance CIFAR-10 models (94–100% with the margin). At the lowest dose the shortcut-vs-object preference equals the random-vs-object preference within 0.07, so much of this is the object map not beating random pixels; the excess preference still rises with r_c on Pet (ρ = 0.47–0.81). On Pet the metrics switch at 1.3–5.4% r_c, against a behavioural switch of 54.1% (bracketed since the A2 Pet models; 29.4–54.1% across labels); on CIFAR-10 the A2 models identify and bracket the behavioural switch at 55.2% (ResNet-18) and 60.3% (small CNN). Within one model, the per-image AUROC is only 0.50–0.78.
 3. **Size and form dependence.** With a size-matched object map, the MNIST patch switch moves from 38.7–39.3% to 0.9–8.6% r_c. On CIFAR-10 black and blur deletion prefer a random ordering over a centred object map at low reliance (75–81% small CNN, 56–72% ResNet-18). Real Pet masks reduce this to 49–53%.
-4. **A pre-registered test and amendment.** On Pet, P1, P2 and P4 hold and P3 fails for black deletion (commits a962b6c → 20694f2 → d823737 → 1e29918). Amendment A1 (8738b32) added 42 models before they were trained. Amendment A2 (f2bff81, Zenodo 10.5281/zenodo.24285532) added 23 SD2 models in the natural-image reliance gaps and 18 ImageNet-pretrained Pet models (SD1) with predictions P5–P9: P5, P6, P7 and P9 hold and P8 fails on part (b) (the excess preference rises significantly only for inpainting deletion), recorded in `docs/PREDICTIONS_pretrained.md`. Every model set is reported.
+4. **A pre-registered test and amendment.** On Pet, P1, P2 and P4 hold and P3 fails for black deletion (commits a962b6c → 20694f2 → d823737 → 1e29918). Amendment A1 (8738b32) added 42 models before they were trained. Amendment A2 (f2bff81, Zenodo 10.5281/zenodo.24285532) added 23 SD2 models in the natural-image reliance gaps and 18 ImageNet-pretrained Pet models (SD1) with predictions P5–P9: P5, P6, P7 and P9 hold and P8 fails on part (b) (the excess preference rises significantly only for inpainting deletion), recorded in `docs/PREDICTIONS_pretrained.md`. Amendment A3 (Zenodo 10.5281/zenodo.24416017; completion note A3-C1, 10.5281/zenodo.24495658) added exact ROAD on every pooled model (SD3) and 18 watermark models on the pretrained network (SD4) with predictions P10–P13: P10, P11 and P12 hold and P13 is refuted (blur deletion over-detects the watermark for 2 of 9 low-reliance models), recorded in `docs/PREDICTIONS_sd3_sd4.md`. Every model set is reported.
 
 Claims that earlier outlines made and that are now corrected:
 - "Rises to 0.93–0.99 for every metric on the patch shortcut" was too general. The form-matched preference at the highest dose is 0.73–0.79 on PneumoniaMNIST patch and 0.76–1.00 on Pet (black deletion lowest).
@@ -65,7 +65,10 @@ Citation rule: cite only papers whose page you have opened. Every reference in t
    - 5.6 same-form controls;
    - 5.7 comparing the metrics (paired);
    - 5.8 explanation methods;
-   - 5.9 reliance and object competence
+   - 5.9 reliance and object competence;
+   - 5.10 amendment A2 (SD1, SD2; P5–P9);
+   - 5.11 exact ROAD (SD3; P10 and P11 hold, submission build);
+   - 5.12 watermark shortcut (SD4; P12 holds, P13 refuted, submission build)
 6. Discussion: findings linked to known mechanisms; recommendations
 7. Limitations
 8. Conclusion
