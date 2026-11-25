@@ -2,10 +2,14 @@
 
 ## Declarations for the submission form and the manuscript
 
-The manuscript carries the same sections (built by `paper/build_paper.py --submission`). Fields in
+The manuscript carries the same sections (built by `paper/build_paper.py --submission`), in this order before the
+reference list: Acknowledgements, the generative-AI declaration, CRediT, competing interest, Funding, Data
+availability. None is on the title page. The journal also asks for the competing-interest declaration as a Word file
+from its declarations tool (`declaration_of_competing_interests.docx` is only a draft). Fields in
 double square brackets starting with `AUTHOR:` are for the author.
 
-**Author.** Md Junaid Faizan Shaikh, Khaja Bandanawaz University, Kalaburagi, India. ORCID
+**Author.** Md Junaid Faizan Shaikh, Department of Computer Science and Engineering, Khaja Bandanawaz University,
+[[AUTHOR: postal address]]. ORCID
 0009-0002-6565-1835. E-mail: [[AUTHOR: e-mail]]. Sole author and corresponding author.
 
 **CRediT authorship contribution statement.** Md Junaid Faizan Shaikh: Conceptualization,
@@ -17,12 +21,12 @@ name and whether to acknowledge]]; DEFERRED.md D18.)
 
 **Funding.** [[AUTHOR: funding statement]]
 
-**Data availability.** The code, per-model result files, analysis outputs and trained checkpoints
-are archived on Zenodo, DOI [[ZENODO_RELEASE_DOI]]. The pre-registration files (amendments A1–A3 and
-predictions P1–P13) are in the Zenodo record 10.5281/zenodo.24285531 (concept DOI; versions
-10.5281/zenodo.24285532, 10.5281/zenodo.24333540, 10.5281/zenodo.24416017 and
-10.5281/zenodo.24495658). MNIST, CIFAR-10,
-PneumoniaMNIST (MedMNIST) and Oxford-IIIT Pet are public datasets and are not redistributed.
+**Data availability.** The code, per-model result files, analysis tables and trained checkpoints are deposited in the
+Zenodo repository, DOI [[ZENODO_RELEASE_DOI]] (code: MIT licence; data, results and checkpoints: CC BY 4.0). The
+pre-registered predictions and amendments are in the Zenodo record 10.5281/zenodo.24285531 (concept DOI; versions
+10.5281/zenodo.24285532, 10.5281/zenodo.24333540, 10.5281/zenodo.24416017 and 10.5281/zenodo.24495658). The raw
+images of MNIST, CIFAR-10, PneumoniaMNIST (MedMNIST) and Oxford-IIIT Pet (CC BY-SA 4.0) are not redistributed;
+they are available from their owners.
 
 **Code availability.** The code is in the repository `https://github.com/JunaidFaizan/xai-dose-response`
 ([[AUTHOR: make the repository public before submission]]) and in the Zenodo release above. It

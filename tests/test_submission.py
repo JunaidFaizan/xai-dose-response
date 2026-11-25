@@ -93,9 +93,51 @@ class SubmissionBuild(unittest.TestCase):
         self.assertNotIn("Appendix B", self.main)
         self.assertNotIn("Appendix C", self.main)
 
-    def test_reference_list_unchanged_from_the_draft(self):
-        self.assertEqual(references_of(PAPER / "paper_submission.docx"), references_of(PAPER / "paper_draft.docx"))
+    def test_reference_list_extends_the_draft_list(self):
+        """Every draft reference is still listed, in the same relative order. The submission adds the datasets,
+        software and code release the guide asks for, and completes three entries (MedMNIST, Pet, Captum)."""
+        sub = [re.sub(r"^\[\d+\] ", "", r) for r in references_of(PAPER / "paper_submission.docx")]
+        draft = [re.sub(r"^\[\d+\] ", "", r) for r in references_of(PAPER / "paper_draft.docx")]
+        completed = ("Yang J, et al. (2023) MedMNIST", "Parkhi OM", "Kokhlikyan N")
+        position = -1
+        for entry in draft:
+            key = entry[:30] if entry.startswith(completed) else entry
+            hits = [i for i, s in enumerate(sub) if s.startswith(key)]
+            self.assertTrue(hits, entry[:60])
+            self.assertGreater(hits[0], position, entry[:60])
+            position = hits[0]
+        for needle in ("LeCun Y", "Krizhevsky A", "Paszke A", "TorchVision maintainers", "road_evaluation",
+                       "Data and code for"):
+            self.assertTrue(any(needle in s for s in sub), needle)
 
+    def test_guide_formatting(self):
+        """Elsevier guide: horizontal table rules only, no shading, British spelling, keywords, figure files."""
+        d = Document(PAPER / "paper_submission.docx")
+        xml = d.element.xml
+        for tag in ("<w:shd", "<w:insideV", "<w:left ", "<w:right ", "TableGrid"):
+            self.assertNotIn(tag, xml, tag)
+        keywords = self.main.split("Keywords ", 1)[1].split("\n", 1)[0].split(" \u00b7 ")
+        self.assertTrue(1 <= len(keywords) <= 7, keywords)
+        self.assertFalse([k for k in keywords if re.search(r"\b(and|of)\b", k)], keywords)
+        self.assertIn("Perturbation metrics", keywords)
+        body = self.main.split("\nReferences\n")[0]
+        self.assertIsNone(re.search(r"behavior|grayscale|normaliz|analyz|\bcenter|labeled", body))
+        self.assertIn("Declaration of generative AI and AI-assisted technologies in the manuscript preparation "
+                      "process", self.main)
+        self.assertRegex(self.main, r"(?m)^Table A\.1\. ")
+        self.assertRegex(self.main, r"(?m)^Fig\. A\.1\. ")
+        self.assertIn("[[AUTHOR: postal address]]", self.main)
+
+    def test_figure_files(self):
+        from PIL import Image
+        folder = PAPER / "figures_submission"
+        labels = [str(n) for n in range(1, 8)] + ["A1"]
+        for label in labels:
+            png, pdf = folder / f"Figure_{label}.png", folder / f"Figure_{label}.pdf"
+            self.assertTrue(png.exists() and pdf.exists(), label)
+            self.assertTrue(pdf.read_bytes().startswith(b"%PDF"), label)
+        for label in ("1", "2", "4", "5", "6"):  # regenerated from the CSVs: vector PDF and >= 2244 px
+            self.assertGreaterEqual(Image.open(folder / f"Figure_{label}.png").width, 2244, label)
     def test_preregistration_dois_in_main_text(self):
         for doi in ("10.5281/zenodo.24285532", "10.5281/zenodo.24333540", "10.5281/zenodo.24416017",
                     "10.5281/zenodo.24495658"):

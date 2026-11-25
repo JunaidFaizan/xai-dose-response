@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this software or data, please cite it as below."
+type: software
+title: "A Dose-Response Evaluation of Explanation Metrics under Controlled Shortcut Reliance in CNN Image Classifiers"
+abstract: "Code, per-model results, analysis tables and trained checkpoints for the dose-response evaluation of deletion and insertion metrics under controlled shortcut reliance in CNN image classifiers."
+authors:
+  - family-names: "Shaikh"
+    given-names: "Md Junaid Faizan"
+    orcid: "https://orcid.org/0009-0002-6565-1835"
+    affiliation: "Khaja Bandanawaz University"
+license: MIT
+version: "1.0.0"
+doi: "[[ZENODO_RELEASE_DOI]]"
+repository-code: "https://github.com/JunaidFaizan/xai-dose-response"
+keywords:
+  - Explainable AI
+  - Faithfulness metrics
+  - Perturbation metrics
+  - Shortcut learning
+  - Meta-evaluation
+  - Pre-registration

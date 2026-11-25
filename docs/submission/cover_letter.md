@@ -9,8 +9,7 @@ To the Editor-in-Chief, *Neurocomputing* (Elsevier)
 Dear Editor,
 
 I submit the manuscript "A Dose-Response Evaluation of Explanation Metrics under Controlled
-Shortcut Reliance in CNN Image Classifiers" for consideration as [[AUTHOR: article type, for
-example Full length article]] in *Neurocomputing*.
+Shortcut Reliance in CNN Image Classifiers" for consideration as a Regular article in *Neurocomputing*.
 
 **What the paper does.** Deletion and insertion metrics decide which explanations of an image
 classifier are called faithful, but they are rarely tested against a known model reliance. I train
@@ -43,9 +42,11 @@ less often on Pet (9 against 10 of 14 low-reliance models, P11). On the watermar
 metrics tracked reliance (Spearman ρ 0.82–0.90, P12), but blur deletion over-detected the watermark
 for only 2 of 9 low-reliance models, so P13 was refuted.
 
-**Why *Neurocomputing*.** The work concerns the evaluation of explanations for neural-network image
-classifiers and gives a controlled test bed for it. [[AUTHOR: add one sentence on fit with the scope
-of the journal after reading the aims and scope]]
+**Why *Neurocomputing*.** The paper is about neural networks: it studies how the faithfulness metrics used to
+explain trained CNN image classifiers respond to controlled shortcut reliance in 293 trained networks, and it
+gives a controlled test bed for these metrics. It is an empirical study with a new, pre-registered protocol and
+not a combination of existing algorithms. [[AUTHOR: optional: add your own reasons for the journal fit after
+reading the aims and scope, or delete this marker]]
 
 **Authorship and declarations.** The manuscript has a single author, Md Junaid Faizan Shaikh (Khaja
 Bandanawaz University; ORCID 0009-0002-6565-1835). It is not under consideration elsewhere
@@ -54,10 +55,16 @@ Bandanawaz University; ORCID 0009-0002-6565-1835). It is not under consideration
 [[AUTHOR: funding statement]]. Use of AI tools in preparing the manuscript is declared in the
 manuscript as the journal's policy requires.
 
+**Keywords:** Explainable AI; Faithfulness metrics; Perturbation metrics; Shortcut learning; Meta-evaluation;
+Pre-registration (the same list as in the manuscript).
+
 **Suggested reviewers** are listed in the submission form (see `suggested_reviewers.md`).
 
 Sincerely,
 
 Md Junaid Faizan Shaikh
-Khaja Bandanawaz University, Kalaburagi, India
+Khaja Bandanawaz University, [[AUTHOR: postal address]]
 [[AUTHOR: e-mail]]
+
+[[AUTHOR: optional line, delete if not wanted: I do not yet have an institutional e-mail address from my university
+and use a personal e-mail address for this submission and for correspondence.]]

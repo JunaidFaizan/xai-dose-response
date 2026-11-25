@@ -70,7 +70,7 @@ Update the row when a task changes state. States: `todo`, `in progress`, `done (
 | T5.1 | Integrate SD3 and SD4; judge P10–P13; update paper | Agent | T3.3, T4.4 | done (b43fbf9, 05055ab, 91fdb55, 0b8b723; docs in the T5.1 docs commit) |
 | T6.1 | M7: submission build of the paper | Agent | T1.5 (can start earlier, finalised after T5.1) | done, offline part (4eeeb6e); pending: see `docs/submission/DEFERRED.md` |
 | T6.2 | M8: cover letter, highlights, placeholders, data-availability text | Agent | T6.1 | done, offline parts (4eeeb6e); pending: see `docs/submission/DEFERRED.md` |
-| T6.3 | Zenodo release of code + results + checkpoints (data-availability DOI) | Author | T5.1 | todo |
+| T6.3 | Zenodo release of code + results + checkpoints (data-availability DOI) | Author | T5.1 | todo (package and metadata prepared: `paper/make_release_package.py`, `docs/submission/zenodo_release_metadata.md`; the author uploads) |
 | T6.4 | Browser check of the Neurocomputing guide for authors (fee route, limits, style) | Author | — | todo |
 | T6.5 | Final read-through, make repo public, submit | Author | all | todo |
 

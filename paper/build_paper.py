@@ -23,6 +23,7 @@ Model counts are derived from models.csv. Nothing is retrained or re-evaluated.
 The script only writes inside paper/ (the document and the figures in paper/figures/).
 """
 
+import shutil
 import sys
 from pathlib import Path
 
@@ -48,6 +49,8 @@ DR = ROOT / "results" / "dose_response"
 AN = ROOT / "results" / "analysis"
 EX = ROOT / "results" / "explanations"
 FIG_OUT = PAPER / "figures"
+FIG_SUB = PAPER / "figures_submission"  # Figure_N.pdf / Figure_N.png for the journal upload (--submission only)
+FIG_SRC = FIG_SUB / "_src"  # intermediate vector and 300 dpi sources of the regenerated figures (git-ignored)
 # Modes: default = the guide-review draft (unchanged); --submission = journal version (main text
 # plus a separate supplementary document); --final = submission build that fails while any [[...]] marker remains.
 FINAL = "--final" in sys.argv
@@ -66,6 +69,12 @@ def S(draft, submission):
 def tref(key, number):
     """Reference to a table that is in the main text in the draft and in the supplement in the submission."""
     return f"Supplementary Table S{SUPP_ORDER.index(key) + 1}" if SUBMISSION else f"Table {number}"
+
+KEYWORDS_DRAFT = ["Explainable AI", "Faithfulness metrics", "Deletion and insertion", "Shortcut learning",
+                  "Meta-evaluation", "Pre-registration"]
+# Elsevier: 1 to 7 keywords, no multi-word keyword with "and" or "of"
+KEYWORDS = ["Explainable AI", "Faithfulness metrics", "Perturbation metrics", "Shortcut learning",
+            "Meta-evaluation", "Pre-registration"]
 
 TITLE = ("A Dose-Response Evaluation of Explanation Metrics under Controlled Shortcut "
          "Reliance in CNN Image Classifiers")
@@ -501,6 +510,35 @@ REFERENCES = {
     "agarwal": "Agarwal R, Schwarzer M, Castro PS, Courville A, Bellemare MG (2021) Deep reinforcement learning at the edge of the statistical precipice. In: Advances in Neural Information Processing Systems (NeurIPS). arXiv:2108.13264",
     "saravanan": "Saravanan V, Berman GJ, Sober SJ (2020) Application of the hierarchical bootstrap to multi-level data in neuroscience. Neurons, Behavior, Data analysis, and Theory 3(5). arXiv:2007.07797",
 }
+if SUBMISSION:
+    # Elsevier asks datasets and software to be cited with author, title, repository or venue, version, year and
+    # identifier. Entries below were checked against the official pages (see docs/submission/DEFERRED.md D31).
+    REFERENCES.update({
+        "lecun": "LeCun Y, Bottou L, Bengio Y, Haffner P (1998) Gradient-based learning applied to document "
+                 "recognition. Proceedings of the IEEE 86(11):2278\u20132324. https://doi.org/10.1109/5.726791. "
+                 "MNIST database: https://yann.lecun.com/exdb/mnist/",
+        "cifar": "Krizhevsky A (2009) Learning multiple layers of features from tiny images. Technical report, "
+                 "University of Toronto. CIFAR-10 dataset: https://www.cs.toronto.edu/~kriz/cifar.html",
+        "pytorch": "Paszke A, et al. (2019) PyTorch: an imperative style, high-performance deep learning library. "
+                   "In: Advances in Neural Information Processing Systems 32 (NeurIPS 2019). Software version 2.14.0. "
+                   "arXiv:1912.01703",
+        "torchvision": "TorchVision maintainers and contributors (2016) TorchVision: PyTorch\u2019s computer vision "
+                       "library. GitHub repository, software version 0.29.0. https://github.com/pytorch/vision",
+        "roadcode": "Rong Y, Leemann T, Borisov V, Kasneci G, Kasneci E (2022) road_evaluation: source code of the ROAD "
+                    "benchmark for feature attribution methods. GitHub repository, revision e6b9987, MIT licence. "
+                    "https://github.com/tleemann/road_evaluation",
+        "code": "Shaikh MJF (2026) Data and code for: " + TITLE + ". Zenodo [software and research data], "
+                "version 1.0.0. https://doi.org/[[ZENODO_RELEASE_DOI]]",
+    })
+    REFERENCES["medmnist"] = ("Yang J, et al. (2023) MedMNIST v2: a large-scale lightweight benchmark for 2D and 3D "
+                              "biomedical image classification. Scientific Data 10:41. "
+                              "https://doi.org/10.1038/s41597-022-01721-8. Dataset and code: https://medmnist.com/ "
+                              "(software version 3.0.2)")
+    REFERENCES["pets"] = ("Parkhi OM, Vedaldi A, Zisserman A, Jawahar CV (2012) Cats and dogs. In: IEEE Conference on "
+                          "Computer Vision and Pattern Recognition (CVPR), pp 3498\u20133505. Oxford-IIIT Pet dataset "
+                          "(CC BY-SA 4.0): https://www.robots.ox.ac.uk/~vgg/data/pets/")
+    REFERENCES["captum"] = ("Kokhlikyan N, et al. (2020) Captum: a unified and generic model interpretability library "
+                            "for PyTorch. arXiv:2009.07896. Software version 0.9.0, https://github.com/pytorch/captum")
 CITED: list[str] = []
 
 
@@ -586,40 +624,58 @@ def preference_figure(comparison, target, ylabel, show_behaviour=True):
     (natural images first), with the increasing isotonic fit used for the switch
     points. Data: preference.csv (per model); behavioural switch: behaviour_summary.csv."""
     FIG_OUT.mkdir(exist_ok=True)
-    fig, axes = plt.subplots(2, 4, figsize=(13, 6.4), sharey=True)
-    colours = ["C0", "C1", "C2", "C3"]
+    if SUBMISSION:
+        # journal version: 3 x 3 grid at about the printed size (text stays readable at 6.2 in), colour-blind safe
+        # palette (Okabe-Ito) with a line style per metric as a second cue; the data and panels are unchanged
+        FIG_SRC.mkdir(parents=True, exist_ok=True)
+        target = FIG_SRC / Path(target).name
+        fig, axes = plt.subplots(3, 3, figsize=(7.4, 7.0), sharey=True)
+        colours = ["#0072B2", "#E69F00", "#009E73", "#CC79A7"]
+        styles, small = ["-", "--", "-.", ":"], 7.5
+    else:
+        fig, axes = plt.subplots(2, 4, figsize=(13, 6.4), sharey=True)
+        colours = ["C0", "C1", "C2", "C3"]
+        styles, small = ["-"] * 4, 8
     for ax, (base, shortcut, label, _) in zip(axes.flat, SETTINGS):
         sel = PREF[(PREF.comparison == comparison) & (PREF.base == base) & (PREF.shortcut == shortcut)]
         assert len(sel) == N_SETTING[(base, shortcut)], (comparison, base, shortcut)
-        for metric, colour in zip(METRICS, colours):
+        for metric, colour, style in zip(METRICS, colours, styles):
             x, y = sel.reliance_corrected.to_numpy(), sel[METRIC_COLUMNS[metric]].to_numpy()
             ax.scatter(x, y, s=9, alpha=0.35, color=colour, linewidths=0)
             ux, inverse, counts = np.unique(x, return_inverse=True, return_counts=True)
             mean = np.bincount(inverse, weights=y) / counts
-            ax.plot(ux, pava(mean, counts), color=colour, lw=1.6, label=metric)
+            ax.plot(ux, pava(mean, counts), color=colour, lw=1.6, ls=style, label=metric)
         ax.axhline(0.5, color="grey", lw=0.7)
         ax.axvline(50, color="grey", lw=0.7, ls=":")
         if show_behaviour:
             sw = behavioural_switch(base, shortcut)
             if not pd.isna(sw):
                 ax.axvline(sw, color="black", lw=0.9, ls="--")
-        ax.set_title(label, fontsize=9)
+        ax.set_title(label, fontsize=small + 1)
         ax.set_xlim(-5, 103)
         ax.set_ylim(-0.03, 1.03)
         ax.grid(alpha=0.25)
-        ax.tick_params(labelsize=8)
-    for ax in axes[1]:
-        ax.set_xlabel(f"Chance-corrected reliance {RC} (%)", fontsize=8.5)
+        ax.tick_params(labelsize=small)
+    xlabel_axes = axes[1] if not SUBMISSION else [axes[1][1], axes[1][2], axes[2][0]]
+    for ax in xlabel_axes:
+        ax.set_xlabel(f"Chance-corrected reliance {RC} (%)", fontsize=small + 0.5)
     for ax in axes[:, 0]:
-        ax.set_ylabel(ylabel, fontsize=8.5)
-    legend_ax = axes.flat[-1]
+        ax.set_ylabel(ylabel, fontsize=small + 0.5)
+    legend_ax = axes.flat[len(SETTINGS)] if SUBMISSION else axes.flat[-1]
+    if SUBMISSION:
+        for ax in axes.flat[len(SETTINGS) + 1:]:
+            ax.axis("off")
     handles, labels = axes.flat[0].get_legend_handles_labels()
     handles += [plt.Line2D([], [], color="grey", ls=":"), plt.Line2D([], [], color="black", ls="--")]
     labels += ["assumed ideal switch (50%)", "behavioural switch (follow rate 0.5)"]
     legend_ax.axis("off")
-    legend_ax.legend(handles, labels, loc="center", fontsize=8.5, frameon=False)
+    legend_ax.legend(handles, labels, loc="center", fontsize=small + 0.5, frameon=False)
     fig.tight_layout()
-    fig.savefig(target, dpi=200)
+    if SUBMISSION:
+        fig.savefig(Path(target).with_suffix(".pdf"))  # vector, fonts embedded as TrueType
+        fig.savefig(target, dpi=400)  # 7.4 in x 400 dpi = 2960 px, above the 2244 px full-page minimum
+    else:
+        fig.savefig(target, dpi=200)
     plt.close(fig)
     return target
 
@@ -635,7 +691,9 @@ PANEL_ORDER = ([_ALPHA.index((b, s)) for b, s, *_ in SETTINGS] + [_ALPHA.index(S
 
 doc = Document()
 SUPP = Document() if SUBMISSION else None
-COUNTERS = {"fig": 0, "table": 0, "stable": 0}
+COUNTERS = {"fig": 0, "table": 0, "stable": 0, "afig": 0, "atable": 0}  # afig, atable: Appendix A (submission)
+APPENDIX = {"on": False}  # while on, the submission numbers tables and figures A.1, A.2, ...
+FIGURE_FILES: list[dict] = []  # submission: one record per exported Figure_N file (checked and written to a manifest)
 
 
 def setup(doc=None, header_text=None):
@@ -715,8 +773,30 @@ def heading(text, level=1):
     doc.add_heading(text, level=level)
 
 
+def export_figure(path, label):
+    """Submission only: copy a figure to paper/figures_submission/Figure_<label>.png and make the matching
+    .pdf: the vector file when the figure was regenerated here, otherwise the bitmap wrapped in a PDF."""
+    FIG_SUB.mkdir(exist_ok=True)
+    path = Path(path)
+    png, pdf = FIG_SUB / f"Figure_{label}.png", FIG_SUB / f"Figure_{label}.pdf"
+    image = Image.open(path)
+    vector = path.with_suffix(".pdf").exists()
+    if vector:
+        shutil.copyfile(path, png)
+        shutil.copyfile(path.with_suffix(".pdf"), pdf)
+    else:
+        image.convert("RGB").save(png, dpi=(300, 300))
+        image.convert("RGB").save(pdf, resolution=300)
+    FIGURE_FILES.append({"label": label, "png": png, "pdf": pdf, "vector": vector, "width_px": image.width,
+                         "height_px": image.height, "source": path.name})
+
+
 def figure(path, caption, width=Inches(6.2)):
-    COUNTERS["fig"] += 1
+    appendix = SUBMISSION and APPENDIX["on"]
+    COUNTERS["afig" if appendix else "fig"] += 1
+    label = f"A.{COUNTERS['afig']}" if appendix else str(COUNTERS["fig"])
+    if SUBMISSION:
+        export_figure(path, label.replace(".", ""))
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.paragraph_format.line_spacing = 1.0
@@ -725,11 +805,11 @@ def figure(path, caption, width=Inches(6.2)):
     c = doc.add_paragraph()
     c.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     c.paragraph_format.line_spacing = 1.0
-    r = c.add_run(f"Fig. {COUNTERS['fig']}. ")
+    r = c.add_run(f"Fig. {label}. ")
     r.bold = True
     r.font.size = Pt(9)
     add_runs(c, caption, size=9)
-    return COUNTERS["fig"]
+    return label if appendix else COUNTERS["fig"]
 
 
 def shade(cell, color="D9D9D9"):
@@ -741,23 +821,43 @@ def shade(cell, color="D9D9D9"):
     props.append(fill)
 
 
+def horizontal_rules(t, n_header_rows):
+    """Elsevier tables: horizontal rules only (top, under the header, bottom), no vertical rules, no shading."""
+    props = t._tbl.tblPr
+    borders = OxmlElement("w:tblBorders")
+    for edge in ("top", "bottom"):
+        e = OxmlElement(f"w:{edge}")
+        for k, v in (("val", "single"), ("sz", "8"), ("space", "0"), ("color", "000000")):
+            e.set(qn(f"w:{k}"), v)
+        borders.append(e)
+    props.append(borders)
+    for cell in t.rows[n_header_rows - 1].cells:
+        tc_borders = OxmlElement("w:tcBorders")
+        e = OxmlElement("w:bottom")
+        for k, v in (("val", "single"), ("sz", "4"), ("space", "0"), ("color", "000000")):
+            e.set(qn(f"w:{k}"), v)
+        tc_borders.append(e)
+        cell._tc.get_or_add_tcPr().append(tc_borders)
+
+
 def table(caption, header, body, widths=None, note=None, size=8, header_rows=None, supp=False):
     """A numbered table: caption above (Elsevier style), optional note below. In the submission build a
     table with supp=True goes to the supplementary document as Table S<n>."""
     doc = SUPP if (SUBMISSION and supp) else globals()["doc"]
-    key = "stable" if (SUBMISSION and supp) else "table"
+    key = "stable" if (SUBMISSION and supp) else ("atable" if SUBMISSION and APPENDIX["on"] else "table")
     COUNTERS[key] += 1
     c = doc.add_paragraph()
     c.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     c.paragraph_format.keep_with_next = True
     c.paragraph_format.line_spacing = 1.0
-    r = c.add_run(f"Table {'S' if key == 'stable' else ''}{COUNTERS[key]}. ")
+    r = c.add_run(f"Table {'S' if key == 'stable' else 'A.' if key == 'atable' else ''}{COUNTERS[key]}. ")
     r.bold = True
     r.font.size = Pt(9)
     add_runs(c, caption, size=9)
     headers = header_rows or [header]
     t = doc.add_table(rows=len(headers) + len(body), cols=len(headers[-1]))
-    t.style = "Table Grid"
+    if not SUBMISSION:
+        t.style = "Table Grid"
     t.alignment = WD_TABLE_ALIGNMENT.CENTER
     for i, values in enumerate(headers + body):
         for j, value in enumerate(values):
@@ -771,7 +871,10 @@ def table(caption, header, body, widths=None, note=None, size=8, header_rows=Non
             run.font.size = Pt(size)
             if i < len(headers):
                 run.bold = True
-                shade(cell)
+                if not SUBMISSION:
+                    shade(cell)
+    if SUBMISSION:
+        horizontal_rules(t, len(headers))
     if widths:
         for i, w in enumerate(widths):
             for cell in t.columns[i].cells:
@@ -1648,12 +1751,22 @@ class use_doc:
 DECLARED_MARKERS = {
     "[[AUTHOR: e-mail]]", "[[AUTHOR: funding statement]]", "[[AUTHOR: competing interests]]",
     "[[AUTHOR: confirm AI-use statement per Elsevier policy]]", "[[AUTHOR: acknowledgements]]",
+    "[[AUTHOR: postal address]]",
     "[[ZENODO_RELEASE_DOI]]",
 }
 
 
 def declarations():
     if SUBMISSION:
+        # order before the reference list: acknowledgements, AI declaration, CRediT, competing interest, funding,
+        # data availability (nothing of this is on the title page)
+        heading("Acknowledgements")
+        para("[[AUTHOR: acknowledgements]]")
+        heading("Declaration of generative AI and AI-assisted technologies in the manuscript preparation process")
+        para("During the preparation of this work the author used AI assistants for code development and for "
+             "drafting the text. After using these tools, the author reviewed and edited the content as needed and "
+             "takes full responsibility for the content of the publication. "
+             "[[AUTHOR: confirm AI-use statement per Elsevier policy]]")
         heading("CRediT authorship contribution statement")
         para("**Md Junaid Faizan Shaikh:** Conceptualization, Methodology, Software, Investigation, Formal "
              "analysis, Data curation, Visualization, Writing \u2013 original draft, Writing \u2013 review & "
@@ -1663,17 +1776,14 @@ def declarations():
         heading("Funding")
         para("[[AUTHOR: funding statement]]")
         heading("Data availability")
-        para("The code, the per-model result files, the analysis outputs and the trained checkpoints are archived "
-             "on Zenodo (DOI [[ZENODO_RELEASE_DOI]]). The pre-registration files are archived in the Zenodo record "
-             "10.5281/zenodo.24285531 (concept DOI). MNIST, CIFAR-10, PneumoniaMNIST and Oxford-IIIT Pet are "
-             "publicly available.")
-        heading("Acknowledgements")
-        para("[[AUTHOR: acknowledgements]]")
-        heading("Declaration of generative AI and AI-assisted technologies in the manuscript preparation process")
-        para("During the preparation of this work the author used AI assistants for code development and for "
-             "drafting the text. After using these tools, the author reviewed and edited the content as needed and "
-             "takes full responsibility for the content of the publication. "
-             "[[AUTHOR: confirm AI-use statement per Elsevier policy]]")
+        para("The research data and code are deposited in the Zenodo repository " + cite("code") + " (DOI "
+             "[[ZENODO_RELEASE_DOI]]): the code, the per-model result files, the analysis tables and the trained "
+             "checkpoints. The code is released "
+             "under the MIT licence and the data, results and checkpoints under CC BY 4.0. The pre-registered "
+             "predictions and amendments are archived in the Zenodo record 10.5281/zenodo.24285531 (concept DOI). "
+             "The raw images are not redistributed. They are available from their owners: MNIST " + cite("lecun")
+             + ", PneumoniaMNIST " + cite("medmnist") + " (MedMNIST), CIFAR-10 " + cite("cifar") + " and "
+             "Oxford-IIIT Pet " + cite("pets") + " (CC BY-SA 4.0).")
         return
     heading("CRediT authorship contribution statement")
     para("**Md Junaid Faizan Shaikh:** Conceptualization, Methodology, Software, Investigation, Formal analysis, "
@@ -1746,6 +1856,65 @@ FORBIDDEN = [r"audit", r"reviewer", r"(?<!original )\bdrafts?\b", r"docs/", r"gu
 MARKER = r"\[\[[^\]]+\]\]"
 
 
+# American spellings that must not appear in the (British) journal text. "Conceptualization" and "Visualization"
+# are CRediT role names and are allowed.
+US_SPELLINGS = (r"behavior|colou?r(?<!colour)|gray|normaliz|analyz|\bcenter|neighbor|favor|catalog|defense|"
+                r"labeled|labeling|modeling|modeled|summariz|organiz|recogniz|optimiz|generaliz|initializ|"
+                r"minimiz|randomiz|standardiz|characteriz|utiliz|emphasiz|parameteriz|artifact|fulfill|judgment|"
+                r"\w{3,}(?<![sS])(?<!Conceptual)(?<!Visual)iz(?:e|es|ed|ing|ation)\b")
+FIGURE_MIN_PX = 2244  # Elsevier: full-page width for a bitmap
+FIGURE_VECTOR_STEMS = ("fig_rc_",)  # figures regenerated from the CSVs in this file (vector PDF + 400 dpi PNG)
+ENGLISH_HEADINGS = ["Acknowledgements", "Declaration of generative AI and AI-assisted technologies in the manuscript "
+                    "preparation process", "CRediT authorship contribution statement", "Declaration of competing "
+                    "interest", "Funding", "Data availability"]
+
+
+def guide_checks(main, supp, main_text, n_figs):
+    """Neurocomputing / Elsevier guide for authors: formatting rules that a Word file can be checked for."""
+    import re
+    # tables: horizontal rules only, no shading, no vertical borders
+    for name, d in (("main text", main), ("supplementary", supp)):
+        assert not list(d.element.body.iter(qn("w:shd"))), f"{name}: shaded table cells"
+        for tag in ("w:left", "w:right", "w:start", "w:end", "w:insideV"):
+            assert not list(d.element.body.iter(qn(tag))), f"{name}: vertical table border {tag}"
+        for style in d.element.body.iter(qn("w:tblStyle")):
+            assert style.get(qn("w:val")) != "TableGrid", f"{name}: Table Grid style has vertical rules"
+        assert not any(r.font.strike or r.font.underline for p in d.paragraphs for r in p.runs), \
+            f"{name}: strikethrough or underline"
+    # keywords: 1 to 7, none with "and" or "of" in a multi-word keyword
+    assert 1 <= len(KEYWORDS) <= 7, KEYWORDS
+    assert not [k for k in KEYWORDS if re.search(r"\b(and|of)\b", k, flags=re.I)], KEYWORDS
+    assert " \u00b7 ".join(KEYWORDS) in main_text, "keywords of the front matter differ from KEYWORDS"
+    # highlights: 3 to 5, at most 85 characters each
+    lines = HIGHLIGHTS_OUTPUT.read_text(encoding="utf8").splitlines()
+    assert 3 <= len(lines) <= 5 and all(len(x) <= 85 for x in lines), [len(x) for x in lines]
+    # one English variant (British); the reference list keeps the original titles
+    body = main_text.split("\nReferences\n")[0] if "\nReferences\n" in main_text else main_text
+    for name, text in (("main text", body), ("supplementary", doc_text(supp))):
+        hit = re.search(US_SPELLINGS, text)
+        assert not hit, f"{name}: American spelling {hit.group(0)!r} near {text[max(hit.start() - 50, 0):hit.end() + 50]!r}"
+    # title page: author, lowercase superscript letter, address marker or address with country, corresponding author
+    head = main_text[:1500]
+    assert "Corresponding author" in head and "ORCID" in head and "Khaja Bandanawaz University" in head
+    # declarations: order before the reference list, none on the title page
+    positions = [main_text.rfind("\n" + h + "\n") for h in ENGLISH_HEADINGS]
+    assert all(p > 0 for p in positions) and positions == sorted(positions), (positions, [main_text[max(x-30,0):x+60] for x in positions])
+    assert main_text.rfind("\nReferences\n") > positions[-1], "declarations must precede the reference list"
+    # figures: files Figure_N.png / .pdf exist, are cited in order, are large enough, text sized; appendix as A1
+    assert len(FIGURE_FILES) == n_figs + COUNTERS["afig"], (len(FIGURE_FILES), n_figs)
+    for f in FIGURE_FILES:
+        assert f["png"].exists() and f["pdf"].exists() and f["png"].name == f"Figure_{f['label']}.png", f
+        if f["vector"]:
+            assert f["width_px"] >= FIGURE_MIN_PX, f
+    first = [re.search(rf"Fig\. {n}\b", main_text) for n in range(1, n_figs + 1)]
+    assert all(first), "a figure is never cited"
+    starts = [m.start() for m in first]
+    assert starts == sorted(starts), f"figures are not first cited in numerical order {starts}"
+    # appendix: its table and figure are numbered A.1, cross-referenced by number
+    assert re.search(r"^Table A\.1\. ", main_text, flags=re.M) and re.search(r"^Fig\. A\.1\. ", main_text, flags=re.M)
+    assert not re.search(r"\bthe (table|figure) (above|below)\b", main_text, flags=re.I), "refer to tables by number"
+
+
 def submission_checks(main, supp, final=False):
     """Format checks of the submission build; `final` also fails while any [[marker]] remains."""
     import re
@@ -1772,6 +1941,7 @@ def submission_checks(main, supp, final=False):
     # a table that moved to the supplement is no longer cited as a main-text table
     for caption_number in range(1, n_tables + 1):
         assert re.search(rf"^Table {caption_number}\. ", main_text, flags=re.M), f"Table {caption_number} has no caption"
+    guide_checks(main, supp, main_text, n_figs)
     # markers: only the declared ones; --final: none at all, in the paper and in docs/submission
     found = {m for t in texts.values() for m in re.findall(MARKER, t)}
     undeclared = found - DECLARED_MARKERS
@@ -2076,11 +2246,23 @@ def build():
     t.paragraph_format.space_before = Pt(12)
     run = t.add_run(TITLE)
     run.bold, run.font.size = True, Pt(16)
-    para("Md Junaid Faizan Shaikh", bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, after=0)
-    para("Department of Computer Science and Engineering, Khaja Bandanawaz University, Kalaburagi, India",
-         align=WD_ALIGN_PARAGRAPH.CENTER, size=10, after=0)
-    para(S("E-mail: [email]", "E-mail: [[AUTHOR: e-mail]]  \u00b7  ORCID: 0009-0002-6565-1835"),
-         align=WD_ALIGN_PARAGRAPH.CENTER, size=10)
+    if SUBMISSION:
+        # Elsevier title page: given and family name, affiliation with its full postal address and country (letter
+        # in superscript), corresponding author with e-mail
+        a = para("Md Junaid Faizan Shaikh", bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, after=0)
+        for mark in ("a", ",*"):
+            a.add_run(mark).font.superscript = True
+        b = para("", align=WD_ALIGN_PARAGRAPH.CENTER, size=10, after=0)
+        b.add_run("a").font.superscript = True
+        b.add_run(" Department of Computer Science and Engineering, Khaja Bandanawaz University, "
+                  "[[AUTHOR: postal address]]").font.size = Pt(10)
+        para("* Corresponding author. E-mail: [[AUTHOR: e-mail]]  \u00b7  ORCID: 0009-0002-6565-1835",
+             align=WD_ALIGN_PARAGRAPH.CENTER, size=10)
+    else:
+        para("Md Junaid Faizan Shaikh", bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, after=0)
+        para("Department of Computer Science and Engineering, Khaja Bandanawaz University, Kalaburagi, India",
+             align=WD_ALIGN_PARAGRAPH.CENTER, size=10, after=0)
+        para("E-mail: [email]", align=WD_ALIGN_PARAGRAPH.CENTER, size=10)
 
     n_word = {1: "one", 2: "two", 3: "three", 4: "four"}
     pet_ident = [m for m in METRICS if m not in pet_no_switch]
@@ -2139,8 +2321,7 @@ def build():
         bullets(highlights)
     else:
         HIGHLIGHTS_OUTPUT.write_text("\n".join(highlights) + "\n", encoding="utf8")
-    para("**Keywords** Explainable AI \u00b7 Faithfulness metrics \u00b7 Deletion and insertion \u00b7 "
-         "Shortcut learning \u00b7 Meta-evaluation \u00b7 Pre-registration")
+    para("**Keywords** " + " \u00b7 ".join(S(KEYWORDS_DRAFT, KEYWORDS)))
 
     # ---- 1 Introduction
     heading("1. Introduction")
@@ -2293,7 +2474,7 @@ def build():
     bullets([
         "**Shortcut map**: 1 on the shortcut pixels, 0 elsewhere.",
         "**Full object map**: on Pet, the real segmentation mask (pet and border band) without the shortcut "
-        "pixels. On the grayscale datasets, the image's own intensities without the shortcut pixels; on "
+        "pixels. On the " + S("grayscale", "greyscale") + " datasets, the image's own intensities without the shortcut pixels; on "
         "PneumoniaMNIST, where 97.5% of the pixels exceed 0.1, this is an intensity ranking of the whole "
         "radiograph rather than an object segmentation. On CIFAR-10, a centred Gaussian prior (\u03c3 = image "
         "size/4), because the images have no masks. Pet is therefore the primary natural-image evidence.",
@@ -2397,8 +2578,8 @@ def build():
              "and 1/12 for the diagonal neighbours), solved jointly for all removed pixels of an image, step and "
              "channel, and Gaussian noise with standard deviation 0.01 is added to the imputed pixels; the "
              "operator is ported from the reference implementation of Rong et al. "
-             "(https://github.com/tleemann/road_evaluation, MIT licence, whose copyright notice is kept in the "
-             "code). The score is the area under the probability-of-label curve over the removed shares divided "
+             "(https://github.com/tleemann/road_evaluation " + cite("roadcode") + ", MIT licence, whose copyright "
+             "notice is kept in the code). The score is the area under the probability-of-label curve over the removed shares divided "
              "by 0.9; ties in the binary maps are broken as for the four existing metrics, and the noise is "
              "seeded per model and image, so the scores are deterministic. Every one of the "
              f"{len(ROAD_MODELS)} pooled models was scored (the pilots were not). The pre-registered timing gate, "
@@ -2429,9 +2610,15 @@ def build():
     # ---- 4 Setup
     heading("4. Experimental setup")
     para("**Datasets.** Oxford-IIIT Pet " + cite("pets") + " as a cat-versus-dog task at 128\u00d7128 with the "
-         "dataset's trimap masks; CIFAR-10 (10 classes, 32\u00d732 colour); MNIST (10 classes, 28\u00d728); and "
+         "dataset's trimap masks; CIFAR-10" + (" " + cite("cifar") if SUBMISSION else "") + " (10 classes, 32\u00d732 "
+         "colour); MNIST" + (" " + cite("lecun") if SUBMISSION else "") + " (10 classes, 28\u00d728); and "
          "PneumoniaMNIST " + cite("medmnist") + " (normal vs pneumonia, 28\u00d728, derived from "
          + cite("kermany") + ").")
+    if SUBMISSION:
+        para("**Software.** The models are implemented in PyTorch " + cite("pytorch") + " with torchvision "
+             + cite("torchvision") + " (versions 2.14.0 and 0.29.0), and the explanation methods are run with "
+             "Captum " + cite("captum") + " (version 0.9.0). The code of this study is archived on Zenodo "
+             + cite("code") + ".")
     para("**Networks and training.** A small CNN with four convolutional layers on the 28\u00d728 data; on "
          "CIFAR-10 a CNN with batch normalisation (0.77M parameters) and a ResNet-18 " + cite("he") + " (11.2M "
          "parameters) with a 3\u00d73 stride-1 first convolution and no initial max-pooling; on Pet the same "
@@ -3103,8 +3290,9 @@ def build():
 
     # ---- Appendix A
     heading("Appendix A. Supporting study: the sanity check against ground truth")
-    t_k = COUNTERS["table"] + 1
-    f_gt = COUNTERS["fig"] + 1
+    t_k = S(COUNTERS["table"] + 1, "A.1")  # the submission numbers the appendix Table A.1 and Fig. A.1
+    f_gt = S(COUNTERS["fig"] + 1, "A.1")
+    APPENDIX["on"] = SUBMISSION
     para("A separate fixed-shortcut study trained three seeds on each of five datasets, including two decoy "
          "datasets with a class-coded patch " + cite("ross") + ". The models follow the patch "
          f"{ACCURACY.loc['decoy_mnist', 'shortcut_reliance_mean']:.0f}% (Decoy MNIST) and "
@@ -3129,6 +3317,7 @@ def build():
            "ground-truth ranking (mean \u00b1 standard deviation over three seeds). Right: per-image Spearman "
            "\u03c1 between metric scores and ground-truth localisation. Source: results/analysis/gt_agreement.png",
            width=Inches(6.0))
+    APPENDIX["on"] = False
 
     if SUBMISSION:
         declarations()

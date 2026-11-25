@@ -28,3 +28,8 @@ kaggle/xai_a3models_bundle.zip
 
 # Scratch files from AI workflow runs (plans, reviews, backups)
 .agents/
+
+# Zenodo release package (zips are never committed)
+release/
+# intermediate sources of the submission figures
+paper/figures_submission/_src/

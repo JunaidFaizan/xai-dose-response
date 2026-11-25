@@ -1,37 +1,81 @@
 # A Dose-Response Evaluation of Explanation Metrics under Controlled Shortcut Reliance in CNN Image Classifiers
 
-## Submission checklist
+## Submission checklist (Neurocomputing, Elsevier)
 
-Tick items when done. Items with a row number are in `DEFERRED.md`.
+Mapped to the journal's guide for authors and to the journal's own submission checklist. Items with a row number are
+in `DEFERRED.md`. `[x]` = done by the build and checked by `build_paper.py --submission` or the tests; `[ ]` = the
+author (or a later step) must do it.
 
-**Before submission (author)**
+### 1. Manuscript file
+- [x] Word `.docx`, single column, no strikethrough or underline (`paper/paper_submission.docx`)
+- [x] Single-anonymized review: author name stays on the title page
+- [x] Abstract at most 250 words, not numbered (250)
+- [x] Keywords: 6, English, none with "and" or "of": Explainable AI; Faithfulness metrics; Perturbation metrics; Shortcut learning; Meta-evaluation; Pre-registration
+- [x] Sections numbered 1., 1.1; appendix lettered (Appendix A, Table A.1, Fig. A.1); cross-references by number
+- [x] One English variant (British), checked by the build against American spellings (CRediT role names excepted)
+- [ ] Spelling and grammar check in Word; page count (the guide states no page limit; D22)
 
-- [ ] Browser check of the Neurocomputing guide for authors: fee route, abstract limit, highlights, length, reference style (D12)
-- [x] Kaggle S3 and S4 finished, SD3 and SD4 integrated in the paper (D01 to D10; T5.1, 2026-11-25)
-- [x] Zenodo version 4 (SD4 completion note) uploaded (D05; 10.5281/zenodo.24495658)
-- [ ] Zenodo release of code, results and checkpoints, DOI in the paper (D13)
-- [ ] E-mail, funding, competing interests, acknowledgements, AI-use statement filled in the paper and in `docs/submission/*.md` (D14 to D18)
-- [ ] Suggested reviewers: names, affiliations, e-mails, conflicts checked (D27)
-- [ ] GitHub repository public, no `data/`, `.pt`, zips or `.agents/` in it (D19)
+### 2. Title page
+- [x] Article title, given and family name, affiliation with superscript letter, corresponding author marked
+- [ ] Full postal address of the affiliation including the country: `[[AUTHOR: postal address]]` (D32)
+- [ ] Corresponding author e-mail: `[[AUTHOR: e-mail]]` (D14). A personal e-mail is not prohibited; the cover letter has an optional line saying that there is no institutional address yet (delete it if you do not want it)
+- [x] ORCID 0009-0002-6565-1835
 
-**Build (agent)**
+### 3. Highlights (separate editable file)
+- [x] 3 to 5 bullets, each at most 85 characters including spaces: `docs/submission/highlights.docx` (`.txt` and `.md` kept)
+- [x] File name contains "highlights"
 
-- [ ] `.venv\Scripts\python.exe paper\build_paper.py --submission` passes its checks
-- [ ] `.venv\Scripts\python.exe paper\build_paper.py --final` passes (no marker left in the paper or in `docs/submission/*.md`)
-- [ ] `.venv\Scripts\python.exe -m unittest discover -s tests -t .` passes
-- [ ] Title is exactly "A Dose-Response Evaluation of Explanation Metrics under Controlled Shortcut Reliance in CNN Image Classifiers" in every file
-- [ ] `docs/submission/highlights.md` equals `paper/highlights_submission.txt`
+### 4. Tables
+- [x] Editable text, numbered consecutively, cited in the text, captions above, notes below the table
+- [x] Horizontal rules only (top, under the header, bottom); no vertical rules and no shading
+- [ ] Tables used sparingly: candidates that repeat results given elsewhere (Tables 7, 8, 10, 13; D23). Decide in Word
 
-**Files to upload**
+### 5. Figures
+- [x] Separate files `paper/figures_submission/Figure_1` to `Figure_7` and `Figure_A1` (`.pdf` and `.png`), cited in order, every figure has a caption
+- [x] Figures 1, 2, 4, 5, 6: vector PDF and 2960 px PNG, readable text, colour-blind-safe palette with line styles
+- [ ] Figures 3, 7 and A1 are bitmaps (2210, 2195 and 1430 px wide) because they come from plots made by the analysis code; Fig. 3 and 7 are 98 % of the 2244 px target, Fig. A1 is 64 % (D33)
+- [x] No figure shows dataset photographs, so no image permission or attribution line is needed (all figures are plots; Oxford-IIIT Pet is CC BY-SA 4.0 and would need an attribution line in the caption)
 
-- [ ] `paper/paper_submission.docx` (manuscript, with references and declarations)
-- [ ] `paper/supplementary_submission.docx` (supplementary material)
-- [ ] Highlights file (3 to 5 bullets, each at most 85 characters), from `docs/submission/highlights.md`
-- [ ] Cover letter from `docs/submission/cover_letter.md`
-- [ ] Figures: `paper/figures/*_submission.png` and the others used in the paper, at 200 dpi (check the journal's resolution rule, D12)
-- [ ] Declaration of competing interests form if the journal asks for one (D16)
+### 6. References and citations
+- [x] Numbered in order of first appearance; every listed reference is cited (asserted by the build)
+- [x] Datasets and software cited with author, title, repository or venue, version, year and identifier: MNIST, PneumoniaMNIST (MedMNIST), CIFAR-10, Oxford-IIIT Pet, PyTorch, torchvision, Captum, ROAD code, own code release
+- [ ] Open items in the reference list: N13 fixes of older entries (D21)
+- [ ] Reference style is free at submission (the guide states no strict style); check once more in Word
 
-**Final read-through (author, T6.5)**
+### 7. Declarations (before the reference list, none on the title page)
+- [x] Order: Acknowledgements, Declaration of generative AI and AI-assisted technologies in the manuscript preparation process, CRediT, Declaration of competing interest, Funding, Data availability
+- [ ] AI statement: tool names and reason (`[[AUTHOR: confirm AI-use statement per Elsevier policy]]`, D17)
+- [ ] Acknowledgements (D18), competing interests (D16), funding (D15)
+- [x] CRediT: sole author, no "Supervision"
+- [ ] Declaration of competing interests as a Word file **generated by the journal's declarations tool** (author signatures not required). `declaration_of_competing_interests.docx` is only a convenience draft (D34)
 
-- [ ] Every number checked against the CSVs after SD3 and SD4 (D25)
-- [ ] Word or PDF page count within the journal limit (D22, D23)
+### 8. Research data (Option C)
+- [x] Data availability section names what is deposited, the licences, the dataset sources, and that raw images are not redistributed
+- [ ] Zenodo release uploaded and DOI inserted (`[[ZENODO_RELEASE_DOI]]`, D13); package and fields: `release/zenodo/`, `docs/submission/zenodo_release_metadata.md`
+- [ ] GitHub repository public (D19)
+
+### 9. Author information
+- [ ] Vitae: biography of at most 100 words and a passport-type photograph as a separate file (`docs/submission/author_biography_TEMPLATE.docx`; D35)
+
+### 10. Cover letter and submission form
+- [x] Article type: Regular article; scope-fit sentence (neural networks; not a combination of existing algorithms)
+- [ ] Date, e-mail, competing interests and funding in the letter; suggested reviewers (D27)
+- [x] Pre-registration DOIs named in the letter
+
+### 11. Before pressing submit (journal checklist)
+- [ ] Corresponding author named with full contact details; all files uploaded (manuscript, highlights, figures, supplement, cover letter, declaration, vitae)
+- [ ] Permissions: no third-party figures; dataset licences stated
+- [ ] Not under consideration elsewhere; the thesis or institution check done (University approval, if required, before submission); the author approves the final version and, if anyone else is to be named, notifies them (sole author: none)
+- [ ] Publishing route: submit by the standard (subscription) route; the open-access choice and its article processing charge come only at the publishing agreement after acceptance. Do not pick open access at submission
+- [ ] SSRN preprint posting through the submission system is optional: leave it OFF
+- [ ] Data in Brief or MethodsX co-submission is optional and **not recommended** (article processing charges after acceptance)
+
+### 12. Build (agent)
+- [x] `.venv\Scripts\python.exe paper\build_paper.py --submission` passes its checks
+- [ ] `.venv\Scripts\python.exe paper\build_paper.py --final` passes (fails now only on the markers listed in `DEFERRED.md` section 1)
+- [x] `.venv\Scripts\python.exe -m unittest discover -s tests -t .` passes
+- [x] Title is exactly "A Dose-Response Evaluation of Explanation Metrics under Controlled Shortcut Reliance in CNN Image Classifiers" in every file
+- [x] `docs/submission/highlights.md` equals `paper/highlights_submission.txt`
+
+### 13. Final read-through (author, T6.5)
+- [ ] Every number checked against the CSVs (D25); page count; make the repository public; submit
