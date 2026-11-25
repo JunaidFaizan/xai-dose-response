@@ -2,7 +2,7 @@
 
     .venv/Scripts/python.exe paper/make_release_package.py
 
-Run it after the last commit: the code zip is `git archive HEAD` (tracked files only) and is named with the
+Run it after the last commit (or give the commit as an argument): the code zip is `git archive <rev>` (tracked files only) and is named with the
 short commit hash. Writes:
   xai-dose-response_code_<sha>.zip          tracked files of HEAD
   xai-dose-response_results_<sha>.zip       results/dose_response (CSVs, per_model files, figures)
@@ -13,6 +13,7 @@ short commit hash. Writes:
 import hashlib
 import shutil
 import subprocess
+import sys
 import zipfile
 from pathlib import Path
 
@@ -33,14 +34,14 @@ def git(*args):
     return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
 
 
-def main():
+def main(rev="HEAD"):
     OUT.mkdir(parents=True, exist_ok=True)
     for old in OUT.glob("*"):
         old.unlink()
-    sha = git("rev-parse", "--short", "HEAD")
-    dirty = git("status", "--porcelain", "--untracked-files=no")
+    sha = git("rev-parse", "--short", rev)
+    dirty = git("status", "--porcelain", "--untracked-files=no") if rev == "HEAD" else ""
     code = OUT / f"xai-dose-response_code_{sha}.zip"
-    subprocess.run(["git", "archive", "--format=zip", "-o", str(code), "HEAD"], cwd=ROOT, check=True)
+    subprocess.run(["git", "archive", "--format=zip", "-o", str(code), rev], cwd=ROOT, check=True)
 
     results = OUT / f"xai-dose-response_results_{sha}.zip"
     files = sorted(p for p in (ROOT / "results" / "dose_response").rglob("*") if p.is_file())
@@ -71,7 +72,7 @@ def main():
     shutil.copyfile(ROOT / "docs" / "submission" / "RELEASE_README.md", OUT / "README.md")
     zips = [code, results] + [n for n, _ in ckpt]
     lines = ["# Manifest of the Zenodo release package", "",
-             f"Code revision: `{sha}` (`git archive HEAD`, tracked files only)."
+             f"Code revision: `{sha}` (`git archive {rev}`, tracked files only)."
              + (" WARNING: tracked files had uncommitted changes when this package was built." if dirty else ""), "",
              "| File | Size (bytes) | SHA-256 |", "|---|---|---|"]
     for z in [OUT / "README.md"] + zips:
@@ -93,4 +94,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1] if len(sys.argv) > 1 else "HEAD")  # optional: a commit to archive, for example 0e128c4
