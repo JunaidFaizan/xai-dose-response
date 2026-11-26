@@ -9,11 +9,12 @@ author (or a later step) must do it.
 ### 1. Manuscript file
 - [x] Word `.docx`, single column, no strikethrough or underline (`paper/paper_submission.docx`)
 - [x] Single-anonymized review: author name stays on the title page
-- [x] Abstract at most 250 words, not numbered (250)
+- [x] Abstract at most 250 words, not numbered (247 as Word counts; abbreviations spelled out)
 - [x] Keywords: 6, English, none with "and" or "of": Explainable AI; Faithfulness metrics; Perturbation metrics; Shortcut learning; Meta-evaluation; Pre-registration
 - [x] Sections numbered 1., 1.1; appendix lettered (Appendix A, Table A.1, Fig. A.1); cross-references by number
 - [x] One English variant (British), checked by the build against American spellings (CRediT role names excepted)
-- [ ] Spelling and grammar check in Word; page count (the guide states no page limit; D22)
+- [x] Page count in Word: 47 pages main text (3 landscape table pages), 7 pages supplement (D22; no page limit stated)
+- [ ] Spelling and grammar check in Word
 
 ### 2. Title page
 - [x] Article title, given and family name, affiliation with superscript letter, corresponding author marked
@@ -27,12 +28,12 @@ author (or a later step) must do it.
 
 ### 4. Tables
 - [x] Editable text, numbered consecutively, cited in the text, captions above, notes below the table
-- [x] Horizontal rules only (top, under the header, bottom); no vertical rules and no shading
+- [x] Horizontal rules only (top, under the header, bottom); no vertical rules and no shading; table text at least 8 pt, fixed widths inside the text block, Tables 5, 12 and 15 on landscape pages
 - [ ] Tables used sparingly: candidates that repeat results given elsewhere (Tables 7, 8, 10, 13; D23). Decide in Word
 
 ### 5. Figures
 - [x] Separate files `paper/figures_submission/Figure_1` to `Figure_7` and `Figure_A1` (`.pdf` and `.png`), cited in order, every figure has a caption
-- [x] Figures 1, 2, 4, 5, 6: vector PDF and 2960 px PNG, readable text, colour-blind-safe palette with line styles
+- [x] All figures (1 to 7 and A.1): vector PDF and 2967 px PNG redrawn from the result files, readable text, colour-blind-safe palette with line styles, markers or hatching (D33 done)
 - [ ] Figures 3, 7 and A1 are bitmaps (2210, 2195 and 1430 px wide) because they come from plots made by the analysis code; Fig. 3 and 7 are 98 % of the 2244 px target, Fig. A1 is 64 % (D33)
 - [x] No figure shows dataset photographs, so no image permission or attribution line is needed (all figures are plots; Oxford-IIIT Pet is CC BY-SA 4.0 and would need an attribution line in the caption)
 
@@ -43,7 +44,7 @@ author (or a later step) must do it.
 - [ ] Reference style is free at submission (the guide states no strict style); check once more in Word
 
 ### 7. Declarations (before the reference list, none on the title page)
-- [x] Order: Acknowledgements, Declaration of generative AI and AI-assisted technologies in the manuscript preparation process, CRediT, Declaration of competing interest, Funding, Data availability
+- [x] Order: CRediT, Declaration of competing interest, Funding, Data availability, Declaration of generative AI and AI-assisted technologies in the manuscript preparation process, Acknowledgements (directly before the references)
 - [x] AI statement: Kiro with Anthropic Claude models and other large language models in Kiro (D17, done 2026-11-28)
 - [x] Acknowledgements (the guide, D18), competing interests (D16), funding (D15), all from AUTHOR_ANSWERS.md
 - [x] CRediT: sole author, no "Supervision"

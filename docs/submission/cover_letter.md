@@ -1,65 +1,28 @@
 # A Dose-Response Evaluation of Explanation Metrics under Controlled Shortcut Reliance in CNN Image Classifiers
 
-## Cover letter (draft, to be finished by the author)
+## Cover letter
+
+<!-- docx: paper/build_submission_docx.py writes docs/submission/cover_letter.docx from the paragraphs below the line -->
+---
 
 [[AUTHOR: date of submission]]
 
-To the Editor-in-Chief, *Neurocomputing* (Elsevier)
+The Editor-in-Chief
+*Neurocomputing* (Elsevier)
 
-Dear Editor,
+Dear Editor-in-Chief,
 
-I submit the manuscript "A Dose-Response Evaluation of Explanation Metrics under Controlled
-Shortcut Reliance in CNN Image Classifiers" for consideration as a Regular article in *Neurocomputing*.
+I submit the manuscript "A Dose-Response Evaluation of Explanation Metrics under Controlled Shortcut Reliance in CNN Image Classifiers" for consideration as a Regular article in *Neurocomputing*.
 
-**What the paper does.** Deletion and insertion metrics decide which explanations of an image
-classifier are called faithful, but they are rarely tested against a known model reliance. I train
-293 CNNs in which a signed training dose sets how strongly the model relies on an injected,
-class-coded shortcut, measure that reliance on held-out conflicting images with a chance correction,
-and score fixed oracle explanations with four metrics. The data are Oxford-IIIT Pet (with object
-masks), CIFAR-10, MNIST and PneumoniaMNIST. The metrics respond to reliance but are not calibrated
-to it: black and blur deletion prefer the shortcut map for many models that barely use the shortcut,
-and the verdicts depend on the size and form of the explanations compared.
+Deletion and insertion metrics decide which explanations of neural image classifiers are called faithful, but they are rarely tested against a known model reliance. I trained 293 convolutional neural networks in which a signed training dose sets the measured, chance-corrected reliance on an injected shortcut, on Oxford-IIIT Pet, CIFAR-10, MNIST and PneumoniaMNIST, and scored fixed oracle explanations with four metrics. The metrics respond to reliance but are not calibrated to it: black and blur deletion prefer the shortcut explanation for most models that barely use the shortcut, and the verdicts depend on the size and form of the explanations compared. The study gives a controlled, pre-registered test bed for the faithfulness metrics used to explain trained neural networks; it is an empirical study with a new protocol, not a combination of existing algorithms.
 
-**Pre-registration.** The Pet predictions were committed before any Pet model was trained.
-Further predictions are pre-registered and time-stamped on Zenodo:
+The predictions were pre-registered, and the amendments and their completion notes are time-stamped on Zenodo as versions 1 to 4 of one record (https://doi.org/10.5281/zenodo.24285532, https://doi.org/10.5281/zenodo.24333540, https://doi.org/10.5281/zenodo.24416017 and https://doi.org/10.5281/zenodo.24495658; concept DOI https://doi.org/10.5281/zenodo.24285531). Ten of the thirteen pre-registered predictions held, and the manuscript reports the three that did not. The code, per-model results and trained checkpoints are archived at https://doi.org/10.5281/zenodo.24551101.
 
-- version 1, amendment A2 with predictions P5–P9 (SD1 pretrained network and SD2 gap-filling doses):
-  https://doi.org/10.5281/zenodo.24285532
-- version 2, completion notes with the final SD1 and SD2 doses:
-  https://doi.org/10.5281/zenodo.24333540
-- version 3, amendment A3 with predictions P10–P13 (exact ROAD and a watermark shortcut), uploaded
-  before any SD3 or SD4 model or score existed: https://doi.org/10.5281/zenodo.24416017
-
-- version 4, completion note A3-C1 with the SD4 pilot outcome, the final SD4 doses and the ROAD
-  timing, uploaded before any confirmatory SD4 model was trained:
-  https://doi.org/10.5281/zenodo.24495658
-
-The concept DOI of the record is https://doi.org/10.5281/zenodo.24285531. The manuscript reports the
-outcome of every registered prediction, including the ones that failed. Of the four A3 predictions,
-three held and one was refuted. Exact ROAD ranked the object map above random pixels more often than
-black deletion in all four natural-image settings (P10), and it over-detected the shortcut slightly
-less often on Pet (9 against 10 of 14 low-reliance models, P11). On the watermark shortcut the four
-metrics tracked reliance (Spearman ρ 0.82–0.90, P12), but blur deletion over-detected the watermark
-for only 2 of 9 low-reliance models, so P13 was refuted.
-
-**Why *Neurocomputing*.** The paper is about neural networks: it studies how the faithfulness metrics used to
-explain trained CNN image classifiers respond to controlled shortcut reliance in 293 trained networks, and it
-gives a controlled test bed for these metrics. It is an empirical study with a new, pre-registered protocol and
-not a combination of existing algorithms.
-
-**Authorship and declarations.** The manuscript has a single author, Md Junaid Faizan Shaikh (Khaja
-Bandanawaz University; ORCID 0009-0002-6565-1835). It is not under consideration elsewhere
-and the data, code and checkpoints are archived on Zenodo
-(https://doi.org/10.5281/zenodo.24551101). Competing interests: the author declares that he has no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper. Funding: This research did not receive any specific grant from funding agencies in the public, commercial, or not-for-profit sectors. Use of AI tools in preparing the manuscript is declared in the
-manuscript as the journal's policy requires.
-
-**Keywords:** Explainable AI; Faithfulness metrics; Perturbation metrics; Shortcut learning; Meta-evaluation;
-Pre-registration (the same list as in the manuscript).
+The manuscript is original, has not been published before and is not under consideration for publication elsewhere. I am its sole author and I approve its submission. The author declares that he has no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper. This research did not receive any specific grant from funding agencies in the public, commercial, or not-for-profit sectors. The use of generative AI and AI-assisted tools in preparing the manuscript is declared in the manuscript, as the journal's policy requires.
 
 Sincerely,
 
 Md Junaid Faizan Shaikh
 Department of Computer Science and Engineering, Khaja Bandanawaz University, Administrative Building, Khaja Bandanawaz University Campus, Rauza-i Buzurg, Kalaburagi, Karnataka 585104, India
-junaid.faizan.codes@gmail.com
-
+E-mail: junaid.faizan.codes@gmail.com · ORCID: 0009-0002-6565-1835
 The author does not have an institutional e-mail address at present and uses a personal address for correspondence.

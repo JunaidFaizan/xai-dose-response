@@ -54,7 +54,33 @@ def main():
                     "or publications, at most 100 words in total>")
     d.add_paragraph("Photograph: <attach passport-type photograph as a separate file>")
     d.save(OUT / "author_biography_TEMPLATE.docx")
-    print("wrote highlights.docx, declaration_of_competing_interests.docx, author_biography_TEMPLATE.docx")
+    cover_letter()
+    print("wrote highlights.docx, declaration_of_competing_interests.docx, author_biography_TEMPLATE.docx, "
+          "cover_letter.docx")
+
+
+def cover_letter():
+    """docs/submission/cover_letter.docx from the paragraphs of cover_letter.md below its '---' line: one page,
+    A4, 2.5 cm margins, Times New Roman 11 pt; *text* is set in italics, lines of one paragraph keep their breaks."""
+    import re
+    from docx.shared import Cm
+    text = (OUT / "cover_letter.md").read_text(encoding="utf8").split("\n---\n", 1)[1]
+    d = new_document()
+    section = d.sections[0]
+    section.page_height, section.page_width = Cm(29.7), Cm(21.0)
+    for side in ("left_margin", "right_margin", "top_margin", "bottom_margin"):
+        setattr(section, side, Cm(2.5))
+    d.styles["Normal"].font.size = Pt(11)
+    d.styles["Normal"].paragraph_format.space_after = Pt(8)
+    for block in [b for b in text.strip().split("\n\n") if b.strip()]:
+        p = d.add_paragraph()
+        for i, line in enumerate(block.strip().split("\n")):
+            if i:
+                p.add_run().add_break()
+            for k, part in enumerate(re.split(r"\*([^*]+)\*", line)):
+                if part:
+                    p.add_run(part).italic = k % 2 == 1
+    d.save(OUT / "cover_letter.docx")
 
 
 if __name__ == "__main__":

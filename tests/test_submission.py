@@ -98,24 +98,37 @@ class SubmissionBuild(unittest.TestCase):
         software and code release the guide asks for, and completes three entries (MedMNIST, Pet, Captum)."""
         sub = [re.sub(r"^\[\d+\] ", "", r) for r in references_of(PAPER / "paper_submission.docx")]
         draft = [re.sub(r"^\[\d+\] ", "", r) for r in references_of(PAPER / "paper_draft.docx")]
-        completed = ("Yang J, et al. (2023) MedMNIST", "Parkhi OM", "Kokhlikyan N")
+        # the submission uses the Elsevier numbered style: match each draft entry by first author's surname, year
+        # and the first words of the title, in the same relative order
         position = -1
         for entry in draft:
-            key = entry[:30] if entry.startswith(completed) else entry
-            hits = [i for i, s in enumerate(sub) if s.startswith(key)]
+            surname = entry.split(" ")[0]
+            year = re.search(r"\((\d{4})\)", entry).group(1)
+            title = re.sub(r"[^\w ]", " ", entry.split(") ", 1)[1]).split()[:3]
+            hits = [i for i, s in enumerate(sub) if i > position and surname in s and year in s
+                    and all(w.lower() in s.lower() for w in title)]
             self.assertTrue(hits, entry[:60])
-            self.assertGreater(hits[0], position, entry[:60])
             position = hits[0]
-        for needle in ("LeCun Y", "Krizhevsky A", "Paszke A", "TorchVision maintainers", "road_evaluation",
+        for needle in ("Y. LeCun", "A. Krizhevsky", "A. Paszke", "TorchVision maintainers", "road_evaluation",
                        "Data and code for"):
             self.assertTrue(any(needle in s for s in sub), needle)
+        for entry in sub:  # Elsevier style: DOIs as links, no 'Surname I (year)' author format left
+            self.assertNotRegex(entry, r"^[A-Z][\w\u00c0-\u017f-]+ [A-Z]{1,3}[,(]", entry[:60])
+            self.assertNotRegex(entry, r"(?<!https://)(?<!/)\bdoi\.org", entry[:60])
 
     def test_guide_formatting(self):
         """Elsevier guide: horizontal table rules only, no shading, British spelling, keywords, figure files."""
         d = Document(PAPER / "paper_submission.docx")
         xml = d.element.xml
-        for tag in ("<w:shd", "<w:insideV", "<w:left ", "<w:right ", "TableGrid"):
+        for tag in ("<w:shd", "<w:insideV", "TableGrid"):
             self.assertNotIn(tag, xml, tag)
+        # no vertical borders (w:left / w:right inside cell margins are allowed)
+        for borders in re.findall(r"<w:(?:tbl|tc)Borders>.*?</w:(?:tbl|tc)Borders>", xml, flags=re.S):
+            for tag in ("<w:left ", "<w:right ", "<w:start ", "<w:end "):
+                self.assertNotIn(tag, borders, tag)
+        sizes = [float(s) / 2 for s in re.findall(r'<w:sz w:val="(\d+)"/>', "".join(
+            t._tbl.xml for t in d.tables))]
+        self.assertGreaterEqual(min(sizes), 8, "table text below 8 pt")
         keywords = self.main.split("Keywords ", 1)[1].split("\n", 1)[0].split(" \u00b7 ")
         self.assertTrue(1 <= len(keywords) <= 7, keywords)
         self.assertFalse([k for k in keywords if re.search(r"\b(and|of)\b", k)], keywords)
@@ -132,8 +145,9 @@ class SubmissionBuild(unittest.TestCase):
         self.assertIn("junaid.faizan.codes@gmail.com", head)
         self.assertNotIn("Supervision", self.main)
         self.assertIn("Sole author.", self.main)
-        positions = [self.main.rfind("\n" + h + "\n") for h in ("Acknowledgements", "Declaration of generative AI and "
-                     "AI-assisted technologies in the manuscript preparation process")]
+        # the AI declaration, then the acknowledgements directly before the references
+        positions = [self.main.rfind("\n" + h + "\n") for h in ("Declaration of generative AI and "
+                     "AI-assisted technologies in the manuscript preparation process", "Acknowledgements")]
         self.assertTrue(0 < positions[0] < positions[1] < self.main.rfind("\nReferences\n"), positions)
         self.assertIn("The author thanks Dr. Raafiya Gulmaher, Assistant Professor, Department of Computer Science "
                       "and Engineering, Khaja Bandanawaz University, for serving as the guide of the author's M.Tech "
@@ -147,14 +161,15 @@ class SubmissionBuild(unittest.TestCase):
             png, pdf = folder / f"Figure_{label}.png", folder / f"Figure_{label}.pdf"
             self.assertTrue(png.exists() and pdf.exists(), label)
             self.assertTrue(pdf.read_bytes().startswith(b"%PDF"), label)
-        for label in ("1", "2", "4", "5", "6"):  # regenerated from the CSVs: vector PDF and >= 2244 px
-            self.assertGreaterEqual(Image.open(folder / f"Figure_{label}.png").width, 2244, label)
+        for label in labels:  # every figure is redrawn from the CSVs: vector PDF and a PNG of at least 2960 px
+            self.assertGreaterEqual(Image.open(folder / f"Figure_{label}.png").width, 2960, label)
+            self.assertNotIn(b"/Subtype /Image", (folder / f"Figure_{label}.pdf").read_bytes()[:400000], label)
     def test_preregistration_dois_in_main_text(self):
         for doi in ("10.5281/zenodo.24285532", "10.5281/zenodo.24333540", "10.5281/zenodo.24416017",
                     "10.5281/zenodo.24495658"):
             self.assertIn(doi, self.main)
         self.assertIn("(DOI 10.5281/zenodo.24551101)", self.main)
-        self.assertIn("Zenodo, version 1.0.0. https://doi.org/10.5281/zenodo.24551101", self.main)
+        self.assertIn("Zenodo, version 1.0.0, 2026. https://doi.org/10.5281/zenodo.24551101", self.main)
         self.assertNotIn("ZENODO_RELEASE_DOI", self.main + self.supp)
 
     def test_highlights(self):
@@ -167,7 +182,9 @@ class SubmissionBuild(unittest.TestCase):
 
     def test_abstract_within_250_words(self):
         abstract = self.main.split("Abstract ", 1)[1].split("\nKeywords", 1)[0]
-        self.assertLessEqual(len(abstract.replace("\u2013", " ").split()), 250)
+        self.assertLessEqual(len(abstract.split()), 250)  # counted as Word and the submission system count words
+        for abbreviation in ("CNN", "AUROC", "BCa", "FPR"):  # no undefined abbreviation in the abstract
+            self.assertNotIn(abbreviation, abstract)
 
 
 class SubmissionDocs(unittest.TestCase):
