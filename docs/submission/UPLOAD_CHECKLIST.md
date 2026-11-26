@@ -7,8 +7,8 @@ not. Sizes are in bytes, from the build of 2026-11-26 (`paper\build_paper.py --s
 sizes if anything changes.
 
 **Before you start:** put the date in the cover letter (the only marker left in `cover_letter.md` and
-`cover_letter.docx`), make the GitHub repository public (D19; the marker in `declarations.md`), then run
-`.venv\Scripts\python.exe paper\build_paper.py --final` after deleting those two markers. It must pass.
+`cover_letter.docx`), the GitHub repository is public since 2026-11-26 (D19 done), then run
+`.venv\Scripts\python.exe paper\build_paper.py --final` after filling in the date. It must pass.
 
 ### Step 1. Article type
 - **Regular article** (not a short communication, review or special issue).

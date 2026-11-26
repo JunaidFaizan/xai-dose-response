@@ -79,4 +79,4 @@ author (or a later step) must do it.
 - [x] `docs/submission/highlights.md` equals `paper/highlights_submission.txt`
 
 ### 13. Final read-through (author, T6.5)
-- [ ] Every number checked against the CSVs (D25); page count; make the repository public; submit
+- [ ] Every number checked against the CSVs (D25); page count; repository public (done 2026-11-26); submit

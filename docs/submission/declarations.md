@@ -29,7 +29,7 @@ images of MNIST, CIFAR-10, PneumoniaMNIST (MedMNIST) and Oxford-IIIT Pet (CC BY-
 they are available from their owners.
 
 **Code availability.** The code is in the repository `https://github.com/JunaidFaizan/xai-dose-response`
-([[AUTHOR: make the repository public before submission]]) and in the Zenodo release above. It
+(public since 2026-11-26) and in the Zenodo release above. It
 includes the training, scoring and analysis scripts and `paper/build_paper.py`, which generates every
 number of the manuscript from the result files.
 
