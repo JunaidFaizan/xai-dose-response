@@ -21,7 +21,8 @@ draft, Writing – review & editing. Sole author. The guide is acknowledged, not
 **Funding.** This research did not receive any specific grant from funding agencies in the public, commercial, or not-for-profit sectors.
 
 **Data availability.** The code, per-model result files, analysis tables and trained checkpoints are deposited in the
-Zenodo repository, DOI [[ZENODO_RELEASE_DOI]] (code: MIT licence; data, results and checkpoints: CC BY 4.0). The
+Zenodo repository, DOI 10.5281/zenodo.24551101 (https://doi.org/10.5281/zenodo.24551101; version 1.0.0,
+concept DOI 10.5281/zenodo.24551100) (code: MIT licence; data, results and checkpoints: CC BY 4.0). The
 pre-registered predictions and amendments are in the Zenodo record 10.5281/zenodo.24285531 (concept DOI; versions
 10.5281/zenodo.24285532, 10.5281/zenodo.24333540, 10.5281/zenodo.24416017 and 10.5281/zenodo.24495658). The raw
 images of MNIST, CIFAR-10, PneumoniaMNIST (MedMNIST) and Oxford-IIIT Pet (CC BY-SA 4.0) are not redistributed;

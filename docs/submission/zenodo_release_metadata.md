@@ -1,11 +1,16 @@
 # A Dose-Response Evaluation of Explanation Metrics under Controlled Shortcut Reliance in CNN Image Classifiers
 
-## Zenodo metadata draft for the research-data release (T6.3)
+## Zenodo metadata for the research-data release (T6.3)
 
-Nothing is uploaded by the agent. Create a new Zenodo record (not a new version of the pre-registration
-record), paste the fields below, upload the files named in `release/zenodo/MANIFEST.md`, publish, then send the
-DOI so that `[[ZENODO_RELEASE_DOI]]` can be replaced in the paper, `CITATION.cff`, `RELEASE_README.md` and the
-cover letter.
+**Status: uploaded and published by the author on 2026-11-26.** DOI 10.5281/zenodo.24551101
+(https://doi.org/10.5281/zenodo.24551101), version 1.0.0, resource type Dataset, licence CC BY 4.0 (code MIT inside
+the code zip), concept DOI 10.5281/zenodo.24551100. The 8 published files match the local `release/zenodo/` files
+by MD5 and size (checked through the Zenodo API on 2026-11-26): `xai-dose-response_code_0e128c4.zip`,
+`xai-dose-response_results_0e128c4.zip`, `xai-dose-response_checkpoints_part1of4.zip` to `part4of4.zip`,
+`MANIFEST.md` and `README.md`. The DOI is now in the paper, `CITATION.cff`, `RELEASE_README.md`, `declarations.md`
+and the cover letter. The archived `README.md` keeps the DOI placeholder because the DOI did not exist at upload time.
+
+The fields and steps below are kept as the record of what was entered.
 
 | Field | Value |
 |---|---|
@@ -39,4 +44,5 @@ Upload steps for the author:
 2. On zenodo.org choose New upload, add all files from `release/zenodo/` (about 6 files plus the checkpoint parts,
    far below the 100 file and 50 GB limits).
 3. Paste the fields above, check the SHA-256 values of the files against `MANIFEST.md`, publish.
-4. Send the DOI to the agent. It replaces `[[ZENODO_RELEASE_DOI]]` and the author runs `build_paper.py --final`.
+4. Send the DOI to the agent. It replaces the DOI placeholder and the author runs `build_paper.py --final`. (Done:
+   DOI 10.5281/zenodo.24551101, 2026-11-26.)

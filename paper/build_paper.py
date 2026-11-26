@@ -527,8 +527,8 @@ if SUBMISSION:
         "roadcode": "Rong Y, Leemann T, Borisov V, Kasneci G, Kasneci E (2022) road_evaluation: source code of the ROAD "
                     "benchmark for feature attribution methods. GitHub repository, revision e6b9987, MIT licence. "
                     "https://github.com/tleemann/road_evaluation",
-        "code": "Shaikh MJF (2026) Data and code for: " + TITLE + ". Zenodo [software and research data], "
-                "version 1.0.0. https://doi.org/[[ZENODO_RELEASE_DOI]]",
+        "code": "[dataset] Shaikh MJF (2026) Data and code for: " + TITLE + ". Zenodo, version 1.0.0. "
+                "https://doi.org/10.5281/zenodo.24551101",
     })
     REFERENCES["medmnist"] = ("Yang J, et al. (2023) MedMNIST v2: a large-scale lightweight benchmark for 2D and 3D "
                               "biomedical image classification. Scientific Data 10:41. "
@@ -1748,9 +1748,7 @@ class use_doc:
 # Every [[...]] marker that the submission build may still contain. They are listed, with what replaces
 # them, in docs/submission/DEFERRED.md; `--final` fails while any marker remains in the paper or in
 # docs/submission/*.md. A marker that is not declared here fails every submission build.
-DECLARED_MARKERS = {
-    "[[ZENODO_RELEASE_DOI]]",
-}
+DECLARED_MARKERS: set[str] = set()  # the Zenodo release DOI (10.5281/zenodo.24551101) replaced the last one
 
 
 def declarations():
@@ -1779,7 +1777,7 @@ def declarations():
              "or not-for-profit sectors.")
         heading("Data availability")
         para("The research data and code are deposited in the Zenodo repository " + cite("code") + " (DOI "
-             "[[ZENODO_RELEASE_DOI]]): the code, the per-model result files, the analysis tables and the trained "
+             "10.5281/zenodo.24551101): the code, the per-model result files, the analysis tables and the trained "
              "checkpoints. The code is released "
              "under the MIT licence and the data, results and checkpoints under CC BY 4.0. The pre-registered "
              "predictions and amendments are archived in the Zenodo record 10.5281/zenodo.24285531 (concept DOI). "

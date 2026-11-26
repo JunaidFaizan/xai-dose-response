@@ -50,7 +50,7 @@ not a combination of existing algorithms.
 **Authorship and declarations.** The manuscript has a single author, Md Junaid Faizan Shaikh (Khaja
 Bandanawaz University; ORCID 0009-0002-6565-1835). It is not under consideration elsewhere
 and the data, code and checkpoints are archived on Zenodo
-([[ZENODO_RELEASE_DOI]]). Competing interests: the author declares that he has no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper. Funding: This research did not receive any specific grant from funding agencies in the public, commercial, or not-for-profit sectors. Use of AI tools in preparing the manuscript is declared in the
+(https://doi.org/10.5281/zenodo.24551101). Competing interests: the author declares that he has no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper. Funding: This research did not receive any specific grant from funding agencies in the public, commercial, or not-for-profit sectors. Use of AI tools in preparing the manuscript is declared in the
 manuscript as the journal's policy requires.
 
 **Keywords:** Explainable AI; Faithfulness metrics; Perturbation metrics; Shortcut learning; Meta-evaluation;

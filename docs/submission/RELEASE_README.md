@@ -3,7 +3,10 @@
 ## Data and code release (Zenodo)
 
 Author: Md Junaid Faizan Shaikh, Khaja Bandanawaz University, ORCID 0009-0002-6565-1835.
-Release DOI: [[ZENODO_RELEASE_DOI]]. Pre-registration record (predictions P1 to P13 and amendments A1 to A3):
+Release DOI: 10.5281/zenodo.24551101 (https://doi.org/10.5281/zenodo.24551101; version 1.0.0, published
+2026-11-26; concept DOI 10.5281/zenodo.24551100, which always resolves to the latest version). The copy of this
+README.md archived in the Zenodo record shows a placeholder instead of the release DOI, because Zenodo assigned the
+DOI only at publication; this repository copy carries the DOI. Pre-registration record (predictions P1 to P13 and amendments A1 to A3):
 concept DOI 10.5281/zenodo.24285531; versions 10.5281/zenodo.24285532, 10.5281/zenodo.24333540,
 10.5281/zenodo.24416017 and 10.5281/zenodo.24495658.
 

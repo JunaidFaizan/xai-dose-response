@@ -63,9 +63,9 @@ class SubmissionBuild(unittest.TestCase):
         deferred = (SUBMISSION_DOCS / "DEFERRED.md").read_text(encoding="utf8")
         for marker in declared:
             self.assertIn(marker, deferred, marker)
-        # T5.1 replaced every SD3/SD4 marker; only author and Zenodo-release markers remain
-        self.assertFalse([m for m in found if m.startswith("[[SD")], found)
-        self.assertTrue(all(m.startswith("[[AUTHOR:") or m == "[[ZENODO_RELEASE_DOI]]" for m in found), found)
+        # T5.1 replaced every SD3/SD4 marker and the Zenodo release DOI replaced the last one: none remains
+        self.assertEqual(found, set())
+        self.assertEqual(declared, set())
 
     def test_final_fails_while_markers_remain_and_writes_nothing(self):
         before = (sha(PAPER / "paper_submission.docx"), sha(PAPER / "supplementary_submission.docx"))
@@ -153,7 +153,9 @@ class SubmissionBuild(unittest.TestCase):
         for doi in ("10.5281/zenodo.24285532", "10.5281/zenodo.24333540", "10.5281/zenodo.24416017",
                     "10.5281/zenodo.24495658"):
             self.assertIn(doi, self.main)
-        self.assertIn("[[ZENODO_RELEASE_DOI]]", self.main)
+        self.assertIn("(DOI 10.5281/zenodo.24551101)", self.main)
+        self.assertIn("Zenodo, version 1.0.0. https://doi.org/10.5281/zenodo.24551101", self.main)
+        self.assertNotIn("ZENODO_RELEASE_DOI", self.main + self.supp)
 
     def test_highlights(self):
         generated = (PAPER / "highlights_submission.txt").read_text(encoding="utf8").strip().split("\n")

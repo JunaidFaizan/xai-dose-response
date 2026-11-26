@@ -10,8 +10,16 @@ authors:
     affiliation: "Khaja Bandanawaz University"
 license: MIT
 version: "1.0.0"
-doi: "[[ZENODO_RELEASE_DOI]]"
+doi: "10.5281/zenodo.24551101"
+date-released: "2026-11-26"
 repository-code: "https://github.com/JunaidFaizan/xai-dose-response"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.24551101"
+    description: "Zenodo release 1.0.0 (code, per-model results, analysis tables and checkpoints)"
+  - type: doi
+    value: "10.5281/zenodo.24551100"
+    description: "Zenodo concept DOI of the release (all versions)"
 keywords:
   - Explainable AI
   - Faithfulness metrics

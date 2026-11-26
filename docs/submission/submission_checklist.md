@@ -51,7 +51,7 @@ author (or a later step) must do it.
 
 ### 8. Research data (Option C)
 - [x] Data availability section names what is deposited, the licences, the dataset sources, and that raw images are not redistributed
-- [ ] Zenodo release uploaded and DOI inserted (`[[ZENODO_RELEASE_DOI]]`, D13); package and fields: `release/zenodo/`, `docs/submission/zenodo_release_metadata.md`
+- [x] Zenodo release uploaded (2026-11-26, version 1.0.0) and DOI 10.5281/zenodo.24551101 inserted in the paper, `CITATION.cff`, the cover letter, `declarations.md` and `RELEASE_README.md` (D13, D36); concept DOI 10.5281/zenodo.24551100
 - [ ] GitHub repository public (D19)
 
 ### 9. Author information
@@ -63,6 +63,7 @@ author (or a later step) must do it.
 - [x] Pre-registration DOIs named in the letter
 
 ### 11. Before pressing submit (journal checklist)
+- [ ] Upload the files and fill the form as listed in `UPLOAD_CHECKLIST.md` (exact files, sizes and answers per step)
 - [ ] Corresponding author named with full contact details; all files uploaded (manuscript, highlights, figures, supplement, cover letter, declaration, vitae)
 - [ ] Permissions: no third-party figures; dataset licences stated
 - [ ] Not under consideration elsewhere; the thesis or institution check done (University approval, if required, before submission); the author approves the final version and, if anyone else is to be named, notifies them (sole author: none)
@@ -72,7 +73,7 @@ author (or a later step) must do it.
 
 ### 12. Build (agent)
 - [x] `.venv\Scripts\python.exe paper\build_paper.py --submission` passes its checks
-- [ ] `.venv\Scripts\python.exe paper\build_paper.py --final` passes (fails now only on the markers listed in `DEFERRED.md` section 1)
+- [ ] `.venv\Scripts\python.exe paper\build_paper.py --final` passes (fails now only on the two author markers: the date of submission in `cover_letter.md` and making the repository public in `declarations.md`; the paper has none)
 - [x] `.venv\Scripts\python.exe -m unittest discover -s tests -t .` passes
 - [x] Title is exactly "A Dose-Response Evaluation of Explanation Metrics under Controlled Shortcut Reliance in CNN Image Classifiers" in every file
 - [x] `docs/submission/highlights.md` equals `paper/highlights_submission.txt`
