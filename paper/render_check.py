@@ -87,7 +87,9 @@ def check(path, out):
         # values split over two lines (an interval or an arrow at a line end); prose can match too: inspect
         for line in page.get_text("text").splitlines():
             s = line.strip()
-            if s.endswith(("\u2192", "[", "(")) or s.count("[") > s.count("]"):
+            if s.endswith(("\u2192", "[", "(", "incl.")) or s.count("[") > s.count("]") \
+                    or s.startswith((")", "]")) or s.endswith(("(pBH", "(pHolm", "pBH", "pHolm")) \
+                    or (len(s) <= 30 and s.count("(") > s.count(")")):
                 findings.append(f"p{i}: split value? {s[-60:]!r}")
     return len(pdf), findings
 

@@ -1244,6 +1244,9 @@ def keep_values_together(value):
     value = re.sub(r"(?<=[\d)]) / (?=[\d\u2212])", NBSP + "/" + NBSP, value)
     value = re.sub(r"(?<=[\d\u2212]) (?=\(\d)", NBSP, value)
     value = re.sub(r"(?<=\d) to (?=[\d\u2212])", NBSP + "to" + NBSP, value)
+    value = re.sub(r"(p_bh|p_holm) (?=[\d<>=])", r"\1" + NBSP, value)  # '(p_bh 0.909)'
+    value = re.sub(r"(?<=\d) (?=\(p_)", NBSP, value)  # '-0.33 (p_bh ...)'
+    value = re.sub(r"incl\. (\d+) (A\d)", "incl." + NBSP + r"\1" + NBSP + r"\2", value)  # 'incl. 3 A2'
     return value
 
 
@@ -2118,7 +2121,8 @@ def table_supp_road():
         "images (number per model in brackets)",
         ["Setting (images)", "Metric", f"\u03c1 with {RC} [two-level CI]", "Preference, lowest \u2192 highest dose",
          "FPR (k/n)", "Margin FPR (k/n)", "R\u2013O, lowest dose", f"Switch, {RC} %"],
-        body, widths=[2.3, 2.3, 2.6, 2.0, 1.5, 1.6, 1.3, 2.4], size=6.5, supp=True, left_cols=2,
+        body, widths=S([2.3, 2.3, 2.6, 2.0, 1.5, 1.6, 1.3, 2.4], [1.8, 2.3, 2.6, 1.8, 2.0, 2.0, 1.1, 2.4]),
+        size=6.5, supp=True, left_cols=2,
         note="R\u2013O: preference for the random map over the full object map. The four "
              "existing metrics are recomputed on the same first N images as ROAD, so their values can differ from "
              "the main tables (100 images). \u2020: not significant after Benjamini\u2013Hochberg within the "
